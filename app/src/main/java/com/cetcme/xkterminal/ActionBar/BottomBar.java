@@ -68,10 +68,10 @@ public class BottomBar extends RelativeLayout implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.button_receive:
-                mainActivity.initMessageFragment("receive");
+                mainActivity.initMessageFragment("send");
                 break;
             case R.id.button_send:
-                mainActivity.initMessageFragment("send");
+                mainActivity.initMessageFragment("receive");
                 break;
             case R.id.button_sign:
                 mainActivity.initLogFragment("sign");

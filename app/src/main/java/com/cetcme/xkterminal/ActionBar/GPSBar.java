@@ -11,7 +11,11 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.R;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -21,6 +25,8 @@ import java.util.ArrayList;
 
 public class GPSBar extends RelativeLayout {
 
+    public MainActivity mainActivity;
+
     private TextView textView_latitude;
     private TextView textView_longitude;
     private TextView textView_speed;
@@ -28,6 +34,8 @@ public class GPSBar extends RelativeLayout {
     private TextView textView_location_status;
     private TextView textView_message;
     private TextView textView_time;
+
+    private TextView textView_message_number;
 
     private ArrayList<TextView> textViews = new ArrayList<>();
 
@@ -40,7 +48,7 @@ public class GPSBar extends RelativeLayout {
         View view = LayoutInflater.from(context).inflate(R.layout.bar_gps_view, this, true);
 
         bindView(view);
-        yoyo();
+        setData();
         new TimeHandler().start();
     }
 
@@ -52,6 +60,22 @@ public class GPSBar extends RelativeLayout {
         textView_location_status    = view.findViewById(R.id.textView_location_status);
         textView_message            = view.findViewById(R.id.textView_message);
         textView_time               = view.findViewById(R.id.textView_time);
+
+        textView_message_number     = view.findViewById(R.id.textView_message_number);
+
+        textView_message.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mainActivity.initMessageFragment("receive");
+            }
+        });
+
+        textView_message_number.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mainActivity.initMessageFragment("receive");
+            }
+        });
 
         textViews.add(textView_latitude);
         textViews.add(textView_longitude);
@@ -68,9 +92,45 @@ public class GPSBar extends RelativeLayout {
         }
     }
 
-    private void yoyo() {
-        textView_location_status.setTextColor(0xFFD0021B);
-        textView_location_status.setText("未定位");
+    private void setData() {
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("latitude", "N 30°46.225′");
+            jsonObject.put("longitude", "E 120°39.510′");
+            jsonObject.put("speed", "10.3Kt");
+            jsonObject.put("heading", "85°");
+            jsonObject.put("gps", true);
+            jsonObject.put("messageNumber", 3);
+
+            textView_latitude.setText(jsonObject.getString("latitude"));
+            textView_longitude.setText(jsonObject.getString("longitude"));
+            textView_speed.setText(jsonObject.getString("speed"));
+            textView_heading.setText(jsonObject.getString("heading"));
+
+            if (jsonObject.getBoolean("gps")) {
+                textView_location_status.setTextColor(0xFF2657EC);
+                textView_location_status.setText("已定位");
+            } else {
+                textView_location_status.setTextColor(0xFFD0021B);
+                textView_location_status.setText("未定位");
+            }
+
+            int messageNumber = jsonObject.getInt("messageNumber");
+            if (messageNumber != 0) {
+                textView_message.setText("短信");
+                textView_message_number.setText(messageNumber + "");
+                textView_message_number.setVisibility(VISIBLE);
+            } else {
+                textView_message.setText("无短信");
+                textView_message_number.setText("-");
+                textView_message_number.setVisibility(INVISIBLE);
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 
     class TimeHandler extends Thread{

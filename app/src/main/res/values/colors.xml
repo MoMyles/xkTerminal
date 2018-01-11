@@ -3,4 +3,11 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <color name="has_gps">#2657ec</color>
+    <color name="no_gps">#D0021B</color>
+
+    <color name="QHTitleColor">#284cb9</color>
+
+    <color name="border_clo">#ccc</color>
 </resources>

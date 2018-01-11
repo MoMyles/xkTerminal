@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.R;
@@ -24,10 +23,10 @@ public class MessageBar extends RelativeLayout implements View.OnClickListener {
     private Button button_new;
     private Button button_detail;
     private Button button_relay;
-    private Button button_pre;
+    private Button button_prev;
     private Button button_next;
     private Button button_back;
-    
+
     private ArrayList<Button> buttons = new ArrayList<>();
 
     public MessageBar(Context context) {
@@ -46,14 +45,14 @@ public class MessageBar extends RelativeLayout implements View.OnClickListener {
         button_new      = view.findViewById(R.id.button_new);
         button_detail   = view.findViewById(R.id.button_detail);
         button_relay    = view.findViewById(R.id.button_relay);
-        button_pre      = view.findViewById(R.id.button_prev);
+        button_prev     = view.findViewById(R.id.button_prev);
         button_next     = view.findViewById(R.id.button_next);
         button_back     = view.findViewById(R.id.button_back);
 
         buttons.add(button_new);
         buttons.add(button_detail);
         buttons.add(button_relay);
-        buttons.add(button_pre);
+        buttons.add(button_prev);
         buttons.add(button_next);
         buttons.add(button_back);
 
@@ -69,13 +68,13 @@ public class MessageBar extends RelativeLayout implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.button_new:
-                Toast.makeText(getContext(), "button_new", Toast.LENGTH_SHORT).show();
+                mainActivity.initNewFragment("new");
                 break;
             case R.id.button_detail:
-                Toast.makeText(getContext(), "button_detail", Toast.LENGTH_SHORT).show();
+                mainActivity.initNewFragment("detail");
                 break;
             case R.id.button_relay:
-                Toast.makeText(getContext(), "button_relay", Toast.LENGTH_SHORT).show();
+                mainActivity.initNewFragment("relay");
                 break;
             case R.id.button_prev:
                 mainActivity.prevPage();
@@ -90,4 +89,35 @@ public class MessageBar extends RelativeLayout implements View.OnClickListener {
                 break;
         }
     }
+
+    public void setNextButtonEnable(boolean enable) {
+        button_next.setEnabled(enable);
+        if (enable) {
+            button_next.setTextColor(0xFF000000);
+        } else {
+            button_next.setTextColor(0xFFA8A8A8);
+        }
+    }
+
+    public void setPrevButtonEnable(boolean enable) {
+        button_prev.setEnabled(enable);
+        if (enable) {
+            button_prev.setTextColor(0xFF000000);
+        } else {
+            button_prev.setTextColor(0xFFA8A8A8);
+        }
+    }
+
+    public void setDetailAndRelayButtonEnable(boolean enable) {
+        button_detail.setEnabled(enable);
+        button_relay.setEnabled(enable);
+        if (enable) {
+            button_detail.setTextColor(0xFF000000);
+            button_relay.setTextColor(0xFF000000);
+        } else {
+            button_detail.setTextColor(0xFFA8A8A8);
+            button_relay.setTextColor(0xFFA8A8A8);
+        }
+    }
+
 }

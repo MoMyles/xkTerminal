@@ -10,8 +10,8 @@
         android:layout_height="match_parent"
         android:layout_marginLeft="10dp"
         android:layout_marginStart="10dp"
-        android:text="N 30°46.225′"
-        android:textSize="30sp"
+        android:text="---"
+        android:textSize="22sp"
         android:gravity="center_vertical" />
 
     <TextView
@@ -24,8 +24,8 @@
         android:layout_toEndOf="@+id/textView_latitude"
         android:layout_toRightOf="@+id/textView_latitude"
         android:gravity="center_vertical"
-        android:text="E 120°39.510′"
-        android:textSize="30sp" />
+        android:text="---"
+        android:textSize="22sp" />
 
     <TextView
         android:id="@+id/textView_speed"
@@ -37,8 +37,8 @@
         android:layout_toEndOf="@+id/textView_longitude"
         android:layout_toRightOf="@+id/textView_longitude"
         android:gravity="center_vertical"
-        android:text="10.3Kt"
-        android:textSize="30sp" />
+        android:text="---"
+        android:textSize="22sp" />
 
     <TextView
         android:id="@+id/textView_heading"
@@ -50,8 +50,8 @@
         android:layout_toEndOf="@+id/textView_speed"
         android:layout_toRightOf="@+id/textView_speed"
         android:gravity="center_vertical"
-        android:text="85°"
-        android:textSize="30sp" />
+        android:text="---"
+        android:textSize="22sp" />
 
     <TextView
         android:id="@+id/textView_location_status"
@@ -64,20 +64,35 @@
         android:layout_toStartOf="@+id/textView_message"
         android:gravity="center_vertical"
         android:text="已定位"
-        android:textSize="30sp" />
+        android:textSize="22sp" />
 
     <TextView
         android:id="@+id/textView_message"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:layout_marginRight="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_toLeftOf="@+id/textView_time"
-        android:layout_toStartOf="@+id/textView_time"
+        android:layout_marginRight="-10dp"
+        android:layout_toLeftOf="@+id/textView_message_number"
+        android:layout_toStartOf="@+id/textView_message_number"
         android:gravity="center_vertical"
         android:text="无短信"
-        android:textSize="30sp" />
+        android:textSize="22sp" />
+
+    <TextView
+        android:id="@+id/textView_message_number"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_toLeftOf="@+id/textView_time"
+        android:layout_toStartOf="@+id/textView_time"
+        android:gravity="center"
+        android:text="-"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/message_num_bg"
+        android:textSize="14sp" />
 
     <TextView
         android:id="@+id/textView_time"
@@ -90,7 +105,7 @@
         android:layout_alignParentTop="true"
         android:gravity="center_vertical"
         android:text="00:00:00"
-        android:textSize="30sp" />
+        android:textSize="22sp" />
 
     <TextView
         android:layout_width="match_parent"

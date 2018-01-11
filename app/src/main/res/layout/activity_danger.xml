@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="500dp"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:background="@drawable/dialog_bg">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="10dp"
+        android:text="遇险类型："
+        android:textColor="@color/red"
+        android:textSize="24dp"
+        android:textStyle="bold"
+        android:gravity="left"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/border_clo"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_marginLeft="80dp"
+        android:layout_marginRight="50dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_margin="5dp">
+
+            <CheckBox
+                android:id="@+id/checkBox1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/dangerType_1"
+                android:textColor="@color/red"
+                android:textSize="16sp"
+                android:button="@drawable/checkbox_selector"
+                android:textStyle="bold" />
+
+            <CheckBox
+                android:id="@+id/checkBox2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/red"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:button="@drawable/checkbox_selector"
+                android:text="@string/dangerType_2" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_margin="5dp">
+            <CheckBox
+                android:id="@+id/checkBox3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/red"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:button="@drawable/checkbox_selector"
+                android:text="@string/dangerType_3" />
+
+            <CheckBox
+                android:id="@+id/checkBox4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/red"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:button="@drawable/checkbox_selector"
+                android:text="@string/dangerType_4" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_margin="5dp">
+            <CheckBox
+                android:id="@+id/checkBox5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/red"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:button="@drawable/checkbox_selector"
+                android:text="@string/dangerType_5" />
+
+            <CheckBox
+                android:id="@+id/checkBox6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/red"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:button="@drawable/checkbox_selector"
+                android:text="@string/dangerType_6" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_margin="5dp">
+            <CheckBox
+                android:id="@+id/checkBox7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/red"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:button="@drawable/checkbox_selector"
+                android:text="@string/dangerType_7" />
+
+            <CheckBox
+                android:id="@+id/checkBox8"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/red"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:button="@drawable/checkbox_selector"
+                android:text="@string/dangerType_8" />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/border_clo"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="10dp"
+        android:gravity="right">
+
+        <Button
+            android:id="@+id/confirm_button"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:text="确认"
+            android:textSize="16sp"
+            android:textColor="@color/red"
+            android:textStyle="bold"
+            android:background="@drawable/button_bg_selector"/>
+
+
+    </LinearLayout>
+
+
+
+</LinearLayout>

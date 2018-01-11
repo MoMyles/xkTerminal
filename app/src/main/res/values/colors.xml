@@ -7,7 +7,7 @@
     <color name="has_gps">#2657ec</color>
     <color name="no_gps">#D0021B</color>
 
-    <color name="QHTitleColor">#284cb9</color>
+    <color name="QHTitleColor">#333c58</color>
 
     <color name="border_clo">#ccc</color>
 </resources>

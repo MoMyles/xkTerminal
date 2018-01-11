@@ -76,30 +76,29 @@ public class MainActivity extends AppCompatActivity {
         bindView();
         initMainFragment();
 
-
-        // 模拟弹窗
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                Intent intent = new Intent(MainActivity.this, IDCardActivity.class);
-//                intent.putExtra("name", "李四");
-//                intent.putExtra("sex", "男");
-//                intent.putExtra("birthday", "1994年12月12日");
-//                intent.putExtra("address", "浙江省嘉兴市南湖区xx小区xx幢xx室");
-//                intent.putExtra("idCard", "330199412120111");
-//                startActivity(intent);
-//            }
-//        },1000);
-
         // 模拟弹窗
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent intent = new Intent(MainActivity.this, DangerActivity.class);
-                startActivity(intent);
+
             }
         },1000);
 
+    }
+
+    private void showIDCardDialog() {
+        Intent intent = new Intent(MainActivity.this, IDCardActivity.class);
+        intent.putExtra("name", "李四");
+        intent.putExtra("sex", "男");
+        intent.putExtra("birthday", "1994年12月12日");
+        intent.putExtra("address", "浙江省嘉兴市南湖区xx小区xx幢xx室");
+        intent.putExtra("idCard", "330199412120111");
+        startActivity(intent);
+    }
+
+    private void showDangerDialog() {
+        Intent intent = new Intent(MainActivity.this, DangerActivity.class);
+        startActivity(intent);
     }
 
     public void onBackPressed() {

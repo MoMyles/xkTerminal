@@ -1,5 +1,6 @@
 package com.cetcme.xkterminal.ActionBar;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
@@ -12,6 +13,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.cetcme.xkterminal.MainActivity;
+import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.R;
 
 import org.json.JSONException;
@@ -100,7 +102,7 @@ public class GPSBar extends RelativeLayout {
             jsonObject.put("longitude", "E 120°39.510′");
             jsonObject.put("speed", "10.3Kt");
             jsonObject.put("heading", "85°");
-            jsonObject.put("gps", true);
+            jsonObject.put("gps", false);
             jsonObject.put("messageNumber", 3);
 
             textView_latitude.setText(jsonObject.getString("latitude"));
@@ -111,9 +113,12 @@ public class GPSBar extends RelativeLayout {
             if (jsonObject.getBoolean("gps")) {
                 textView_location_status.setTextColor(0xFF2657EC);
                 textView_location_status.setText("已定位");
+                noGps = false;
             } else {
                 textView_location_status.setTextColor(0xFFD0021B);
                 textView_location_status.setText("未定位");
+                noGps = true;
+                new HalfTimeHandler().start();
             }
 
             int messageNumber = jsonObject.getInt("messageNumber");
@@ -131,6 +136,26 @@ public class GPSBar extends RelativeLayout {
             e.printStackTrace();
         }
 
+    }
+
+    private boolean noGps = true;
+
+    class HalfTimeHandler extends Thread{
+        @Override
+        public void run() {
+            super.run();
+            while (noGps && Constant.NO_GPS_FLASH_TIME != 0) {
+                try {
+                    Message message = new Message();
+                    message.what = 3;
+                    handler.sendMessage(message);
+                    Thread.sleep(Constant.NO_GPS_FLASH_TIME);
+                }
+                catch (Exception e) {
+
+                }
+            }
+        }
     }
 
     class TimeHandler extends Thread{
@@ -151,6 +176,8 @@ public class GPSBar extends RelativeLayout {
         }
     }
 
+
+    @SuppressLint("HandlerLeak")
     private Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -160,6 +187,9 @@ public class GPSBar extends RelativeLayout {
                     long sysTime = System.currentTimeMillis();
                     CharSequence sysTimeStr = DateFormat.format("HH:mm:ss", sysTime);
                     textView_time.setText(sysTimeStr); //更新时间
+                    break;
+                case 3:
+                    textView_location_status.setVisibility(textView_location_status.getVisibility() == VISIBLE ? INVISIBLE : VISIBLE);
                     break;
                 default:
                     break;

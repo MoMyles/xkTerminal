@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.cetcme.xkterminal.ActionBar.TitleBar;
 import com.cetcme.xkterminal.MainActivity;
+import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.R;
 
 /**
@@ -38,6 +39,7 @@ public class MessageNewFragment extends Fragment{
     private EditText content_editText;
 
     private TextView text_count_textView;
+    private TextView last_send_textView;
     private TextView sender_or_receiver_textView;
 
     public MessageNewFragment(String tg, String receive, String content, String time) {
@@ -57,27 +59,31 @@ public class MessageNewFragment extends Fragment{
         content_editText = view.findViewById(R.id.content_editText);
 
         text_count_textView = view.findViewById(R.id.text_count_textView);
+        last_send_textView = view.findViewById(R.id.last_send_textView);
+
         sender_or_receiver_textView = view.findViewById(R.id.sender_or_receiver_textView);
 
         if (tg.equals("new")) {
             titleBar.setTitle("新建短信");
+            text_count_textView.setText("剩余短信字数：" + (Constant.MESSAGE_CONTENT_MAX_LENGTH - content.length()));
         }
         if (tg.equals("relay")) {
             titleBar.setTitle("转发短信");
 //            receiver_editText.setText(receive);
             content_editText.setText(content);
-            text_count_textView.setText(time + "  短信字数：" + content.length());
+            text_count_textView.setText("剩余短信字数：" + (Constant.MESSAGE_CONTENT_MAX_LENGTH - content.length()));
         }
 
         if (tg.equals("detail")) {
             titleBar.setTitle("短信详情");
             receiver_editText.setText(receive);
             content_editText.setText(content);
-            text_count_textView.setText(time);
+            text_count_textView.setText("");
             receiver_editText.setEnabled(false);
             receiver_editText.setTextColor(0xFF000000);
             content_editText.setEnabled(false);
             content_editText.setTextColor(0xFF000000);
+            last_send_textView.setText(time);
             if (mainActivity.messageListStatus.equals("receive")) sender_or_receiver_textView.setText("发件人：");
         }
 
@@ -95,10 +101,10 @@ public class MessageNewFragment extends Fragment{
             @Override
             public void afterTextChanged(Editable editable) {
                 if (tg.equals("new")) {
-                    text_count_textView.setText("短信字数：" + content_editText.getText().length());
+                    text_count_textView.setText("剩余短信字数：" + (Constant.MESSAGE_CONTENT_MAX_LENGTH - content_editText.getText().length()));
                 }
                 if (tg.equals("relay")) {
-                    text_count_textView.setText(time + "  短信字数：" + content_editText.getText().length());
+                    text_count_textView.setText("剩余短信字数：" + (Constant.MESSAGE_CONTENT_MAX_LENGTH - content_editText.getText().length()));
                 }
             }
         });

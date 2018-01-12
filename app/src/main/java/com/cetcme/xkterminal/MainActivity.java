@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.ActionBar.BackBar;
@@ -25,12 +24,16 @@ import com.cetcme.xkterminal.Fragment.MessageFragment;
 import com.cetcme.xkterminal.Fragment.MessageNewFragment;
 import com.cetcme.xkterminal.Fragment.SettingFragment;
 import com.cetcme.xkterminal.MyClass.Constant;
+import com.cetcme.xkterminal.MyClass.DateUtil;
+import com.cetcme.xkterminal.RealmModels.Message;
 import com.qiuhong.qhlibrary.Dialog.QHDialog;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import io.realm.Realm;
+import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -59,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
     //back toast
     private Toast backToast;
 
+    private Realm realm;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         //隐藏动作条
         getSupportActionBar().hide();
 
+        realm = ((MyApplication) getApplication()).realm;
 
         bindView();
         initMainFragment();
@@ -84,7 +90,40 @@ public class MainActivity extends AppCompatActivity {
             }
         },1000);
 
+        //模拟添加短信
+//        addMessages();
+
+//        System.out.println(getMessages());
+
     }
+
+    private void addMessages() {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                Message message = realm.createObject(Message.class);
+                message.setSender("654321");
+                message.setReceiver("123456");
+                message.setContent("duan xin nei rong");
+                Date date = null;
+                message.setSend_time(DateUtil.String2Date("2018-01-01 13:11:23"));
+                message.setRead(false);
+
+
+                Message message1 = realm.createObject(Message.class);
+                message1.setSender("123456");
+                message1.setReceiver("654321");
+                message1.setContent("duan xin nei rong");
+                message1.setSend_time(DateUtil.String2Date("2018-01-11 13:11:23"));
+                message1.setRead(false);
+            }
+        });
+    }
+
+    private RealmResults<Message> getMessages() {
+        return realm.where(Message.class).equalTo("receiver", "123456").findAll();
+    }
+
 
     private void showIDCardDialog() {
         Intent intent = new Intent(MainActivity.this, IDCardActivity.class);

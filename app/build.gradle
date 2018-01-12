@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'realm-android'
 
 android {
     compileSdkVersion 26
@@ -30,4 +31,8 @@ dependencies {
     compile 'com.daimajia.androidanimations:library:2.3@aar'
 
     compile 'com.github.qiuh1016:qhLibrary:1.2.0'
+}
+
+realm {
+    syncEnabled = true
 }

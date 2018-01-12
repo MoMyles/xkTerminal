@@ -17,13 +17,20 @@ import android.widget.Toast;
 
 import com.cetcme.xkterminal.ActionBar.TitleBar;
 import com.cetcme.xkterminal.MainActivity;
+import com.cetcme.xkterminal.MyApplication;
+import com.cetcme.xkterminal.MyClass.DateUtil;
 import com.cetcme.xkterminal.MyClass.DensityUtil;
 import com.cetcme.xkterminal.R;
+import com.cetcme.xkterminal.RealmModels.Message;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import io.realm.Realm;
+import io.realm.RealmResults;
 
 /**
  * Created by qiuhong on 10/01/2018.
@@ -45,7 +52,8 @@ public class MessageFragment extends Fragment{
     private int pageIndex = 0;
     private int totalPage = 1;
 
-    private LinearLayout messageListLayout;
+    private Realm realm;
+    private String status;
 
     public MessageFragment(String tg) {
         this.tg = tg;
@@ -54,6 +62,8 @@ public class MessageFragment extends Fragment{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        realm = ((MyApplication) getActivity().getApplication()).realm;
+
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_message,container,false);
 
         // 通过WindowManager获取
@@ -69,16 +79,18 @@ public class MessageFragment extends Fragment{
         if (tg.equals("send")) {
             titleBar.setTitle("发件箱");
             titleTextView.setText("收件人");
+            status = "sender";
         }
         if (tg.equals("receive")) {
             titleBar.setTitle("收件箱");
             titleTextView.setText("发件人");
+            status = "receiver";
         }
 
         //设置listView
         listView = view.findViewById(R.id.list_view);
         simpleAdapter = new SimpleAdapter(getActivity(), getMessageData(), R.layout.cell_message_list,
-                new String[]{"selected", "time", "sender", "content", "read"},
+                new String[]{"selected", "time", status, "content", "read"},
                 new int[]{R.id.selected_in_message_cell, R.id.time_in_message_cell, R.id.sender_in_message_cell, R.id.content_in_message_cell, R.id.read_in_message_cell});
         listView.setAdapter(simpleAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -137,19 +149,38 @@ public class MessageFragment extends Fragment{
     }
 
     private List<Map<String, Object>> getMessageData() {
+
+        RealmResults<Message> messages = realm.where(Message.class).equalTo(status.equals("sender") ? "receiver" : "sender", "123456").findAll();
+
         dataList.clear();
-        for (int i = 0; i < messagePerPage; i++) {
+//        for (int i = 0; i < messagePerPage; i++) {
+//            Map<String, Object> map = new HashMap<>();
+//            map.put("selected", "");
+//            map.put("time", "2018/01/10 09:58:3" + i);
+//            map.put("sender", "123456");
+//            map.put("content", "message content" + pageIndex);
+//            int id = pageIndex * messagePerPage + i;
+//            map.put("id", id);
+//            map.put("read", id < 3 ? "未读" : "");
+//            dataList.add(map);
+//        }
+//        totalPage = 4;
+
+        for (int i = 0; i < messages.size(); i++) {
+            Message message = messages.get(i);
             Map<String, Object> map = new HashMap<>();
             map.put("selected", "");
-            map.put("time", "2018/01/10 09:58:3" + i);
-            map.put("sender", "123456");
-            map.put("content", "message content" + pageIndex);
+            map.put("time", DateUtil.Date2String(message.getSend_time()));
+            map.put("sender", message.getSender());
+            map.put("receiver", message.getReceiver());
+            map.put("content", message.getContent());
             int id = pageIndex * messagePerPage + i;
             map.put("id", id);
-            map.put("read", id < 3 ? "未读" : "");
+            map.put("read", message.isRead() ? "未读" : "");
             dataList.add(map);
         }
-        totalPage = 4;
+
+        totalPage = 1;
         modifyPageButton(pageIndex, totalPage);
         return dataList;
     }

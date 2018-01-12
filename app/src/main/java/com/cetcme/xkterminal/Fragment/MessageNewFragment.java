@@ -1,5 +1,6 @@
 package com.cetcme.xkterminal.Fragment;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
@@ -21,6 +22,7 @@ import com.cetcme.xkterminal.R;
  * Created by qiuhong on 11/01/2018.
  */
 
+@SuppressLint("ValidFragment")
 public class MessageNewFragment extends Fragment{
 
     public MainActivity mainActivity;

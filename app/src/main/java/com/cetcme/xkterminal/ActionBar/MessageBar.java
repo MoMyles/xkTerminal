@@ -25,7 +25,7 @@ public class MessageBar extends RelativeLayout implements View.OnClickListener {
     private Button button_relay;
     private Button button_prev;
     private Button button_next;
-    private Button button_back;
+    public Button button_back;
 
     private ArrayList<Button> buttons = new ArrayList<>();
 

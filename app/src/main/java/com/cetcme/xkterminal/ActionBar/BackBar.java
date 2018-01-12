@@ -18,7 +18,7 @@ public class BackBar extends RelativeLayout implements View.OnClickListener{
 
     public MainActivity mainActivity;
 
-    private Button button_back;
+    public Button button_back;
 
     public BackBar(Context context) {
         super(context);

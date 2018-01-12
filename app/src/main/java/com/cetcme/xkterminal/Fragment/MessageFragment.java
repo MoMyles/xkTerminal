@@ -1,5 +1,6 @@
 package com.cetcme.xkterminal.Fragment;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
@@ -28,6 +29,7 @@ import java.util.Map;
  * Created by qiuhong on 10/01/2018.
  */
 
+@SuppressLint("ValidFragment")
 public class MessageFragment extends Fragment{
 
     public MainActivity mainActivity;

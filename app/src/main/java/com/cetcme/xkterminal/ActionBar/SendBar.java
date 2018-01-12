@@ -21,7 +21,7 @@ public class SendBar extends RelativeLayout implements View.OnClickListener {
     public MainActivity mainActivity;
 
     private Button button_send;
-    private Button button_back;
+    public Button button_back;
 
     private ArrayList<Button> buttons = new ArrayList<>();
 

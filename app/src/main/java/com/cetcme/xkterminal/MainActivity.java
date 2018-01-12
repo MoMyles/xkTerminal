@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private AboutFragment aboutFragment;
     private MessageNewFragment messageNewFragment;
 
-    private String fragmentName = "main";
+    public String fragmentName = "main";
 
     public String backButtonStatus = "backToMain";
     public String messageListStatus = "";
@@ -102,6 +102,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onBackPressed() {
+
+
+        if (backBar.getVisibility() == View.VISIBLE) {
+            backBar.button_back.performClick();
+            return;
+        }
+
+        if (messageBar.getVisibility() == View.VISIBLE) {
+            messageBar.button_back.performClick();
+            return;
+        }
+
+        if (pageBar.getVisibility() == View.VISIBLE) {
+            pageBar.button_back.performClick();
+            return;
+        }
+
+        if (sendBar.getVisibility() == View.VISIBLE) {
+            sendBar.button_back.performClick();
+            return;
+        }
 
         if (!hasPressedBackOnce) {
             backToast = Toast.makeText(this, "再按一次返回键退出程序", Toast.LENGTH_SHORT);

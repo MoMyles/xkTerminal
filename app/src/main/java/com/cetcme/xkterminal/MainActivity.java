@@ -27,7 +27,9 @@ import com.cetcme.xkterminal.Fragment.SettingFragment;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.DateUtil;
 import com.cetcme.xkterminal.MyClass.DensityUtil;
+import com.cetcme.xkterminal.RealmModels.Alert;
 import com.cetcme.xkterminal.RealmModels.Message;
+import com.cetcme.xkterminal.RealmModels.Sign;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.qiuhong.qhlibrary.Dialog.QHDialog;
 
@@ -106,6 +108,9 @@ public class MainActivity extends AppCompatActivity {
 //        }
 //        addMessages();
 
+        addAlertLog();
+        addSignLog();
+
         modifyGpsBarMessageCount();
 
     }
@@ -123,13 +128,7 @@ public class MainActivity extends AppCompatActivity {
 //                message.setSend_time(DateUtil.String2Date("2018-01-01 13:11:23"));
                 message.setRead(false);
 
-//                Message message1 = realm.createObject(Message.class);
-//                message1.setSender("123456");
-//                message1.setReceiver("654321");
-//                message1.setContent("duan xin nei rong");
-//                message1.setDeleted(false);
-//                message1.setSend_time(new Date());
-//                message1.setRead(false);
+//
             }
         });
     }
@@ -170,6 +169,31 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("address", "浙江省嘉兴市南湖区xx小区xx幢xx室");
         intent.putExtra("idCard", "330199412120111");
         startActivity(intent);
+    }
+
+    private void addSignLog() {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                Sign sign = realm.createObject(Sign.class);
+                sign.setDeleted(false);
+                sign.setIdCard("330283198811240134");
+                sign.setName("张三");
+                sign.setTime(new Date());
+            }
+        });
+    }
+
+    private void addAlertLog() {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                Alert alert = realm.createObject(Alert.class);
+                alert.setDeleted(false);
+                alert.setType("火灾、碰撞");
+                alert.setTime(new Date());
+            }
+        });
     }
 
     private void showDangerDialog() {

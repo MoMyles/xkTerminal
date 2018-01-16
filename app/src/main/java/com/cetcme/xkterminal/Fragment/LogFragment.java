@@ -15,14 +15,22 @@ import android.widget.Toast;
 
 import com.cetcme.xkterminal.ActionBar.TitleBar;
 import com.cetcme.xkterminal.MainActivity;
+import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.CommonUtil;
+import com.cetcme.xkterminal.MyClass.DateUtil;
 import com.cetcme.xkterminal.MyClass.DensityUtil;
 import com.cetcme.xkterminal.R;
+import com.cetcme.xkterminal.RealmModels.Alert;
+import com.cetcme.xkterminal.RealmModels.Sign;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import io.realm.Realm;
+import io.realm.RealmResults;
+import io.realm.Sort;
 
 /**
  * Created by qiuhong on 10/01/2018.
@@ -42,6 +50,8 @@ public class LogFragment extends Fragment{
     private int pageIndex = 0;
     private int totalPage = 1;
 
+    private Realm realm;
+
     public LogFragment(String tg) {
         this.tg = tg;
         Log.e("Main", "LogFragment: " + tg );
@@ -49,6 +59,9 @@ public class LogFragment extends Fragment{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        realm = ((MyApplication) getActivity().getApplication()).realm;
+
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_log,container,false);
 
         logPerPage = CommonUtil.getCountPerPage(getContext(), getActivity());
@@ -114,30 +127,101 @@ public class LogFragment extends Fragment{
 
     private List<Map<String, Object>> getSignData() {
         dataList.clear();
-        for (int i = 0; i < logPerPage; i++) {
+
+        RealmResults<Sign> signs = realm.where(Sign.class)
+                .findAll();
+        signs = signs.sort("time", Sort.DESCENDING);
+
+        totalPage = CommonUtil.getTotalPage(signs.size(), logPerPage);
+
+        int lastIndex;
+        if (signs.size() == 0) {
+            lastIndex = 0;
+            totalPage = 1;
+        } else {
+            if (pageIndex == totalPage - 1) {
+                lastIndex = signs.size();
+            } else {
+                lastIndex = (pageIndex + 1) * logPerPage;
+            }
+        }
+
+        for (int i = pageIndex * logPerPage; i < lastIndex; i++) {
+            Sign sign = signs.get(i);
             Map<String, Object> map = new HashMap<>();
-            map.put("number", pageIndex * logPerPage + i + 1);
-            map.put("idCard", "33028319881111000" + i);
-            map.put("name", "123456");
-            map.put("time", "2018/01/10 09:58:3" + i);
+            map.put("number", signs.size() - i);
+            map.put("time", DateUtil.Date2String(sign.getTime()));
+            map.put("idCard", sign.getIdCard());
+            map.put("name", sign.getName());
             dataList.add(map);
         }
-        totalPage = 4;
+
         modifyPageButton(pageIndex, totalPage);
+
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                mainActivity.kProgressHUD.dismiss();
+//                mainActivity.okHUD.show();
+//                new Handler().postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        mainActivity.okHUD.dismiss();
+//                    }
+//                },700);
+//            }
+//        },500);
+
         return dataList;
     }
 
     private List<Map<String, Object>> getAlertData() {
+
         dataList.clear();
-        for (int i = 0; i < 3; i++) {
+
+        RealmResults<Alert> alerts = realm.where(Alert.class)
+                .findAll();
+        alerts = alerts.sort("time", Sort.DESCENDING);
+
+        totalPage = CommonUtil.getTotalPage(alerts.size(), logPerPage);
+
+        int lastIndex;
+        if (alerts.size() == 0) {
+            lastIndex = 0;
+            totalPage = 1;
+        } else {
+            if (pageIndex == totalPage - 1) {
+                lastIndex = alerts.size();
+            } else {
+                lastIndex = (pageIndex + 1) * logPerPage;
+            }
+        }
+
+        for (int i = pageIndex * logPerPage; i < lastIndex; i++) {
+            Alert alert = alerts.get(i);
             Map<String, Object> map = new HashMap<>();
-            map.put("number", pageIndex * logPerPage + i + 1);
-            map.put("type", "火灾、沉船");
-            map.put("time", "2018/01/10 09:58:3" + i);
+            map.put("number", alerts.size() - i);
+            map.put("time", DateUtil.Date2String(alert.getTime()));
+            map.put("type", alert.getType());
             dataList.add(map);
         }
-        totalPage = 1;
+
         modifyPageButton(pageIndex, totalPage);
+
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                mainActivity.kProgressHUD.dismiss();
+//                mainActivity.okHUD.show();
+//                new Handler().postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        mainActivity.okHUD.dismiss();
+//                    }
+//                },700);
+//            }
+//        },500);
+
         return dataList;
     }
 

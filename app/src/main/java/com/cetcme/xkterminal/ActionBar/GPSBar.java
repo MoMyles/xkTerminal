@@ -13,6 +13,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.cetcme.xkterminal.MainActivity;
+import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.R;
 
@@ -20,6 +21,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+
+import io.realm.Realm;
+import io.realm.RealmResults;
 
 /**
  * Created by qiuhong on 10/01/2018.
@@ -39,6 +43,8 @@ public class GPSBar extends RelativeLayout {
 
     private TextView textView_message_number;
 
+    private Realm realm;
+
     private ArrayList<TextView> textViews = new ArrayList<>();
 
     public GPSBar(Context context) {
@@ -47,10 +53,12 @@ public class GPSBar extends RelativeLayout {
 
     public GPSBar(Context context, AttributeSet attrs) {
         super(context, attrs);
+
         View view = LayoutInflater.from(context).inflate(R.layout.bar_gps_view, this, true);
 
         bindView(view);
         setData();
+
         new TimeHandler().start();
     }
 
@@ -121,16 +129,8 @@ public class GPSBar extends RelativeLayout {
                 new HalfTimeHandler().start();
             }
 
-            int messageNumber = jsonObject.getInt("messageNumber");
-            if (messageNumber != 0) {
-                textView_message.setText("短信");
-                textView_message_number.setText(messageNumber + "");
-                textView_message_number.setVisibility(VISIBLE);
-            } else {
-                textView_message.setText("无短信");
-                textView_message_number.setText("-");
-                textView_message_number.setVisibility(INVISIBLE);
-            }
+//            int messageNumber = jsonObject.getInt("messageNumber");
+//            setMessageCount(messageNumber);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -196,6 +196,18 @@ public class GPSBar extends RelativeLayout {
             }
         }
     };
+
+    public void modifyMessageCount(long count) {
+        if (count != 0) {
+            textView_message.setText("短信");
+            textView_message_number.setText(count + "");
+            textView_message_number.setVisibility(VISIBLE);
+        } else {
+            textView_message.setText("无短信");
+            textView_message_number.setText("-");
+            textView_message_number.setVisibility(INVISIBLE);
+        }
+    }
 
 
 }

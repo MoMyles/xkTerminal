@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.cetcme.xkterminal.ActionBar.TitleBar;
 import com.cetcme.xkterminal.MainActivity;
+import com.cetcme.xkterminal.MyClass.CommonUtil;
 import com.cetcme.xkterminal.MyClass.DensityUtil;
 import com.cetcme.xkterminal.R;
 
@@ -50,14 +51,7 @@ public class LogFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_log,container,false);
 
-
-        // 通过WindowManager获取
-        DisplayMetrics dm = new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
-
-        int screenHeight = DensityUtil.px2dip(getContext(), (float) dm.heightPixels);
-        int messageListHeight = screenHeight - 60 - 50 - 60 - 50; // gps 60 bottom 60 title 50
-        logPerPage = messageListHeight / 50;
+        logPerPage = CommonUtil.getCountPerPage(getContext(), getActivity());
 
         titleBar = view.findViewById(R.id.titleBar);
         if (tg.equals("sign")) {

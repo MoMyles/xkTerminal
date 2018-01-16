@@ -2,6 +2,7 @@ package com.cetcme.xkterminal.Fragment;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 import com.cetcme.xkterminal.ActionBar.TitleBar;
 import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.MyApplication;
+import com.cetcme.xkterminal.MyClass.CommonUtil;
 import com.cetcme.xkterminal.MyClass.DateUtil;
 import com.cetcme.xkterminal.MyClass.DensityUtil;
 import com.cetcme.xkterminal.R;
@@ -30,7 +32,9 @@ import java.util.List;
 import java.util.Map;
 
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
+import io.realm.Sort;
 
 /**
  * Created by qiuhong on 10/01/2018.
@@ -53,7 +57,7 @@ public class MessageFragment extends Fragment{
     private int totalPage = 1;
 
     private Realm realm;
-    private String status;
+    public String status;
 
     public MessageFragment(String tg) {
         this.tg = tg;
@@ -66,13 +70,7 @@ public class MessageFragment extends Fragment{
 
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_message,container,false);
 
-        // 通过WindowManager获取
-        DisplayMetrics dm = new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
-
-        int screenHeight = DensityUtil.px2dip(getContext(), (float) dm.heightPixels);
-        int messageListHeight = screenHeight - 60 - 50 - 60 - 50; // gps 60 bottom 60 title 50
-        messagePerPage = messageListHeight / 50;
+        messagePerPage = CommonUtil.getCountPerPage(getContext(), getActivity());
 
         titleBar = view.findViewById(R.id.titleBar);
         TextView titleTextView = view.findViewById(R.id.sender_title_textView);
@@ -96,6 +94,7 @@ public class MessageFragment extends Fragment{
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                System.out.println("message id: " + dataList.get(i).get("id"));
                 mainActivity.messageBar.setDetailAndRelayButtonEnable(true);
                 if (i == selectedIndex) return;
                 dataList.get(i).put("selected", "●");
@@ -149,24 +148,29 @@ public class MessageFragment extends Fragment{
     }
 
     private List<Map<String, Object>> getMessageData() {
-
-        RealmResults<Message> messages = realm.where(Message.class).equalTo(status.equals("sender") ? "receiver" : "sender", "123456").findAll();
-
+//        mainActivity.kProgressHUD.show();
         dataList.clear();
-//        for (int i = 0; i < messagePerPage; i++) {
-//            Map<String, Object> map = new HashMap<>();
-//            map.put("selected", "");
-//            map.put("time", "2018/01/10 09:58:3" + i);
-//            map.put("sender", "123456");
-//            map.put("content", "message content" + pageIndex);
-//            int id = pageIndex * messagePerPage + i;
-//            map.put("id", id);
-//            map.put("read", id < 3 ? "未读" : "");
-//            dataList.add(map);
-//        }
-//        totalPage = 4;
 
-        for (int i = 0; i < messages.size(); i++) {
+        RealmResults<Message> messages = realm.where(Message.class)
+                .equalTo(status.equals("sender") ? "sender" : "receiver", MainActivity.myNumber)
+                .findAll();
+        messages = messages.sort("send_time", Sort.DESCENDING);
+
+        totalPage = CommonUtil.getTotalPage(messages.size(), messagePerPage);
+
+        int lastMessageIndex;
+        if (messages.size() == 0) {
+            lastMessageIndex = 0;
+            totalPage = 1;
+        } else {
+            if (pageIndex == totalPage - 1) {
+                lastMessageIndex = messages.size();
+            } else {
+                lastMessageIndex = (pageIndex + 1) * messagePerPage;
+            }
+        }
+
+        for (int i = pageIndex * messagePerPage; i < lastMessageIndex; i++) {
             Message message = messages.get(i);
             Map<String, Object> map = new HashMap<>();
             map.put("selected", "");
@@ -174,20 +178,45 @@ public class MessageFragment extends Fragment{
             map.put("sender", message.getSender());
             map.put("receiver", message.getReceiver());
             map.put("content", message.getContent());
-            int id = pageIndex * messagePerPage + i;
-            map.put("id", id);
-            map.put("read", message.isRead() ? "未读" : "");
+            map.put("id", message.getId());
+            map.put("read", message.isRead() ? "" : status.equals("sender") ? "" : "未读");
             dataList.add(map);
         }
 
-        totalPage = 1;
         modifyPageButton(pageIndex, totalPage);
+
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                mainActivity.kProgressHUD.dismiss();
+//                mainActivity.okHUD.show();
+//                new Handler().postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        mainActivity.okHUD.dismiss();
+//                    }
+//                },700);
+//            }
+//        },500);
+
         return dataList;
     }
 
     public void setMessageRead(int index) {
+
         dataList.get(index).put("read", "");
         simpleAdapter.notifyDataSetChanged();
+
+        final String id = dataList.get(index).get("id").toString();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                //先查找后得到User对象
+                Message message = realm.where(Message.class).equalTo("id", id).findFirst();
+                message.setRead(true);
+            }
+        });
+        mainActivity.modifyGpsBarMessageCount();
     }
 
     private void modifyPageButton(int currentPage, int totalPage) {
@@ -203,5 +232,10 @@ public class MessageFragment extends Fragment{
         } else {
             mainActivity.messageBar.setPrevButtonEnable(true);
         }
+    }
+
+    public void reloadDate() {
+        getMessageData();
+        simpleAdapter.notifyDataSetChanged();
     }
 }

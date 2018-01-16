@@ -24,7 +24,7 @@
 
         <TextView
             android:id="@+id/time_in_message_cell"
-            android:layout_width="220dp"
+            android:layout_width="230dp"
             android:layout_height="match_parent"
             android:textSize="20sp"
             android:textColor="#000000"

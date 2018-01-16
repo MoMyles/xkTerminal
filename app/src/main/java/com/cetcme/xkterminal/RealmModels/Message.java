@@ -1,8 +1,10 @@
 package com.cetcme.xkterminal.RealmModels;
 
 import java.util.Date;
+import java.util.UUID;
 
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 /**
  * Created by qiuhong on 12/01/2018.
@@ -10,13 +12,19 @@ import io.realm.RealmObject;
 
 public class Message extends RealmObject {
 
+//    @PrimaryKey
+    private String id = UUID.randomUUID().toString();
+
+    public String getId() {
+        return id;
+    }
+
     private String sender;
     private String receiver;
     private Date send_time;
     private String content;
     private boolean read;
-
-
+    private boolean deleted;
 
     public String getSender() {
         return sender;
@@ -56,5 +64,13 @@ public class Message extends RealmObject {
 
     public void setRead(boolean read) {
         this.read = read;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 }

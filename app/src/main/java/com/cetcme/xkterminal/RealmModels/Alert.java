@@ -12,6 +12,7 @@ public class Alert extends RealmObject {
 
     private String type;
     private Date time;
+    private boolean deleted;
 
     public String getType() {
         return type;
@@ -27,5 +28,13 @@ public class Alert extends RealmObject {
 
     public void setTime(Date time) {
         this.time = time;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 }

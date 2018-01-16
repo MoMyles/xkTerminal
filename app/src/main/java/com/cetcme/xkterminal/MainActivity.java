@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.ActionBar.BackBar;
@@ -25,7 +26,9 @@ import com.cetcme.xkterminal.Fragment.MessageNewFragment;
 import com.cetcme.xkterminal.Fragment.SettingFragment;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.DateUtil;
+import com.cetcme.xkterminal.MyClass.DensityUtil;
 import com.cetcme.xkterminal.RealmModels.Message;
+import com.kaopiz.kprogresshud.KProgressHUD;
 import com.qiuhong.qhlibrary.Dialog.QHDialog;
 
 import java.text.ParseException;
@@ -36,6 +39,8 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity {
+
+    public static String myNumber = "123456";
 
     private GPSBar gpsBar;
 
@@ -62,7 +67,10 @@ public class MainActivity extends AppCompatActivity {
     //back toast
     private Toast backToast;
 
-    private Realm realm;
+    public Realm realm;
+
+    public KProgressHUD kProgressHUD;
+    public KProgressHUD okHUD;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +89,8 @@ public class MainActivity extends AppCompatActivity {
 
         bindView();
         initMainFragment();
+        initHud();
+
 
         // 模拟弹窗
         new Handler().postDelayed(new Runnable() {
@@ -91,9 +101,12 @@ public class MainActivity extends AppCompatActivity {
         },1000);
 
         //模拟添加短信
+//        for (int i = 0; i < 10; i++) {
+//            addMessages();
+//        }
 //        addMessages();
 
-//        System.out.println(getMessages());
+        modifyGpsBarMessageCount();
 
     }
 
@@ -103,25 +116,49 @@ public class MainActivity extends AppCompatActivity {
             public void execute(Realm realm) {
                 Message message = realm.createObject(Message.class);
                 message.setSender("654321");
-                message.setReceiver("123456");
+                message.setReceiver(myNumber);
                 message.setContent("duan xin nei rong");
-                Date date = null;
-                message.setSend_time(DateUtil.String2Date("2018-01-01 13:11:23"));
+                message.setDeleted(false);
+                message.setSend_time(new Date());
+//                message.setSend_time(DateUtil.String2Date("2018-01-01 13:11:23"));
                 message.setRead(false);
 
-
-                Message message1 = realm.createObject(Message.class);
-                message1.setSender("123456");
-                message1.setReceiver("654321");
-                message1.setContent("duan xin nei rong");
-                message1.setSend_time(DateUtil.String2Date("2018-01-11 13:11:23"));
-                message1.setRead(false);
+//                Message message1 = realm.createObject(Message.class);
+//                message1.setSender("123456");
+//                message1.setReceiver("654321");
+//                message1.setContent("duan xin nei rong");
+//                message1.setDeleted(false);
+//                message1.setSend_time(new Date());
+//                message1.setRead(false);
             }
         });
     }
 
     private RealmResults<Message> getMessages() {
         return realm.where(Message.class).equalTo("receiver", "123456").findAll();
+    }
+
+    private void initHud() {
+
+        int hudWidth = DensityUtil.getScreenHeight(getApplicationContext(), this) / 4;
+        if (hudWidth < 110) hudWidth = 110;
+
+        //hudView
+        kProgressHUD = KProgressHUD.create(this)
+                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+                .setLabel("加载中")
+                .setAnimationSpeed(1)
+                .setDimAmount(0.3f)
+                .setSize(hudWidth, hudWidth)
+                .setCancellable(false);
+        ImageView imageView = new ImageView(this);
+        imageView.setBackgroundResource(R.drawable.checkmark);
+        okHUD  =  KProgressHUD.create(this)
+                .setCustomView(imageView)
+                .setLabel("加载成功")
+                .setCancellable(false)
+                .setSize(hudWidth,hudWidth)
+                .setDimAmount(0.3f);
     }
 
 
@@ -349,6 +386,10 @@ public class MainActivity extends AppCompatActivity {
         showMessageBar();
         fragmentName = "message";
         backButtonStatus = "backToMain";
+
+        if (messageFragment.status.equals("sender")) {
+            messageFragment.reloadDate();
+        }
     }
 
     public void nextPage() {
@@ -369,8 +410,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void sendMessage() {
 
-        String receiver = messageNewFragment.getReceiver();
-        String content = messageNewFragment.getContent();
+        final String receiver = messageNewFragment.getReceiver();
+        final String content = messageNewFragment.getContent();
 
         if (receiver.isEmpty()) {
             QHDialog qhDialog = new QHDialog(this,"提示", "收件人为空！");
@@ -402,6 +443,29 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         qhDialog.show();
+
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                Message message = realm.createObject(Message.class);
+                message.setSender(myNumber);
+                message.setReceiver(receiver);
+                message.setContent(content);
+                message.setDeleted(false);
+                message.setSend_time(new Date());
+                message.setRead(false);
+            }
+        });
+    }
+
+    public void modifyGpsBarMessageCount() {
+        long count = realm.where(com.cetcme.xkterminal.RealmModels.Message.class)
+                .equalTo("receiver", myNumber)
+                .equalTo("read", false)
+                .count();
+        System.out.println("count: " + count);
+
+        gpsBar.modifyMessageCount(count);
     }
 
 }

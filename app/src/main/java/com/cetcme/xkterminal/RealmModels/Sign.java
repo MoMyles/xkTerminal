@@ -13,6 +13,7 @@ public class Sign extends RealmObject {
     private String idCard;
     private String name;
     private Date time;
+    private boolean deleted;
 
     public String getIdCard() {
         return idCard;
@@ -36,5 +37,13 @@ public class Sign extends RealmObject {
 
     public void setTime(Date time) {
         this.time = time;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 }

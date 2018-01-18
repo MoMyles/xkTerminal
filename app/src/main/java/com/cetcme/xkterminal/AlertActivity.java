@@ -38,7 +38,7 @@ public class AlertActivity extends Activity implements View.OnClickListener{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_danger);
+        setContentView(R.layout.activity_alert);
 
         realm = ((MyApplication) getApplication()).realm;
 

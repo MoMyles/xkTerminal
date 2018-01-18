@@ -13,7 +13,7 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="50dp"
         android:layout_marginLeft="20dp"
         android:layout_marginStart="20dp"
         android:layout_marginRight="20dp"
@@ -21,27 +21,27 @@
 
         <TextView
             android:id="@+id/selected_in_message_cell"
-            android:layout_width="20dp"
+            android:layout_width="30dp"
             android:layout_height="match_parent"
-            android:textSize="12sp"
+            android:textSize="20sp"
             android:textColor="#000000"
             android:text=""
             android:gravity="center_vertical"/>
 
         <TextView
             android:id="@+id/time_title_textView"
-            android:layout_width="130dp"
+            android:layout_width="230dp"
             android:layout_height="match_parent"
-            android:textSize="12sp"
+            android:textSize="20sp"
             android:textColor="#000000"
             android:text="时间"
             android:gravity="center_vertical"/>
 
         <TextView
             android:id="@+id/sender_title_textView"
-            android:layout_width="100dp"
+            android:layout_width="220dp"
             android:layout_height="match_parent"
-            android:textSize="12sp"
+            android:textSize="20sp"
             android:textColor="#000000"
             android:text="发件人"
             android:gravity="center"/>
@@ -50,7 +50,7 @@
             android:id="@+id/content_title_textView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:textSize="12sp"
+            android:textSize="20sp"
             android:textColor="#000000"
             android:text="内容"
             android:gravity="center_vertical"/>

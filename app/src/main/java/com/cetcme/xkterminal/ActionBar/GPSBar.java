@@ -113,7 +113,7 @@ public class GPSBar extends RelativeLayout {
 
         for (TextView textview: textViews) {
             textview.getPaint().setFakeBoldText(true);
-//            textview.setTextSize(14); //22
+            textview.setTextSize(22);
             textview.setTextColor(0xFF000000);
         }
     }

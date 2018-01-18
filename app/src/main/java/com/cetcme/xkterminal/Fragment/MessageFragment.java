@@ -177,7 +177,7 @@ public class MessageFragment extends Fragment{
             map.put("time", DateUtil.Date2String(message.getSend_time()));
             map.put("sender", message.getSender());
             map.put("receiver", message.getReceiver());
-            map.put("content", message.getContent().replace("\n", " "));
+            map.put("content", message.getContent());
             map.put("id", message.getId());
             map.put("read", message.isRead() ? "" : status.equals("sender") ? "" : "未读");
             dataList.add(map);

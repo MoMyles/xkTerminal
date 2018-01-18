@@ -12,7 +12,7 @@
 
     <android.support.v4.widget.Space
         android:layout_width="match_parent"
-        android:layout_height="10dp"/>
+        android:layout_height="20dp" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -25,20 +25,20 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="32dp"
+                android:layout_height="50dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical">
 
                 <TextView
                     android:layout_width="250dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="80dp"
-                    android:layout_marginStart="80dp"
                     android:layout_weight="1"
+                    android:layout_height="match_parent"
                     android:gravity="center_vertical"
-                    android:text="用户地址："
+                    android:layout_marginLeft="200dp"
+                    android:layout_marginStart="200dp"
                     android:textColor="#000000"
-                    android:textSize="11sp"/>
+                    android:textSize="18sp"
+                    android:text="用户地址："/>
 
                 <TextView
                     android:id="@+id/address_textView"
@@ -47,7 +47,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:textColor="#000000"
-                    android:textSize="11sp"
+                    android:textSize="18sp"
                     android:text="---"/>
 
                 <android.support.v4.widget.Space
@@ -60,20 +60,20 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:textColor="#000000"
-                    android:textSize="11sp"
+                    android:textSize="18sp"
                     android:text="定位来源："/>
 
                 <TextView
                     android:id="@+id/location_from_textView"
                     android:layout_width="250dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginEnd="80dp"
-                    android:layout_marginRight="80dp"
                     android:layout_weight="1"
+                    android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="---"
                     android:textColor="#000000"
-                    android:textSize="11sp"/>
+                    android:layout_marginRight="200dp"
+                    android:layout_marginEnd="200dp"
+                    android:textSize="18sp"
+                    android:text="---"/>
 
             </LinearLayout>
 
@@ -85,20 +85,19 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="32dp"
+                android:layout_height="50dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical">
-
                 <TextView
                     android:layout_width="250dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="80dp"
-                    android:layout_marginStart="80dp"
                     android:layout_weight="1"
+                    android:layout_height="match_parent"
                     android:gravity="center_vertical"
-                    android:text="信号强度："
+                    android:layout_marginLeft="200dp"
+                    android:layout_marginStart="200dp"
                     android:textColor="#000000"
-                    android:textSize="11sp"/>
+                    android:textSize="18sp"
+                    android:text="信号强度："/>
 
                 <TextView
                     android:id="@+id/signal_textView"
@@ -107,7 +106,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:textColor="#000000"
-                    android:textSize="11sp"
+                    android:textSize="18sp"
                     android:text="---"/>
 
                 <android.support.v4.widget.Space
@@ -120,20 +119,20 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:textColor="#000000"
-                    android:textSize="11sp"
+                    android:textSize="18sp"
                     android:text="通讯来源："/>
 
                 <TextView
                     android:id="@+id/communication_from_textView"
                     android:layout_width="250dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginEnd="80dp"
-                    android:layout_marginRight="80dp"
                     android:layout_weight="1"
+                    android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="---"
                     android:textColor="#000000"
-                    android:textSize="11sp"/>
+                    android:layout_marginRight="200dp"
+                    android:layout_marginEnd="200dp"
+                    android:textSize="18sp"
+                    android:text="---"/>
             </LinearLayout>
 
             <TextView
@@ -144,7 +143,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="32dp"
+                android:layout_height="50dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical">
 
@@ -153,10 +152,10 @@
                     android:layout_weight="1"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
-                    android:layout_marginLeft="80dp"
-                    android:layout_marginStart="80dp"
+                    android:layout_marginLeft="200dp"
+                    android:layout_marginStart="200dp"
                     android:textColor="#000000"
-                    android:textSize="11sp"
+                    android:textSize="18sp"
                     android:text="位置报告频度："/>
 
                 <TextView
@@ -166,7 +165,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:textColor="#000000"
-                    android:textSize="11sp"
+                    android:textSize="18sp"
                     android:text="---"/>
 
                 <android.support.v4.widget.Space
@@ -179,7 +178,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:textColor="#000000"
-                    android:textSize="11sp"
+                    android:textSize="18sp"
                     android:text="信号强度："/>
 
                 <TextView
@@ -189,9 +188,9 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:textColor="#000000"
-                    android:layout_marginRight="80dp"
-                    android:layout_marginEnd="80dp"
-                    android:textSize="11sp"
+                    android:layout_marginRight="200dp"
+                    android:layout_marginEnd="200dp"
+                    android:textSize="18sp"
                     android:text="---"/>
 
             </LinearLayout>
@@ -204,7 +203,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="32dp"
+                android:layout_height="50dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical">
                 <TextView
@@ -212,10 +211,10 @@
                     android:layout_weight="1"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
-                    android:layout_marginLeft="80dp"
-                    android:layout_marginStart="80dp"
+                    android:layout_marginLeft="200dp"
+                    android:layout_marginStart="200dp"
                     android:textColor="#000000"
-                    android:textSize="11sp"
+                    android:textSize="18sp"
                     android:text="GPS定位频度："/>
 
                 <TextView
@@ -225,7 +224,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:textColor="#000000"
-                    android:textSize="11sp"
+                    android:textSize="18sp"
                     android:text="---"/>
 
                 <android.support.v4.widget.Space
@@ -238,7 +237,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:textColor="#000000"
-                    android:textSize="11sp"
+                    android:textSize="18sp"
                     android:text="卫星数量："/>
 
                 <TextView
@@ -248,9 +247,9 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:textColor="#000000"
-                    android:layout_marginRight="80dp"
-                    android:layout_marginEnd="80dp"
-                    android:textSize="11sp"
+                    android:layout_marginRight="200dp"
+                    android:layout_marginEnd="200dp"
+                    android:textSize="18sp"
                     android:text="---"/>
             </LinearLayout>
 
@@ -262,7 +261,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="32dp"
+                android:layout_height="50dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical">
 
@@ -271,10 +270,10 @@
                     android:layout_weight="1"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
-                    android:layout_marginLeft="80dp"
-                    android:layout_marginStart="80dp"
+                    android:layout_marginLeft="200dp"
+                    android:layout_marginStart="200dp"
                     android:textColor="#000000"
-                    android:textSize="11sp"
+                    android:textSize="18sp"
                     android:text="中心用户机号："/>
 
                 <TextView
@@ -284,7 +283,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:textColor="#000000"
-                    android:textSize="11sp"
+                    android:textSize="18sp"
                     android:text="---"/>
 
                 <android.support.v4.widget.Space
@@ -297,7 +296,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:textColor="#000000"
-                    android:textSize="11sp"
+                    android:textSize="18sp"
                     android:text="主板温度："/>
 
                 <TextView
@@ -307,9 +306,9 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:textColor="#000000"
-                    android:layout_marginRight="80dp"
-                    android:layout_marginEnd="80dp"
-                    android:textSize="11sp"
+                    android:layout_marginRight="200dp"
+                    android:layout_marginEnd="200dp"
+                    android:textSize="18sp"
                     android:text="---"/>
 
             </LinearLayout>
@@ -322,7 +321,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="32dp"
+                android:layout_height="50dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical">
                 <TextView
@@ -330,10 +329,10 @@
                     android:layout_weight="1"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
-                    android:layout_marginLeft="80dp"
-                    android:layout_marginStart="80dp"
+                    android:layout_marginLeft="200dp"
+                    android:layout_marginStart="200dp"
                     android:textColor="#000000"
-                    android:textSize="11sp"
+                    android:textSize="18sp"
                     android:text="锂电池电压："/>
 
                 <TextView
@@ -343,7 +342,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:textColor="#000000"
-                    android:textSize="11sp"
+                    android:textSize="18sp"
                     android:text="---"/>
 
                 <android.support.v4.widget.Space
@@ -356,7 +355,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:textColor="#000000"
-                    android:textSize="11sp"
+                    android:textSize="18sp"
                     android:text="光伏电压："/>
 
                 <TextView
@@ -366,11 +365,17 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:textColor="#000000"
-                    android:layout_marginRight="80dp"
-                    android:layout_marginEnd="80dp"
-                    android:textSize="11sp"
+                    android:layout_marginRight="200dp"
+                    android:layout_marginEnd="200dp"
+                    android:textSize="18sp"
                     android:text="---"/>
             </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_alignParentBottom="true"
+                android:background="#b7b7b7" />
 
         </LinearLayout>
 

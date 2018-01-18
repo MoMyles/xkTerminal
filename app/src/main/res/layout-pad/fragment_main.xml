@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#dddddd"
+    android:orientation="vertical">
+
+    <TextView
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:layout_marginTop="50dp"
+    android:gravity="center"
+    android:textSize="60sp"
+    android:textStyle="bold"
+    android:textColor="#fd9f3b"
+    android:text="舰载北斗显控终端" />
+
+    <TextView
+    android:id="@+id/textView2"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="0.5"
+    android:gravity="center"
+    android:textSize="44sp"
+    android:textStyle="bold"
+    android:textColor="#2657ec"
+    android:text="C E T C M E" />
+
+    <TextView
+    android:id="@+id/textView"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="0.8"
+    android:gravity="center"
+    android:textSize="32sp"
+    android:text="中电科（宁波）海洋电子研究院" />
+
+</LinearLayout>

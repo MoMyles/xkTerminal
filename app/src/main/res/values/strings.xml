@@ -3,22 +3,22 @@
 
     <string-array name="dangerType">
         <item>沉船</item>
-        <item>风灾</item>
         <item>搁浅</item>
-        <item>伤病</item>
         <item>碰撞</item>
-        <item>抓扣</item>
         <item>火灾</item>
+        <item>风灾</item>
+        <item>伤病</item>
+        <item>抓扣</item>
         <item>故障</item>
     </string-array>
 
     <string name="dangerType_1">沉船</string>
-    <string name="dangerType_2">风灾</string>
-    <string name="dangerType_3">搁浅</string>
-    <string name="dangerType_4">伤病</string>
-    <string name="dangerType_5">碰撞</string>
-    <string name="dangerType_6">抓扣</string>
-    <string name="dangerType_7">火灾</string>
+    <string name="dangerType_2">搁浅</string>
+    <string name="dangerType_3">碰撞</string>
+    <string name="dangerType_4">火灾</string>
+    <string name="dangerType_5">风灾</string>
+    <string name="dangerType_6">伤病</string>
+    <string name="dangerType_7">抓扣</string>
     <string name="dangerType_8">故障</string>
 
 </resources>

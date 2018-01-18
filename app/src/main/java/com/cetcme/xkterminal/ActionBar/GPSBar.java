@@ -87,6 +87,22 @@ public class GPSBar extends RelativeLayout {
             }
         });
 
+        // TODO: for test
+        textView_latitude.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mainActivity.showIDCardDialog();
+            }
+        });
+
+        // TODO: for test
+        textView_longitude.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mainActivity.showDangerDialog();
+            }
+        });
+
         textViews.add(textView_latitude);
         textViews.add(textView_longitude);
         textViews.add(textView_speed);

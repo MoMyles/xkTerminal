@@ -25,7 +25,6 @@ import com.cetcme.xkterminal.Fragment.MessageFragment;
 import com.cetcme.xkterminal.Fragment.MessageNewFragment;
 import com.cetcme.xkterminal.Fragment.SettingFragment;
 import com.cetcme.xkterminal.MyClass.Constant;
-import com.cetcme.xkterminal.MyClass.DateUtil;
 import com.cetcme.xkterminal.MyClass.DensityUtil;
 import com.cetcme.xkterminal.RealmModels.Alert;
 import com.cetcme.xkterminal.RealmModels.Message;
@@ -33,12 +32,9 @@ import com.cetcme.xkterminal.RealmModels.Sign;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.qiuhong.qhlibrary.Dialog.QHDialog;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import io.realm.Realm;
-import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -108,33 +104,11 @@ public class MainActivity extends AppCompatActivity {
 //        }
 //        addMessages();
 
-        addAlertLog();
-        addSignLog();
+//        addAlertLog();
+//        addSignLog();
 
         modifyGpsBarMessageCount();
 
-    }
-
-    private void addMessages() {
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                Message message = realm.createObject(Message.class);
-                message.setSender("654321");
-                message.setReceiver(myNumber);
-                message.setContent("duan xin nei rong");
-                message.setDeleted(false);
-                message.setSend_time(new Date());
-//                message.setSend_time(DateUtil.String2Date("2018-01-01 13:11:23"));
-                message.setRead(false);
-
-//
-            }
-        });
-    }
-
-    private RealmResults<Message> getMessages() {
-        return realm.where(Message.class).equalTo("receiver", "123456").findAll();
     }
 
     private void initHud() {
@@ -161,15 +135,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void showIDCardDialog() {
-        Intent intent = new Intent(MainActivity.this, IDCardActivity.class);
-        intent.putExtra("name", "李四");
-        intent.putExtra("sex", "男");
-        intent.putExtra("birthday", "1994年12月12日");
-        intent.putExtra("address", "浙江省嘉兴市南湖区xx小区xx幢xx室");
-        intent.putExtra("idCard", "330199412120111");
-        startActivity(intent);
-    }
+
 
     private void addSignLog() {
         realm.executeTransaction(new Realm.Transaction() {
@@ -196,8 +162,20 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void showDangerDialog() {
-        Intent intent = new Intent(MainActivity.this, DangerActivity.class);
+    public void showIDCardDialog() {
+        Intent intent = new Intent(MainActivity.this, IDCardActivity.class);
+        intent.putExtra("name", "李四");
+        intent.putExtra("sex", "男");
+        intent.putExtra("birthday", "1994年12月12日");
+        intent.putExtra("address", "浙江省嘉兴市南湖区xx小区xx幢xx室");
+        intent.putExtra("idCard", "330199412120111");
+        startActivity(intent);
+
+        addSignLog();
+    }
+
+    public void showDangerDialog() {
+        Intent intent = new Intent(MainActivity.this, AlertActivity.class);
         startActivity(intent);
     }
 

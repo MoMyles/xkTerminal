@@ -2,7 +2,6 @@ package com.cetcme.xkterminal;
 
 import android.app.Activity;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.widget.TextView;
@@ -17,7 +16,7 @@ public class IDCardActivity extends Activity {
     private TextView address_textView;
     private TextView idCard_textView;
 
-    boolean closed = false;
+    boolean needDismissActivity = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +30,7 @@ public class IDCardActivity extends Activity {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    if (!closed) {
+                    if (needDismissActivity) {
                         onBackPressed();
                     }
                 }
@@ -70,8 +69,13 @@ public class IDCardActivity extends Activity {
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        closed = true;
         onBackPressed();
         return true;
     }
+
+    protected void onDestroy() {
+        needDismissActivity = false;
+        super.onDestroy();
+    }
+
 }

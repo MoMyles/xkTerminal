@@ -24,7 +24,7 @@
             android:launchMode="singleTask"
             android:theme="@style/myDialogActivityStyle" />
         <activity
-            android:name=".DangerActivity"
+            android:name=".AlertActivity"
             android:launchMode="singleTask"
             android:theme="@style/myDialogActivityStyle" />
     </application>

@@ -64,7 +64,7 @@
                 android:textStyle="bold"
                 android:textSize="16sp"
                 android:button="@drawable/checkbox_selector"
-                android:text="@string/dangerType_2" />
+                android:text="@string/dangerType_5" />
         </LinearLayout>
 
         <LinearLayout
@@ -82,39 +82,10 @@
                 android:textStyle="bold"
                 android:textSize="16sp"
                 android:button="@drawable/checkbox_selector"
-                android:text="@string/dangerType_3" />
+                android:text="@string/dangerType_2" />
 
             <CheckBox
                 android:id="@+id/checkBox4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textColor="@color/red"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:button="@drawable/checkbox_selector"
-                android:text="@string/dangerType_4" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="36dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:layout_margin="5dp">
-            <CheckBox
-                android:id="@+id/checkBox5"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textColor="@color/red"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:button="@drawable/checkbox_selector"
-                android:text="@string/dangerType_5" />
-
-            <CheckBox
-                android:id="@+id/checkBox6"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -132,7 +103,18 @@
             android:orientation="horizontal"
             android:layout_margin="5dp">
             <CheckBox
-                android:id="@+id/checkBox7"
+                android:id="@+id/checkBox5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/red"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:button="@drawable/checkbox_selector"
+                android:text="@string/dangerType_3" />
+
+            <CheckBox
+                android:id="@+id/checkBox6"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -141,6 +123,24 @@
                 android:textSize="16sp"
                 android:button="@drawable/checkbox_selector"
                 android:text="@string/dangerType_7" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_margin="5dp">
+            <CheckBox
+                android:id="@+id/checkBox7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/red"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:button="@drawable/checkbox_selector"
+                android:text="@string/dangerType_4" />
 
             <CheckBox
                 android:id="@+id/checkBox8"
@@ -168,7 +168,7 @@
         android:orientation="vertical"
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         android:gravity="right">
 

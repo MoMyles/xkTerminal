@@ -3,6 +3,8 @@ package com.cetcme.xkterminal;
 import android.app.Application;
 import android.util.Log;
 
+import com.cetcme.xkterminal.MyClass.DensityUtil;
+
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
@@ -22,6 +24,7 @@ public class MyApplication extends Application {
         Realm.setDefaultConfiguration(config);
 
         realm = Realm.getDefaultInstance();
+
     }
 
     @Override

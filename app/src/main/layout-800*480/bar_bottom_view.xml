@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="40dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_alignParentTop="true"
+        android:background="#000000" />
+
+    <Button
+        android:id="@+id/button_receive"
+        android:layout_width="70dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
+        android:text="发件箱"
+        android:textSize="10sp"
+        android:gravity="center" />
+
+    <Button
+        android:id="@+id/button_send"
+        android:layout_width="70dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
+        android:layout_toEndOf="@+id/button_receive"
+        android:layout_toRightOf="@+id/button_receive"
+        android:gravity="center"
+        android:text="收件箱"
+        android:textSize="10sp" />
+
+    <Button
+        android:id="@+id/button_sign"
+        android:layout_width="70dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
+        android:layout_toEndOf="@+id/button_send"
+        android:layout_toRightOf="@+id/button_send"
+        android:gravity="center"
+        android:text="打卡记录"
+        android:textSize="10sp" />
+
+    <Button
+        android:id="@+id/button_alert"
+        android:layout_width="70dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
+        android:layout_toEndOf="@+id/button_sign"
+        android:layout_toRightOf="@+id/button_sign"
+        android:gravity="center"
+        android:text="报警记录"
+        android:textSize="10sp" />
+
+    <Button
+        android:id="@+id/button_setting"
+        android:layout_width="70dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
+        android:layout_toEndOf="@+id/button_alert"
+        android:layout_toRightOf="@+id/button_alert"
+        android:gravity="center"
+        android:text="系统参数"
+        android:textSize="10sp" />
+
+    <Button
+        android:id="@+id/button_about"
+        android:layout_width="70dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:gravity="center"
+        android:text="关于"
+        android:textSize="10sp" />
+
+</RelativeLayout>

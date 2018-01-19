@@ -109,6 +109,11 @@ public class MainActivity extends AppCompatActivity {
 
         modifyGpsBarMessageCount();
 
+        int height = DensityUtil.getScreenHeight(this, this);
+        int width = DensityUtil.getScreenWidth(this, this);
+        System.out.println("========== height: " + height);
+        System.out.println("========== width: " + width);
+
     }
 
     private void initHud() {

@@ -39,7 +39,7 @@ public class BackBar extends RelativeLayout implements View.OnClickListener{
         button_back.setBackgroundResource(R.drawable.button_bg_selector);
         button_back.setOnClickListener(this);
 
-        button_back.setTextSize(10); //16
+//        button_back.setTextSize(10); //16
 
     }
 

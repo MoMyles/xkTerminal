@@ -51,7 +51,7 @@ public class PageBar extends RelativeLayout implements View.OnClickListener {
             button.setTextColor(0xFF000000);
             button.setBackgroundResource(R.drawable.button_bg_selector);
             button.setOnClickListener(this);
-            button.setTextSize(10); //16
+//            button.setTextSize(10); //16
         }
 
     }

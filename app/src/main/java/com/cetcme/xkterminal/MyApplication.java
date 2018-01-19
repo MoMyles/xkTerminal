@@ -1,6 +1,7 @@
 package com.cetcme.xkterminal;
 
 import android.app.Application;
+import android.util.Log;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
@@ -25,6 +26,7 @@ public class MyApplication extends Application {
 
     @Override
     public void onTerminate() {
+        Log.e("Application", "onTerminate: ==============");
         super.onTerminate();
         realm.close();
     }

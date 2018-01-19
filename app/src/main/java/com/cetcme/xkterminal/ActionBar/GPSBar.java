@@ -45,6 +45,9 @@ public class GPSBar extends RelativeLayout {
 
     private Realm realm;
 
+    // 用于关闭app
+    private int clickTime = 0;
+
     private ArrayList<TextView> textViews = new ArrayList<>();
 
     public GPSBar(Context context) {
@@ -84,6 +87,29 @@ public class GPSBar extends RelativeLayout {
             @Override
             public void onClick(View view) {
                 if (!mainActivity.fragmentName.equals("message")) mainActivity.initMessageFragment("receive");
+            }
+        });
+
+        textView_time.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.e("GPSBar", "onClick: " + clickTime);
+
+                if (clickTime == 0) {
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.e("GPSBar", "clickTime reverse to 0 ");
+                            clickTime = 0;
+                        }
+                    }, 1000);
+                }
+                clickTime++;
+
+                if (clickTime >= 5) {
+                    System.exit(0);
+                }
+
             }
         });
 

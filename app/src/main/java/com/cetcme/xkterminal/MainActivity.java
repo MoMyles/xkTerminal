@@ -18,6 +18,8 @@ import com.cetcme.xkterminal.ActionBar.GPSBar;
 import com.cetcme.xkterminal.ActionBar.MessageBar;
 import com.cetcme.xkterminal.ActionBar.PageBar;
 import com.cetcme.xkterminal.ActionBar.SendBar;
+import com.cetcme.xkterminal.DataFormat.MessageFormat;
+import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
 import com.cetcme.xkterminal.Fragment.AboutFragment;
 import com.cetcme.xkterminal.Fragment.LogFragment;
 import com.cetcme.xkterminal.Fragment.MainFragment;
@@ -109,10 +111,10 @@ public class MainActivity extends AppCompatActivity {
 
         modifyGpsBarMessageCount();
 
-        int height = DensityUtil.getScreenHeight(this, this);
-        int width = DensityUtil.getScreenWidth(this, this);
-        System.out.println("========== height: " + height);
-        System.out.println("========== width: " + width);
+//        int height = DensityUtil.getScreenHeight(this, this);
+//        int width = DensityUtil.getScreenWidth(this, this);
+//        System.out.println("========== height: " + height);
+//        System.out.println("========== width: " + width);
 
     }
 
@@ -463,6 +465,10 @@ public class MainActivity extends AppCompatActivity {
                 message.setRead(false);
             }
         });
+
+        byte[] messageBytes = MessageFormat.format(receiver, content);
+        ((MyApplication) getApplication()).sendBytes(messageBytes);
+        System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
     }
 
     public void modifyGpsBarMessageCount() {
@@ -470,8 +476,6 @@ public class MainActivity extends AppCompatActivity {
                 .equalTo("receiver", myNumber)
                 .equalTo("read", false)
                 .count();
-        System.out.println("count: " + count);
-
         gpsBar.modifyMessageCount(count);
     }
 

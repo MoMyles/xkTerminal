@@ -2,6 +2,7 @@ package com.cetcme.xkterminal.ActionBar;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 import android.text.format.DateFormat;
@@ -13,9 +14,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.cetcme.xkterminal.MainActivity;
-import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.R;
+import com.cetcme.xkterminal.SerialTest.SerialPortActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,7 +24,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import io.realm.Realm;
-import io.realm.RealmResults;
 
 /**
  * Created by qiuhong on 10/01/2018.
@@ -87,6 +87,14 @@ public class GPSBar extends RelativeLayout {
             @Override
             public void onClick(View view) {
                 if (!mainActivity.fragmentName.equals("message")) mainActivity.initMessageFragment("receive");
+            }
+        });
+
+        // TODO: for test
+        textView_location_status.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mainActivity.startActivity(new Intent(mainActivity, SerialPortActivity.class));
             }
         });
 

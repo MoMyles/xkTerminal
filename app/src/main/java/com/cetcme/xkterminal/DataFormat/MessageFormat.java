@@ -40,6 +40,7 @@ public class MessageFormat {
     }
 
     public static byte[] format(String targetAddress, String message) {
+        targetAddress = Util.addZeroString(targetAddress, 12);
         byte[] bytes = messageHead.getBytes();
         String unique = ConvertUtil.rc4ToHex();
         byte[] addressBytes = ByteUtil.byteMerger(ConvertUtil.str2Bcd(targetAddress), ConvertUtil.str2Bcd(unique));

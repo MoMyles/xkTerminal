@@ -27,6 +27,7 @@
             android:name=".AlertActivity"
             android:launchMode="singleTask"
             android:theme="@style/myDialogActivityStyle" />
+        <activity android:name=".SerialTest.SerialPortActivity"/>
     </application>
 
 </manifest>

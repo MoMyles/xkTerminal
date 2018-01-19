@@ -44,6 +44,15 @@ public class Util {
         return (byte) re;
     }
 
+    /**
+     * byte[]去掉第一位
+     */
+    public static  void bytesRemoveFirst(byte[] bytes, int count) {
+        for (int i = 0; i < count; i++) {
+            bytes[i] = bytes[i + 1];
+        }
+    }
+
     public static int computeCheckSum(byte[] buf, int start, int end) {
         int sum = 0;
         for (int i = start; i < end; i++) {

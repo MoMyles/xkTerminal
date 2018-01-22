@@ -5,12 +5,10 @@ import android.app.Application;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.cetcme.xkterminal.DataFormat.MessageFormat;
-import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
 import com.cetcme.xkterminal.DataFormat.Util.Util;
-import com.cetcme.xkterminal.MyClass.DensityUtil;
-import com.cetcme.xkterminal.SerialTest.SerialPortActivity;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,6 +26,8 @@ import io.realm.RealmConfiguration;
  */
 
 public class MyApplication extends Application {
+
+    public MainActivity mainActivity;
 
     public Realm realm;
     private OutputStream mOutputStream;
@@ -143,13 +143,13 @@ public class MyApplication extends Application {
     byte[] serialBuffer = new byte[100];
     int serialCount = 0;
     boolean hasHead = false;
+
     protected void onDataReceived(byte[] buffer, int size) {
         serialBuffer[serialCount] = buffer[0];
         serialCount++;
-        if (serialCount == 2) {
-            // $04
-            if (serialBuffer[0] == (byte) 0x24 && serialBuffer[1] == (byte) 0x30) {
-                //
+        if (serialCount == 3) {
+            String head = Util.bytesGetHead(serialBuffer, 3);
+            if (head.equals("$04") || head.equals("$R4") || head.equals("$R1") || head.equals("$R5") || head.equals("$R0")) {
                 hasHead = true;
             } else {
                 Util.bytesRemoveFirst(serialBuffer, serialCount);
@@ -164,8 +164,47 @@ public class MyApplication extends Application {
                 return;
             }
             if (serialBuffer[serialCount - 2] == (byte) 0x0D && serialBuffer[serialCount - 1] == (byte) 0x0A) {
+                switch (Util.bytesGetHead(serialBuffer, 3)) {
+                    case "$04":
+                        // 接收短信
+                        String[] messageStrings = MessageFormat.unFormat(buffer);
+                        String address = messageStrings[0];
+                        String content = messageStrings[1];
+                        mainActivity.addMessage(address, content);
+                        mainActivity.modifyGpsBarMessageCount();
+                        break;
+                    case "$R4":
+                        // 短信发送成功
+                        Toast.makeText(this, "短信发送成功", Toast.LENGTH_SHORT).show();
+                        break;
+                    case "$R1":
+                        // 接收时间
+
+                        break;
+                    case "$R5":
+
+                        if (size == 17) {
+                            // 紧急报警成功
+                            Toast.makeText(this, "遇险报警发送成功", Toast.LENGTH_SHORT).show();
+                        } else if (size == 16) {
+                            // 显示报警activity
+                            mainActivity.showDangerDialog();
+                        }
+                        break;
+                    case "$R0":
+                        // 接收身份证信息
+                        String[] idStrings = MessageFormat.unFormat(buffer);
+                        String id = idStrings[0];
+                        String name = idStrings[1];
+                        mainActivity.showIDCardDialog(id, name);
+                        break;
+                    default:
+                        hasHead = false;
+                        Util.bytesRemoveFirst(serialBuffer, serialCount);
+                        serialCount--;
+                        break;
+                }
                 hasHead = false;
-                unFormatData(serialBuffer, serialCount);
                 serialBuffer = new byte[100];
                 serialCount = 0;
             }

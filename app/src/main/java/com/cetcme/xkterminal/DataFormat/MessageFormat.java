@@ -87,12 +87,14 @@ public class MessageFormat {
 //                (byte) 0x0A
 //            };
 
-        byte[] frameData = format(Util.addZeroString("123456", 12), "你好，这是一条短信00000");
-        String[] unFormatStrings = unFormat(frameData);
-        String targetAddress = unFormatStrings[0];
-        String messageContent = unFormatStrings[1];
-        System.out.println(targetAddress);
-        System.out.println(messageContent);
+//        byte[] frameData = format(Util.addZeroString("123456", 12), "你好，这是一条短信00000");
+//        String[] unFormatStrings = unFormat(frameData);
+//        String targetAddress = unFormatStrings[0];
+//        String messageContent = unFormatStrings[1];
+//        System.out.println(targetAddress);
+//        System.out.println(messageContent);
+        System.out.println(ConvertUtil.bytesToHexString("$04".getBytes()));
+        System.out.println(Util.bytesGetHead("$R1".getBytes(),3));
     }
 
     private static byte getDataLengthByte (String message, int frameCountInt) {

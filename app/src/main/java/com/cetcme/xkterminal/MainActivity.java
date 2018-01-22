@@ -20,6 +20,7 @@ import com.cetcme.xkterminal.ActionBar.PageBar;
 import com.cetcme.xkterminal.ActionBar.SendBar;
 import com.cetcme.xkterminal.DataFormat.MessageFormat;
 import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
+import com.cetcme.xkterminal.DataFormat.Util.Util;
 import com.cetcme.xkterminal.Fragment.AboutFragment;
 import com.cetcme.xkterminal.Fragment.LogFragment;
 import com.cetcme.xkterminal.Fragment.MainFragment;
@@ -86,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().hide();
 
         realm = ((MyApplication) getApplication()).realm;
+        ((MyApplication) getApplication()).mainActivity = this;
 
         bindView();
         initMainFragment();
@@ -141,23 +143,36 @@ public class MainActivity extends AppCompatActivity {
                 .setDimAmount(0.3f);
     }
 
+    public void addMessage(final String address, final String content) {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                Message message = realm.createObject(Message.class);
+                message.setSender(address);
+                message.setReceiver(myNumber);
+                message.setContent(content);
+                message.setDeleted(false);
+                message.setSend_time(new Date());
+                message.setRead(false);
+            }
+        });
+    }
 
 
-
-    private void addSignLog() {
+    public void addSignLog(final String id, final String name) {
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 Sign sign = realm.createObject(Sign.class);
                 sign.setDeleted(false);
-                sign.setIdCard("330283198811240134");
-                sign.setName("张三");
+                sign.setIdCard(id);
+                sign.setName(name);
                 sign.setTime(new Date());
             }
         });
     }
 
-    private void addAlertLog() {
+    public void addAlertLog() {
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
@@ -169,16 +184,17 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void showIDCardDialog() {
+    public void showIDCardDialog(String id, String name) {
         Intent intent = new Intent(MainActivity.this, IDCardActivity.class);
-        intent.putExtra("name", "李四");
-        intent.putExtra("sex", "男");
-        intent.putExtra("birthday", "1994年12月12日");
+        intent.putExtra("name", name);
+        //TODO: 解析身份证
+        intent.putExtra("sex", Util.idCardGetSex(id));
+        intent.putExtra("birthday", Util.idCardGetBirthday(id));
         intent.putExtra("address", "浙江省嘉兴市南湖区xx小区xx幢xx室");
-        intent.putExtra("idCard", "330199412120111");
+        intent.putExtra("idCard", id);
         startActivity(intent);
 
-        addSignLog();
+        addSignLog(id, name);
     }
 
     public void showDangerDialog() {

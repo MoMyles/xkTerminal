@@ -1,5 +1,7 @@
 package com.cetcme.xkterminal.DataFormat.Util;
 
+import java.io.UnsupportedEncodingException;
+
 /**
  * Created by qiuhong on 17/01/2018.
  */
@@ -69,6 +71,43 @@ public class Util {
             str = "0" + str;
         }
         return str;
+    }
+
+    public static String bytesGetHead(byte[] bytes, int size) {
+        if (bytes.length < size) return null;
+
+        byte[] newBytes = new byte[size];
+        System.arraycopy(bytes, 0, newBytes, 0, size);
+        try {
+            return new String(newBytes, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    public static String idCardGetSex(String idCardNumber) {
+        if (idCardNumber.length() != 18) return "";
+
+        int sexNumber = Integer.parseInt(idCardNumber.charAt(16)+ "");
+        if (sexNumber % 2 == 0) {
+            return "女";
+        } else {
+            return "男";
+        }
+    }
+
+    public static String idCardGetBirthday(String idCardNumber) {
+        if (idCardNumber.length() != 18) return "";
+
+        String year = idCardNumber.substring(6, 10);
+        String month = idCardNumber.substring(10, 12);
+        String day = idCardNumber.substring(12, 14);
+        return year + "年" + month + "月" + day + "日";
+    }
+
+    public static void main(String[] args) {
+        System.out.println(idCardGetBirthday("330238198811240134"));
     }
 
 }

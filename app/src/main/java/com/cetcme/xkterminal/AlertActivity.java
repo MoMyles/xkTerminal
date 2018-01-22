@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Toast;
 
+import com.cetcme.xkterminal.DataFormat.AlertFormat;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.RealmModels.Alert;
 
@@ -84,14 +85,13 @@ public class AlertActivity extends Activity implements View.OnClickListener{
             @Override
             public void onClick(View view) {
 
+                String type = "";
                 for (int i = 0; i < checkBoxes.size(); i++) {
-                    if (checkBoxes.get(i).isChecked()) {
-                        String danger = getResources().getStringArray(R.array.dangerType)[i];
-                        System.out.println(danger);
-                    }
+                    type += checkBoxes.get(i).isChecked() ? "1" : "0";
                 }
-                Toast.makeText(AlertActivity.this, "遇险报警发送成功", Toast.LENGTH_SHORT).show();
-                addAlertLog();
+                ((MyApplication) getApplication()).sendBytes(AlertFormat.format((byte) 0x00, type));
+
+                addAlertLog(type);
                 onBackPressed();
             }
         });
@@ -108,13 +108,13 @@ public class AlertActivity extends Activity implements View.OnClickListener{
         needDismissActivity = false;
     }
 
-    private void addAlertLog() {
+    private void addAlertLog(final String type) {
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 Alert alert = realm.createObject(Alert.class);
                 alert.setDeleted(false);
-                alert.setType("火灾、碰撞");
+                alert.setType(AlertFormat.getStringType(type));
                 alert.setTime(new Date());
             }
         });

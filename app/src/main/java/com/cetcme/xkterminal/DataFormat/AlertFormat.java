@@ -5,6 +5,7 @@ import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
 import com.cetcme.xkterminal.DataFormat.Util.Util;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 
 /**
  * Created by qiuhong on 17/01/2018.
@@ -32,10 +33,10 @@ public class AlertFormat {
         return new String[]{modeStr, typeStr};
     }
 
-    public static byte[] format(String mode, String type) {
+    public static byte[] format(byte mode, String type) {
         byte[] bytes = alertHead.getBytes();
 
-        byte[] modeBytes = new byte[]{Util.BitToByte(mode)};
+        byte[] modeBytes = new byte[]{mode};
         byte[] typeBytes = new byte[]{Util.BitToByte(type)};
 
         byte[] toCheckBytes = ByteUtil.byteMerger(modeBytes, typeBytes);
@@ -47,14 +48,41 @@ public class AlertFormat {
         bytes = ByteUtil.byteMerger(bytes, checkSumBytes);
         return bytes;
     }
-    public static void main(String[] args) {
 
-        byte[] frameData = format("00000010", "00001110");
+    public static String getStringType(String type) {
+        String[] defaultTypes = new String[] {
+                "沉船",
+                "搁浅",
+                "碰撞",
+                "火灾",
+                "风灾",
+                "伤病",
+                "抓扣",
+                "故障"
+        };
+
+        if (type.length() != 8) return "";
+        ArrayList<String> list = new ArrayList<>();
+        for (int i = 0; i < 8; i++) {
+            if (type.substring(i, i + 1).equals("1")) list.add(defaultTypes[7 - i]);
+        }
+
+        StringBuilder str = new StringBuilder();
+        for (int i = 0; i < list.size(); i++) {
+            str.append(list.get(i));
+            if (i != list.size() - 1) str.append("、");
+        }
+
+        return str.toString();
+    }
+
+    public static void main(String[] args) {
+        byte[] frameData = format((byte) 0x00, "00001110");
         String[] unFormatStrings = unFormat(frameData);
         String mode = unFormatStrings[0];
         String type = unFormatStrings[1];
         System.out.println(mode);
-        System.out.println(type);
+        System.out.println(getStringType(type));
     }
 
 }

@@ -125,7 +125,7 @@ public class GPSBar extends RelativeLayout {
         textView_latitude.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                mainActivity.showIDCardDialog();
+                mainActivity.showIDCardDialog("330283198811220131", "张三");
             }
         });
 

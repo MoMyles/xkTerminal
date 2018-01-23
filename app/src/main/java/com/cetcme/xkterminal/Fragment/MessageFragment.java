@@ -77,12 +77,12 @@ public class MessageFragment extends Fragment{
         if (tg.equals("send")) {
             titleBar.setTitle("发件箱");
             titleTextView.setText("收件人");
-            status = "sender";
+            status = "receiver";
         }
         if (tg.equals("receive")) {
             titleBar.setTitle("收件箱");
             titleTextView.setText("发件人");
-            status = "receiver";
+            status = "sender";
         }
 
         //设置listView
@@ -94,7 +94,7 @@ public class MessageFragment extends Fragment{
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                System.out.println("message id: " + dataList.get(i).get("id"));
+                System.out.println("message id: " + dataList.get(i));
                 mainActivity.messageBar.setDetailAndRelayButtonEnable(true);
                 if (i == selectedIndex) return;
                 dataList.get(i).put("selected", "●");
@@ -152,7 +152,7 @@ public class MessageFragment extends Fragment{
         dataList.clear();
 
         RealmResults<Message> messages = realm.where(Message.class)
-                .equalTo(status.equals("sender") ? "sender" : "receiver", MainActivity.myNumber)
+                .equalTo(tg.equals("send") ? "sender" : "receiver", MainActivity.myNumber)
                 .findAll();
         messages = messages.sort("send_time", Sort.DESCENDING);
 
@@ -179,7 +179,7 @@ public class MessageFragment extends Fragment{
             map.put("receiver", message.getReceiver());
             map.put("content", message.getContent().replace("\n", " "));
             map.put("id", message.getId());
-            map.put("read", message.isRead() ? "" : status.equals("sender") ? "" : "未读");
+            map.put("read", message.isRead() ? "" : tg.equals("send") ? "" : "未读");
             dataList.add(map);
         }
 

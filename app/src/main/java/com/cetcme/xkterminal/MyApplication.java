@@ -95,7 +95,7 @@ public class MyApplication extends Application {
                 frameData = ByteUtil.byteMerger(frameData, "12345678".getBytes());
 //                frameData = ByteUtil.byteMerger(frameData, new byte[]{(byte) 0x00});
                 frameData = ByteUtil.byteMerger(frameData, "OK".getBytes());
-                frameData = ByteUtil.byteMerger(frameData, "*hh".getBytes());
+                frameData = ByteUtil.byteMerger(frameData, "*h".getBytes());
                 frameData = ByteUtil.byteMerger(frameData, new byte[]{(byte) 0x0D, (byte) 0x0A});
                 sendBytes(frameData);
                 break;
@@ -184,7 +184,6 @@ public class MyApplication extends Application {
     boolean hasHead = false;
 
     protected void onDataReceived(byte[] buffer, int size) {
-        System.out.println(ConvertUtil.bytesToHexString(buffer));
         serialBuffer[serialCount] = buffer[0];
         serialCount++;
         if (serialCount == 3) {
@@ -215,6 +214,21 @@ public class MyApplication extends Application {
                         message.setData(bundle);
                         mHandler.sendMessage(message);
                         break;
+                    default:
+                        hasHead = false;
+                        Util.bytesRemoveFirst(serialBuffer, serialCount);
+                        serialCount--;
+                        break;
+                }
+                hasHead = false;
+                serialBuffer = new byte[100];
+                serialCount = 0;
+            } else if (serialBuffer[serialCount - 1] == (byte) 0x3B) {
+                System.out.println("收到包：" + ConvertUtil.bytesToHexString(serialBuffer));
+                Message message = new Message();
+                Bundle bundle = new Bundle();
+                bundle.putByteArray("bytes", serialBuffer);
+                switch (Util.bytesGetHead(serialBuffer, 3)) {
                     case "$R4":
                         // 短信发送成功
                         message.what = 0x02;
@@ -228,10 +242,10 @@ public class MyApplication extends Application {
                         mHandler.sendMessage(message);
                         break;
                     case "$R5":
-                        if (serialCount == 18) {
+                        if (serialCount == 14) {
                             // 紧急报警成功
                             message.what = 0x04;
-                        } else if (serialCount == 17) {
+                        } else if (serialCount == 15) {
                             // 显示报警activity
                             message.what = 0x05;
                         }

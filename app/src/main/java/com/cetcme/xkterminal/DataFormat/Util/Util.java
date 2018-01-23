@@ -118,7 +118,7 @@ public class Util {
 
     public static void main(String[] args) {
 //        System.out.println(idCardGetBirthday("330238198811240134"));
-        System.out.println(ConvertUtil.bytesToHexString(";".getBytes()));
+        System.out.println(ConvertUtil.bytesToHexString("12345678".getBytes()));
     }
 
 }

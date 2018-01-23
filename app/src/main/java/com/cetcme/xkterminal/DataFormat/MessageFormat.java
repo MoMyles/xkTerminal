@@ -1,5 +1,7 @@
 package com.cetcme.xkterminal.DataFormat;
 
+import android.telephony.PhoneNumberUtils;
+
 import com.cetcme.xkterminal.DataFormat.Util.ByteUtil;
 import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
 import com.cetcme.xkterminal.DataFormat.Util.Util;
@@ -25,15 +27,17 @@ public class MessageFormat {
         }
 
         String targetAddress = ConvertUtil.bcd2Str(ByteUtil.subBytes(frameData, 3, 9));
+        targetAddress = Util.stringRemoveZero(targetAddress);
         byte b = frameData[14];
         int frameCount = Integer.parseInt(Util.byteToBit(b).substring(0, 2), 2);
         int messageLength = Integer.parseInt(Util.byteToBit(b).substring(2, 8), 2);
         String messageContent = null;
         try {
-            messageContent = new String(ByteUtil.subBytes(frameData, 15, 15 + messageLength), "UTF-8");
+            messageContent = new String(ByteUtil.subBytes(frameData, 15, 15 + messageLength), "GBK");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+
 
 
         return new String[]{targetAddress, messageContent};
@@ -41,11 +45,17 @@ public class MessageFormat {
 
     public static byte[] format(String targetAddress, String message) {
         targetAddress = Util.stringAddZero(targetAddress, 12);
+        System.out.println(targetAddress);
         byte[] bytes = messageHead.getBytes();
         String unique = ConvertUtil.rc4ToHex();
         byte[] addressBytes = ByteUtil.byteMerger(ConvertUtil.str2Bcd(targetAddress), ConvertUtil.str2Bcd(unique));
-        byte[] lengthBytes = new byte[]{getDataLengthByte(message, 1)};
-        byte[] messageBytes = message.getBytes();
+        byte[] lengthBytes = new byte[]{getDataLengthByte(message, 0)};
+        byte[] messageBytes = new byte[0];
+        try {
+            messageBytes = message.getBytes("GBK");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
         byte[] toCheckBytes = ByteUtil.byteMerger(addressBytes, lengthBytes);
         toCheckBytes = ByteUtil.byteMerger(toCheckBytes, messageBytes);
@@ -59,42 +69,42 @@ public class MessageFormat {
         return bytes;
     }
     public static void main(String[] args) {
-//        byte[] frameData = new byte[] {
-//                (byte) 0x24,
-//                (byte) 0x30,
-//                (byte) 0x34,
-//                (byte) 0x00,
-//                (byte) 0x00,
-//                (byte) 0x00,
-//                (byte) 0x12,
-//                (byte) 0x34,
-//                (byte) 0x56,
-//                (byte) 0xD9,
-//                (byte) 0xD9,
-//                (byte) 0xC6,
-//                (byte) 0x93,
-//                (byte) 0x31,
-//                (byte) 0x46,
-//                (byte) 0xE4,
-//                (byte) 0xBD,
-//                (byte) 0xA0,
-//                (byte) 0xE5,
-//                (byte) 0xA5,
-//                (byte) 0xBD,
-//                (byte) 0x2A,
-//                (byte) 0xA6,
-//                (byte) 0x0D,
-//                (byte) 0x0A
-//            };
+        byte[] frameData = new byte[] {
+                (byte) 0x24,
+                (byte) 0x30,
+                (byte) 0x34,
+                (byte) 0x00,
+                (byte) 0x00,
+                (byte) 0x00,
+                (byte) 0x12,
+                (byte) 0x34,
+                (byte) 0x56,
+                (byte) 0xD9,
+                (byte) 0xD9,
+                (byte) 0xC6,
+                (byte) 0x93,
+                (byte) 0x31,
+                (byte) 0x46,
+                (byte) 0xE4,
+                (byte) 0xBD,
+                (byte) 0xA0,
+                (byte) 0xE5,
+                (byte) 0xA5,
+                (byte) 0xBD,
+                (byte) 0x2A,
+                (byte) 0xA6,
+                (byte) 0x0D,
+                (byte) 0x0A
+            };
 
 //        byte[] frameData = format(Util.stringAddZero("123456", 12), "你好，这是一条短信00000");
-//        String[] unFormatStrings = unFormat(frameData);
-//        String targetAddress = unFormatStrings[0];
-//        String messageContent = unFormatStrings[1];
-//        System.out.println(targetAddress);
-//        System.out.println(messageContent);
-        System.out.println(ConvertUtil.bytesToHexString("$04".getBytes()));
-        System.out.println(Util.bytesGetHead("$R1".getBytes(),3));
+        String[] unFormatStrings = unFormat(frameData);
+        String targetAddress = unFormatStrings[0];
+        String messageContent = unFormatStrings[1];
+        System.out.println(targetAddress);
+        System.out.println(messageContent);
+//        System.out.println(ConvertUtil.bytesToHexString("$04".getBytes()));
+//        System.out.println(Util.bytesGetHead("$R1".getBytes(),3));
     }
 
     private static byte getDataLengthByte (String message, int frameCountInt) {

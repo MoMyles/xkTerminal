@@ -1,0 +1,4 @@
+SharedPreferences：
+
+'lastSendTime' : String // 收到发送成功 后 将lastSendTimeSave 保存为lastSendTime
+'lastSendTimeSave' : String //发送后保存

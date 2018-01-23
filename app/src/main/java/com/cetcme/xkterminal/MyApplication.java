@@ -3,6 +3,7 @@ package com.cetcme.xkterminal;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Application;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import com.cetcme.xkterminal.DataFormat.MessageFormat;
 import com.cetcme.xkterminal.DataFormat.SignFormat;
 import com.cetcme.xkterminal.DataFormat.Util.ByteUtil;
 import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
+import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
 import com.cetcme.xkterminal.DataFormat.Util.Util;
 import com.cetcme.xkterminal.MyClass.Constant;
 
@@ -23,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.InvalidParameterException;
+import java.util.Date;
 
 import android_serialport_api.SerialPort;
 import android_serialport_api.SerialPortFinder;
@@ -313,6 +316,13 @@ public class MyApplication extends Application {
                 case 0x02:
                     // 短信发送成功
                     Toast.makeText(getApplicationContext(), "短信发送成功", Toast.LENGTH_SHORT).show();
+
+                    SharedPreferences sharedPreferences = getSharedPreferences("xkTerminal", Context.MODE_PRIVATE); //私有数据
+                    SharedPreferences.Editor editor = sharedPreferences.edit();//获取编辑器
+                    String lastSendTimeSave = sharedPreferences.getString("lastSendTime", "");
+                    editor.putString("lastSendTimeSave", lastSendTimeSave);
+                    editor.apply(); //提交修改
+
                     break;
                 case 0x03:
                     // 接收时间

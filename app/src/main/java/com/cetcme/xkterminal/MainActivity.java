@@ -1,7 +1,9 @@
 package com.cetcme.xkterminal;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +22,7 @@ import com.cetcme.xkterminal.ActionBar.PageBar;
 import com.cetcme.xkterminal.ActionBar.SendBar;
 import com.cetcme.xkterminal.DataFormat.MessageFormat;
 import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
+import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
 import com.cetcme.xkterminal.DataFormat.Util.Util;
 import com.cetcme.xkterminal.Fragment.AboutFragment;
 import com.cetcme.xkterminal.Fragment.LogFragment;
@@ -435,6 +438,16 @@ public class MainActivity extends AppCompatActivity {
 
     public void sendMessage() {
 
+        SharedPreferences sharedPreferences = getSharedPreferences("xkTerminal", Context.MODE_PRIVATE); //私有数据
+        String lastSendTime = sharedPreferences.getString("lastSendTime", "");
+        Long sendDate = DateUtil.parseStringToDate(lastSendTime, DateUtil.DatePattern.YYYYMMDDHHMMSS).getTime();
+        Long now = new Date().getTime();
+        if (now - sendDate <= 60 * 1000) {
+            Toast.makeText(this, "发送时间间隔不到1分钟，请等待", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+
         final String receiver = messageNewFragment.getReceiver();
         final String content = messageNewFragment.getContent();
 
@@ -459,15 +472,19 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        QHDialog qhDialog = new QHDialog(this,"提示", "短信发送成功");
-        qhDialog.setPositiveButton("ok", 0, new DialogInterface.OnClickListener(){
-            @Override
-            public void onClick(DialogInterface dialog, int which){
-                backToMessageFragment();
-                dialog.dismiss();
-            }
-        });
-        qhDialog.show();
+//        QHDialog qhDialog = new QHDialog(this,"提示", "短信发送成功");
+//        qhDialog.setPositiveButton("ok", 0, new DialogInterface.OnClickListener(){
+//            @Override
+//            public void onClick(DialogInterface dialog, int which){
+//                backToMessageFragment();
+//                dialog.dismiss();
+//            }
+//        });
+//        qhDialog.show();
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();//获取编辑器
+        editor.putString("lastSendTimeSave", DateUtil.parseDateToString(new Date(), DateUtil.DatePattern.YYYYMMDDHHMMSS));
+        editor.apply(); //提交修改
 
         realm.executeTransaction(new Realm.Transaction() {
             @Override

@@ -1,6 +1,11 @@
 package com.cetcme.xkterminal.DataFormat.Util;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.widget.Toast;
+
 import java.io.UnsupportedEncodingException;
+import java.util.Date;
 
 /**
  * Created by qiuhong on 17/01/2018.
@@ -118,7 +123,17 @@ public class Util {
 
     public static void main(String[] args) {
 //        System.out.println(idCardGetBirthday("330238198811240134"));
-        System.out.println(ConvertUtil.bytesToHexString("12345678".getBytes()));
+//        System.out.println(ConvertUtil.bytesToHexString("12345678".getBytes()));
+
+
+//        SharedPreferences sharedPreferences = getSharedPreferences("xkTerminal", Context.MODE_PRIVATE); //私有数据
+//        String lastSendTime = sharedPreferences.getString("lastSendTime", "");
+        Long sendDate = DateUtil.parseStringToDate("2018/01/23 16:53:00", DateUtil.DatePattern.YYYYMMDDHHMMSS).getTime();
+        Long now = new Date().getTime();
+        System.out.println(now - sendDate);
+
+
+//        System.out.println(DateUtil.parseDateToString(new Date(), DateUtil.DatePattern.YYYYMMDDHHMMSS));
     }
 
 }

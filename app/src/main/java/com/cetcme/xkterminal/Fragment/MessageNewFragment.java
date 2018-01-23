@@ -1,6 +1,8 @@
 package com.cetcme.xkterminal.Fragment;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
@@ -83,9 +85,12 @@ public class MessageNewFragment extends Fragment{
             receiver_editText.setTextColor(0xFF000000);
             content_editText.setEnabled(false);
             content_editText.setTextColor(0xFF000000);
-            last_send_textView.setText(time);
+
             if (mainActivity.messageListStatus.equals("receive")) sender_or_receiver_textView.setText("发件人：");
         }
+        SharedPreferences sharedPreferences = mainActivity.getSharedPreferences("xkTerminal", Context.MODE_PRIVATE); //私有数据
+        String lastSendTime = sharedPreferences.getString("lastSendTime", "");
+        last_send_textView.setText(lastSendTime);
 
         content_editText.addTextChangedListener(new TextWatcher() {
             @Override

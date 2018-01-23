@@ -66,9 +66,19 @@ public class Util {
     /**
      * 字符串前面补0
      */
-    public static String addZeroString(String str, int length) {
+    public static String stringAddZero(String str, int length) {
         while(str.length() < length) {
             str = "0" + str;
+        }
+        return str;
+    }
+
+    /**
+     * 字符串去掉前面的0
+     */
+    public static String stringRemoveZero(String str) {
+        while (str.charAt(0) == '0') {
+            str = str.substring(1, str.length());
         }
         return str;
     }
@@ -107,7 +117,8 @@ public class Util {
     }
 
     public static void main(String[] args) {
-        System.out.println(idCardGetBirthday("330238198811240134"));
+//        System.out.println(idCardGetBirthday("330238198811240134"));
+        System.out.println(ConvertUtil.bytesToHexString(";".getBytes()));
     }
 
 }

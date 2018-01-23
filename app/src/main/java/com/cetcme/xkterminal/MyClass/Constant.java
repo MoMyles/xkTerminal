@@ -17,4 +17,10 @@ public class Constant {
 
     // 未定位闪烁间隔，0为不闪烁，ms
     public static int NO_GPS_FLASH_TIME = 700;
+
+    public static int MSG_WHAT_$04 = 0x01;
+    public static int MSG_WHAT_$R4 = 0x02;
+    public static int MSG_WHAT_$R1 = 0x03;
+    public static int MSG_WHAT_$R5 = 0x04;
+    public static int MSG_WHAT_$R0 = 0x05;
 }

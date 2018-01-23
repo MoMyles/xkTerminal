@@ -40,7 +40,7 @@ public class MessageFormat {
     }
 
     public static byte[] format(String targetAddress, String message) {
-        targetAddress = Util.addZeroString(targetAddress, 12);
+        targetAddress = Util.stringAddZero(targetAddress, 12);
         byte[] bytes = messageHead.getBytes();
         String unique = ConvertUtil.rc4ToHex();
         byte[] addressBytes = ByteUtil.byteMerger(ConvertUtil.str2Bcd(targetAddress), ConvertUtil.str2Bcd(unique));
@@ -87,7 +87,7 @@ public class MessageFormat {
 //                (byte) 0x0A
 //            };
 
-//        byte[] frameData = format(Util.addZeroString("123456", 12), "你好，这是一条短信00000");
+//        byte[] frameData = format(Util.stringAddZero("123456", 12), "你好，这是一条短信00000");
 //        String[] unFormatStrings = unFormat(frameData);
 //        String targetAddress = unFormatStrings[0];
 //        String messageContent = unFormatStrings[1];
@@ -98,8 +98,8 @@ public class MessageFormat {
     }
 
     private static byte getDataLengthByte (String message, int frameCountInt) {
-        String messageLengthBitStr = Util.addZeroString(Integer.toBinaryString(message.getBytes().length), 6);
-        String frameCount = Util.addZeroString(Integer.toBinaryString(frameCountInt), 2);
+        String messageLengthBitStr = Util.stringAddZero(Integer.toBinaryString(message.getBytes().length), 6);
+        String frameCount = Util.stringAddZero(Integer.toBinaryString(frameCountInt), 2);
         return Util.BitToByte(frameCount + messageLengthBitStr);
     }
 

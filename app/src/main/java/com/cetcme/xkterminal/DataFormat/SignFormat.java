@@ -12,6 +12,8 @@ import java.io.UnsupportedEncodingException;
 
 public class SignFormat {
 
+    public static final String MESSAGE_END_SYMBOL = "\r\n";
+
     public static String[] unFormat(byte[] frameData) {
 
         try {
@@ -28,8 +30,22 @@ public class SignFormat {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+        name = Util.stringRemoveZero(name);
 
         return new String[]{id, name};
+    }
+
+    public static byte[] format() {
+        byte[] frameData = "$R0".getBytes();
+        byte[] idBytes = ConvertUtil.str2Bcd("330283198811240134");
+        frameData = ByteUtil.byteMerger(frameData, idBytes);
+        try {
+            frameData = ByteUtil.byteMerger(frameData, "00000000裘鸿".getBytes("GBK"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        frameData = ByteUtil.byteMerger(frameData, MESSAGE_END_SYMBOL.getBytes());
+        return frameData;
     }
 
     public static void main(String[] args) {

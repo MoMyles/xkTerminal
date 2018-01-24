@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="629dp"
+              android:layout_height="397dp"
+              android:orientation="vertical"
+              android:background="@drawable/sfz">
+
+    <TextView
+        android:id="@+id/name_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="120dp"
+        android:layout_marginStart="120dp"
+        android:layout_marginTop="66dp"
+        android:gravity="center_vertical"
+        android:text="裘鸿"
+        android:textColor="#000000"
+        android:textSize="22sp"/>
+
+
+    <TextView
+        android:id="@+id/sex_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="120dp"
+        android:layout_marginStart="120dp"
+        android:layout_marginTop="112dp"
+        android:textColor="#000000"
+        android:textSize="22sp"
+        android:gravity="center_vertical"
+        android:text="男"/>
+
+    <TextView
+        android:id="@+id/nation_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="250dp"
+        android:layout_marginStart="250dp"
+        android:layout_marginTop="112dp"
+        android:textColor="#000000"
+        android:textSize="22sp"
+        android:gravity="center_vertical"
+        android:text="汉"/>
+
+    <TextView
+        android:id="@+id/year_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="120dp"
+        android:layout_marginStart="120dp"
+        android:layout_marginTop="158dp"
+        android:textColor="#000000"
+        android:textSize="22sp"
+        android:gravity="center_vertical"
+        android:text="1988"/>
+
+    <TextView
+        android:id="@+id/month_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="220dp"
+        android:layout_marginStart="220dp"
+        android:layout_marginTop="158dp"
+        android:textColor="#000000"
+        android:textSize="22sp"
+        android:gravity="center_vertical"
+        android:text="11"/>
+
+    <TextView
+        android:id="@+id/day_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="280dp"
+        android:layout_marginStart="280dp"
+        android:layout_marginTop="158dp"
+        android:textColor="#000000"
+        android:textSize="22sp"
+        android:gravity="center_vertical"
+        android:text="24"/>
+
+    <TextView
+        android:id="@+id/address_textView"
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="120dp"
+        android:layout_marginStart="120dp"
+        android:layout_marginTop="202dp"
+        android:textColor="#000000"
+        android:textSize="22sp"
+        android:gravity="center_vertical"
+        android:lineSpacingExtra="6dp"
+        android:text="浙江省奉化市锦屏街道凉河路2幢305室"/>
+
+    <TextView
+        android:id="@+id/idCard_textView"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="210dp"
+        android:layout_marginStart="210dp"
+        android:layout_marginTop="322dp"
+        android:gravity="center_vertical"
+        android:text="3302831988112401123"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:textSize="26sp"/>
+
+    <TextView
+        android:id="@+id/img_textView"
+        android:layout_width="160dp"
+        android:layout_height="220dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="50dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginTop="70dp"
+        android:gravity="center_vertical"
+        android:background="@drawable/portrait"
+        android:textSize="26sp"/>
+
+
+
+
+
+</RelativeLayout>

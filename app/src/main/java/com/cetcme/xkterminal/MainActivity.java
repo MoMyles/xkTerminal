@@ -187,14 +187,15 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void showIDCardDialog(String id, String name) {
+    public void showIDCardDialog(String id, String name, String nation, String address) {
         Intent intent = new Intent(MainActivity.this, IDCardActivity.class);
         intent.putExtra("name", name);
-        //TODO: 解析身份证
+
         intent.putExtra("sex", Util.idCardGetSex(id));
         intent.putExtra("birthday", Util.idCardGetBirthday(id));
-        intent.putExtra("address", "浙江省嘉兴市南湖区xx小区xx幢xx室");
+        intent.putExtra("address", address);
         intent.putExtra("idCard", id);
+        intent.putExtra("nation", nation);
         startActivity(intent);
 
         addSignLog(id, name);

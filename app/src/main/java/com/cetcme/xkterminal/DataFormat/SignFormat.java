@@ -22,11 +22,18 @@ public class SignFormat {
             e.printStackTrace();
         }
 
-        String id = ConvertUtil.bcd2Str(ByteUtil.subBytes(frameData, 3, 12));
+        try {
+            String targetAddress = new String(ByteUtil.subBytes(frameData, 3, 11), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        String id = ConvertUtil.bcd2Str(ByteUtil.subBytes(frameData, 11, 20));
         String name = ""; //ConvertUtil.asciiToString(ByteUtil.subBytes(frameData, 3, 12));
 
         try {
-            name = new String(ByteUtil.subBytes(frameData, 12, 24), "GBK");
+            name = ConvertUtil.turnNameBytesToString(ByteUtil.subBytes(frameData, 20, 32), 0);
+//            name = new String(ByteUtil.subBytes(frameData, 20, 32), "GBK");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -38,6 +45,7 @@ public class SignFormat {
     public static byte[] format() {
         byte[] frameData = "$R0".getBytes();
         byte[] idBytes = ConvertUtil.str2Bcd("330283198811240134");
+        frameData = ByteUtil.byteMerger(frameData, "12345678".getBytes());
         frameData = ByteUtil.byteMerger(frameData, idBytes);
         try {
             frameData = ByteUtil.byteMerger(frameData, "00000000裘鸿".getBytes("GBK"));

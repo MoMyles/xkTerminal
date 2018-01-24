@@ -341,7 +341,9 @@ public class MyApplication extends Application {
                     String[] idStrings = SignFormat.unFormat(bytes);
                     String id = idStrings[0];
                     String name = idStrings[1];
-                    mainActivity.showIDCardDialog(id, name);
+                    String nation = "--";
+                    String idAddress = "浙江省嘉兴市南湖区xx小区xx幢xx室";
+                    mainActivity.showIDCardDialog(id, name, nation, idAddress);
                     break;
                 default:
                     super.handleMessage(msg);//这里最好对不需要或者不关心的消息抛给父类，避免丢失消息

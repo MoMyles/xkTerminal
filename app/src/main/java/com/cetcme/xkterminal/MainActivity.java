@@ -32,12 +32,14 @@ import com.cetcme.xkterminal.Fragment.MessageNewFragment;
 import com.cetcme.xkterminal.Fragment.SettingFragment;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.DensityUtil;
+import com.cetcme.xkterminal.MyClass.SystemDateTime;
 import com.cetcme.xkterminal.RealmModels.Alert;
 import com.cetcme.xkterminal.RealmModels.Message;
 import com.cetcme.xkterminal.RealmModels.Sign;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.qiuhong.qhlibrary.Dialog.QHDialog;
 
+import java.io.IOException;
 import java.util.Date;
 
 import io.realm.Realm;
@@ -120,6 +122,14 @@ public class MainActivity extends AppCompatActivity {
 //        int width = DensityUtil.getScreenWidth(this, this);
 //        System.out.println("========== height: " + height);
 //        System.out.println("========== width: " + width);
+
+        try {
+            SystemDateTime.setTime(11,11);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
     }
 

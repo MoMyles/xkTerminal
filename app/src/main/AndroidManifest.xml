@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.cetcme.xkterminal">
 
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
@@ -10,6 +12,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <!--开机广播接受者-->
+        <receiver android:name=".MyClass.BootBroadcastReceiver">
+            <intent-filter>
+                <!--注册开机广播地址-->
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
         <activity
             android:name=".MainActivity"
             android:screenOrientation="sensorLandscape">

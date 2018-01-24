@@ -441,13 +441,14 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences sharedPreferences = getSharedPreferences("xkTerminal", Context.MODE_PRIVATE); //私有数据
         String lastSendTime = sharedPreferences.getString("lastSendTime", "");
-        Long sendDate = DateUtil.parseStringToDate(lastSendTime, DateUtil.DatePattern.YYYYMMDDHHMMSS).getTime();
-        Long now = new Date().getTime();
-        if (now - sendDate <= 60 * 1000) {
-            Toast.makeText(this, "发送时间间隔不到1分钟，请等待", Toast.LENGTH_SHORT).show();
-            return;
+        if (!lastSendTime.isEmpty()) {
+            Long sendDate = DateUtil.parseStringToDate(lastSendTime, DateUtil.DatePattern.YYYYMMDDHHMMSS).getTime();
+            Long now = new Date().getTime();
+            if (now - sendDate <= 60 * 1000) {
+                Toast.makeText(this, "发送时间间隔不到1分钟，请等待", Toast.LENGTH_SHORT).show();
+                return;
+            }
         }
-
 
         final String receiver = messageNewFragment.getReceiver();
         final String content = messageNewFragment.getContent();
@@ -503,6 +504,8 @@ public class MainActivity extends AppCompatActivity {
         byte[] messageBytes = MessageFormat.format(receiver, content);
         ((MyApplication) getApplication()).sendBytes(messageBytes);
         System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
+
+        backToMessageFragment();
     }
 
     public void modifyGpsBarMessageCount() {

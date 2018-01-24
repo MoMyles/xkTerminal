@@ -21,6 +21,8 @@ import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.R;
 
+import java.io.UnsupportedEncodingException;
+
 /**
  * Created by qiuhong on 11/01/2018.
  */
@@ -67,13 +69,13 @@ public class MessageNewFragment extends Fragment{
 
         if (tg.equals("new")) {
             titleBar.setTitle("新建短信");
-            text_count_textView.setText("剩余短信字数：" + (Constant.MESSAGE_CONTENT_MAX_LENGTH - content.length()));
+            text_count_textView.setText(Constant.MESSAGE_CONTENT_MAX_LENGTH + "");
         }
         if (tg.equals("relay")) {
             titleBar.setTitle("转发短信");
 //            receiver_editText.setText(receive);
             content_editText.setText(content);
-            text_count_textView.setText("剩余短信字数：" + (Constant.MESSAGE_CONTENT_MAX_LENGTH - content.length()));
+            text_count_textView.setText(getCurrentContentLength());
         }
 
         if (tg.equals("detail")) {
@@ -106,10 +108,10 @@ public class MessageNewFragment extends Fragment{
             @Override
             public void afterTextChanged(Editable editable) {
                 if (tg.equals("new")) {
-                    text_count_textView.setText("剩余短信字数：" + (Constant.MESSAGE_CONTENT_MAX_LENGTH - content_editText.getText().length()));
+                    text_count_textView.setText(getCurrentContentLength());
                 }
                 if (tg.equals("relay")) {
-                    text_count_textView.setText("剩余短信字数：" + (Constant.MESSAGE_CONTENT_MAX_LENGTH - content_editText.getText().length()));
+                    text_count_textView.setText(getCurrentContentLength());
                 }
             }
         });
@@ -125,5 +127,14 @@ public class MessageNewFragment extends Fragment{
         return content_editText.getText().toString();
     }
 
+    private String getCurrentContentLength() {
+        try {
+            int length = Constant.MESSAGE_CONTENT_MAX_LENGTH - content_editText.getText().toString().getBytes("GBK").length;
+            return length + "";
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return Constant.MESSAGE_CONTENT_MAX_LENGTH + "";
 
+        }
+    }
 }

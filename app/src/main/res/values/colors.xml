@@ -11,4 +11,6 @@
     <color name="QHTitleColor">#333c58</color>
 
     <color name="border_clo">#ccc</color>
+
+    <color name="separate_clo">#494949</color>
 </resources>

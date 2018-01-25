@@ -8,6 +8,8 @@ import android.view.MotionEvent;
 import android.widget.TextView;
 
 import com.cetcme.xkterminal.MyClass.Constant;
+
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 public class IDCardActivity extends Activity {
@@ -143,10 +145,12 @@ public class IDCardActivity extends Activity {
         String idCard = bundle.getString("idCard");
         String nation = bundle.getString("nation");
 
+        name = name.replace(" ", "");
+
         if (name.length() == 2) {
             String xing = name.substring(0, 1);
             name = name.substring(1, 2);
-            name = xing + "  " + name;
+            name = xing + "   " + name;
         }
 
         name_textView.setText(name);
@@ -200,7 +204,8 @@ public class IDCardActivity extends Activity {
                 break;
             case "X":
             case "x":
-                textView.setBackgroundResource(R.drawable.ocb_x);
+            case "A":
+                textView.setBackgroundResource(R.drawable.ocb_x_big);
                 break;
             default:
                 break;

@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -41,12 +42,13 @@ import com.qiuhong.qhlibrary.Dialog.QHDialog;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Objects;
 
 import io.realm.Realm;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static String myNumber = "123456";
+    public static String myNumber = "654321";
 
     private GPSBar gpsBar;
 
@@ -123,13 +125,24 @@ public class MainActivity extends AppCompatActivity {
 //        System.out.println("========== height: " + height);
 //        System.out.println("========== width: " + width);
 
-        try {
-            SystemDateTime.setTime(11,11);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            SystemDateTime.setTime(11,11);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+        SharedPreferences sharedPreferences = getSharedPreferences("xkTerminal", Context.MODE_PRIVATE);
+//        String dataStr = DateUtil.parseDateToString(new Date(), DateUtil.DatePattern.YYYYMMDDHHMMSS);
+//
+//        SharedPreferences.Editor editor = sharedPreferences.edit();//获取编辑器
+//        editor.putString("lastSendTimeSave", DateUtil.parseDateToString(new Date(), DateUtil.DatePattern.YYYYMMDDHHMMSS));
+//        editor.apply(); //提交修改
+
+        String lastSendTime = sharedPreferences.getString("lastSendTimeSave", "");
+
+        System.out.println("lastSendTime : " + lastSendTime);
+//        System.out.println("dataStr: " + dataStr);
 
     }
 
@@ -169,6 +182,10 @@ public class MainActivity extends AppCompatActivity {
                 message.setRead(false);
             }
         });
+
+        if (fragmentName.equals("message") && messageFragment.tg.equals("receive")) {
+            messageFragment.reloadDate();
+        }
     }
 
 
@@ -435,7 +452,7 @@ public class MainActivity extends AppCompatActivity {
         fragmentName = "message";
         backButtonStatus = "backToMain";
 
-        if (messageFragment.status.equals("sender")) {
+        if (messageFragment.tg.equals("send")) {
             messageFragment.reloadDate();
         }
     }
@@ -463,8 +480,9 @@ public class MainActivity extends AppCompatActivity {
         if (!lastSendTime.isEmpty()) {
             Long sendDate = DateUtil.parseStringToDate(lastSendTime, DateUtil.DatePattern.YYYYMMDDHHMMSS).getTime();
             Long now = new Date().getTime();
-            if (now - sendDate <= 60 * 1000) {
-                Toast.makeText(this, "发送时间间隔不到1分钟，请等待", Toast.LENGTH_SHORT).show();
+            if (now - sendDate <= Constant.MESSAGE_SEND_LIMIT_TIME) {
+                long remainSecond = (Constant.MESSAGE_SEND_LIMIT_TIME - (now - sendDate)) / 1000;
+                Toast.makeText(this, "发送时间间隔不到1分钟，请等待" + remainSecond + "秒", Toast.LENGTH_SHORT).show();
                 return;
             }
         }
@@ -534,5 +552,26 @@ public class MainActivity extends AppCompatActivity {
                 .count();
         gpsBar.modifyMessageCount(count);
     }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        System.out.println(keyCode);
+        switch(keyCode){
+            case KeyEvent.KEYCODE_HOME:return true;
+            case KeyEvent.KEYCODE_BACK:return true;
+            case KeyEvent.KEYCODE_CALL:return true;
+            case KeyEvent.KEYCODE_SYM: return true;
+            case KeyEvent.KEYCODE_VOLUME_DOWN: return true;
+            case KeyEvent.KEYCODE_VOLUME_UP: return true;
+            case KeyEvent.KEYCODE_STAR: return true;
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
+
+//    public void onAttachedToWindow() {
+//        this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD);
+//        super.onAttachedToWindow();
+//    }
 
 }

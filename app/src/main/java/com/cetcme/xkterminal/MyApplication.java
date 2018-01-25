@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.security.InvalidParameterException;
 import java.util.Date;
 
@@ -305,8 +306,13 @@ public class MyApplication extends Application {
     private Handler mHandler = new Handler() {
         @Override public void handleMessage(Message msg) {//覆盖handleMessage方法
             byte[] bytes = msg.getData().getByteArray("bytes");
+
+            SharedPreferences sharedPreferences = getSharedPreferences("xkTerminal", Context.MODE_PRIVATE); //私有数据
+            SharedPreferences.Editor editor = sharedPreferences.edit();//获取编辑器
+
             switch (msg.what) {//根据收到的消息的what类型处理
                 case 0x01:
+                    // 收到新短信
                     String[] messageStrings = MessageFormat.unFormat(bytes);
                     String address = messageStrings[0];
                     String content = messageStrings[1];
@@ -318,16 +324,29 @@ public class MyApplication extends Application {
                     // 短信发送成功
                     Toast.makeText(getApplicationContext(), "短信发送成功", Toast.LENGTH_SHORT).show();
 
-                    SharedPreferences sharedPreferences = getSharedPreferences("xkTerminal", Context.MODE_PRIVATE); //私有数据
-                    SharedPreferences.Editor editor = sharedPreferences.edit();//获取编辑器
-                    String lastSendTimeSave = sharedPreferences.getString("lastSendTime", "");
-                    editor.putString("lastSendTimeSave", lastSendTimeSave);
+
+                    String lastSendTimeSave = sharedPreferences.getString("lastSendTimeSave", "");
+                    editor.putString("lastSendTime", lastSendTimeSave);
                     editor.apply(); //提交修改
 
                     break;
                 case 0x03:
                     // 接收时间
+                    try {
+                        String year = new String(ByteUtil.subBytes(bytes, 11, 12), "UTF-8");
+                        String month = new String(ByteUtil.subBytes(bytes, 12, 13), "UTF-8");
+                        String day = new String(ByteUtil.subBytes(bytes, 13, 14), "UTF-8");
+                        String hour = new String(ByteUtil.subBytes(bytes, 14, 15), "UTF-8");
+                        String minute = new String(ByteUtil.subBytes(bytes, 16, 17), "UTF-8");
+                        String second = new String(ByteUtil.subBytes(bytes, 18, 19), "UTF-8");
+                        String date = "20" + year + "/" + month + "/" + day + " " + hour + ":" + minute + ":" + second;
+                        System.out.println("date: " + date);
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
 
+                    String myNumber = ConvertUtil.bcd2Str(ByteUtil.subBytes(bytes, 17, 21));
+                    System.out.println("myNumber: " + myNumber);
                     break;
                 case 0x04:
                     // 报警发送成功

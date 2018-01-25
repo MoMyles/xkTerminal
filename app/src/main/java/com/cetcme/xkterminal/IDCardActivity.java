@@ -74,7 +74,7 @@ public class IDCardActivity extends Activity {
                 }
                 countDown--;
                 System.out.println(countDown);
-            } while (countDown != 0);
+            } while (countDown > 0);
             if (needDismissActivity) {
                 runOnUiThread(new Runnable() {
                     @Override
@@ -224,6 +224,7 @@ public class IDCardActivity extends Activity {
 
     protected void onDestroy() {
         needDismissActivity = false;
+        countDown = 0;
         MainActivity.idCardDialogOpen = false;
         ((MyApplication)getApplication()).idCardActivity = null;
         super.onDestroy();

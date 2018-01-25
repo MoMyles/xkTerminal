@@ -45,7 +45,7 @@ public class MessageFragment extends Fragment{
 
     public MainActivity mainActivity;
 
-    private String tg;
+    public String tg;
     private TitleBar titleBar;
 
     private ListView listView;

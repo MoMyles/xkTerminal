@@ -176,7 +176,6 @@ public class GPSBar extends RelativeLayout {
                 textView_location_status.setTextColor(0xFFD0021B);
                 textView_location_status.setText("未定位");
                 noGps = true;
-                new HalfTimeHandler().start();
             }
 
 //            int messageNumber = jsonObject.getInt("messageNumber");
@@ -212,16 +211,33 @@ public class GPSBar extends RelativeLayout {
         @Override
         public void run() {
             super.run();
+            int i = 0;
             do {
+
                 try {
-                    Message message = new Message();
-                    message.what = 1;
-                    handler.sendMessage(message);
-                    Thread.sleep(1000);
+                    Thread.sleep(100);
                 }
                 catch (Exception e) {
 
                 }
+
+                if (i % 10 == 0) {
+                    Message message = new Message();
+                    message.what = 1;
+                    handler.sendMessage(message);
+                }
+
+                if (Constant.NO_GPS_FLASH_TIME != 0) {
+                    int noGpsFlashTime = Constant.NO_GPS_FLASH_TIME / 100;
+                    if (noGps && i % noGpsFlashTime == 0) {
+                        Message message = new Message();
+                        message.what = 3;
+                        handler.sendMessage(message);
+                    }
+                    if (i == 10 * noGpsFlashTime) i = 0;
+                }
+
+                i++;
             } while (true);
         }
     }

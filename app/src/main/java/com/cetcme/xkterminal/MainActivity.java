@@ -198,18 +198,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showIDCardDialog(String id, String name, String nation, String address) {
-        Intent intent = new Intent(MainActivity.this, IDCardActivity.class);
-        intent.putExtra("name", name);
+        Bundle bundle = new Bundle();
+        bundle.putString("name", name);
+        bundle.putString("sex", Util.idCardGetSex(id));
+        bundle.putString("nation", nation);
+        bundle.putString("birthday", Util.idCardGetBirthday(id));
+        bundle.putString("address", address);
+        bundle.putString("idCard", id);
 
-        intent.putExtra("sex", Util.idCardGetSex(id));
-        intent.putExtra("birthday", Util.idCardGetBirthday(id));
-        intent.putExtra("address", address);
-        intent.putExtra("idCard", id);
-        intent.putExtra("nation", nation);
-        startActivity(intent);
+        if (!idCardDialogOpen) {
+            Intent intent = new Intent(MainActivity.this, IDCardActivity.class);
+            intent.putExtras(bundle);
+            startActivity(intent);
+            idCardDialogOpen = true;
+        } else {
+            ((MyApplication)getApplication()).idCardActivity.setData(bundle);
+        }
 
         addSignLog(id, name);
+
     }
+    public static boolean idCardDialogOpen = false;
 
     public void showDangerDialog() {
         Intent intent = new Intent(MainActivity.this, AlertActivity.class);

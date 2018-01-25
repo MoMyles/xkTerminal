@@ -3,6 +3,7 @@ package com.cetcme.xkterminal;
 import android.app.Activity;
 import android.os.Handler;
 import android.os.Bundle;
+import android.os.Message;
 import android.view.MotionEvent;
 import android.widget.TextView;
 
@@ -41,26 +42,46 @@ public class IDCardActivity extends Activity {
     private ArrayList<TextView> idTextViewArr = new ArrayList<>();
 
     boolean needDismissActivity = true;
+    int countDown = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_idcard_new);
         bindView();
-        setDate();
+
+        ((MyApplication)getApplication()).idCardActivity = this;
+
+        setData(getIntent().getExtras());
 
 
         if (Constant.IDCARD_REMAIN_TIME != 0) {
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (needDismissActivity) {
-                        onBackPressed();
-                    }
-                }
-            }, Constant.IDCARD_REMAIN_TIME);
+            new TimeHandler().start();
         }
 
+    }
+
+    class TimeHandler extends Thread {
+        @Override
+        public void run() {
+            super.run();
+            do {
+                try {
+                    Thread.sleep(1000);
+                } catch (Exception e) {
+                }
+                countDown--;
+                System.out.println(countDown);
+            } while (countDown != 0);
+            if (needDismissActivity) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        onBackPressed();
+                    }
+                });
+            }
+        }
     }
 
     private void bindView() {
@@ -112,14 +133,15 @@ public class IDCardActivity extends Activity {
 
     }
 
-    private void setDate() {
-
-        String name = getIntent().getExtras().getString("name");
-        String sex = getIntent().getExtras().getString("sex");
-        String birthday = getIntent().getExtras().getString("birthday");
-        String address = getIntent().getExtras().getString("address");
-        String idCard = getIntent().getExtras().getString("idCard");
-        String nation = getIntent().getExtras().getString("nation");
+    public void setData(Bundle bundle) {
+        countDown = Constant.IDCARD_REMAIN_TIME / 1000;
+        System.out.println("set countdown " + countDown);
+        String name = bundle.getString("name");
+        String sex = bundle.getString("sex");
+        String birthday = bundle.getString("birthday");
+        String address = bundle.getString("address");
+        String idCard = bundle.getString("idCard");
+        String nation = bundle.getString("nation");
 
         if (name.length() == 2) {
             String xing = name.substring(0, 1);
@@ -197,7 +219,11 @@ public class IDCardActivity extends Activity {
 
     protected void onDestroy() {
         needDismissActivity = false;
+        MainActivity.idCardDialogOpen = false;
+        ((MyApplication)getApplication()).idCardActivity = null;
         super.onDestroy();
     }
+
+
 
 }

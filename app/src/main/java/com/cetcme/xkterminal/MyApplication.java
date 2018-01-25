@@ -39,6 +39,7 @@ import io.realm.RealmConfiguration;
 public class MyApplication extends Application {
 
     public MainActivity mainActivity;
+    public IDCardActivity idCardActivity;
 
     public Realm realm;
     private OutputStream mOutputStream;

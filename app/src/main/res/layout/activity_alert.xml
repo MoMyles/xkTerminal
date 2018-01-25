@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="500dp"
+    android:layout_width="650dp"
     android:layout_height="wrap_content"
     android:gravity="center_horizontal"
     android:orientation="vertical"
     android:background="@drawable/dialog_bg">
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="30dp"
@@ -15,12 +15,30 @@
         android:layout_marginRight="30dp"
         android:layout_marginEnd="30dp"
         android:layout_marginBottom="10dp"
-        android:text="遇险类型："
-        android:textColor="@color/red"
-        android:textSize="24dp"
-        android:textStyle="bold"
-        android:gravity="left"
-        />
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="30dp"
+            android:text="遇险类型："
+            android:textColor="@color/red"
+            android:textSize="24dp"
+            android:textStyle="bold"
+            android:gravity="center_vertical"
+            />
+
+        <TextView
+            android:id="@+id/close_textView"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginTop="-10dp"
+            android:background="@drawable/close"/>
+
+
+    </LinearLayout>
+
+
 
     <TextView
         android:layout_width="match_parent"
@@ -37,6 +55,10 @@
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp">
 
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp"/>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="36dp"
@@ -51,7 +73,7 @@
                 android:layout_weight="1"
                 android:text="@string/dangerType_1"
                 android:textColor="@color/red"
-                android:textSize="16sp"
+                android:textSize="22sp"
                 android:button="@drawable/checkbox_selector"
                 android:textStyle="bold" />
 
@@ -62,10 +84,14 @@
                 android:layout_weight="1"
                 android:textColor="@color/red"
                 android:textStyle="bold"
-                android:textSize="16sp"
+                android:textSize="22sp"
                 android:button="@drawable/checkbox_selector"
                 android:text="@string/dangerType_5" />
         </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -80,7 +106,7 @@
                 android:layout_weight="1"
                 android:textColor="@color/red"
                 android:textStyle="bold"
-                android:textSize="16sp"
+                android:textSize="22sp"
                 android:button="@drawable/checkbox_selector"
                 android:text="@string/dangerType_2" />
 
@@ -91,10 +117,14 @@
                 android:layout_weight="1"
                 android:textColor="@color/red"
                 android:textStyle="bold"
-                android:textSize="16sp"
+                android:textSize="22sp"
                 android:button="@drawable/checkbox_selector"
                 android:text="@string/dangerType_6" />
         </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -109,7 +139,7 @@
                 android:layout_weight="1"
                 android:textColor="@color/red"
                 android:textStyle="bold"
-                android:textSize="16sp"
+                android:textSize="22sp"
                 android:button="@drawable/checkbox_selector"
                 android:text="@string/dangerType_3" />
 
@@ -120,10 +150,14 @@
                 android:layout_weight="1"
                 android:textColor="@color/red"
                 android:textStyle="bold"
-                android:textSize="16sp"
+                android:textSize="22sp"
                 android:button="@drawable/checkbox_selector"
                 android:text="@string/dangerType_7" />
         </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -138,7 +172,7 @@
                 android:layout_weight="1"
                 android:textColor="@color/red"
                 android:textStyle="bold"
-                android:textSize="16sp"
+                android:textSize="22sp"
                 android:button="@drawable/checkbox_selector"
                 android:text="@string/dangerType_4" />
 
@@ -149,10 +183,14 @@
                 android:layout_weight="1"
                 android:textColor="@color/red"
                 android:textStyle="bold"
-                android:textSize="16sp"
+                android:textSize="22sp"
                 android:button="@drawable/checkbox_selector"
                 android:text="@string/dangerType_8" />
         </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp"/>
 
 
     </LinearLayout>

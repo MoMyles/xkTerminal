@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.DataFormat.AlertFormat;
@@ -30,6 +31,7 @@ public class AlertActivity extends Activity implements View.OnClickListener{
 
 
     private Button confirm_button;
+
     private Realm realm;
 
     boolean needDismissActivity = true;
@@ -58,6 +60,14 @@ public class AlertActivity extends Activity implements View.OnClickListener{
     }
 
     private void bindView() {
+
+        findViewById(R.id.close_textView).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
+
         checkBox1 = findViewById(R.id.checkBox1);
         checkBox2 = findViewById(R.id.checkBox2);
         checkBox3 = findViewById(R.id.checkBox3);

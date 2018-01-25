@@ -14,11 +14,11 @@
         android:layout_alignParentTop="true"
         android:layout_marginLeft="120dp"
         android:layout_marginStart="120dp"
-        android:layout_marginTop="66dp"
+        android:layout_marginTop="58dp"
         android:gravity="center_vertical"
         android:text="裘鸿"
         android:textColor="#000000"
-        android:textSize="22sp"/>
+        android:textSize="26sp"/>
 
 
     <TextView
@@ -73,7 +73,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginLeft="220dp"
+        android:layout_marginLeft="200dp"
         android:layout_marginStart="220dp"
         android:layout_marginTop="158dp"
         android:textColor="#000000"
@@ -105,28 +105,28 @@
         android:layout_alignParentTop="true"
         android:layout_marginLeft="120dp"
         android:layout_marginStart="120dp"
-        android:layout_marginTop="202dp"
+        android:layout_marginTop="206dp"
         android:textColor="#000000"
         android:textSize="22sp"
         android:gravity="center_vertical"
         android:lineSpacingExtra="6dp"
         android:text="浙江省奉化市锦屏街道凉河路2幢305室"/>
 
-    <TextView
-        android:id="@+id/idCard_textView"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="210dp"
-        android:layout_marginStart="210dp"
-        android:layout_marginTop="322dp"
-        android:gravity="center_vertical"
-        android:text="3302831988112401123"
-        android:textStyle="bold"
-        android:textColor="#000000"
-        android:textSize="26sp"/>
+    <!--<com.cetcme.xkterminal.MyClass.Font.FontTextView-->
+        <!--android:id="@+id/idCard_textView"-->
+        <!--android:layout_width="300dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentLeft="true"-->
+        <!--android:layout_alignParentStart="true"-->
+        <!--android:layout_alignParentTop="true"-->
+        <!--android:layout_marginLeft="210dp"-->
+        <!--android:layout_marginStart="210dp"-->
+        <!--android:layout_marginTop="330dp"-->
+        <!--android:gravity="center_vertical"-->
+        <!--android:text="3302831988112401123"-->
+        <!--android:textColor="#000000"-->
+        <!--android:textSize="26sp"-->
+        <!--/>-->
 
     <TextView
         android:id="@+id/img_textView"
@@ -141,6 +141,242 @@
         android:gravity="center_vertical"
         android:background="@drawable/portrait"
         android:textSize="26sp"/>
+
+
+    <TextView
+        android:id="@+id/idCard_0_textView"
+        android:layout_width="16dp"
+        android:layout_height="23dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="210dp"
+        android:layout_marginStart="210dp"
+        android:layout_marginTop="330dp"
+        android:background="@drawable/ocb_3"
+        />
+
+    <TextView
+        android:id="@+id/idCard_1_textView"
+        android:layout_width="16dp"
+        android:layout_height="23dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="330dp"
+        android:layout_toEndOf="@+id/idCard_0_textView"
+        android:layout_toRightOf="@+id/idCard_0_textView"
+        android:layout_marginLeft="3dp"
+        android:layout_marginStart="3dp"
+        android:background="@drawable/ocb_3"
+        />
+
+    <TextView
+        android:id="@+id/idCard_2_textView"
+        android:layout_width="16dp"
+        android:layout_height="23dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="330dp"
+        android:layout_toEndOf="@+id/idCard_1_textView"
+        android:layout_toRightOf="@+id/idCard_1_textView"
+        android:layout_marginLeft="3dp"
+        android:layout_marginStart="3dp"
+        android:background="@drawable/ocb_0"
+        />
+
+    <TextView
+        android:id="@+id/idCard_3_textView"
+        android:layout_width="16dp"
+        android:layout_height="23dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="330dp"
+        android:layout_toEndOf="@+id/idCard_2_textView"
+        android:layout_toRightOf="@+id/idCard_2_textView"
+        android:layout_marginLeft="3dp"
+        android:layout_marginStart="3dp"
+        android:background="@drawable/ocb_2"
+        />
+
+    <TextView
+        android:id="@+id/idCard_4_textView"
+        android:layout_width="16dp"
+        android:layout_height="23dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="330dp"
+        android:layout_toEndOf="@+id/idCard_3_textView"
+        android:layout_toRightOf="@+id/idCard_3_textView"
+        android:layout_marginLeft="3dp"
+        android:layout_marginStart="3dp"
+        android:background="@drawable/ocb_8"
+        />
+
+    <TextView
+        android:id="@+id/idCard_5_textView"
+        android:layout_width="16dp"
+        android:layout_height="23dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="330dp"
+        android:layout_toEndOf="@+id/idCard_4_textView"
+        android:layout_toRightOf="@+id/idCard_4_textView"
+        android:layout_marginLeft="3dp"
+        android:layout_marginStart="3dp"
+        android:background="@drawable/ocb_3"
+        />
+
+    <TextView
+        android:id="@+id/idCard_6_textView"
+        android:layout_width="16dp"
+        android:layout_height="23dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="330dp"
+        android:layout_toEndOf="@+id/idCard_5_textView"
+        android:layout_toRightOf="@+id/idCard_5_textView"
+        android:layout_marginLeft="3dp"
+        android:layout_marginStart="3dp"
+        android:background="@drawable/ocb_1"
+        />
+
+    <TextView
+        android:id="@+id/idCard_7_textView"
+        android:layout_width="16dp"
+        android:layout_height="23dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="330dp"
+        android:layout_toEndOf="@+id/idCard_6_textView"
+        android:layout_toRightOf="@+id/idCard_6_textView"
+        android:layout_marginLeft="3dp"
+        android:layout_marginStart="3dp"
+        android:background="@drawable/ocb_9"
+        />
+
+    <TextView
+        android:id="@+id/idCard_8_textView"
+        android:layout_width="16dp"
+        android:layout_height="23dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="330dp"
+        android:layout_toEndOf="@+id/idCard_7_textView"
+        android:layout_toRightOf="@+id/idCard_7_textView"
+        android:layout_marginLeft="3dp"
+        android:layout_marginStart="3dp"
+        android:background="@drawable/ocb_8"
+        />
+
+    <TextView
+        android:id="@+id/idCard_9_textView"
+        android:layout_width="16dp"
+        android:layout_height="23dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="330dp"
+        android:layout_toEndOf="@+id/idCard_8_textView"
+        android:layout_toRightOf="@+id/idCard_8_textView"
+        android:layout_marginLeft="3dp"
+        android:layout_marginStart="3dp"
+        android:background="@drawable/ocb_8"
+        />
+
+    <TextView
+        android:id="@+id/idCard_10_textView"
+        android:layout_width="16dp"
+        android:layout_height="23dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="330dp"
+        android:layout_toEndOf="@+id/idCard_9_textView"
+        android:layout_toRightOf="@+id/idCard_9_textView"
+        android:layout_marginLeft="3dp"
+        android:layout_marginStart="3dp"
+        android:background="@drawable/ocb_1"
+        />
+
+    <TextView
+        android:id="@+id/idCard_11_textView"
+        android:layout_width="16dp"
+        android:layout_height="23dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="330dp"
+        android:layout_toEndOf="@+id/idCard_10_textView"
+        android:layout_toRightOf="@+id/idCard_10_textView"
+        android:layout_marginLeft="3dp"
+        android:layout_marginStart="3dp"
+        android:background="@drawable/ocb_1"
+        />
+
+    <TextView
+        android:id="@+id/idCard_12_textView"
+        android:layout_width="16dp"
+        android:layout_height="23dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="330dp"
+        android:layout_toEndOf="@+id/idCard_11_textView"
+        android:layout_toRightOf="@+id/idCard_11_textView"
+        android:layout_marginLeft="3dp"
+        android:layout_marginStart="3dp"
+        android:background="@drawable/ocb_2"
+        />
+
+    <TextView
+        android:id="@+id/idCard_13_textView"
+        android:layout_width="16dp"
+        android:layout_height="23dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="330dp"
+        android:layout_toEndOf="@+id/idCard_12_textView"
+        android:layout_toRightOf="@+id/idCard_12_textView"
+        android:layout_marginLeft="3dp"
+        android:layout_marginStart="3dp"
+        android:background="@drawable/ocb_4"
+        />
+
+    <TextView
+        android:id="@+id/idCard_14_textView"
+        android:layout_width="16dp"
+        android:layout_height="23dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="330dp"
+        android:layout_toEndOf="@+id/idCard_13_textView"
+        android:layout_toRightOf="@+id/idCard_13_textView"
+        android:layout_marginLeft="3dp"
+        android:layout_marginStart="3dp"
+        android:background="@drawable/ocb_0"
+        />
+
+    <TextView
+        android:id="@+id/idCard_15_textView"
+        android:layout_width="16dp"
+        android:layout_height="23dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="330dp"
+        android:layout_toEndOf="@+id/idCard_14_textView"
+        android:layout_toRightOf="@+id/idCard_14_textView"
+        android:layout_marginLeft="3dp"
+        android:layout_marginStart="3dp"
+        android:background="@drawable/ocb_1"
+        />
+
+    <TextView
+        android:id="@+id/idCard_16_textView"
+        android:layout_width="16dp"
+        android:layout_height="23dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="330dp"
+        android:layout_toEndOf="@+id/idCard_15_textView"
+        android:layout_toRightOf="@+id/idCard_15_textView"
+        android:layout_marginLeft="3dp"
+        android:layout_marginStart="3dp"
+        android:background="@drawable/ocb_3"
+        />
+
+    <TextView
+        android:id="@+id/idCard_17_textView"
+        android:layout_width="16dp"
+        android:layout_height="23dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="330dp"
+        android:layout_toEndOf="@+id/idCard_16_textView"
+        android:layout_toRightOf="@+id/idCard_16_textView"
+        android:layout_marginLeft="3dp"
+        android:layout_marginStart="3dp"
+        android:background="@drawable/ocb_4"
+        />
+
 
 
 

@@ -41,6 +41,7 @@ import com.kaopiz.kprogresshud.KProgressHUD;
 import com.qiuhong.qhlibrary.Dialog.QHDialog;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.Objects;
 
@@ -504,7 +505,14 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        if (Constant.MESSAGE_CONTENT_MAX_LENGTH != 0 && content.length() > Constant.MESSAGE_CONTENT_MAX_LENGTH) {
+        int length = 0;
+        try {
+            length = Constant.MESSAGE_CONTENT_MAX_LENGTH - content.getBytes("GBK").length;
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        if (Constant.MESSAGE_CONTENT_MAX_LENGTH != 0 && length > Constant.MESSAGE_CONTENT_MAX_LENGTH) {
             QHDialog qhDialog = new QHDialog(this,"提示", "短信内容长度超出最大值（" + Constant.MESSAGE_CONTENT_MAX_LENGTH + "）！");
             qhDialog.setOnlyOneButtonText("好的");
             qhDialog.show();

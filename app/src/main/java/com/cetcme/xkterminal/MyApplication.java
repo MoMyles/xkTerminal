@@ -350,6 +350,8 @@ public class MyApplication extends Application {
                     String status = Util.byteToBit(ByteUtil.subBytes(bytes, 21, 22)[0]);
                     boolean gpsStatus = status.charAt(7) == '1';
                     mainActivity.gpsBar.setGPSStatus(gpsStatus);
+                    String communication_from = status.charAt(6) == '1' ? "北斗" : "GPRS";
+                    PreferencesUtils.putString(getApplicationContext(), "communication_from", communication_from);
                     break;
                 case 0x04:
                     // 报警发送成功

@@ -71,6 +71,8 @@ public class SettingFragment extends Fragment {
             jsonObject.put("central_number", "378378");
 
             address_textView        .setText(PreferencesUtils.getString(getActivity(), "myNumber"));
+            communication_from_textView.setText(PreferencesUtils.getString(getActivity(), "communication_from"));
+
             signal_textView         .setText(jsonObject.getString("signal"));
             location_freq_textView  .setText(jsonObject.getString("location_per"));
             gps_freq_textView       .setText(jsonObject.getString("gps_per"));

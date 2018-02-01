@@ -178,7 +178,7 @@ public class MessageFragment extends Fragment{
         dataList.clear();
 
         RealmResults<Message> messages = realm.where(Message.class)
-                .equalTo(tg.equals("send") ? "sender" : "receiver", MainActivity.myNumber)
+                .equalTo("isSend" , tg.equals("send"))
                 .findAll();
         messages = messages.sort("send_time", Sort.DESCENDING);
 

@@ -25,6 +25,7 @@ public class Message extends RealmObject {
     private String content;
     private boolean read;
     private boolean deleted;
+    private boolean isSend;
 
     public String getSender() {
         return sender;
@@ -72,5 +73,13 @@ public class Message extends RealmObject {
 
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public boolean isSend() {
+        return isSend;
+    }
+
+    public void setSend(boolean send) {
+        isSend = send;
     }
 }

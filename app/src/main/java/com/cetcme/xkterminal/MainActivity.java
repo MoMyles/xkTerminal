@@ -177,6 +177,7 @@ public class MainActivity extends AppCompatActivity {
                 message.setDeleted(false);
                 message.setSend_time(new Date());
                 message.setRead(false);
+                message.setSend(false);
             }
         });
 
@@ -539,6 +540,7 @@ public class MainActivity extends AppCompatActivity {
                 message.setDeleted(false);
                 message.setSend_time(new Date());
                 message.setRead(false);
+                message.setSend(true);
             }
         });
 

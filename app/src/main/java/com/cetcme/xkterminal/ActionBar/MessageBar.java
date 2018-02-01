@@ -56,6 +56,9 @@ public class MessageBar extends RelativeLayout implements View.OnClickListener {
         buttons.add(button_next);
         buttons.add(button_back);
 
+        button_detail.setVisibility(GONE);
+        button_relay.setVisibility(GONE);
+
         for (Button button: buttons) {
             button.setTextColor(0xFF000000);
             button.setBackgroundResource(R.drawable.button_bg_selector);

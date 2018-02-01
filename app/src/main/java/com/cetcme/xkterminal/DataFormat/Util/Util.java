@@ -52,6 +52,64 @@ public class Util {
     }
 
     /**
+     * 将int数值转换为占四个字节的byte数组，本方法适用于(低位在前，高位在后)的顺序。 和bytesToInt（）配套使用
+     * @param value
+     *            要转换的int值
+     * @return byte数组
+     */
+    public static byte[] intToBytes( int value )
+    {
+        byte[] src = new byte[4];
+        src[3] =  (byte) ((value>>24) & 0xFF);
+        src[2] =  (byte) ((value>>16) & 0xFF);
+        src[1] =  (byte) ((value>>8) & 0xFF);
+        src[0] =  (byte) (value & 0xFF);
+        return src;
+    }
+    /**
+     * 将int数值转换为占四个字节的byte数组，本方法适用于(高位在前，低位在后)的顺序。  和bytesToInt2（）配套使用
+     */
+    public static byte[] intToBytes2(int value)
+    {
+        byte[] src = new byte[4];
+        src[0] = (byte) ((value>>24) & 0xFF);
+        src[1] = (byte) ((value>>16)& 0xFF);
+        src[2] = (byte) ((value>>8)&0xFF);
+        src[3] = (byte) (value & 0xFF);
+        return src;
+    }
+
+    /**
+     * byte数组中取int数值，本方法适用于(低位在前，高位在后)的顺序，和和intToBytes（）配套使用
+     *
+     * @param src
+     *            byte数组
+     * @param offset
+     *            从数组的第offset位开始
+     * @return int数值
+     */
+    public static int bytesToInt(byte[] src, int offset) {
+        int value;
+        value = (int) ((src[offset] & 0xFF)
+                | ((src[offset+1] & 0xFF)<<8)
+                | ((src[offset+2] & 0xFF)<<16)
+                | ((src[offset+3] & 0xFF)<<24));
+        return value;
+    }
+
+    /**
+     * byte数组中取int数值，本方法适用于(低位在后，高位在前)的顺序。和intToBytes2（）配套使用
+     */
+    public static int bytesToInt2(byte[] src, int offset) {
+        int value;
+        value = (int) ( ((src[offset] & 0xFF)<<24)
+                |((src[offset+1] & 0xFF)<<16)
+                |((src[offset+2] & 0xFF)<<8)
+                |(src[offset+3] & 0xFF));
+        return value;
+    }
+
+    /**
      * byte[]去掉第一位
      */
     public static  void bytesRemoveFirst(byte[] bytes, int count) {
@@ -128,12 +186,60 @@ public class Util {
 
 //        SharedPreferences sharedPreferences = getSharedPreferences("xkTerminal", Context.MODE_PRIVATE); //私有数据
 //        String lastSendTime = sharedPreferences.getString("lastSendTime", "");
-        Long sendDate = DateUtil.parseStringToDate("2018/01/23 16:53:00", DateUtil.DatePattern.YYYYMMDDHHMMSS).getTime();
-        Long now = new Date().getTime();
-        System.out.println(now - sendDate);
+//        Long sendDate = DateUtil.parseStringToDate("2018/01/23 16:53:00", DateUtil.DatePattern.YYYYMMDDHHMMSS).getTime();
+//        Long now = new Date().getTime();
+//        System.out.println(now - sendDate);
 
 
 //        System.out.println(DateUtil.parseDateToString(new Date(), DateUtil.DatePattern.YYYYMMDDHHMMSS));
+
+        byte[] bytes = "$R112345678".getBytes();
+
+        byte[] timeBytes = new byte[] {
+                0x12,
+                0x01,
+                0x0B,
+                0x07,
+                0x12,
+                0x01
+        };
+
+        byte[] numberBytes = new byte[] {
+                (byte) 0x00,
+                (byte) 0x26,
+                (byte) 0x12,
+                (byte) 0x22
+        };
+        bytes = ByteUtil.byteMerger(bytes, timeBytes);
+        bytes = ByteUtil.byteMerger(bytes, numberBytes);
+
+//        try {
+//            year = new String(ByteUtil.subBytes(bytes, 11, 12), "UTF-8");
+//            String month = new String(ByteUtil.subBytes(bytes, 12, 13), "UTF-8");
+//            String day = new String(ByteUtil.subBytes(bytes, 13, 14), "UTF-8");
+//            String hour = new String(ByteUtil.subBytes(bytes, 14, 15), "UTF-8");
+//            String minute = new String(ByteUtil.subBytes(bytes, 15, 16), "UTF-8");
+//            String second = new String(ByteUtil.subBytes(bytes, 17, 18), "UTF-8");
+//            String date = "20" + year + "/" + month + "/" + day + " " + hour + ":" + minute + ":" + second;
+//            System.out.println("date: " + date);
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
+
+        int year = ByteUtil.subBytes(bytes, 11, 12)[0]  & 0xFF;
+        int month = ByteUtil.subBytes(bytes, 12, 13)[0]  & 0xFF;
+        int day = ByteUtil.subBytes(bytes, 13, 14)[0]  & 0xFF;
+        int hour = ByteUtil.subBytes(bytes, 14, 15)[0]  & 0xFF;
+        int minute = ByteUtil.subBytes(bytes, 15, 16)[0]  & 0xFF;
+        int second = ByteUtil.subBytes(bytes, 16, 17)[0]  & 0xFF;
+        String date = "20" + year + "/" + month + "/" + day + " " + hour + ":" + minute + ":" + second;
+        System.out.println("date: " + date);
+
+        Date date1 = DateUtil.parseStringToDate(date);
+        System.out.println(date1);
+
+
+        System.out.println(bytesToInt2(ByteUtil.subBytes(bytes, 17, 21), 0));
     }
 
 }

@@ -19,6 +19,7 @@ import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
 import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
 import com.cetcme.xkterminal.DataFormat.Util.Util;
 import com.cetcme.xkterminal.MyClass.Constant;
+import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -332,21 +333,23 @@ public class MyApplication extends Application {
                     break;
                 case 0x03:
                     // 接收时间
-                    try {
-                        String year = new String(ByteUtil.subBytes(bytes, 11, 12), "UTF-8");
-                        String month = new String(ByteUtil.subBytes(bytes, 12, 13), "UTF-8");
-                        String day = new String(ByteUtil.subBytes(bytes, 13, 14), "UTF-8");
-                        String hour = new String(ByteUtil.subBytes(bytes, 14, 15), "UTF-8");
-                        String minute = new String(ByteUtil.subBytes(bytes, 16, 17), "UTF-8");
-                        String second = new String(ByteUtil.subBytes(bytes, 18, 19), "UTF-8");
-                        String date = "20" + year + "/" + month + "/" + day + " " + hour + ":" + minute + ":" + second;
-                        System.out.println("date: " + date);
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
+                    int year = ByteUtil.subBytes(bytes, 11, 12)[0]  & 0xFF;
+                    int month = ByteUtil.subBytes(bytes, 12, 13)[0]  & 0xFF;
+                    int day = ByteUtil.subBytes(bytes, 13, 14)[0]  & 0xFF;
+                    int hour = ByteUtil.subBytes(bytes, 14, 15)[0]  & 0xFF;
+                    int minute = ByteUtil.subBytes(bytes, 15, 16)[0]  & 0xFF;
+                    int second = ByteUtil.subBytes(bytes, 16, 17)[0]  & 0xFF;
+                    String dateStr = "20" + year + "/" + month + "/" + day + " " + hour + ":" + minute + ":" + second;
+                    Date date = DateUtil.parseStringToDate(dateStr);
+                    System.out.println(date);
 
-                    String myNumber = ConvertUtil.bcd2Str(ByteUtil.subBytes(bytes, 17, 21));
+                    int myNumber = Util.bytesToInt2(ByteUtil.subBytes(bytes, 17, 21), 0);
+                    PreferencesUtils.putString(getApplicationContext(), "myNumber", myNumber + "");
                     System.out.println("myNumber: " + myNumber);
+
+                    String status = Util.byteToBit(ByteUtil.subBytes(bytes, 21, 22)[0]);
+                    boolean gpsStatus = status.charAt(7) == '1';
+                    mainActivity.gpsBar.setGPSStatus(gpsStatus);
                     break;
                 case 0x04:
                     // 报警发送成功

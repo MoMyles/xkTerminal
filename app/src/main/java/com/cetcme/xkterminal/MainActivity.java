@@ -33,6 +33,7 @@ import com.cetcme.xkterminal.Fragment.MessageNewFragment;
 import com.cetcme.xkterminal.Fragment.SettingFragment;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.DensityUtil;
+import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.MyClass.SystemDateTime;
 import com.cetcme.xkterminal.RealmModels.Alert;
 import com.cetcme.xkterminal.RealmModels.Message;
@@ -49,15 +50,15 @@ import io.realm.Realm;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static String myNumber = "654321";
+    public static String myNumber = "";
 
-    private GPSBar gpsBar;
+    public GPSBar gpsBar;
 
-    private BottomBar bottomBar;
+    public BottomBar bottomBar;
     public  MessageBar messageBar;
     public  PageBar pageBar;
-    private BackBar backBar;
-    private SendBar sendBar;
+    public BackBar backBar;
+    public SendBar sendBar;
 
     private MainFragment mainFragment;
     private MessageFragment messageFragment;
@@ -101,6 +102,11 @@ public class MainActivity extends AppCompatActivity {
         initMainFragment();
         initHud();
 
+        myNumber = PreferencesUtils.getString(this, "myNumber");
+        if (myNumber == null) {
+            myNumber = "654321";
+            PreferencesUtils.putString(this, "myNumber", myNumber);
+        }
 
         // 模拟弹窗
         new Handler().postDelayed(new Runnable() {
@@ -133,17 +139,7 @@ public class MainActivity extends AppCompatActivity {
 //        } catch (InterruptedException e) {
 //            e.printStackTrace();
 //        }
-        SharedPreferences sharedPreferences = getSharedPreferences("xkTerminal", Context.MODE_PRIVATE);
-//        String dataStr = DateUtil.parseDateToString(new Date(), DateUtil.DatePattern.YYYYMMDDHHMMSS);
-//
-//        SharedPreferences.Editor editor = sharedPreferences.edit();//获取编辑器
-//        editor.putString("lastSendTimeSave", DateUtil.parseDateToString(new Date(), DateUtil.DatePattern.YYYYMMDDHHMMSS));
-//        editor.apply(); //提交修改
 
-        String lastSendTime = sharedPreferences.getString("lastSendTimeSave", "");
-
-        System.out.println("lastSendTime : " + lastSendTime);
-//        System.out.println("dataStr: " + dataStr);
 
     }
 
@@ -561,21 +557,21 @@ public class MainActivity extends AppCompatActivity {
         gpsBar.modifyMessageCount(count);
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        System.out.println(keyCode);
-        switch(keyCode){
-            case KeyEvent.KEYCODE_HOME:return true;
-            case KeyEvent.KEYCODE_BACK:return true;
-            case KeyEvent.KEYCODE_CALL:return true;
-            case KeyEvent.KEYCODE_SYM: return true;
-            case KeyEvent.KEYCODE_VOLUME_DOWN: return true;
-            case KeyEvent.KEYCODE_VOLUME_UP: return true;
-            case KeyEvent.KEYCODE_STAR: return true;
-        }
-
-        return super.onKeyDown(keyCode, event);
-    }
+//    @Override
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//        System.out.println(keyCode);
+//        switch(keyCode){
+//            case KeyEvent.KEYCODE_HOME:return true;
+//            case KeyEvent.KEYCODE_BACK:return true;
+//            case KeyEvent.KEYCODE_CALL:return true;
+//            case KeyEvent.KEYCODE_SYM: return true;
+//            case KeyEvent.KEYCODE_VOLUME_DOWN: return true;
+//            case KeyEvent.KEYCODE_VOLUME_UP: return true;
+//            case KeyEvent.KEYCODE_STAR: return true;
+//        }
+//
+//        return super.onKeyDown(keyCode, event);
+//    }
 
 //    public void onAttachedToWindow() {
 //        this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD);

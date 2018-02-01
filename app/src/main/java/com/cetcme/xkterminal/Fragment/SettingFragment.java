@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.cetcme.xkterminal.ActionBar.TitleBar;
+import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.R;
 
 import org.json.JSONException;
@@ -69,7 +70,7 @@ public class SettingFragment extends Fragment {
             jsonObject.put("gps_per", "1s");
             jsonObject.put("central_number", "378378");
 
-            address_textView        .setText(jsonObject.getString("address"));
+            address_textView        .setText(PreferencesUtils.getString(getActivity(), "myNumber"));
             signal_textView         .setText(jsonObject.getString("signal"));
             location_freq_textView  .setText(jsonObject.getString("location_per"));
             gps_freq_textView       .setText(jsonObject.getString("gps_per"));

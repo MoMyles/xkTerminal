@@ -94,6 +94,8 @@ public class MessageFragment extends Fragment{
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                /* 详情 和 转发按钮
                 System.out.println("message id: " + dataList.get(i));
                 mainActivity.messageBar.setDetailAndRelayButtonEnable(true);
                 if (i == selectedIndex) return;
@@ -107,6 +109,30 @@ public class MessageFragment extends Fragment{
                 mainActivity.messageReceiver = dataList.get(i).get("sender").toString();
                 mainActivity.messageContent = dataList.get(i).get("content").toString();
                 mainActivity.messageTime = dataList.get(i).get("time").toString();
+                */
+
+
+                // 单击进入
+                mainActivity.messageIndex = i;
+                mainActivity.messageId = dataList.get(i).get("id").toString();
+                mainActivity.messageReceiver = dataList.get(i).get("sender").toString();
+                mainActivity.messageContent = dataList.get(i).get("content").toString();
+                mainActivity.messageTime = dataList.get(i).get("time").toString();
+                mainActivity.initNewFragment("detail");
+
+            }
+        });
+
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                System.out.println("message id: " + dataList.get(i));
+                mainActivity.messageId = dataList.get(i).get("id").toString();
+                mainActivity.messageReceiver = dataList.get(i).get("sender").toString();
+                mainActivity.messageContent = dataList.get(i).get("content").toString();
+                mainActivity.messageTime = dataList.get(i).get("time").toString();
+                mainActivity.initNewFragment("relay");
+                return true;
             }
         });
 

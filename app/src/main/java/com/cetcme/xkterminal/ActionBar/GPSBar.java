@@ -168,15 +168,17 @@ public class GPSBar extends RelativeLayout {
             textView_speed.setText(jsonObject.getString("speed"));
             textView_heading.setText(jsonObject.getString("heading"));
 
-            if (jsonObject.getBoolean("gps")) {
-                textView_location_status.setTextColor(0xFF2657EC);
-                textView_location_status.setText("已定位");
-                noGps = false;
-            } else {
-                textView_location_status.setTextColor(0xFFD0021B);
-                textView_location_status.setText("未定位");
-                noGps = true;
-            }
+//            if (jsonObject.getBoolean("gps")) {
+//                textView_location_status.setTextColor(0xFF2657EC);
+//                textView_location_status.setText("已定位");
+//                noGps = false;
+//            } else {
+//                textView_location_status.setTextColor(0xFFD0021B);
+//                textView_location_status.setText("未定位");
+//                noGps = true;
+//            }
+
+            setGPSStatus(jsonObject.getBoolean("gps"));
 
 //            int messageNumber = jsonObject.getInt("messageNumber");
 //            setMessageCount(messageNumber);
@@ -185,6 +187,12 @@ public class GPSBar extends RelativeLayout {
             e.printStackTrace();
         }
 
+    }
+
+    public void setGPSStatus(boolean gpsStatus) {
+        textView_location_status.setTextColor(gpsStatus ? 0xFF2657EC : 0xFFD0021B);
+        textView_location_status.setText(gpsStatus ? "已定位" : "未定位");
+        noGps = !gpsStatus;
     }
 
     private boolean noGps = true;

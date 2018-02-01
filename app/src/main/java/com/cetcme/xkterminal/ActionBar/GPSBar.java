@@ -45,6 +45,8 @@ public class GPSBar extends RelativeLayout {
 
     private Realm realm;
 
+    private boolean noGps = true;
+
     // 用于关闭app
     private int clickTime = 0;
 
@@ -76,6 +78,7 @@ public class GPSBar extends RelativeLayout {
 
         textView_message_number     = view.findViewById(R.id.textView_message_number);
 
+        // TODO: for test
         textView_message.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -83,6 +86,7 @@ public class GPSBar extends RelativeLayout {
             }
         });
 
+        // TODO: for test
         textView_message_number.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -94,6 +98,12 @@ public class GPSBar extends RelativeLayout {
         textView_location_status.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
+                //测试定位状态
+//                System.out.println("textView_location_status clicked ++++++++++++++ nogps : " + noGps);
+//                noGps = !noGps;
+//                setGPSStatus(!noGps);
+
+                //显示串口测试activity
                 mainActivity.startActivity(new Intent(mainActivity, SerialPortActivity.class));
             }
         });
@@ -192,10 +202,9 @@ public class GPSBar extends RelativeLayout {
     public void setGPSStatus(boolean gpsStatus) {
         textView_location_status.setTextColor(gpsStatus ? 0xFF2657EC : 0xFFD0021B);
         textView_location_status.setText(gpsStatus ? "已定位" : "未定位");
+        if (gpsStatus) textView_location_status.setVisibility(VISIBLE);
         noGps = !gpsStatus;
     }
-
-    private boolean noGps = true;
 
     class HalfTimeHandler extends Thread{
         @Override

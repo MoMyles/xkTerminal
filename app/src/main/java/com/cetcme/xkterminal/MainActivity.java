@@ -200,13 +200,13 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void addAlertLog() {
+    public void addAlertLog(final String type) {
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 Alert alert = realm.createObject(Alert.class);
                 alert.setDeleted(false);
-                alert.setType("火灾、碰撞");
+                alert.setType(type);
                 alert.setTime(new Date());
             }
         });

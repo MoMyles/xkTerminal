@@ -254,6 +254,9 @@ public class MyApplication extends Application {
                         } else if (serialCount == 15) {
                             // 显示报警activity
                             message.what = 0x05;
+                        } else if (serialCount == 16) {
+                            // todo: 增加报警记录，显示收到报警
+                            message.what = 0x07;
                         }
                         message.setData(bundle);
                         mHandler.sendMessage(message);
@@ -360,6 +363,11 @@ public class MyApplication extends Application {
                 case 0x05:
                     // 显示报警activity
                     mainActivity.showDangerDialog();
+                    break;
+                case 0x07:
+                    // todo test: 增加报警记录，显示收到报警
+                    Toast.makeText(getApplicationContext(), "收到遇险报警", Toast.LENGTH_SHORT).show();
+                    mainActivity.addAlertLog("");
                     break;
                 case 0x06:
                     // 接收身份证信息

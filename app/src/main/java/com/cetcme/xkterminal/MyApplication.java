@@ -218,6 +218,17 @@ public class MyApplication extends Application {
 
                     // TODO 返回成功socket
 
+                    JSONObject sendJson = new JSONObject();
+                    try {
+                        sendJson.put("apiType", "sms_send");
+                        sendJson.put("code", 0);
+                        sendJson.put("msg", "发送成功");
+
+                        SocketServer.send(sendJson);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
 
             }
         } catch (JSONException e) {

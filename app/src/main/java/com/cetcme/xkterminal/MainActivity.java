@@ -38,8 +38,12 @@ import com.cetcme.xkterminal.MyClass.SystemDateTime;
 import com.cetcme.xkterminal.RealmModels.Alert;
 import com.cetcme.xkterminal.RealmModels.Message;
 import com.cetcme.xkterminal.RealmModels.Sign;
+import com.cetcme.xkterminal.Socket.SocketServer;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.qiuhong.qhlibrary.Dialog.QHDialog;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -530,6 +534,15 @@ public class MainActivity extends AppCompatActivity {
         editor.putString("lastSendTimeSave", DateUtil.parseDateToString(new Date(), DateUtil.DatePattern.YYYYMMDDHHMMSS));
         editor.apply(); //提交修改
 
+        final Message newMessage = new Message();
+        newMessage.setSender(myNumber);
+        newMessage.setReceiver(receiver);
+        newMessage.setContent(content);
+        newMessage.setDeleted(false);
+        newMessage.setSend_time(new Date());
+        newMessage.setRead(false);
+        newMessage.setSend(true);
+
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
@@ -549,6 +562,18 @@ public class MainActivity extends AppCompatActivity {
         System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
 
         backToMessageFragment();
+
+        // 短信推送
+        JSONObject sendJson = new JSONObject();
+        try {
+            sendJson.put("apiType", "sms_push");
+            sendJson.put("userAddress", "sms_push");
+            sendJson.put("data", newMessage.toJson());
+
+            SocketServer.send(sendJson);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public void modifyGpsBarMessageCount() {

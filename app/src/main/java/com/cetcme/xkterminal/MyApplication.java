@@ -18,21 +18,41 @@ import com.cetcme.xkterminal.DataFormat.Util.ByteUtil;
 import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
 import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
 import com.cetcme.xkterminal.DataFormat.Util.Util;
+import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
+import com.cetcme.xkterminal.Socket.SocketServer;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.qiuhong.qhlibrary.Dialog.QHDialog;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import android_serialport_api.SerialPort;
 import android_serialport_api.SerialPortFinder;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
+import io.realm.Sort;
+
+import static com.cetcme.xkterminal.MainActivity.myNumber;
 
 /**
  * Created by qiuhong on 12/01/2018.
@@ -47,9 +67,14 @@ public class MyApplication extends Application {
     private OutputStream mOutputStream;
     private InputStream mInputStream;
 
+    private Gson gson;
+
     @Override
     public void onCreate() {
         super.onCreate();
+
+        EventBus.getDefault().register(this);
+
         Realm.init(this);
         RealmConfiguration config = new RealmConfiguration.Builder().name("myrealm.realm").build();
         Realm.setDefaultConfiguration(config);
@@ -72,14 +97,206 @@ public class MyApplication extends Application {
             DisplayError(R.string.error_configuration);
         }
 
-        new Handler().postDelayed(new Runnable() {
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                // 测试接收
+//                testReceive(1);
+//            }
+//        },2000);
+
+        new Thread() {
             @Override
             public void run() {
-                // 测试接收
-//                testReceive(1);
+                new SocketServer().startService();
             }
-        },2000);
+        }.start();
 
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void Event(SmsEvent smsEvent) {
+        JSONObject receiveJson = smsEvent.getReceiveJson();
+        try {
+            String apiType = receiveJson.getString("apiType");
+            JSONObject jsonObject = new JSONObject();
+            switch (apiType) {
+                case "sms_list":
+                    JSONArray smsList = getSmsList();
+
+                    jsonObject.put("apiType", "sms_list");
+                    jsonObject.put("code", "0");
+                    jsonObject.put("msg", "获取成功");
+                    jsonObject.put("data", smsList);
+                    jsonObject.put("userAddress", MainActivity.myNumber);
+                    SocketServer.send(jsonObject);
+
+                    break;
+                case "sms_detail":
+                    String userAddress = receiveJson.getString("userAddress");
+                    JSONArray smsDetailStr = getSmsDetail(userAddress);
+
+                    jsonObject.put("apiType", "sms_detail");
+                    jsonObject.put("code", "0");
+                    jsonObject.put("msg", "获取成功");
+                    jsonObject.put("data", smsDetailStr);
+                    SocketServer.send(jsonObject);
+                    break;
+
+                case "sms_send":
+                    final com.cetcme.xkterminal.RealmModels.Message message = new com.cetcme.xkterminal.RealmModels.Message();
+                    message.fromJson(receiveJson.getJSONObject("data"));
+
+                    SharedPreferences sharedPreferences = getSharedPreferences("xkTerminal", Context.MODE_PRIVATE); //私有数据
+                    String lastSendTime = sharedPreferences.getString("lastSendTime", "");
+                    if (!lastSendTime.isEmpty()) {
+                        Long sendDate = DateUtil.parseStringToDate(lastSendTime, DateUtil.DatePattern.YYYYMMDDHHMMSS).getTime();
+                        Long now = new Date().getTime();
+                        if (now - sendDate <= Constant.MESSAGE_SEND_LIMIT_TIME) {
+                            long remainSecond = (Constant.MESSAGE_SEND_LIMIT_TIME - (now - sendDate)) / 1000;
+                            // TODO 返回不成功socket
+                            Toast.makeText(this, "发送时间间隔不到1分钟，请等待" + remainSecond + "秒", Toast.LENGTH_SHORT).show();
+
+                            JSONObject sendJson = new JSONObject();
+                            try {
+                                sendJson.put("apiType", "sms_send");
+                                sendJson.put("code", 1);
+                                sendJson.put("msg", "发送时间间隔不到1分钟，请等待" + remainSecond + "秒");
+
+                                SocketServer.send(sendJson);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            return;
+                        }
+                    }
+
+                    int length = 0;
+                    try {
+                        length = Constant.MESSAGE_CONTENT_MAX_LENGTH - message.getContent().getBytes("GBK").length;
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+
+                    if (Constant.MESSAGE_CONTENT_MAX_LENGTH != 0 && length > Constant.MESSAGE_CONTENT_MAX_LENGTH) {
+                        // TODO 返回不成功socket
+
+                        JSONObject sendJson = new JSONObject();
+                        try {
+                            sendJson.put("apiType", "sms_send");
+                            sendJson.put("code", 2);
+                            sendJson.put("msg", "短信内容长度超出最大值（" + Constant.MESSAGE_CONTENT_MAX_LENGTH + "）！");
+
+                            SocketServer.send(sendJson);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        return;
+                    }
+
+                    SharedPreferences.Editor editor = sharedPreferences.edit();//获取编辑器
+                    editor.putString("lastSendTimeSave", DateUtil.parseDateToString(new Date(), DateUtil.DatePattern.YYYYMMDDHHMMSS));
+                    editor.apply(); //提交修改
+
+                    realm.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            com.cetcme.xkterminal.RealmModels.Message newMessage = realm.createObject(com.cetcme.xkterminal.RealmModels.Message.class);
+                            newMessage.setSender(myNumber);
+                            newMessage.setReceiver(message.getReceiver());
+                            newMessage.setContent(message.getContent());
+                            newMessage.setDeleted(false);
+                            newMessage.setSend_time(message.getSend_time());
+                            newMessage.setRead(false);
+                            newMessage.setSend(true);
+                        }
+                    });
+
+                    byte[] messageBytes = MessageFormat.format(message.getReceiver(), message.getContent());
+                    sendBytes(messageBytes);
+                    System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
+
+                    // TODO 返回成功socket
+
+
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public JSONArray getSmsList() {
+        RealmResults<com.cetcme.xkterminal.RealmModels.Message> messages = realm.where(com.cetcme.xkterminal.RealmModels.Message.class)
+                .findAll();
+        messages = messages.sort("send_time", Sort.DESCENDING);
+
+        ArrayList<String> userAddresses = new ArrayList<>();
+        for (com.cetcme.xkterminal.RealmModels.Message message: messages) {
+            if (message.isSend() && !userAddresses.contains(message.getReceiver())) userAddresses.add(message.getReceiver());
+            if (!message.isSend() && !userAddresses.contains(message.getSender())) userAddresses.add(message.getSender());
+        }
+
+        JSONArray smsList = new JSONArray();
+        for (String userAddress : userAddresses) {
+            RealmQuery<com.cetcme.xkterminal.RealmModels.Message> query = realm.where(com.cetcme.xkterminal.RealmModels.Message.class);
+            query.equalTo("receiver", userAddress);
+            query.sort("send_time", Sort.ASCENDING);
+            RealmResults<com.cetcme.xkterminal.RealmModels.Message> smses = query.findAll();
+            com.cetcme.xkterminal.RealmModels.Message message = smses.last();
+
+            JSONObject jsonObject = new JSONObject();
+            try {
+                jsonObject.put("lastSmsContent", message.getContent());
+                jsonObject.put("userAddress", userAddress);
+                jsonObject.put("lastSmsTime", message.getSend_time());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            smsList.put(jsonObject);
+        }
+
+//        System.out.println("+++++smsList" + smsList);
+        return smsList;
+    }
+
+    public JSONArray getSmsDetail(String userAddress) {
+        RealmResults<com.cetcme.xkterminal.RealmModels.Message> messages;
+
+        if (userAddress.equals(myNumber)) {
+            messages = realm.where(com.cetcme.xkterminal.RealmModels.Message.class)
+                    .equalTo("sender", userAddress)
+                    .equalTo("receiver", userAddress)
+                    .findAll();
+        } else {
+            messages = realm.where(com.cetcme.xkterminal.RealmModels.Message.class)
+                    .equalTo("sender", userAddress)
+                    .or().equalTo("receiver", userAddress)
+                    .findAll();
+        }
+
+        messages = messages.sort("send_time", Sort.ASCENDING);
+
+        JSONArray smsList = new JSONArray();
+        for (com.cetcme.xkterminal.RealmModels.Message message : messages) {
+            JSONObject jsonObject = new JSONObject();
+            try {
+                jsonObject.put("id", message.getId());
+                jsonObject.put("sender", message.getSender());
+                jsonObject.put("receiver", message.getReceiver());
+                jsonObject.put("send_time", message.getSend_time());
+                jsonObject.put("content", message.getContent());
+                jsonObject.put("read", message.isRead());
+                jsonObject.put("deleted", message.isDeleted());
+                jsonObject.put("isSend", message.isSend());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            smsList.put(jsonObject);
+        }
+        return smsList;
     }
 
     private void testReceive(int i) {

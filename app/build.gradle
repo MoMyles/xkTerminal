@@ -53,6 +53,12 @@ dependencies {
     compile 'com.github.qiuh1016:qhLibrary:1.2.0'
 
     compile 'com.kaopiz:kprogresshud:1.0.5'
+
+    // eventBus
+    compile 'org.greenrobot:eventbus:3.1.1'
+
+    // gson
+    compile 'com.google.code.gson:gson:2.8.0'
 }
 
 realm {

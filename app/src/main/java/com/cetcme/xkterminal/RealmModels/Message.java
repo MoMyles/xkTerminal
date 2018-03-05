@@ -1,5 +1,8 @@
 package com.cetcme.xkterminal.RealmModels;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Date;
 import java.util.UUID;
 
@@ -82,4 +85,37 @@ public class Message extends RealmObject {
     public void setSend(boolean send) {
         isSend = send;
     }
+
+    public JSONObject toJson() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("id", this.id);
+            jsonObject.put("sender", this.sender);
+            jsonObject.put("receiver", this.receiver);
+            jsonObject.put("send_time", this.send_time);
+            jsonObject.put("content", this.content);
+            jsonObject.put("read", this.read);
+            jsonObject.put("deleted", this.deleted);
+            jsonObject.put("isSend", this.isSend);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return jsonObject;
+    }
+
+    public void fromJson(JSONObject jsonObject) {
+        try {
+            this.sender = jsonObject.getString("sender");
+            this.receiver = jsonObject.getString("receiver");
+            this.send_time = new Date(jsonObject.getString("send_time"));
+            this.content = jsonObject.getString("content");
+            this.read = jsonObject.getBoolean("read");
+            this.deleted = jsonObject.getBoolean("deleted");
+            this.isSend = jsonObject.getBoolean("isSend");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

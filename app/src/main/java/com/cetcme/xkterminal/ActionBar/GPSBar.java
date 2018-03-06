@@ -12,7 +12,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.cetcme.xkterminal.DataFormat.MessageFormat;
 import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.R;
@@ -22,6 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import io.realm.Realm;
 
@@ -105,6 +108,18 @@ public class GPSBar extends RelativeLayout {
 
                 //显示串口测试activity
                 mainActivity.startActivity(new Intent(mainActivity, SerialPortActivity.class));
+            }
+        });
+
+        // TODO: for test 收到新的短信息
+        textView_heading.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // 收到新短信
+
+                mainActivity.addMessage("654321", "测试收到新的短消息");
+                mainActivity.modifyGpsBarMessageCount();
+                Toast.makeText(view.getContext(), "您有新的短信", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -204,24 +219,6 @@ public class GPSBar extends RelativeLayout {
         textView_location_status.setText(gpsStatus ? "已定位" : "未定位");
         if (gpsStatus) textView_location_status.setVisibility(VISIBLE);
         noGps = !gpsStatus;
-    }
-
-    class HalfTimeHandler extends Thread{
-        @Override
-        public void run() {
-            super.run();
-            while (noGps && Constant.NO_GPS_FLASH_TIME != 0) {
-                try {
-                    Message message = new Message();
-                    message.what = 3;
-                    handler.sendMessage(message);
-                    Thread.sleep(Constant.NO_GPS_FLASH_TIME);
-                }
-                catch (Exception e) {
-
-                }
-            }
-        }
     }
 
     class TimeHandler extends Thread{

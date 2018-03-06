@@ -207,7 +207,7 @@ public class MyApplication extends Application {
                             newMessage.setContent(message.getContent());
                             newMessage.setDeleted(false);
                             newMessage.setSend_time(message.getSend_time());
-                            newMessage.setRead(false);
+                            newMessage.setRead(true);
                             newMessage.setSend(true);
                         }
                     });
@@ -217,7 +217,6 @@ public class MyApplication extends Application {
                     System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
 
                     // 返回成功socket
-
                     JSONObject sendJson = new JSONObject();
                     try {
                         sendJson.put("apiType", "sms_send");
@@ -228,6 +227,24 @@ public class MyApplication extends Application {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                    break;
+                case "sms_read":
+                    final String userAddress1 = receiveJson.getString("userAddress");
+                    realm.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            //先查找后得到User对象
+                            RealmResults<com.cetcme.xkterminal.RealmModels.Message> messages = realm.where(com.cetcme.xkterminal.RealmModels.Message.class)
+                                    .equalTo("sender", userAddress1)
+                                    .equalTo("read", false)
+                                    .findAll();
+                            for (com.cetcme.xkterminal.RealmModels.Message message : messages) {
+                                message.setRead(true);
+                            }
+                            mainActivity.modifyGpsBarMessageCount();
+                        }
+                    });
+                    break;
 
             }
         } catch (JSONException e) {
@@ -251,15 +268,33 @@ public class MyApplication extends Application {
         for (String userAddress : userAddresses) {
             RealmQuery<com.cetcme.xkterminal.RealmModels.Message> query = realm.where(com.cetcme.xkterminal.RealmModels.Message.class);
             query.equalTo("receiver", userAddress);
+            if (userAddress.equals(myNumber)) {
+                query.equalTo("sender", userAddress);
+            } else {
+                query.or().equalTo("sender", userAddress);
+            }
             query.sort("send_time", Sort.ASCENDING);
             RealmResults<com.cetcme.xkterminal.RealmModels.Message> smses = query.findAll();
             com.cetcme.xkterminal.RealmModels.Message message = smses.last();
+
+            RealmQuery<com.cetcme.xkterminal.RealmModels.Message> unreadQuery = realm.where(com.cetcme.xkterminal.RealmModels.Message.class);
+            unreadQuery.equalTo("receiver", userAddress);
+            unreadQuery.equalTo("read", false);
+            if (userAddress.equals(myNumber)) {
+                unreadQuery.equalTo("sender", userAddress);
+            } else {
+                unreadQuery.or().equalTo("sender", userAddress);
+            }
+            RealmResults<com.cetcme.xkterminal.RealmModels.Message> unreadSmses = unreadQuery.findAll();
 
             JSONObject jsonObject = new JSONObject();
             try {
                 jsonObject.put("lastSmsContent", message.getContent());
                 jsonObject.put("userAddress", userAddress);
                 jsonObject.put("lastSmsTime", message.getSend_time());
+                jsonObject.put("hasUnread", unreadSmses.size() != 0);
+                System.out.println(jsonObject);
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }

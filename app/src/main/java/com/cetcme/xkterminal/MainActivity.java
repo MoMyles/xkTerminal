@@ -51,9 +51,11 @@ import java.util.Date;
 import java.util.Objects;
 
 import io.realm.Realm;
+import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity {
 
+    // TODO: fot test
     public static String myNumber = "";
 
     public GPSBar gpsBar;
@@ -106,8 +108,20 @@ public class MainActivity extends AppCompatActivity {
         initMainFragment();
         initHud();
 
+
+        // 删除 所有消息
+//        final RealmResults<Message> messages = realm.where(Message.class).findAll();
+//        realm.executeTransaction(new Realm.Transaction() {
+//            @Override
+//            public void execute(Realm realm) {
+//                for (Message message : messages) {
+//                    message.deleteFromRealm();
+//                }
+//            }
+//        });
+
         myNumber = PreferencesUtils.getString(this, "myNumber");
-        if (myNumber == null) {
+        if (myNumber == null || myNumber.isEmpty()) {
             myNumber = "654321";
             PreferencesUtils.putString(this, "myNumber", myNumber);
         }
@@ -182,6 +196,18 @@ public class MainActivity extends AppCompatActivity {
                 message.setSend_time(new Date());
                 message.setRead(false);
                 message.setSend(false);
+
+                // 短信推送
+                JSONObject sendJson = new JSONObject();
+                try {
+                    sendJson.put("apiType", "sms_push");
+                    sendJson.put("userAddress", "sms_push");
+                    sendJson.put("data", message.toJson());
+
+                    SocketServer.send(sendJson);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -540,7 +566,7 @@ public class MainActivity extends AppCompatActivity {
         newMessage.setContent(content);
         newMessage.setDeleted(false);
         newMessage.setSend_time(new Date());
-        newMessage.setRead(false);
+        newMessage.setRead(true);
         newMessage.setSend(true);
 
         realm.executeTransaction(new Realm.Transaction() {
@@ -579,6 +605,7 @@ public class MainActivity extends AppCompatActivity {
     public void modifyGpsBarMessageCount() {
         long count = realm.where(com.cetcme.xkterminal.RealmModels.Message.class)
                 .equalTo("receiver", myNumber)
+                .equalTo("isSend", false)
                 .equalTo("read", false)
                 .count();
         gpsBar.modifyMessageCount(count);

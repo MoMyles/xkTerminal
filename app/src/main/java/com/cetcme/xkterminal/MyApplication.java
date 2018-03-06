@@ -185,7 +185,7 @@ public class MyApplication extends Application {
                         try {
                             sendJson.put("apiType", "sms_send");
                             sendJson.put("code", 2);
-                            sendJson.put("msg", "短信内容长度超出最大值（" + Constant.MESSAGE_CONTENT_MAX_LENGTH + "）！");
+                            sendJson.put("msg", "内容长度:" + length + ",超出最大值" + Constant.MESSAGE_CONTENT_MAX_LENGTH + "!");
 
                             SocketServer.send(sendJson);
                         } catch (JSONException e) {
@@ -245,7 +245,26 @@ public class MyApplication extends Application {
                         }
                     });
                     break;
+                case "sms_delete":
+                    final String userAddress2 = receiveJson.getString("userAddress");
+                    // 删除 所有消息
+                    RealmQuery<com.cetcme.xkterminal.RealmModels.Message> query = realm.where(com.cetcme.xkterminal.RealmModels.Message.class);
+                    query.equalTo("receiver", userAddress2);
+                    if (userAddress2.equals(myNumber)) {
+                        query.equalTo("receiver", userAddress2);
+                    }
+                    final RealmResults<com.cetcme.xkterminal.RealmModels.Message> messages = query.findAll();
+                    realm.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            for (com.cetcme.xkterminal.RealmModels.Message message : messages) {
+                                message.deleteFromRealm();
+                            }
+                            mainActivity.modifyGpsBarMessageCount();
+                        }
+                    });
 
+                    break;
             }
         } catch (JSONException e) {
             e.printStackTrace();

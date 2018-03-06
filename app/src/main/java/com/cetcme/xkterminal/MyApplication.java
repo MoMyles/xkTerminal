@@ -154,7 +154,7 @@ public class MyApplication extends Application {
                         Long now = new Date().getTime();
                         if (now - sendDate <= Constant.MESSAGE_SEND_LIMIT_TIME) {
                             long remainSecond = (Constant.MESSAGE_SEND_LIMIT_TIME - (now - sendDate)) / 1000;
-                            // TODO 返回不成功socket
+                            // 返回不成功socket
                             Toast.makeText(this, "发送时间间隔不到1分钟，请等待" + remainSecond + "秒", Toast.LENGTH_SHORT).show();
 
                             JSONObject sendJson = new JSONObject();
@@ -173,13 +173,13 @@ public class MyApplication extends Application {
 
                     int length = 0;
                     try {
-                        length = Constant.MESSAGE_CONTENT_MAX_LENGTH - message.getContent().getBytes("GBK").length;
+                        length = message.getContent().getBytes("GBK").length;
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
 
                     if (Constant.MESSAGE_CONTENT_MAX_LENGTH != 0 && length > Constant.MESSAGE_CONTENT_MAX_LENGTH) {
-                        // TODO 返回不成功socket
+                        // 返回不成功socket
 
                         JSONObject sendJson = new JSONObject();
                         try {
@@ -216,7 +216,7 @@ public class MyApplication extends Application {
                     sendBytes(messageBytes);
                     System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
 
-                    // TODO 返回成功socket
+                    // 返回成功socket
 
                     JSONObject sendJson = new JSONObject();
                     try {
@@ -228,7 +228,6 @@ public class MyApplication extends Application {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-
 
             }
         } catch (JSONException e) {

@@ -115,7 +115,7 @@ public class MessageFragment extends Fragment{
                 // 单击进入
                 mainActivity.messageIndex = i;
                 mainActivity.messageId = dataList.get(i).get("id").toString();
-                mainActivity.messageReceiver = dataList.get(i).get("sender").toString();
+                mainActivity.messageReceiver = dataList.get(i).get("receiver").toString();
                 mainActivity.messageContent = dataList.get(i).get("content").toString();
                 mainActivity.messageTime = dataList.get(i).get("time").toString();
                 mainActivity.initNewFragment("detail");

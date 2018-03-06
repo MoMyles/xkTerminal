@@ -508,7 +508,7 @@ public class MainActivity extends AppCompatActivity {
 
         int length = 0;
         try {
-            length = Constant.MESSAGE_CONTENT_MAX_LENGTH - content.getBytes("GBK").length;
+            length = content.getBytes("GBK").length;
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

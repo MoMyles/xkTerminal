@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -47,6 +49,8 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.Objects;
 
@@ -87,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
 
     public KProgressHUD kProgressHUD;
     public KProgressHUD okHUD;
+
+    public WifiManager mWifiManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -159,6 +165,8 @@ public class MainActivity extends AppCompatActivity {
 //        }
 
 
+        mWifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        createWifiHotspot();
     }
 
     private void initHud() {
@@ -631,5 +639,61 @@ public class MainActivity extends AppCompatActivity {
 //        this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD);
 //        super.onAttachedToWindow();
 //    }
+
+    /**
+     * 创建Wifi热点
+     */
+    private void createWifiHotspot() {
+        if (mWifiManager.isWifiEnabled()) {
+            //如果wifi处于打开状态，则关闭wifi,
+            mWifiManager.setWifiEnabled(false);
+        }
+        closeWifiHotspot();
+        WifiConfiguration config = new WifiConfiguration();
+        config.SSID = getString(R.string.wifi_ssid);
+//        config.preSharedKey = "123456789";
+        config.hiddenSSID = true;
+        config.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN);//开放系统认证
+        config.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
+//        config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+        config.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
+        config.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
+        config.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
+        config.status = WifiConfiguration.Status.ENABLED;
+        //通过反射调用设置热点
+        try {
+            Method method = mWifiManager.getClass().getMethod("setWifiApEnabled", WifiConfiguration.class, Boolean.TYPE);
+            boolean enable = (Boolean) method.invoke(mWifiManager, config, true);
+            if (enable) {
+                System.out.println("热点已开启 SSID:" + "qh_android_test" + " password:123456789");
+            } else {
+                System.out.println("创建热点失败");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("创建热点失败");
+        }
+    }
+
+    /**
+     * 关闭WiFi热点
+     */
+    public void closeWifiHotspot() {
+        try {
+            Method method = mWifiManager.getClass().getMethod("getWifiApConfiguration");
+            method.setAccessible(true);
+            WifiConfiguration config = (WifiConfiguration) method.invoke(mWifiManager);
+            Method method2 = mWifiManager.getClass().getMethod("setWifiApEnabled", WifiConfiguration.class, boolean.class);
+            method2.invoke(mWifiManager, config, false);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
 
 }

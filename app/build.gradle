@@ -22,7 +22,8 @@ android {
             abi {
                 enable true
                 reset()
-                include 'armeabi', 'armeabi-v7a'
+                include 'armeabi-v7a'
+//                include 'armeabi', 'armeabi-v7a'
             }
         }
     }
@@ -59,6 +60,9 @@ dependencies {
 
     // gson
     compile 'com.google.code.gson:gson:2.8.0'
+
+    // 腾讯ui
+    compile 'com.qmuiteam:qmui:1.0.6'
 }
 
 realm {

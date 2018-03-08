@@ -2,14 +2,20 @@ package com.cetcme.xkterminal.Fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.cetcme.xkterminal.ActionBar.TitleBar;
+import com.cetcme.xkterminal.MainActivity;
+import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.R;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,13 +40,14 @@ public class SettingFragment extends Fragment {
     private TextView li_voltage_textView;
     private TextView sun_voltage_textView;
 
+    private TextView wifi_ssid_textView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_setting,container,false);
 
         TitleBar titleBar = view.findViewById(R.id.titleBar);
-        titleBar.setTitle("北斗参数");
+        titleBar.setTitle("系统参数");
 
         address_textView            = view.findViewById(R.id.address_textView);
         signal_textView             = view.findViewById(R.id.signal_textView);
@@ -55,6 +62,41 @@ public class SettingFragment extends Fragment {
         broad_temp_textView         = view.findViewById(R.id.broad_temp_textView);
         li_voltage_textView         = view.findViewById(R.id.li_voltage_textView);
         sun_voltage_textView        = view.findViewById(R.id.sun_voltage_textView);
+
+        wifi_ssid_textView          = view.findViewById(R.id.wifi_ssid_textView);
+
+        wifi_ssid_textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
+                builder.setTitle("修改WIFI SSID")
+                        .setPlaceholder("在此输入新的WIFI SSID")
+                        .setInputType(InputType.TYPE_CLASS_TEXT)
+                        .addAction("取消", new QMUIDialogAction.ActionListener() {
+                            @Override
+                            public void onClick(QMUIDialog dialog, int index) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .addAction("确定", new QMUIDialogAction.ActionListener() {
+                            @Override
+                            public void onClick(QMUIDialog dialog, int index) {
+                                CharSequence text = builder.getEditText().getText();
+                                if (text != null && text.length() > 0) {
+                                    PreferencesUtils.putString(getActivity(), "wifiSSID", text.toString());
+                                    wifi_ssid_textView.setText(text);
+                                    Toast.makeText(getActivity(), "新的WIFI SSID: " + text, Toast.LENGTH_SHORT).show();
+                                    dialog.dismiss();
+                                    assert ((MainActivity) getActivity()) != null;
+                                    ((MainActivity) getActivity()).createWifiHotspot();
+                                } else {
+                                    Toast.makeText(getActivity(), "请输入新的WIFI SSID", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        })
+                        .show();
+            }
+        });
 
         getData();
 
@@ -72,6 +114,13 @@ public class SettingFragment extends Fragment {
 
             address_textView        .setText(PreferencesUtils.getString(getActivity(), "myNumber"));
             communication_from_textView.setText(PreferencesUtils.getString(getActivity(), "communication_from"));
+
+            String ssid = PreferencesUtils.getString(getActivity(), "wifiSSID");
+            if (ssid != null ) {
+                wifi_ssid_textView.setText(ssid);
+            } else {
+                wifi_ssid_textView.setText(getString(R.string.wifi_ssid));
+            }
 
             signal_textView         .setText(jsonObject.getString("signal"));
             location_freq_textView  .setText(jsonObject.getString("location_per"));

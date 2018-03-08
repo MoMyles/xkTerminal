@@ -643,14 +643,20 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 创建Wifi热点
      */
-    private void createWifiHotspot() {
+    public void createWifiHotspot() {
         if (mWifiManager.isWifiEnabled()) {
             //如果wifi处于打开状态，则关闭wifi,
             mWifiManager.setWifiEnabled(false);
         }
         closeWifiHotspot();
         WifiConfiguration config = new WifiConfiguration();
-        config.SSID = getString(R.string.wifi_ssid);
+
+        String ssid = PreferencesUtils.getString(MainActivity.this, "wifiSSID");
+        if (ssid == null ) {
+            ssid = getString(R.string.wifi_ssid);
+        }
+
+        config.SSID = ssid;
 //        config.preSharedKey = "123456789";
         config.hiddenSSID = true;
         config.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN);//开放系统认证
@@ -665,7 +671,7 @@ public class MainActivity extends AppCompatActivity {
             Method method = mWifiManager.getClass().getMethod("setWifiApEnabled", WifiConfiguration.class, Boolean.TYPE);
             boolean enable = (Boolean) method.invoke(mWifiManager, config, true);
             if (enable) {
-                System.out.println("热点已开启 SSID:" + "qh_android_test" + " password:123456789");
+                System.out.println("热点已开启 SSID:" + ssid + " password: 无");
             } else {
                 System.out.println("创建热点失败");
             }

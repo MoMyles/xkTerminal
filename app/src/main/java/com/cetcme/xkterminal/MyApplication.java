@@ -23,8 +23,6 @@ import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.Socket.SocketServer;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.qiuhong.qhlibrary.Dialog.QHDialog;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -38,11 +36,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Type;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import android_serialport_api.SerialPort;
 import android_serialport_api.SerialPortFinder;
@@ -134,7 +130,9 @@ public class MyApplication extends Application {
                     break;
                 case "sms_detail":
                     String userAddress = receiveJson.getString("userAddress");
-                    JSONArray smsDetailStr = getSmsDetail(userAddress);
+                    int countPerPage = receiveJson.getInt("countPerPage");
+                    String timeBefore = receiveJson.getString("timeBefore");
+                    JSONArray smsDetailStr = getSmsDetail(userAddress, countPerPage, timeBefore);
 
                     jsonObject.put("apiType", "sms_detail");
                     jsonObject.put("code", "0");
@@ -325,25 +323,31 @@ public class MyApplication extends Application {
         return smsList;
     }
 
-    public JSONArray getSmsDetail(String userAddress) {
+    public JSONArray getSmsDetail(String userAddress, int countPerPage, String timeBefore) {
         RealmResults<com.cetcme.xkterminal.RealmModels.Message> messages;
 
         if (userAddress.equals(myNumber)) {
             messages = realm.where(com.cetcme.xkterminal.RealmModels.Message.class)
                     .equalTo("sender", userAddress)
                     .equalTo("receiver", userAddress)
+                    .lessThan("send_time", new Date(timeBefore))
                     .findAll();
         } else {
             messages = realm.where(com.cetcme.xkterminal.RealmModels.Message.class)
                     .equalTo("sender", userAddress)
                     .or().equalTo("receiver", userAddress)
+                    .lessThan("send_time", new Date(timeBefore))
                     .findAll();
         }
 
         messages = messages.sort("send_time", Sort.ASCENDING);
 
         JSONArray smsList = new JSONArray();
-        for (com.cetcme.xkterminal.RealmModels.Message message : messages) {
+        if (messages.size() < countPerPage) countPerPage = messages.size();
+
+
+        for (int i = messages.size() - countPerPage; i < messages.size(); i++) {
+            com.cetcme.xkterminal.RealmModels.Message message = messages.get(i);
             JSONObject jsonObject = new JSONObject();
             try {
                 jsonObject.put("id", message.getId());
@@ -608,7 +612,6 @@ public class MyApplication extends Application {
                 case 0x02:
                     // 短信发送成功
                     Toast.makeText(getApplicationContext(), "短信发送成功", Toast.LENGTH_SHORT).show();
-
 
                     String lastSendTimeSave = sharedPreferences.getString("lastSendTimeSave", "");
                     editor.putString("lastSendTime", lastSendTimeSave);

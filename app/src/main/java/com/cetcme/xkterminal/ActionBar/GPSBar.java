@@ -3,8 +3,15 @@ package com.cetcme.xkterminal.ActionBar;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.net.Uri;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -17,12 +24,16 @@ import android.widget.Toast;
 import com.cetcme.xkterminal.DataFormat.MessageFormat;
 import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.MyClass.Constant;
+import com.cetcme.xkterminal.MyClass.DensityUtil;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.SerialTest.SerialPortActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -162,6 +173,13 @@ public class GPSBar extends RelativeLayout {
             }
         });
 
+        textView_speed.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                screenshot();
+            }
+        });
+
         textViews.add(textView_latitude);
         textViews.add(textView_longitude);
         textViews.add(textView_speed);
@@ -175,6 +193,57 @@ public class GPSBar extends RelativeLayout {
 //            textview.setTextSize(14); //22
             textview.setTextColor(0xFF000000);
         }
+    }
+
+    private void screenshot() {
+
+        String IMAGE_DIR = Environment.getExternalStorageDirectory() + File.separator + "Android截屏";
+        System.out.println();
+        final String SCREEN_SHOT ="screenshot.png";
+
+        // 获取屏幕
+        View dView = mainActivity.getWindow().getDecorView();
+        dView.setDrawingCacheEnabled(true);
+        dView.buildDrawingCache();
+        Bitmap bmp = dView.getDrawingCache();
+        if (bmp != null) {
+            try {
+
+                //二次截图
+                Bitmap saveBitmap = Bitmap.createBitmap(DensityUtil.getScreenWidth(mainActivity.getApplicationContext(), mainActivity), DensityUtil.getScreenHeight(mainActivity.getApplicationContext(), mainActivity), Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(saveBitmap);
+                Paint paint = new Paint();
+                canvas.drawBitmap(bmp, new Rect(0, 0, DensityUtil.getScreenWidth(mainActivity.getApplicationContext(), mainActivity), DensityUtil.getScreenHeight(mainActivity.getApplicationContext(), mainActivity)),
+                        new Rect(0, 0, DensityUtil.getScreenWidth(mainActivity.getApplicationContext(), mainActivity), DensityUtil.getScreenHeight(mainActivity.getApplicationContext(), mainActivity)), paint);
+
+                File imageDir = new File(IMAGE_DIR);
+                if (!imageDir.exists()) {
+                    imageDir.mkdir();
+                }
+                String imageName = SCREEN_SHOT;
+                File file = new File(imageDir, imageName);
+                try {
+                    if (file.exists()) {
+                        file.delete();
+                    }
+                    file.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                FileOutputStream os = new FileOutputStream(file);
+                saveBitmap.compress(Bitmap.CompressFormat.PNG, 100, os);
+                os.flush();
+                os.close();
+
+                //将截图保存至相册并广播通知系统刷新
+                MediaStore.Images.Media.insertImage(mainActivity.getContentResolver(), file.getAbsolutePath(), imageName, null);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+        }
+
     }
 
     private void setData() {

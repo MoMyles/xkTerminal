@@ -167,6 +167,14 @@ public class MainActivity extends AppCompatActivity {
 
         mWifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         createWifiHotspot();
+
+
+//        RealmResults<Message> messages = realm.where(Message.class)
+//                .equalTo("sender", "654321")
+//                .equalTo("receiver", "538558556")
+//                .lessThan("send_time", new Date("2018/3/8 15:00:00"))
+//                .findAll();
+//        System.out.println(messages);
     }
 
     private void initHud() {
@@ -223,7 +231,6 @@ public class MainActivity extends AppCompatActivity {
             messageFragment.reloadDate();
         }
     }
-
 
     public void addSignLog(final String id, final String name) {
         realm.executeTransaction(new Realm.Transaction() {

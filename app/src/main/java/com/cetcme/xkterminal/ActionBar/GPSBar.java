@@ -32,6 +32,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -198,7 +199,7 @@ public class GPSBar extends RelativeLayout {
     private void screenshot() {
 
         String IMAGE_DIR = Environment.getExternalStorageDirectory() + File.separator + "Android截屏";
-        System.out.println();
+        System.out.println(IMAGE_DIR);
         final String SCREEN_SHOT ="screenshot.png";
 
         // 获取屏幕
@@ -206,42 +207,41 @@ public class GPSBar extends RelativeLayout {
         dView.setDrawingCacheEnabled(true);
         dView.buildDrawingCache();
         Bitmap bmp = dView.getDrawingCache();
-        if (bmp != null) {
-            try {
 
-                //二次截图
-                Bitmap saveBitmap = Bitmap.createBitmap(DensityUtil.getScreenWidth(mainActivity.getApplicationContext(), mainActivity), DensityUtil.getScreenHeight(mainActivity.getApplicationContext(), mainActivity), Bitmap.Config.ARGB_8888);
-                Canvas canvas = new Canvas(saveBitmap);
-                Paint paint = new Paint();
-                canvas.drawBitmap(bmp, new Rect(0, 0, DensityUtil.getScreenWidth(mainActivity.getApplicationContext(), mainActivity), DensityUtil.getScreenHeight(mainActivity.getApplicationContext(), mainActivity)),
-                        new Rect(0, 0, DensityUtil.getScreenWidth(mainActivity.getApplicationContext(), mainActivity), DensityUtil.getScreenHeight(mainActivity.getApplicationContext(), mainActivity)), paint);
+        //二次截图
+//        Bitmap saveBitmap = Bitmap.createBitmap(DensityUtil.getScreenWidth(mainActivity.getApplicationContext(), mainActivity), DensityUtil.getScreenHeight(mainActivity.getApplicationContext(), mainActivity), Bitmap.Config.ARGB_8888);
+//        Canvas canvas = new Canvas(saveBitmap);
+//        Paint paint = new Paint();
+//        canvas.drawBitmap(bmp, new Rect(0, 0, DensityUtil.getScreenWidth(mainActivity.getApplicationContext(), mainActivity), DensityUtil.getScreenHeight(mainActivity.getApplicationContext(), mainActivity)),
+//                new Rect(0, 0, DensityUtil.getScreenWidth(mainActivity.getApplicationContext(), mainActivity), DensityUtil.getScreenHeight(mainActivity.getApplicationContext(), mainActivity)), paint);
 
-                File imageDir = new File(IMAGE_DIR);
-                if (!imageDir.exists()) {
-                    imageDir.mkdir();
-                }
-                String imageName = SCREEN_SHOT;
-                File file = new File(imageDir, imageName);
-                try {
-                    if (file.exists()) {
-                        file.delete();
-                    }
-                    file.createNewFile();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                FileOutputStream os = new FileOutputStream(file);
-                saveBitmap.compress(Bitmap.CompressFormat.PNG, 100, os);
-                os.flush();
-                os.close();
 
-                //将截图保存至相册并广播通知系统刷新
-                MediaStore.Images.Media.insertImage(mainActivity.getContentResolver(), file.getAbsolutePath(), imageName, null);
-
-            } catch (Exception e) {
-                e.printStackTrace();
+        File imageDir = new File(IMAGE_DIR);
+        if (!imageDir.exists()) {
+            imageDir.mkdir();
+        }
+        String imageName = SCREEN_SHOT;
+        File file = new File(imageDir, imageName);
+        try {
+            if (file.exists()) {
+                file.delete();
             }
-        } else {
+            file.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            FileOutputStream os = new FileOutputStream(file);
+            bmp.compress(Bitmap.CompressFormat.PNG, 100, os);
+            os.flush();
+            os.close();
+
+            //将截图保存至相册并广播通知系统刷新
+            MediaStore.Images.Media.insertImage(mainActivity.getContentResolver(), file.getAbsolutePath(), imageName, null);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
     }

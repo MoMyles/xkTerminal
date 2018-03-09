@@ -29,7 +29,7 @@ public class AlertActivity extends Activity implements View.OnClickListener{
     private CheckBox checkBox7;
     private CheckBox checkBox8;
 
-
+    private Button cancel_button;
     private Button confirm_button;
 
     private Realm realm;
@@ -102,6 +102,14 @@ public class AlertActivity extends Activity implements View.OnClickListener{
                 ((MyApplication) getApplication()).sendBytes(AlertFormat.format((byte) 0x00, type));
 
                 addAlertLog(type);
+                onBackPressed();
+            }
+        });
+
+        cancel_button = findViewById(R.id.cancel_button);
+        cancel_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 onBackPressed();
             }
         });

@@ -13,7 +13,7 @@ public class Constant {
     public static int IDCARD_REMAIN_TIME = 5000;
 
     // 报警对话框自动关闭时间，0为不关闭，ms
-    public static int ALERT_REMAIN_TIME = 5000;
+    public static int ALERT_REMAIN_TIME = 0;
 
     // 未定位闪烁间隔，0为不闪烁，ms
     public static int NO_GPS_FLASH_TIME = 700;

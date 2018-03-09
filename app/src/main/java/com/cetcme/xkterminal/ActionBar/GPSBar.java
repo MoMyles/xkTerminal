@@ -95,7 +95,7 @@ public class GPSBar extends RelativeLayout {
 
         textView_message_number     = view.findViewById(R.id.textView_message_number);
 
-        // TODO: for test
+
         textView_message.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -103,7 +103,6 @@ public class GPSBar extends RelativeLayout {
             }
         });
 
-        // TODO: for test
         textView_message_number.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -111,7 +110,7 @@ public class GPSBar extends RelativeLayout {
             }
         });
 
-        // TODO: for test
+        // TODO: for test 串口调试界面 看是否通
         textView_location_status.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -125,7 +124,7 @@ public class GPSBar extends RelativeLayout {
             }
         });
 
-        // TODO: for test 收到新的短信息
+        // TODO: for test 测试收到新的短信息
         textView_heading.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -137,6 +136,7 @@ public class GPSBar extends RelativeLayout {
             }
         });
 
+        // TODO: for test 多次点击退出app
         textView_time.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -160,7 +160,7 @@ public class GPSBar extends RelativeLayout {
             }
         });
 
-        // TODO: for test
+        // TODO: for test 测试打卡
         textView_latitude.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -168,7 +168,7 @@ public class GPSBar extends RelativeLayout {
             }
         });
 
-        // TODO: for test
+        // TODO: for test 测试收到报警
         textView_longitude.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {

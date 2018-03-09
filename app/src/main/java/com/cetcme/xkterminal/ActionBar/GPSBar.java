@@ -296,7 +296,6 @@ public class GPSBar extends RelativeLayout {
             super.run();
             int i = 0;
             do {
-
                 try {
                     Thread.sleep(100);
                 }

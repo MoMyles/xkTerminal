@@ -21,4 +21,7 @@ public class Constant {
     // 短信发送间隔
     public static int MESSAGE_SEND_LIMIT_TIME = 60000;
 
+    // 紧急报警闪烁间隔，0为不闪烁，ms
+    public static int ALERT_FLASH_TIME = 500;
+
 }

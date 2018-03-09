@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">舰载北斗显控终端</string>
+    <string name="app_name">船载北斗显控终端</string>
 
     <string-array name="dangerType">
         <item>沉船</item>

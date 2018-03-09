@@ -10,8 +10,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.DataFormat.AlertFormat;
+import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.RealmModels.Alert;
+
+import org.greenrobot.eventbus.EventBus;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -117,6 +122,13 @@ public class AlertActivity extends Activity implements View.OnClickListener{
 
     protected void onDestroy() {
         needDismissActivity = false;
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("apiType", "showAlertInHomePage");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        EventBus.getDefault().post(new SmsEvent(jsonObject));
         super.onDestroy();
     }
 

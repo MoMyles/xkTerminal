@@ -5,35 +5,79 @@
     android:background="#dddddd"
     android:orientation="vertical">
 
-    <TextView
-    android:layout_width="match_parent"
-    android:layout_height="0dp"
-    android:layout_weight="1"
-    android:layout_marginTop="50dp"
-    android:gravity="center"
-    android:textSize="60sp"
-    android:textStyle="bold"
-    android:textColor="#fd9f3b"
-    android:text="舰载北斗显控终端" />
+    <LinearLayout
+        android:id="@+id/main_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone">
 
-    <TextView
-    android:id="@+id/textView2"
-    android:layout_width="match_parent"
-    android:layout_height="0dp"
-    android:layout_weight="0.5"
-    android:gravity="center"
-    android:textSize="44sp"
-    android:textStyle="bold"
-    android:textColor="#2657ec"
-    android:text="C E T C M E" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="50dp"
+            android:gravity="center"
+            android:textSize="60sp"
+            android:textStyle="bold"
+            android:textColor="#fd9f3b"
+            android:text="舰载北斗显控终端" />
 
-    <TextView
-    android:id="@+id/textView"
-    android:layout_width="match_parent"
-    android:layout_height="0dp"
-    android:layout_weight="0.8"
-    android:gravity="center"
-    android:textSize="32sp"
-    android:text="中电科（宁波）海洋电子研究院" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.5"
+            android:gravity="center"
+            android:textSize="44sp"
+            android:textStyle="bold"
+            android:textColor="#2657ec"
+            android:text="C E T C M E" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.8"
+            android:gravity="center"
+            android:textSize="32sp"
+            android:text="中电科（宁波）海洋电子研究院" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/alert_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/alert_tv"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="50dp"
+            android:gravity="center"
+            android:textSize="200sp"
+            android:textStyle="bold"
+            android:textColor="#ed211a"
+            android:text="紧急报警" />
+
+
+        <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
+            android:id="@+id/alert_confirm_btn"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+            android:layout_marginBottom="50dp"
+            android:text="确认"
+            android:padding="10dp"
+            android:textSize="24sp"
+            />
+
+
+
+    </LinearLayout>
+
+
 
 </LinearLayout>

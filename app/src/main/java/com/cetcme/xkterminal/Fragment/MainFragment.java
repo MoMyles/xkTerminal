@@ -1,6 +1,7 @@
 package com.cetcme.xkterminal.Fragment;
 
 import android.annotation.SuppressLint;
+import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
@@ -29,7 +30,7 @@ import org.json.JSONObject;
  * Created by qiuhong on 10/01/2018.
  */
 
-public class MainFragment extends Fragment {
+public class MainFragment extends Fragment{
 
     private LinearLayout main_layout;
     private LinearLayout alert_layout;
@@ -64,11 +65,42 @@ public class MainFragment extends Fragment {
 
         alert_tv = view.findViewById(R.id.alert_tv);
 
+        view.findViewById(R.id.app_name_tv).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                System.out.println("开始播放");
+//                if (player != null && player.isPlaying()) {
+//                    player.stop();
+//                    player.release();
+//                    player = null;
+//                    return;
+//                }
+//                player = MediaPlayer.create(getActivity(), R.raw.talkroom_begin);
+                player.start();
+
+            }
+        });
+
+        player = MediaPlayer.create(getActivity(), R.raw.alert);
+        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                if (needAlertSound) {
+                    player.start();
+                }
+                System.out.println("播放完毕00000000000000000");
+            }
+        });
+
         return view;
     }
 
+    MediaPlayer player;
+    boolean needAlertSound = false;
+
     private void showMainLayout() {
         alert_need_flash = false;
+        needAlertSound = false;
         main_layout.setVisibility(View.VISIBLE);
         alert_layout.setVisibility(View.GONE);
     }
@@ -83,6 +115,11 @@ public class MainFragment extends Fragment {
         }
     }
 
+    private void alertSound() {
+        needAlertSound = true;
+        player.start();
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(SmsEvent event) {
         JSONObject receiveJson = event.getReceiveJson();
@@ -95,6 +132,9 @@ public class MainFragment extends Fragment {
                     }
                     PreferencesUtils.putBoolean(getActivity(), "homePageAlertView", true);
                     showAlertLayout();
+                    break;
+                case "alertSound":
+                    alertSound();
                     break;
             }
         } catch (JSONException e) {
@@ -117,7 +157,6 @@ public class MainFragment extends Fragment {
             int i = 0;
             do {
 
-                System.out.println(i);
                 try {
                     Thread.sleep(100);
                 }

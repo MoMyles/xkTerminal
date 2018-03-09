@@ -99,10 +99,9 @@ public class AlertActivity extends Activity implements View.OnClickListener{
         confirm_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 String type = "";
                 for (int i = 0; i < checkBoxes.size(); i++) {
-                    type += checkBoxes.get(i).isChecked() ? "1" : "0";
+                    type = checkBoxes.get(i).isChecked() ? "1" : "0" + type;
                 }
                 ((MyApplication) getApplication()).sendBytes(AlertFormat.format((byte) 0x00, type));
 

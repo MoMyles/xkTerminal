@@ -27,6 +27,7 @@ import com.cetcme.xkterminal.DataFormat.MessageFormat;
 import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
 import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
 import com.cetcme.xkterminal.DataFormat.Util.Util;
+import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.Fragment.AboutFragment;
 import com.cetcme.xkterminal.Fragment.LogFragment;
 import com.cetcme.xkterminal.Fragment.MainFragment;
@@ -44,6 +45,7 @@ import com.cetcme.xkterminal.Socket.SocketServer;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.qiuhong.qhlibrary.Dialog.QHDialog;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -281,6 +283,15 @@ public class MainActivity extends AppCompatActivity {
     public static boolean idCardDialogOpen = false;
 
     public void showDangerDialog() {
+
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("apiType", "alertSound");
+            EventBus.getDefault().post(new SmsEvent(jsonObject));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         Intent intent = new Intent(MainActivity.this, AlertActivity.class);
         startActivity(intent);
     }

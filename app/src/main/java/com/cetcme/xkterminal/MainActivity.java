@@ -209,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
                 message.setReceiver(myNumber);
                 message.setContent(content);
                 message.setDeleted(false);
-                message.setSend_time(new Date());
+                message.setSend_time(Constant.SYSTEM_DATE);
                 message.setRead(false);
                 message.setSend(false);
 
@@ -240,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
                 sign.setDeleted(false);
                 sign.setIdCard(id);
                 sign.setName(name);
-                sign.setTime(new Date());
+                sign.setTime(Constant.SYSTEM_DATE);
             }
         });
     }
@@ -252,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
                 Alert alert = realm.createObject(Alert.class);
                 alert.setDeleted(false);
                 alert.setType(type);
-                alert.setTime(new Date());
+                alert.setTime(Constant.SYSTEM_DATE);
             }
         });
     }
@@ -522,7 +522,7 @@ public class MainActivity extends AppCompatActivity {
         String lastSendTime = sharedPreferences.getString("lastSendTime", "");
         if (!lastSendTime.isEmpty()) {
             Long sendDate = DateUtil.parseStringToDate(lastSendTime, DateUtil.DatePattern.YYYYMMDDHHMMSS).getTime();
-            Long now = new Date().getTime();
+            Long now = Constant.SYSTEM_DATE.getTime();
             if (now - sendDate <= Constant.MESSAGE_SEND_LIMIT_TIME) {
                 long remainSecond = (Constant.MESSAGE_SEND_LIMIT_TIME - (now - sendDate)) / 1000;
                 Toast.makeText(this, "发送时间间隔不到1分钟，请等待" + remainSecond + "秒", Toast.LENGTH_SHORT).show();
@@ -572,7 +572,7 @@ public class MainActivity extends AppCompatActivity {
 //        qhDialog.show();
 
         SharedPreferences.Editor editor = sharedPreferences.edit();//获取编辑器
-        editor.putString("lastSendTimeSave", DateUtil.parseDateToString(new Date(), DateUtil.DatePattern.YYYYMMDDHHMMSS));
+        editor.putString("lastSendTimeSave", DateUtil.parseDateToString(Constant.SYSTEM_DATE, DateUtil.DatePattern.YYYYMMDDHHMMSS));
         editor.apply(); //提交修改
 
         final Message newMessage = new Message();
@@ -580,7 +580,7 @@ public class MainActivity extends AppCompatActivity {
         newMessage.setReceiver(receiver);
         newMessage.setContent(content);
         newMessage.setDeleted(false);
-        newMessage.setSend_time(new Date());
+        newMessage.setSend_time(Constant.SYSTEM_DATE);
         newMessage.setRead(true);
         newMessage.setSend(true);
 
@@ -592,7 +592,7 @@ public class MainActivity extends AppCompatActivity {
                 message.setReceiver(receiver);
                 message.setContent(content);
                 message.setDeleted(false);
-                message.setSend_time(new Date());
+                message.setSend_time(Constant.SYSTEM_DATE);
                 message.setRead(false);
                 message.setSend(true);
             }

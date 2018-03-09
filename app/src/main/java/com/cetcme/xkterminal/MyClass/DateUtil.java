@@ -16,11 +16,29 @@ public class DateUtil {
         return sdf.format(date);
     }
 
+    public static String Date2String(Date date, String format) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(format);
+        return dateFormat.format(date);
+    }
+
     public static Date String2Date(String dateString) {
 
         Date date = null;
         try {
             date = sdf.parse(dateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
+    }
+
+    public static Date String2Date(String dateString, String format) {
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat(format);
+
+        Date date = null;
+        try {
+            date = dateFormat.parse(dateString);
         } catch (ParseException e) {
             e.printStackTrace();
         }

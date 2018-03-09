@@ -1,10 +1,14 @@
 package com.cetcme.xkterminal.MyClass;
 
+import java.util.Date;
+
 /**
  * Created by qiuhong on 11/01/2018.
  */
 
 public class Constant {
+
+    public static Date SYSTEM_DATE = new Date();
 
     // 短信内容最大长度，0为不限
     public static int MESSAGE_CONTENT_MAX_LENGTH = 56;

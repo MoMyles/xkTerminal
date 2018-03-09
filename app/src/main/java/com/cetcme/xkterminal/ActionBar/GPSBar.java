@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.cetcme.xkterminal.DataFormat.MessageFormat;
 import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.MyClass.Constant;
+import com.cetcme.xkterminal.MyClass.DateUtil;
 import com.cetcme.xkterminal.MyClass.DensityUtil;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.SerialTest.SerialPortActivity;
@@ -36,6 +37,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 import io.realm.Realm;
@@ -304,6 +306,12 @@ public class GPSBar extends RelativeLayout {
                 }
 
                 if (i % 10 == 0) {
+
+                    Calendar c = Calendar.getInstance();
+                    c.setTime(Constant.SYSTEM_DATE);
+                    c.add(Calendar.SECOND, 1);
+                    Constant.SYSTEM_DATE = c.getTime();
+
                     Message message = new Message();
                     message.what = 1;
                     handler.sendMessage(message);
@@ -332,9 +340,10 @@ public class GPSBar extends RelativeLayout {
             super.handleMessage(msg);
             switch (msg.what) {
                 case 1:
-                    long sysTime = System.currentTimeMillis();
-                    CharSequence sysTimeStr = DateFormat.format("HH:mm:ss", sysTime);
-                    textView_time.setText(sysTimeStr); //更新时间
+//                    long sysTime = System.currentTimeMillis();
+//                    CharSequence sysTimeStr = DateFormat.format("HH:mm:ss", sysTime);
+//                    textView_time.setText(sysTimeStr); //更新时间
+                    textView_time.setText(DateUtil.Date2String(Constant.SYSTEM_DATE, "HH:mm:ss"));
                     break;
                 case 3:
                     textView_location_status.setVisibility(textView_location_status.getVisibility() == VISIBLE ? INVISIBLE : VISIBLE);

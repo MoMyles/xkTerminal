@@ -145,7 +145,7 @@ public class AlertActivity extends Activity implements View.OnClickListener{
                 Alert alert = realm.createObject(Alert.class);
                 alert.setDeleted(false);
                 alert.setType(AlertFormat.getStringType(type));
-                alert.setTime(new Date());
+                alert.setTime(Constant.SYSTEM_DATE);
             }
         });
     }

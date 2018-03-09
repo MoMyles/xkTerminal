@@ -193,7 +193,7 @@ public class MyApplication extends Application {
                     }
 
                     SharedPreferences.Editor editor = sharedPreferences.edit();//获取编辑器
-                    editor.putString("lastSendTimeSave", DateUtil.parseDateToString(new Date(), DateUtil.DatePattern.YYYYMMDDHHMMSS));
+                    editor.putString("lastSendTimeSave", DateUtil.parseDateToString(Constant.SYSTEM_DATE, DateUtil.DatePattern.YYYYMMDDHHMMSS));
                     editor.apply(); //提交修改
 
                     realm.executeTransaction(new Realm.Transaction() {
@@ -629,6 +629,7 @@ public class MyApplication extends Application {
                     String dateStr = "20" + year + "/" + month + "/" + day + " " + hour + ":" + minute + ":" + second;
                     Date date = DateUtil.parseStringToDate(dateStr);
                     System.out.println(date);
+                    Constant.SYSTEM_DATE = date;
 
                     int myNumber = Util.bytesToInt2(ByteUtil.subBytes(bytes, 17, 21), 0);
                     PreferencesUtils.putString(getApplicationContext(), "myNumber", myNumber + "");

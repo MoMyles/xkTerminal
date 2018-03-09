@@ -651,8 +651,15 @@ public class MyApplication extends Application {
                     break;
                 case 0x07:
                     // todo test: 增加报警记录，显示收到报警
-                    Toast.makeText(getApplicationContext(), "收到遇险报警", Toast.LENGTH_SHORT).show();
-                    mainActivity.addAlertLog("");
+                    byte[] alertBytes = ByteUtil.subBytes(bytes, 11, 13);
+                    if (alertBytes[0] == 0x02 && alertBytes[1] == 0x00) {
+                        Toast.makeText(getApplicationContext(), "收到落水报警", Toast.LENGTH_SHORT).show();
+                        mainActivity.addAlertLog("落水");
+                    } else {
+                        Toast.makeText(getApplicationContext(), "收到遇险报警", Toast.LENGTH_SHORT).show();
+                        mainActivity.addAlertLog("");
+                    }
+
                     break;
                 case 0x06:
                     // 接收身份证信息

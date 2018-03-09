@@ -88,7 +88,6 @@ public class MainFragment extends Fragment{
                 if (needAlertSound) {
                     player.start();
                 }
-                System.out.println("播放完毕00000000000000000");
             }
         });
 

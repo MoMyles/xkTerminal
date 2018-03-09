@@ -77,12 +77,39 @@ public class AlertFormat {
     }
 
     public static void main(String[] args) {
-        byte[] frameData = format((byte) 0x00, "00001110");
-        String[] unFormatStrings = unFormat(frameData);
-        String mode = unFormatStrings[0];
-        String type = unFormatStrings[1];
-        System.out.println(mode);
-        System.out.println(getStringType(type));
+//        byte[] frameData = format((byte) 0x00, "00001110");
+//        String[] unFormatStrings = unFormat(frameData);
+//        String mode = unFormatStrings[0];
+//        String type = unFormatStrings[1];
+//        System.out.println(mode);
+//        System.out.println(getStringType(type));
+
+        byte[] bytes = new byte[] {
+                0x24,
+                0x52,
+                0x35,
+                0x31,
+                0x31,
+                0x31,
+                0x37,
+                0x33,
+                0x37,
+                0x35,
+                0x35,
+                0x02,
+                0x00,
+                0x2A,
+                (byte) 0xA0,
+                0x3B,
+        };
+
+
+
+        byte[] alertBytes = ByteUtil.subBytes(bytes, 11, 13);
+        if (alertBytes[0] == 0x02 && alertBytes[1] == 0x00) {
+            System.out.println("123123123123123");
+        }
+
     }
 
 }

@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.cetcme.xkterminal.DataFormat.AlertFormat;
 import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.MyClass.Constant;
+import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.RealmModels.Alert;
 
 import org.greenrobot.eventbus.EventBus;
@@ -122,6 +123,7 @@ public class AlertActivity extends Activity implements View.OnClickListener{
 
     protected void onDestroy() {
         needDismissActivity = false;
+        PreferencesUtils.putBoolean(this, "homePageAlertView", true);
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("apiType", "showAlertInHomePage");

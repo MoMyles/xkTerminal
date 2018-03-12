@@ -6,6 +6,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -63,7 +64,12 @@ public class MyApplication extends Application {
     private OutputStream mOutputStream;
     private InputStream mInputStream;
 
-    private Gson gson;
+    private static MediaPlayer player;
+
+    public static void soundPlay() {
+        player.start();
+    }
+
 
     @Override
     public void onCreate() {
@@ -76,6 +82,17 @@ public class MyApplication extends Application {
         Realm.setDefaultConfiguration(config);
 
         realm = Realm.getDefaultInstance();
+
+
+        player = MediaPlayer.create(this, R.raw.alert);
+        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                if (PreferencesUtils.getBoolean(getApplicationContext(), "needAlertSound")) {
+                    player.start();
+                }
+            }
+        });
 
         try {
             mSerialPort = getSerialPort();
@@ -263,6 +280,10 @@ public class MyApplication extends Application {
                     });
 
                     break;
+
+                case "alertSound":
+                    PreferencesUtils.putBoolean(this, "needAlertSound", true);
+                    soundPlay();
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -628,8 +649,11 @@ public class MyApplication extends Application {
                     int second = ByteUtil.subBytes(bytes, 16, 17)[0]  & 0xFF;
                     String dateStr = "20" + year + "/" + month + "/" + day + " " + hour + ":" + minute + ":" + second;
                     Date date = DateUtil.parseStringToDate(dateStr);
-                    System.out.println(date);
-                    Constant.SYSTEM_DATE = date;
+                    // 加8小时
+                    long rightTime = date.getTime() + 8 * 3600 * 1000;
+                    Date rightDate = new Date(rightTime);
+                    System.out.println(rightDate);
+                    Constant.SYSTEM_DATE = rightDate;
 
                     int myNumber = Util.bytesToInt2(ByteUtil.subBytes(bytes, 17, 21), 0);
                     PreferencesUtils.putString(getApplicationContext(), "myNumber", myNumber + "");
@@ -650,7 +674,19 @@ public class MyApplication extends Application {
                     mainActivity.showDangerDialog();
                     break;
                 case 0x07:
-                    // todo test: 增加报警记录，显示收到报警
+                    // 增加报警记录，显示收到报警
+
+                    try {
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put("apiType", "showAlertInHomePage");
+                        EventBus.getDefault().post(new SmsEvent(jsonObject));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    PreferencesUtils.putBoolean(getApplicationContext(), "homePageAlertView", true);
+                    soundPlay();
+
                     byte[] alertBytes = ByteUtil.subBytes(bytes, 11, 13);
                     if (alertBytes[0] == 0x02 && alertBytes[1] == 0x00) {
                         Toast.makeText(getApplicationContext(), "收到落水报警", Toast.LENGTH_SHORT).show();

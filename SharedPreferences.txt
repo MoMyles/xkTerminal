@@ -5,3 +5,6 @@ SharedPreferences：
 
 
 wifiSSID : string // wifi AP ssid
+
+homePageAlertView： boolen // 主界面显示紧急报警
+needAlertSound：boolen // 用来控制报警声音是否重复一直播放

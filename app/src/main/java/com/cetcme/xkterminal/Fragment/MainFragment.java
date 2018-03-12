@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.cetcme.xkterminal.Event.SmsEvent;
+import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.R;
@@ -76,30 +77,18 @@ public class MainFragment extends Fragment{
 //                    return;
 //                }
 //                player = MediaPlayer.create(getActivity(), R.raw.talkroom_begin);
-                player.start();
+                MyApplication.soundPlay();
 
             }
         });
 
-        player = MediaPlayer.create(getActivity(), R.raw.alert);
-        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
-                if (needAlertSound) {
-                    player.start();
-                }
-            }
-        });
 
         return view;
     }
 
-    MediaPlayer player;
-    boolean needAlertSound = false;
-
     private void showMainLayout() {
         alert_need_flash = false;
-        needAlertSound = false;
+        PreferencesUtils.putBoolean(getActivity(), "needAlertSound", false);
         main_layout.setVisibility(View.VISIBLE);
         alert_layout.setVisibility(View.GONE);
     }
@@ -114,10 +103,6 @@ public class MainFragment extends Fragment{
         }
     }
 
-    private void alertSound() {
-        needAlertSound = true;
-        player.start();
-    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(SmsEvent event) {
@@ -131,9 +116,6 @@ public class MainFragment extends Fragment{
                     }
                     PreferencesUtils.putBoolean(getActivity(), "homePageAlertView", true);
                     showAlertLayout();
-                    break;
-                case "alertSound":
-                    alertSound();
                     break;
             }
         } catch (JSONException e) {

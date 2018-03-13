@@ -26,6 +26,7 @@ import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.DateUtil;
 import com.cetcme.xkterminal.MyClass.DensityUtil;
+import com.cetcme.xkterminal.MyClass.ScreenBrightness;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.SerialTest.SerialPortActivity;
 
@@ -177,6 +178,13 @@ public class GPSBar extends RelativeLayout {
             @Override
             public void onClick(View view) {
                 screenshot();
+            }
+        });
+
+        findViewById(R.id.bright_btn).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ScreenBrightness.modifyBrightness(mainActivity);
             }
         });
 

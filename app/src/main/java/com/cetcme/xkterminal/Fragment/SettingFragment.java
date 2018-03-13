@@ -6,6 +6,7 @@ import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,6 +20,8 @@ import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Date;
 
 /**
  * Created by qiuhong on 10/01/2018.
@@ -41,6 +44,11 @@ public class SettingFragment extends Fragment {
     private TextView sun_voltage_textView;
 
     private TextView wifi_ssid_textView;
+
+    private TextView time_zone_textView;
+    private SeekBar time_zone_seekBar;
+
+    private Toast time_zone_toast;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -95,6 +103,47 @@ public class SettingFragment extends Fragment {
                             }
                         })
                         .show();
+            }
+        });
+
+        time_zone_textView = view.findViewById(R.id.time_zone_textView);
+        time_zone_seekBar = view.findViewById(R.id.time_zone_seekBar);
+
+        time_zone_toast = Toast.makeText(getActivity(), "时区", Toast.LENGTH_SHORT);
+
+        int originalTimeZone = PreferencesUtils.getInt(getActivity(), "time_zone");
+        if (originalTimeZone == -1) originalTimeZone = Constant.TIME_ZONE;
+
+        time_zone_textView.setText("时区：" + (originalTimeZone - 12));
+        time_zone_seekBar.setProgress(originalTimeZone);
+
+        time_zone_seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                time_zone_toast.setText("时区：" + (i - 12));
+                time_zone_toast.show();
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                int originalTimeZone = PreferencesUtils.getInt(getActivity(), "time_zone");
+                if (originalTimeZone == -1) originalTimeZone = Constant.TIME_ZONE;
+                int deltZone = originalTimeZone - seekBar.getProgress();
+                if (deltZone != 0) {
+                    PreferencesUtils.putInt(getActivity(), "time_zone", seekBar.getProgress());
+
+                    // 修正时间
+                    long rightTime = Constant.SYSTEM_DATE.getTime() - deltZone * 3600 * 1000;
+                    Date rightDate = new Date(rightTime);
+                    Constant.SYSTEM_DATE = rightDate;
+
+                    time_zone_textView.setText("时区：" + (seekBar.getProgress() - 12));
+                }
             }
         });
 

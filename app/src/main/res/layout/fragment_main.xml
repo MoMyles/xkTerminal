@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:visibility="gone">
+        >
 
         <TextView
             android:id="@+id/app_name_tv"
@@ -34,6 +34,7 @@
             android:textColor="#2657ec"
             android:text="C E T C M E" />
 
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -42,7 +43,6 @@
             android:textSize="32sp"
             android:text="中电科（宁波）海洋电子研究院" />
 
-
     </LinearLayout>
 
     <LinearLayout
@@ -50,7 +50,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:gravity="center">
+        android:gravity="center"
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/alert_tv"

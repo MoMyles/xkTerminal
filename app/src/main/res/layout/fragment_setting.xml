@@ -408,25 +408,36 @@
                     android:layout_height="match_parent"/>
 
                 <TextView
+                    android:id="@+id/time_zone_textView"
                     android:layout_width="250dp"
                     android:layout_weight="1"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:textColor="#000000"
                     android:textSize="18sp"
-                    android:text=""/>
+                    android:text="时区："/>
 
-                <TextView
-                    android:id="@+id/sun_voltage_textView1"
+                <SeekBar
+                    android:id="@+id/time_zone_seekBar"
                     android:layout_width="250dp"
-                    android:layout_weight="1"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:textColor="#000000"
+                    android:layout_height="wrap_content"
                     android:layout_marginRight="200dp"
                     android:layout_marginEnd="200dp"
-                    android:textSize="18sp"
-                    android:text=""/>
+                    android:layout_weight="1"
+                    android:max="24"
+                    />
+
+                <!--<TextView-->
+                    <!--android:id="@+id/sun_voltage_textView1"-->
+                    <!--android:layout_width="250dp"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:gravity="center"-->
+                    <!--android:textColor="#000000"-->
+                    <!--android:layout_marginRight="200dp"-->
+                    <!--android:layout_marginEnd="200dp"-->
+                    <!--android:textSize="18sp"-->
+                    <!--android:text=""/>-->
             </LinearLayout>
 
             <TextView

@@ -110,29 +110,13 @@ public class GPSBar extends RelativeLayout {
             }
         });
 
-        // TODO: for test 串口调试界面 看是否通
+
+        // TODO: for test串口调试界面 看是否通
         textView_location_status.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                //测试定位状态
-//                System.out.println("textView_location_status clicked ++++++++++++++ nogps : " + noGps);
-//                noGps = !noGps;
-//                setGPSStatus(!noGps);
-
                 //显示串口测试activity
                 mainActivity.startActivity(new Intent(mainActivity, SerialPortActivity.class));
-            }
-        });
-
-        // TODO: for test 测试收到新的短信息
-        textView_heading.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // 收到新短信
-
-                mainActivity.addMessage("654321", "测试收到新的短消息");
-                mainActivity.modifyGpsBarMessageCount();
-                Toast.makeText(view.getContext(), "您有新的短信", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -160,8 +144,20 @@ public class GPSBar extends RelativeLayout {
             }
         });
 
+        // TODO: for test 测试收到新的短信息
+        findViewById(R.id.sms_btn).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // 收到新短信
+
+                mainActivity.addMessage("654321", "测试收到新的短消息");
+                mainActivity.modifyGpsBarMessageCount();
+                Toast.makeText(view.getContext(), "您有新的短信", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         // TODO: for test 测试打卡
-        textView_latitude.setOnClickListener(new OnClickListener() {
+        findViewById(R.id.sign_btn).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 mainActivity.showIDCardDialog("33028319881122013X", "张三", "汉", "浙江省奉化市锦屏街道凉河路x幢xxx室");
@@ -169,14 +165,15 @@ public class GPSBar extends RelativeLayout {
         });
 
         // TODO: for test 测试收到报警
-        textView_longitude.setOnClickListener(new OnClickListener() {
+        findViewById(R.id.alert_btn).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 mainActivity.showDangerDialog();
             }
         });
 
-        textView_speed.setOnClickListener(new OnClickListener() {
+        // TODO: for test 截图
+        findViewById(R.id.screen_btn).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 screenshot();

@@ -10,6 +10,8 @@ public class Constant {
 
     public static Date SYSTEM_DATE = new Date();
 
+    public static int TIME_ZONE = 20; // +8   0 ~ 24
+
     // 短信内容最大长度，0为不限
     public static int MESSAGE_CONTENT_MAX_LENGTH = 56;
 

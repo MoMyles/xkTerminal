@@ -284,6 +284,13 @@ public class MyApplication extends Application {
                 case "alertSound":
                     PreferencesUtils.putBoolean(this, "needAlertSound", true);
                     soundPlay();
+                    break;
+                case "set_time":
+                    Date date = new Date(receiveJson.getString("time"));
+                    if (Math.abs(date.getTime() - Constant.SYSTEM_DATE.getTime()) > 3600 * 1000) {
+                        Constant.SYSTEM_DATE = date;
+                    }
+                    break;
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -650,7 +657,11 @@ public class MyApplication extends Application {
                     String dateStr = "20" + year + "/" + month + "/" + day + " " + hour + ":" + minute + ":" + second;
                     Date date = DateUtil.parseStringToDate(dateStr);
                     // 加8小时
-                    long rightTime = date.getTime() + 8 * 3600 * 1000;
+
+                    int originalTimeZone = PreferencesUtils.getInt(getApplicationContext(), "time_zone");
+                    if (originalTimeZone == -1) originalTimeZone = Constant.TIME_ZONE;
+
+                    long rightTime = date.getTime() + (originalTimeZone - 12) * 3600 * 1000;
                     Date rightDate = new Date(rightTime);
                     System.out.println(rightDate);
                     Constant.SYSTEM_DATE = rightDate;

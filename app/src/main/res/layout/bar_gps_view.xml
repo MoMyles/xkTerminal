@@ -4,54 +4,106 @@
     android:layout_width="match_parent"
     android:layout_height="60dp">
 
-    <TextView
-        android:id="@+id/textView_latitude"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_marginLeft="10dp"
-        android:layout_marginStart="10dp"
-        android:text="---"
-        android:textSize="22sp"
-        android:gravity="center_vertical" />
+        android:orientation="horizontal"
+        android:visibility="gone">
 
-    <TextView
-        android:id="@+id/textView_longitude"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="20dp"
-        android:layout_marginStart="20dp"
-        android:layout_toEndOf="@+id/textView_latitude"
-        android:layout_toRightOf="@+id/textView_latitude"
-        android:gravity="center_vertical"
-        android:text="---"
-        android:textSize="22sp" />
+        <TextView
+            android:id="@+id/textView_latitude"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:text="---"
+            android:textSize="22sp"
+            android:gravity="center_vertical" />
 
-    <TextView
-        android:id="@+id/textView_speed"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="20dp"
-        android:layout_marginStart="20dp"
-        android:layout_toEndOf="@+id/textView_longitude"
-        android:layout_toRightOf="@+id/textView_longitude"
-        android:gravity="center_vertical"
-        android:text="---"
-        android:textSize="22sp" />
+        <TextView
+            android:id="@+id/textView_longitude"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
+            android:gravity="center_vertical"
+            android:text="---"
+            android:textSize="22sp" />
 
-    <TextView
-        android:id="@+id/textView_heading"
+        <TextView
+            android:id="@+id/textView_speed"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
+            android:gravity="center_vertical"
+            android:text="---"
+            android:textSize="22sp" />
+
+        <TextView
+            android:id="@+id/textView_heading"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
+            android:gravity="center_vertical"
+            android:text="---"
+            android:textSize="22sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="20dp"
-        android:layout_marginStart="20dp"
-        android:layout_toEndOf="@+id/textView_speed"
-        android:layout_toRightOf="@+id/textView_speed"
-        android:gravity="center_vertical"
-        android:text="---"
-        android:textSize="22sp" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:textSize="22sp"
+            android:text="测试用："/>
+
+        <Button
+            android:id="@+id/sign_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:text="打卡"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/alert_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
+            android:text="报警"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/screen_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
+            android:text="截图"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/sms_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
+            android:text="收短信"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
 
     <TextView
         android:id="@+id/textView_location_status"

@@ -22,8 +22,8 @@ import com.cetcme.xkterminal.DataFormat.Util.Util;
 import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
+import com.cetcme.xkterminal.MyClass.ScreenBrightness;
 import com.cetcme.xkterminal.Socket.SocketServer;
-import com.google.gson.Gson;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -72,6 +72,14 @@ public class MyApplication extends Application {
         player.start();
     }
 
+    private static final int SERIAL_PORT_RECEIVE_NEW_MESSAGE = 0x01;
+    private static final int SERIAL_PORT_MESSAGE_SEND_SUCCESS = 0x02;
+    private static final int SERIAL_PORT_TIME_NUMBER_AND_COMMUNICATION_FROM = 0x03;
+    private static final int SERIAL_PORT_ALERT_SEND_SUCCESS = 0x04;
+    private static final int SERIAL_PORT_SHOW_ALERT_ACTIVITY = 0x05;
+    private static final int SERIAL_PORT_RECEIVE_NEW_SIGN = 0x06;
+    private static final int SERIAL_PORT_RECEIVE_NEW_ALERT = 0x07;
+    private static final int SERIAL_PORT_MODIFY_SCREEN_BRIGHTNESS = 0x08;
 
     @Override
     public void onCreate() {
@@ -448,11 +456,12 @@ public class MyApplication extends Application {
     public SerialPort getSerialPort() throws SecurityException, IOException, InvalidParameterException {
         if (mSerialPort == null) {
 			/* Read serial port parameters */
-            SharedPreferences sp = getSharedPreferences("android_serialport_api.sample_preferences", MODE_PRIVATE);
-            String path = sp.getString("DEVICE", "");
-            path = "/dev/ttyS3";
-            int baudrate = Integer.decode(sp.getString("BAUDRATE", "-1"));
-            baudrate = 9600;
+//            SharedPreferences sp = getSharedPreferences("android_serialport_api.sample_preferences", MODE_PRIVATE);
+//            String path = sp.getString("DEVICE", "");
+//            path = "/dev/ttyS3";
+//            int baudrate = Integer.decode(sp.getString("BAUDRATE", "-1"));
+            String path = "/dev/ttyS3";
+            int baudrate = Constant.SERIAL_PORT_BAUD_RATE;
 
 			/* Check parameters */
             if ( (path.length() == 0) || (baudrate == -1)) {
@@ -518,7 +527,7 @@ public class MyApplication extends Application {
         serialCount++;
         if (serialCount == 3) {
             String head = Util.bytesGetHead(serialBuffer, 3);
-            if (head.equals("$04") || head.equals("$R4") || head.equals("$R1") || head.equals("$R5") || head.equals("$R0")) {
+            if (head.equals("$04") || head.equals("$R4") || head.equals("$R1") || head.equals("$R5") || head.equals("$R0") || head.equals("$R6")) {
                 hasHead = true;
             } else {
                 Util.bytesRemoveFirst(serialBuffer, serialCount);
@@ -540,7 +549,7 @@ public class MyApplication extends Application {
                 switch (Util.bytesGetHead(serialBuffer, 3)) {
                     case "$04":
                         // 接收短信
-                        message.what = 0x01;
+                        message.what = SERIAL_PORT_RECEIVE_NEW_MESSAGE;
                         message.setData(bundle);
                         mHandler.sendMessage(message);
                         break;
@@ -561,33 +570,39 @@ public class MyApplication extends Application {
                 switch (Util.bytesGetHead(serialBuffer, 3)) {
                     case "$R4":
                         // 短信发送成功
-                        message.what = 0x02;
+                        message.what = SERIAL_PORT_MESSAGE_SEND_SUCCESS;
                         message.setData(bundle);
                         mHandler.sendMessage(message);
                         break;
                     case "$R1":
                         // 接收时间
-                        message.what = 0x03;
+                        message.what = SERIAL_PORT_TIME_NUMBER_AND_COMMUNICATION_FROM;
                         message.setData(bundle);
                         mHandler.sendMessage(message);
                         break;
                     case "$R5":
                         if (serialCount == 14) {
                             // 紧急报警成功
-                            message.what = 0x04;
+                            message.what = SERIAL_PORT_ALERT_SEND_SUCCESS;
                         } else if (serialCount == 15) {
                             // 显示报警activity
-                            message.what = 0x05;
+                            message.what = SERIAL_PORT_SHOW_ALERT_ACTIVITY;
                         } else if (serialCount == 16) {
-                            // todo: 增加报警记录，显示收到报警
-                            message.what = 0x07;
+                            // 增加报警记录，显示收到报警
+                            message.what = SERIAL_PORT_RECEIVE_NEW_ALERT;
                         }
                         message.setData(bundle);
                         mHandler.sendMessage(message);
                         break;
                     case "$R0":
                         // 接收身份证信息
-                        message.what = 0x06;
+                        message.what = SERIAL_PORT_RECEIVE_NEW_SIGN;
+                        message.setData(bundle);
+                        mHandler.sendMessage(message);
+                        break;
+                    case "$R6":
+                        // 调节背光
+                        message.what = SERIAL_PORT_MODIFY_SCREEN_BRIGHTNESS;
                         message.setData(bundle);
                         mHandler.sendMessage(message);
                         break;
@@ -639,7 +654,7 @@ public class MyApplication extends Application {
             SharedPreferences.Editor editor = sharedPreferences.edit();//获取编辑器
 
             switch (msg.what) {//根据收到的消息的what类型处理
-                case 0x01:
+                case SERIAL_PORT_RECEIVE_NEW_MESSAGE:
                     // 收到新短信
                     String[] messageStrings = MessageFormat.unFormat(bytes);
                     String address = messageStrings[0];
@@ -648,7 +663,7 @@ public class MyApplication extends Application {
                     mainActivity.modifyGpsBarMessageCount();
                     Toast.makeText(getApplicationContext(), "您有新的短信", Toast.LENGTH_SHORT).show();
                     break;
-                case 0x02:
+                case SERIAL_PORT_MESSAGE_SEND_SUCCESS:
                     // 短信发送成功
                     Toast.makeText(getApplicationContext(), "短信发送成功", Toast.LENGTH_SHORT).show();
 
@@ -673,7 +688,7 @@ public class MyApplication extends Application {
                     }
 
                     break;
-                case 0x03:
+                case SERIAL_PORT_TIME_NUMBER_AND_COMMUNICATION_FROM:
                     // 接收时间
                     int year = ByteUtil.subBytes(bytes, 11, 12)[0]  & 0xFF;
                     int month = ByteUtil.subBytes(bytes, 12, 13)[0]  & 0xFF;
@@ -703,15 +718,15 @@ public class MyApplication extends Application {
                     String communication_from = status.charAt(6) == '1' ? "北斗" : "GPRS";
                     PreferencesUtils.putString(getApplicationContext(), "communication_from", communication_from);
                     break;
-                case 0x04:
+                case SERIAL_PORT_ALERT_SEND_SUCCESS:
                     // 报警发送成功
                     Toast.makeText(getApplicationContext(), "遇险报警发送成功", Toast.LENGTH_SHORT).show();
                     break;
-                case 0x05:
+                case SERIAL_PORT_SHOW_ALERT_ACTIVITY:
                     // 显示报警activity
                     mainActivity.showDangerDialog();
                     break;
-                case 0x07:
+                case SERIAL_PORT_RECEIVE_NEW_ALERT:
                     // 增加报警记录，显示收到报警
 
                     try {
@@ -735,7 +750,7 @@ public class MyApplication extends Application {
                     }
 
                     break;
-                case 0x06:
+                case SERIAL_PORT_RECEIVE_NEW_SIGN:
                     // 接收身份证信息
                     String[] idStrings = SignFormat.unFormat(bytes);
                     String id = idStrings[0];
@@ -743,6 +758,10 @@ public class MyApplication extends Application {
                     String nation = "--";
                     String idAddress = "浙江省嘉兴市南湖区xx小区xx幢xx室";
                     mainActivity.showIDCardDialog(id, name, nation, idAddress);
+                    break;
+                case SERIAL_PORT_MODIFY_SCREEN_BRIGHTNESS:
+                    // 调节背光
+                    ScreenBrightness.modifyBrightness(mainActivity);
                     break;
                 default:
                     super.handleMessage(msg);//这里最好对不需要或者不关心的消息抛给父类，避免丢失消息

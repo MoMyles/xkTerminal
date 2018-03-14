@@ -35,4 +35,7 @@ public class Constant {
     // 紧急报警闪烁间隔，0为不闪烁，ms
     public static int ALERT_FLASH_TIME = 500;
 
+    // 串口码率
+    public static int SERIAL_PORT_BAUD_RATE = 9600;
+
 }

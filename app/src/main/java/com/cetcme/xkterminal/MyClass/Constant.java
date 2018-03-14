@@ -8,12 +8,17 @@ import java.util.Date;
 
 public class Constant {
 
+    // 时间
     public static Date SYSTEM_DATE = new Date();
 
+    // 时区
     public static int TIME_ZONE = 20; // +8   0 ~ 24
 
     // 短信内容最大长度，0为不限
     public static int MESSAGE_CONTENT_MAX_LENGTH = 56;
+
+    // 短信发送失败等待时间
+    public static int MESSAGE_FAIL_TIME = 2000;
 
     // 打卡对话框自动关闭时间，0为不关闭，ms
     public static int IDCARD_REMAIN_TIME = 5000;

@@ -1,7 +1,6 @@
 package com.cetcme.xkterminal;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiConfiguration;
@@ -10,7 +9,6 @@ import android.os.Handler;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -37,7 +35,6 @@ import com.cetcme.xkterminal.Fragment.SettingFragment;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.DensityUtil;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
-import com.cetcme.xkterminal.MyClass.SystemDateTime;
 import com.cetcme.xkterminal.RealmModels.Alert;
 import com.cetcme.xkterminal.RealmModels.Message;
 import com.cetcme.xkterminal.RealmModels.Sign;
@@ -49,15 +46,11 @@ import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Date;
-import java.util.Objects;
 
 import io.realm.Realm;
-import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -95,6 +88,8 @@ public class MainActivity extends AppCompatActivity {
     public KProgressHUD okHUD;
 
     public WifiManager mWifiManager;
+
+    public boolean messageSendFailed = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -604,7 +599,7 @@ public class MainActivity extends AppCompatActivity {
                 message.setContent(content);
                 message.setDeleted(false);
                 message.setSend_time(Constant.SYSTEM_DATE);
-                message.setRead(false);
+                message.setRead(true);
                 message.setSend(true);
             }
         });
@@ -614,6 +609,18 @@ public class MainActivity extends AppCompatActivity {
         System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
 
         backToMessageFragment();
+
+
+        // 显示短信发送失败
+        messageSendFailed = true;
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (messageSendFailed) {
+                    Toast.makeText(MainActivity.this, "发送失败", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }, Constant.MESSAGE_FAIL_TIME);
 
         // 短信推送
         JSONObject sendJson = new JSONObject();

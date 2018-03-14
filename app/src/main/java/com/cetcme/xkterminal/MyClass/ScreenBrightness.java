@@ -91,7 +91,7 @@ public class ScreenBrightness {
         int bright = getScreenBrightness(activity);
         int newBright = bright + 15;
         if (newBright > 255) newBright = 170;
-        setBrightness(activity, newBright);
+//        setBrightness(activity, newBright);
         saveBrightness(activity, newBright);
     }
 

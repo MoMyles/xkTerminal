@@ -66,6 +66,8 @@ public class MyApplication extends Application {
 
     private static MediaPlayer player;
 
+    private boolean messageSendFailed = true;
+
     public static void soundPlay() {
         player.start();
     }
@@ -231,17 +233,26 @@ public class MyApplication extends Application {
                     sendBytes(messageBytes);
                     System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
 
-                    // 返回成功socket
-                    JSONObject sendJson = new JSONObject();
-                    try {
-                        sendJson.put("apiType", "sms_send");
-                        sendJson.put("code", 0);
-                        sendJson.put("msg", "发送成功");
+                    messageSendFailed = true;
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (messageSendFailed) {
+                                // 返回成功socket
+                                JSONObject sendJson = new JSONObject();
+                                try {
+                                    sendJson.put("apiType", "sms_send");
+                                    sendJson.put("code", 1);
+                                    sendJson.put("msg", "发送失败");
 
-                        SocketServer.send(sendJson);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+                                    SocketServer.send(sendJson);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    }, Constant.MESSAGE_FAIL_TIME);
+
                     break;
                 case "sms_read":
                     final String userAddress1 = receiveJson.getString("userAddress");
@@ -644,6 +655,22 @@ public class MyApplication extends Application {
                     String lastSendTimeSave = sharedPreferences.getString("lastSendTimeSave", "");
                     editor.putString("lastSendTime", lastSendTimeSave);
                     editor.apply(); //提交修改
+
+                    // 用于去掉2秒后显示发送失败提示
+                    mainActivity.messageSendFailed = false;
+                    messageSendFailed = false;
+
+                    // 返回成功socket
+                    JSONObject sendJson = new JSONObject();
+                    try {
+                        sendJson.put("apiType", "sms_send");
+                        sendJson.put("code", 0);
+                        sendJson.put("msg", "发送成功");
+
+                        SocketServer.send(sendJson);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
 
                     break;
                 case 0x03:

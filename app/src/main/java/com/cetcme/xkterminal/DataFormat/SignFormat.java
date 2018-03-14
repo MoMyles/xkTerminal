@@ -74,28 +74,34 @@ public class SignFormat {
 //        System.out.println(id);
 //        System.out.println(name);
 
-        byte[] bytes = new byte[] {
-                (byte) 0xD8,
-                (byte) 0x88,
-                (byte) 0x3F,
-                (byte) 0x9E,
-                (byte) 0x20,
-                (byte) 0x00,
-                (byte) 0x20,
-                (byte) 0x00,
-                (byte) 0x20,
-                (byte) 0x00,
-                (byte) 0x20,
-                (byte) 0x00
-        };
+//        byte[] bytes = new byte[] {
+//                (byte) 0xD8,
+//                (byte) 0x88,
+//                (byte) 0x3F,
+//                (byte) 0x9E,
+//                (byte) 0x20,
+//                (byte) 0x00,
+//                (byte) 0x20,
+//                (byte) 0x00,
+//                (byte) 0x20,
+//                (byte) 0x00,
+//                (byte) 0x20,
+//                (byte) 0x00
+//        };
+//
+//        try {
+//            String str = ConvertUtil.turnNameBytesToString(bytes,0);
+//            System.out.println(str);
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
 
-        try {
-            String str = ConvertUtil.turnNameBytesToString(bytes,0);
-            System.out.println(str);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+        byte[] bytes = "$01".getBytes();
+        bytes = ByteUtil.byteMerger(bytes, new byte[] {0x01, 0x00});
+        bytes = ByteUtil.byteMerger(bytes, "hh".getBytes());
+        bytes = ByteUtil.byteMerger(bytes, "\r\n".getBytes());
 
+        System.out.println(ConvertUtil.bytesToHexString(bytes));
 
     }
 

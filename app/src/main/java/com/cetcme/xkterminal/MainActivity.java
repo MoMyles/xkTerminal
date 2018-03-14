@@ -22,6 +22,7 @@ import com.cetcme.xkterminal.ActionBar.MessageBar;
 import com.cetcme.xkterminal.ActionBar.PageBar;
 import com.cetcme.xkterminal.ActionBar.SendBar;
 import com.cetcme.xkterminal.DataFormat.MessageFormat;
+import com.cetcme.xkterminal.DataFormat.Util.ByteUtil;
 import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
 import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
 import com.cetcme.xkterminal.DataFormat.Util.Util;
@@ -172,6 +173,9 @@ public class MainActivity extends AppCompatActivity {
 //                .lessThan("send_time", new Date("2018/3/8 15:00:00"))
 //                .findAll();
 //        System.out.println(messages);
+
+        // 发送启动$01，要求对方发时间
+        sendBootData();
     }
 
     private void initHud() {
@@ -727,4 +731,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void sendBootData() {
+        byte[] bytes = "$01".getBytes();
+        bytes = ByteUtil.byteMerger(bytes, new byte[] {0x01, 0x00});
+        bytes = ByteUtil.byteMerger(bytes, new byte[] {0x2A, 0x01});
+        bytes = ByteUtil.byteMerger(bytes, "\r\n".getBytes());
+        ((MyApplication) getApplication()).sendBytes(bytes);
+    }
 }

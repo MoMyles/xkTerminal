@@ -66,21 +66,14 @@ public class MainFragment extends Fragment{
 
         alert_tv = view.findViewById(R.id.alert_tv);
 
-        view.findViewById(R.id.app_name_tv).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                System.out.println("开始播放");
-//                if (player != null && player.isPlaying()) {
-//                    player.stop();
-//                    player.release();
-//                    player = null;
-//                    return;
-//                }
-//                player = MediaPlayer.create(getActivity(), R.raw.talkroom_begin);
-                MyApplication.soundPlay();
-
-            }
-        });
+//        view.findViewById(R.id.app_name_tv).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                System.out.println("开始播放");
+//                MyApplication.soundPlay();
+//
+//            }
+//        });
 
 
         return view;

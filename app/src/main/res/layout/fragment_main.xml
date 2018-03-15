@@ -22,7 +22,7 @@
             android:textSize="60sp"
             android:textStyle="bold"
             android:textColor="#fd9f3b"
-            android:text="舰载北斗显控终端" />
+            android:text="@string/app_name" />
 
         <TextView
             android:layout_width="match_parent"

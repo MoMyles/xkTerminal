@@ -59,8 +59,7 @@ public class MainFragment extends Fragment{
         alert_confirm_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                PreferencesUtils.putBoolean(getActivity(), "homePageAlertView", false);
-                showMainLayout();
+                cancelAlert();
             }
         });
 
@@ -168,6 +167,13 @@ public class MainFragment extends Fragment{
         }
     };
 
+    /**
+     * 解除报警，用户手动解除或者北斗中心解除
+     */
+    private void cancelAlert() {
+        PreferencesUtils.putBoolean(getActivity(), "homePageAlertView", false);
+        showMainLayout();
+    }
 
 
 }

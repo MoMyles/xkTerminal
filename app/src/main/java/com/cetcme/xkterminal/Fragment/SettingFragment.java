@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.cetcme.xkterminal.ActionBar.TitleBar;
 import com.cetcme.xkterminal.MainActivity;
+import com.cetcme.xkterminal.MyClass.CommonUtil;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.R;
@@ -107,7 +108,7 @@ public class SettingFragment extends Fragment {
                                     wifi_ssid_textView.setText(text);
                                     Toast.makeText(getActivity(), "新的WIFI SSID: " + text, Toast.LENGTH_SHORT).show();
                                     dialog.dismiss();
-                                    assert ((MainActivity) getActivity()) != null;
+                                    assert getActivity() != null;
                                     ((MainActivity) getActivity()).createWifiHotspot();
                                 } else {
                                     Toast.makeText(getActivity(), "请输入新的WIFI SSID", Toast.LENGTH_SHORT).show();
@@ -171,6 +172,22 @@ public class SettingFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 smsTempDelete();
+            }
+        });
+
+        // 通讯录
+
+        view.findViewById(R.id.friend_add_textView).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                friendAdd();
+            }
+        });
+
+        view.findViewById(R.id.friend_delete_textView).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                friendDelete();
             }
         });
     }
@@ -284,7 +301,7 @@ public class SettingFragment extends Fragment {
                 int[] indexes = builder.getCheckedItemIndexes();
                 String newSmsTempStr = "";
                 for (int i = 0; i < items.length; i++) {
-                    if (!useLoop(indexes, i)) {
+                    if (!CommonUtil.useLoop(indexes, i)) {
                         if (!newSmsTempStr.isEmpty()) {
                             newSmsTempStr += getString(R.string.smsTemplateSeparate);
                         }
@@ -299,13 +316,90 @@ public class SettingFragment extends Fragment {
         builder.show();
     }
 
-    public static boolean useLoop(int[] arr, int targetValue) {
-        for (int s : arr) {
-            if (s == targetValue)
-                return true;
-        }
-        return false;
+    int friendDialogStatus = 0;
+
+    private void friendAdd() {
+        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
+        final String[] friend = {"", ""};
+        builder.setTitle("添加好友")
+                .setPlaceholder("在此输入好友昵称")
+                .setInputType(InputType.TYPE_CLASS_TEXT)
+                .addAction("取消", new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
+                        dialog.dismiss();
+                    }
+                })
+                .addAction("确认", new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
+                        CharSequence text = builder.getEditText().getText();
+                        if (text != null && text.length() > 0) {
+
+//                            if (friendDialogStatus == 0) {
+//                                friendDialogStatus++;
+//                                // 昵称
+//
+//                                friend[0] = text.toString();
+//                                System.out.println("好友昵称：" + friend[0]);
+//
+//                                builder.setPlaceholder("在此输入好友号码");
+//                                builder.show();
+//                            } else if (friendDialogStatus == 1) {
+//                                // 号码
+//                                friend[1] = text.toString();
+//                                System.out.println("好友昵称：" + friend[0] +"好友号码：" + friend[1]);
+//                                dialog.dismiss();
+//                            }
+
+
+                        } else {
+                            Toast.makeText(getActivity(), "请填入内容", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                })
+                .show();
     }
 
+    private void friendDelete() {
+        String smsTempStr = PreferencesUtils.getString(getActivity(), "smsTemplate", "");
+        if (smsTempStr.isEmpty()) {
+            Toast.makeText(getActivity(), "自定义短信模版为空", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        final String[] items = smsTempStr.split(getString(R.string.smsTemplateSeparate));
+        final QMUIDialog.MultiCheckableDialogBuilder builder = new QMUIDialog.MultiCheckableDialogBuilder(getActivity())
+                .addItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+        builder.addAction("取消", new QMUIDialogAction.ActionListener() {
+            @Override
+            public void onClick(QMUIDialog dialog, int index) {
+                dialog.dismiss();
+            }
+        });
+        builder.addAction("删除", new QMUIDialogAction.ActionListener() {
+            @Override
+            public void onClick(QMUIDialog dialog, int index) {
+                int[] indexes = builder.getCheckedItemIndexes();
+                String newSmsTempStr = "";
+                for (int i = 0; i < items.length; i++) {
+                    if (!CommonUtil.useLoop(indexes, i)) {
+                        if (!newSmsTempStr.isEmpty()) {
+                            newSmsTempStr += getString(R.string.smsTemplateSeparate);
+                        }
+                        newSmsTempStr += items[i];
+                    }
+                }
+                PreferencesUtils.putString(getActivity(), "smsTemplate", newSmsTempStr);
+                Toast.makeText(getActivity(), "短信模版删除成功", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            }
+        });
+        builder.show();
+    }
 
 }

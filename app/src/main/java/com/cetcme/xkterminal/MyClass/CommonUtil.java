@@ -19,4 +19,14 @@ public class CommonUtil {
         return messageListHeight / 50  + 1;
     }
 
+    /**
+     * int[] 里是否包含 targetValue
+     */
+    public static boolean useLoop(int[] arr, int targetValue) {
+        for (int s : arr) {
+            if (s == targetValue)
+                return true;
+        }
+        return false;
+    }
 }

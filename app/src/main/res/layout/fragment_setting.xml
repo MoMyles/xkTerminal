@@ -493,26 +493,35 @@
                     android:layout_height="match_parent"/>
 
                 <TextView
-                    android:id="@+id/other_textView"
                     android:layout_width="250dp"
                     android:layout_weight="1"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:textColor="#000000"
                     android:textSize="18sp"
-                    android:text=""/>
+                    android:text="通讯录："/>
 
                 <TextView
-                    android:id="@+id/other1_textView"
-                    android:layout_width="250dp"
-                    android:layout_weight="1"
+                    android:id="@+id/friend_add_textView"
+                    android:layout_width="125dp"
+                    android:layout_weight="0.5"
                     android:layout_height="match_parent"
-                    android:gravity="center_vertical"
+                    android:gravity="center"
+                    android:textColor="#000000"
+                    android:textSize="18sp"
+                    android:text="增加"/>
+
+                <TextView
+                    android:id="@+id/friend_delete_textView"
+                    android:layout_width="125dp"
+                    android:layout_weight="0.5"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
                     android:textColor="#000000"
                     android:textSize="18sp"
                     android:layout_marginRight="200dp"
                     android:layout_marginEnd="200dp"
-                    android:text=""/>
+                    android:text="删除"/>
 
                 <!--<TextView-->
                 <!--android:id="@+id/sun_voltage_textView1"-->

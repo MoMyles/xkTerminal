@@ -23,6 +23,7 @@ import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.MyClass.ScreenBrightness;
+import com.cetcme.xkterminal.Socket.SocketManager;
 import com.cetcme.xkterminal.Socket.SocketServer;
 
 import org.greenrobot.eventbus.EventBus;
@@ -38,6 +39,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidParameterException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -81,6 +83,13 @@ public class MyApplication extends Application {
     private static final int SERIAL_PORT_RECEIVE_NEW_ALERT = 0x07;
     private static final int SERIAL_PORT_MODIFY_SCREEN_BRIGHTNESS = 0x08;
 
+    // for file pick
+    private Handler handler;
+    private SocketManager socketManager;
+
+    private Toast tipToast;
+
+    @SuppressLint("HandlerLeak")
     @Override
     public void onCreate() {
         super.onCreate();
@@ -135,6 +144,29 @@ public class MyApplication extends Application {
             }
         }.start();
 
+        tipToast = Toast.makeText(getApplicationContext(), "", Toast.LENGTH_SHORT);
+
+        handler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                switch(msg.what){
+                    case 0:
+                        SimpleDateFormat format = new SimpleDateFormat("hh:mm:ss");
+                        String str = "[" + format.format(Constant.SYSTEM_DATE) + "]" + msg.obj.toString();
+                        tipToast.setText(str);
+                        tipToast.show();
+                        System.out.println(str);
+                        break;
+                    case 1:
+                        System.out.println("本机IP：" + " 监听端口:" + msg.obj.toString());
+                        break;
+                    case 2:
+                        Toast.makeText(getApplicationContext(), msg.obj.toString(), Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+        };
+        socketManager = new SocketManager(handler, getApplicationContext());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

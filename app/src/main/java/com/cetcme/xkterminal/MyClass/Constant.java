@@ -8,6 +8,12 @@ import java.util.Date;
 
 public class Constant {
 
+    // socket 服务器端口
+    public static final int SOCKET_SERVER_PORT = 9999;
+
+    // socket 文件服务器端口
+    public static final int FILE_SOCKET_SERVER_PORT = 9998;
+
     // 时间
     public static Date SYSTEM_DATE = new Date();
 

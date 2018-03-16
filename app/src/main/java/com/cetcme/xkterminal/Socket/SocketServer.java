@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.MyApplication;
+import com.cetcme.xkterminal.MyClass.Constant;
 
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;
@@ -37,7 +38,7 @@ public class SocketServer {
     public void startService() {
         try {
             // 创建ServerSocket
-            ServerSocket serverSocket = new ServerSocket(9999);
+            ServerSocket serverSocket = new ServerSocket(Constant.SOCKET_SERVER_PORT);
             System.out.println("--开启服务器，监听端口 9999--");
 
             // 监听端口，等待客户端连接

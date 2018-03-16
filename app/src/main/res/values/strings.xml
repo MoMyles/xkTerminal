@@ -21,11 +21,37 @@
     <string name="dangerType_7">抓扣</string>
     <string name="dangerType_8">故障</string>
 
+    // 用于分割 短信模版
+    <string name="smsTemplateSeparate">`xk`sp`</string>
+
     // serial test
     <string name="error_configuration">Please configure your serial port first.</string>
     <string name="error_security">You do not have read/write permission to the serial port.</string>
     <string name="error_unknown">The serial port can not be opened for an unknown reason.</string>
 
     <string name="wifi_ssid">船载北斗显控终端_WIFI</string>
+
+    <string-array name="smsTemplate">
+        <item>固定短信模版1</item>
+        <item>固定短信模版2</item>
+        <item>固定短信模版3</item>
+        <item>固定短信模版4</item>
+        <item>固定短信模版5</item>
+        <item>固定短信模版6</item>
+        <item>固定短信模版7</item>
+        <item>固定短信模版8</item>
+        <item>固定短信模版9</item>
+        <item>固定短信模版10</item>
+        <item>固定短信模版11</item>
+        <item>固定短信模版12</item>
+        <item>固定短信模版13</item>
+        <item>固定短信模版14</item>
+        <item>固定短信模版15</item>
+        <item>固定短信模版16</item>
+        <item>固定短信模版17</item>
+        <item>固定短信模版18</item>
+        <item>固定短信模版19</item>
+        <item>固定短信模版20</item>
+    </string-array>
 
 </resources>

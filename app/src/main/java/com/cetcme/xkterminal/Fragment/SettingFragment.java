@@ -1,5 +1,6 @@
 package com.cetcme.xkterminal.Fragment;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.InputType;
@@ -21,7 +22,11 @@ import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by qiuhong on 10/01/2018.
@@ -54,6 +59,13 @@ public class SettingFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_setting,container,false);
 
+        initView(view);
+        getData();
+
+        return view;
+    }
+
+    private void initView(View view) {
         TitleBar titleBar = view.findViewById(R.id.titleBar);
         titleBar.setTitle("系统参数");
 
@@ -147,9 +159,20 @@ public class SettingFragment extends Fragment {
             }
         });
 
-        getData();
+        // 短信模版
+        view.findViewById(R.id.temp_add_textView).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                smsTempAdd();
+            }
+        });
 
-        return view;
+        view.findViewById(R.id.temp_delete_textView).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                smsTempDelete();
+            }
+        });
     }
 
     private void getData() {
@@ -188,5 +211,101 @@ public class SettingFragment extends Fragment {
         }
 
     }
+
+    private void smsTempAdd() {
+        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
+        builder.setTitle("添加短信模版")
+                .setPlaceholder("在此输入短信模版内容")
+                .setInputType(InputType.TYPE_CLASS_TEXT)
+                .addAction("取消", new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
+                        dialog.dismiss();
+                    }
+                })
+                .addAction("添加", new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
+                        CharSequence text = builder.getEditText().getText();
+                        if (text != null && text.length() > 0) {
+
+                            int contentLength = 0;
+                            try {
+                                contentLength = text.toString().getBytes("GBK").length;
+                            } catch (UnsupportedEncodingException e) {
+                                e.printStackTrace();
+                            }
+
+                            if (contentLength > Constant.MESSAGE_CONTENT_MAX_LENGTH) {
+                                Toast.makeText(getActivity(), "内容长度(" + contentLength + ")超出最大限制(" + Constant.MESSAGE_CONTENT_MAX_LENGTH + ")", Toast.LENGTH_SHORT).show();
+                            } else {
+                                String smsTempStr = PreferencesUtils.getString(getActivity(), "smsTemplate", "");
+                                if (!smsTempStr.isEmpty()) {
+                                    smsTempStr += getString(R.string.smsTemplateSeparate);
+                                }
+                                smsTempStr += text.toString();
+                                PreferencesUtils.putString(getActivity(), "smsTemplate", smsTempStr);
+                                Toast.makeText(getActivity(), "短信模版添加成功", Toast.LENGTH_SHORT).show();
+                                dialog.dismiss();
+                            }
+
+
+                        } else {
+                            Toast.makeText(getActivity(), "请填入内容", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                })
+                .show();
+    }
+
+    private void smsTempDelete() {
+        String smsTempStr = PreferencesUtils.getString(getActivity(), "smsTemplate", "");
+        if (smsTempStr.isEmpty()) {
+            Toast.makeText(getActivity(), "自定义短信模版为空", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        final String[] items = smsTempStr.split(getString(R.string.smsTemplateSeparate));
+        final QMUIDialog.MultiCheckableDialogBuilder builder = new QMUIDialog.MultiCheckableDialogBuilder(getActivity())
+                .addItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+        builder.addAction("取消", new QMUIDialogAction.ActionListener() {
+            @Override
+            public void onClick(QMUIDialog dialog, int index) {
+                dialog.dismiss();
+            }
+        });
+        builder.addAction("删除", new QMUIDialogAction.ActionListener() {
+            @Override
+            public void onClick(QMUIDialog dialog, int index) {
+                int[] indexes = builder.getCheckedItemIndexes();
+                String newSmsTempStr = "";
+                for (int i = 0; i < items.length; i++) {
+                    if (!useLoop(indexes, i)) {
+                        if (!newSmsTempStr.isEmpty()) {
+                            newSmsTempStr += getString(R.string.smsTemplateSeparate);
+                        }
+                        newSmsTempStr += items[i];
+                    }
+                }
+                PreferencesUtils.putString(getActivity(), "smsTemplate", newSmsTempStr);
+                Toast.makeText(getActivity(), "短信模版删除成功", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            }
+        });
+        builder.show();
+    }
+
+    public static boolean useLoop(int[] arr, int targetValue) {
+        for (int s : arr) {
+            if (s == targetValue)
+                return true;
+        }
+        return false;
+    }
+
 
 }

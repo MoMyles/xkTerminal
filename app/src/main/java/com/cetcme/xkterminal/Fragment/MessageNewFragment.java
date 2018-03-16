@@ -2,6 +2,7 @@ package com.cetcme.xkterminal.Fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -14,14 +15,19 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.cetcme.xkterminal.ActionBar.TitleBar;
 import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.MyClass.Constant;
+import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.R;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 
 /**
  * Created by qiuhong on 11/01/2018.
@@ -92,9 +98,7 @@ public class MessageNewFragment extends Fragment{
             if (mainActivity.messageListStatus.equals("receive")) sender_or_receiver_textView.setText("发件人：");
         }
 
-        SharedPreferences sharedPreferences = mainActivity.getSharedPreferences("xkTerminal", Context.MODE_PRIVATE); //私有数据
-        String lastSendTime = sharedPreferences.getString("lastSendTime", "");
-        last_send_textView.setText(lastSendTime);
+        last_send_textView.setText(PreferencesUtils.getString(getActivity(),"lastSendTime", ""));
 
         content_editText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -118,6 +122,23 @@ public class MessageNewFragment extends Fragment{
             }
         });
 
+        // sms temp
+        view.findViewById(R.id.sms_temp_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final String[] items = getSmsTempList();
+                new QMUIDialog.CheckableDialogBuilder(getActivity())
+                    .addItems(items, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            content_editText.setText(items[which]);
+                            dialog.dismiss();
+                        }
+                    })
+                    .show();
+            }
+        });
+
         return view;
     }
 
@@ -138,5 +159,19 @@ public class MessageNewFragment extends Fragment{
             return Constant.MESSAGE_CONTENT_MAX_LENGTH + "";
 
         }
+    }
+
+    private String[] getSmsTempList() {
+        final String[] items = getActivity().getResources().getStringArray(R.array.smsTemplate);
+        String smsTempStr = PreferencesUtils.getString(getActivity(), "smsTemplate", "");
+        if (smsTempStr.isEmpty()) {
+            return items;
+        }
+
+        for (String s : items) {
+            smsTempStr += getString(R.string.smsTemplateSeparate);
+            smsTempStr += s;
+        }
+        return  smsTempStr.split(getString(R.string.smsTemplateSeparate));
     }
 }

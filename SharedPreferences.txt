@@ -10,3 +10,5 @@ homePageAlertView： boolen // 主界面显示紧急报警
 needAlertSound：boolen // 用来控制报警声音是否重复一直播放
 
 time_zone: int // 0 ~ 24
+
+smsTemplate: string -> array 用`xk`sp`来间隔

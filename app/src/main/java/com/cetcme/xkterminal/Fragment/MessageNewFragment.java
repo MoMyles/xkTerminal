@@ -103,21 +103,23 @@ public class MessageNewFragment extends Fragment{
         content_editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                System.out.println(charSequence);
 
             }
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
             }
 
             @Override
             public void afterTextChanged(Editable editable) {
+                modifyContentIntoLength();
+
                 if (tg.equals("new")) {
-                    text_count_textView.setText(getCurrentContentLength());
+                    text_count_textView.setText(getRemainContentLength() + "");
                 }
                 if (tg.equals("relay")) {
-                    text_count_textView.setText(getCurrentContentLength());
+                    text_count_textView.setText(getRemainContentLength() + "");
                 }
             }
         });
@@ -150,14 +152,22 @@ public class MessageNewFragment extends Fragment{
         return content_editText.getText().toString();
     }
 
-    private String getCurrentContentLength() {
+    private int getRemainContentLength() {
         try {
-            int length = Constant.MESSAGE_CONTENT_MAX_LENGTH - content_editText.getText().toString().getBytes("GBK").length;
-            return length + "";
+            int length = Constant.MESSAGE_CONTENT_MAX_LENGTH - content_editText.getText().toString().getBytes("GB2312").length;
+            return length;
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-            return Constant.MESSAGE_CONTENT_MAX_LENGTH + "";
+            return Constant.MESSAGE_CONTENT_MAX_LENGTH;
+        }
+    }
 
+    private int getCurrentContentLength() {
+        try {
+            return content_editText.getText().toString().getBytes("GB2312").length;
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return 0;
         }
     }
 
@@ -173,5 +183,14 @@ public class MessageNewFragment extends Fragment{
             smsTempStr += s;
         }
         return  smsTempStr.split(getString(R.string.smsTemplateSeparate));
+    }
+
+    private void modifyContentIntoLength() {
+        String content = content_editText.getText().toString();
+        if (getCurrentContentLength() > Constant.MESSAGE_CONTENT_MAX_LENGTH) {
+            content_editText.setText(content.subSequence(0, content.length() - 1));
+            content_editText.setSelection(content_editText.getText().toString().length());
+            modifyContentIntoLength();
+        }
     }
 }

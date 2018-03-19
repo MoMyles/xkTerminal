@@ -105,7 +105,7 @@ public class AlertActivity extends Activity implements View.OnClickListener{
                     String singleType = checkBoxes.get(i).isChecked() ? "1" : "0";
                     type = singleType + type;
                 }
-                ((MyApplication) getApplication()).sendBytes(AlertFormat.format((byte) 0x00, type));
+                ((MyApplication) getApplication()).sendBytes(AlertFormat.format("00000000", type));
 
                 addAlertLog(type);
                 onBackPressed();

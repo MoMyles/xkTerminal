@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:visibility="gone"
         >
 
         <TextView
@@ -51,7 +52,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <TextView
             android:id="@+id/alert_tv"
@@ -65,16 +66,37 @@
             android:textColor="#ed211a"
             android:text="紧急报警" />
 
-
-        <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
-            android:id="@+id/alert_confirm_btn"
-            android:layout_width="200dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="50dp"
+            android:orientation="horizontal"
             android:layout_marginBottom="50dp"
-            android:text="确认"
-            android:padding="10dp"
-            android:textSize="24sp"
-            />
+            android:gravity="center">
+
+            <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
+                android:id="@+id/alert_cancel_btn"
+                android:layout_width="200dp"
+                android:layout_height="50dp"
+                android:text="取消"
+                android:padding="10dp"
+                android:textSize="24sp"
+                android:layout_marginRight="50dp"
+                android:layout_marginEnd="50dp"
+                />
+
+            <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
+                android:id="@+id/alert_confirm_btn"
+                android:layout_width="200dp"
+                android:layout_height="50dp"
+                android:text="确认"
+                android:padding="10dp"
+                android:textSize="24sp"
+                />
+
+        </LinearLayout>
+
+
+
 
 
 

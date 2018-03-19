@@ -4,15 +4,10 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
-import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,14 +16,16 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.cetcme.xkterminal.DataFormat.MessageFormat;
+import com.cetcme.xkterminal.DataFormat.AlertFormat;
 import com.cetcme.xkterminal.MainActivity;
+import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.DateUtil;
-import com.cetcme.xkterminal.MyClass.DensityUtil;
 import com.cetcme.xkterminal.MyClass.ScreenBrightness;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.SerialTest.SerialPortActivity;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,7 +36,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 
 import io.realm.Realm;
 
@@ -60,10 +56,15 @@ public class GPSBar extends RelativeLayout {
     private TextView textView_time;
 
     private TextView textView_message_number;
+    private TextView textView_alert;
 
     private Realm realm;
 
     private boolean noGps = true;
+
+    public boolean flashAlert = false;
+
+    private boolean flashTextViewVisible = true;
 
     // 用于关闭app
     private int clickTime = 0;
@@ -96,6 +97,35 @@ public class GPSBar extends RelativeLayout {
 
         textView_message_number     = view.findViewById(R.id.textView_message_number);
 
+        textView_alert              = view.findViewById(R.id.textView_alert);
+        textView_alert.setVisibility(INVISIBLE);
+        textView_alert.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new QMUIDialog.MessageDialogBuilder(mainActivity)
+                        .setTitle("解除报警")
+                        .setMessage("确定要解除吗？")
+                        .addAction("取消", new QMUIDialogAction.ActionListener() {
+                            @Override
+                            public void onClick(QMUIDialog dialog, int index) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .addAction(0, "解除", QMUIDialogAction.ACTION_PROP_NEGATIVE, new QMUIDialogAction.ActionListener() {
+                            @Override
+                            public void onClick(QMUIDialog dialog, int index) {
+
+                                // 解除报警操作
+                                ((MyApplication) mainActivity.getApplication()).sendBytes(AlertFormat.format("00010000", "00000000"));
+//                                PreferencesUtils.putBoolean(mainActivity, "homePageAlertView", false);
+                                flashAlert = false;
+                                textView_alert.setVisibility(INVISIBLE);
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
+            }
+        });
 
         textView_message.setOnClickListener(new OnClickListener() {
             @Override
@@ -324,10 +354,13 @@ public class GPSBar extends RelativeLayout {
 
                 if (Constant.NO_GPS_FLASH_TIME != 0) {
                     int noGpsFlashTime = Constant.NO_GPS_FLASH_TIME / 100;
-                    if (noGps && i % noGpsFlashTime == 0) {
+                    if (i % noGpsFlashTime == 0) {
+                        flashTextViewVisible = !flashTextViewVisible;
                         Message message = new Message();
                         message.what = 3;
                         handler.sendMessage(message);
+
+
                     }
                     if (i == 10 * noGpsFlashTime) i = 0;
                 }
@@ -345,13 +378,17 @@ public class GPSBar extends RelativeLayout {
             super.handleMessage(msg);
             switch (msg.what) {
                 case 1:
-//                    long sysTime = System.currentTimeMillis();
-//                    CharSequence sysTimeStr = DateFormat.format("HH:mm:ss", sysTime);
-//                    textView_time.setText(sysTimeStr); //更新时间
                     textView_time.setText(DateUtil.Date2String(Constant.SYSTEM_DATE, "yyyy年MM月dd日 HH:mm:ss"));
                     break;
                 case 3:
-                    textView_location_status.setVisibility(textView_location_status.getVisibility() == VISIBLE ? INVISIBLE : VISIBLE);
+
+                    if (noGps) {
+                        textView_location_status.setVisibility(flashTextViewVisible ? VISIBLE: INVISIBLE);
+                    }
+
+                    if (flashAlert) {
+                        textView_alert.setVisibility(flashTextViewVisible ? VISIBLE: INVISIBLE);
+                    }
                     break;
                 default:
                     break;

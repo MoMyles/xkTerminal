@@ -13,9 +13,9 @@ import java.util.ArrayList;
 
 public class AlertFormat {
 
-    private static String alertHead = "$05";
+    private static final String alertHead = "$05";
 
-    public static final String ALERT_END_SYMBOL = "\r\n";
+    private static final String ALERT_END_SYMBOL = "\r\n";
 
     public static String[] unFormat(byte[] frameData) {
 
@@ -33,10 +33,10 @@ public class AlertFormat {
         return new String[]{modeStr, typeStr};
     }
 
-    public static byte[] format(byte mode, String type) {
+    public static byte[] format(String mode, String type) {
         byte[] bytes = alertHead.getBytes();
 
-        byte[] modeBytes = new byte[]{mode};
+        byte[] modeBytes = new byte[]{Util.BitToByte(mode)};
         byte[] typeBytes = new byte[]{Util.BitToByte(type)};
 
         byte[] toCheckBytes = ByteUtil.byteMerger(modeBytes, typeBytes);

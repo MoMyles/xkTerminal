@@ -108,7 +108,7 @@ public class MessageNewFragment extends Fragment{
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                
+
             }
 
             @Override

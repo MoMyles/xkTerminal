@@ -131,12 +131,19 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // 模拟弹窗
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-
-            }
-        },1000);
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                showRescueDialog("121231231232121");
+//                new Handler().postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        showRescueDialog("121231231232121");
+//
+//                    }
+//                },2000);
+//            }
+//        },2000);
 
         //模拟添加短信
 //        for (int i = 0; i < 10; i++) {
@@ -292,6 +299,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         Intent intent = new Intent(MainActivity.this, AlertActivity.class);
+        startActivity(intent);
+    }
+
+    public void showRescueDialog(String content) {
+        Intent intent = new Intent(MainActivity.this, RescueMessageActivity.class);
+        intent.putExtra("content", content);
         startActivity(intent);
     }
 

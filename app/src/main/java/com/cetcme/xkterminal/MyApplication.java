@@ -696,6 +696,9 @@ public class MyApplication extends Application {
                     mainActivity.addMessage(address, content);
                     mainActivity.modifyGpsBarMessageCount();
                     Toast.makeText(getApplicationContext(), "您有新的短信", Toast.LENGTH_SHORT).show();
+                    if (type.equals(MessageFormat.MESSAGE_TYPE_RESCURE)) {
+                        mainActivity.showRescueDialog(content);
+                    }
                     break;
                 case SERIAL_PORT_MESSAGE_SEND_SUCCESS:
                     // 短信发送成功

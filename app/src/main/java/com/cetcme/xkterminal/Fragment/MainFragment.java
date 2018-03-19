@@ -1,24 +1,25 @@
 package com.cetcme.xkterminal.Fragment;
 
 import android.annotation.SuppressLint;
-import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.cetcme.xkterminal.DataFormat.AlertFormat;
 import com.cetcme.xkterminal.Event.SmsEvent;
+import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.R;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton;
 
 import org.greenrobot.eventbus.EventBus;
@@ -37,6 +38,7 @@ public class MainFragment extends Fragment{
     private LinearLayout alert_layout;
 
     private QMUIRoundButton alert_confirm_btn;
+    private QMUIRoundButton alert_cancel_btn;
     private TextView alert_tv;
 
     private boolean alert_need_flash = false;
@@ -57,6 +59,14 @@ public class MainFragment extends Fragment{
 
         alert_confirm_btn = view.findViewById(R.id.alert_confirm_btn);
         alert_confirm_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                confirmAlert();
+            }
+        });
+
+        alert_cancel_btn = view.findViewById(R.id.alert_cancel_btn);
+        alert_cancel_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 cancelAlert();
@@ -170,9 +180,38 @@ public class MainFragment extends Fragment{
     /**
      * 解除报警，用户手动解除或者北斗中心解除
      */
-    private void cancelAlert() {
+    public void cancelAlert() {
+        new QMUIDialog.MessageDialogBuilder(getActivity())
+            .setTitle("解除报警")
+            .setMessage("确定要解除吗？")
+            .addAction("取消", new QMUIDialogAction.ActionListener() {
+                @Override
+                public void onClick(QMUIDialog dialog, int index) {
+                    dialog.dismiss();
+                }
+            })
+            .addAction(0, "解除", QMUIDialogAction.ACTION_PROP_NEGATIVE, new QMUIDialogAction.ActionListener() {
+                @Override
+                public void onClick(QMUIDialog dialog, int index) {
+
+                    // 解除报警操作
+                    ((MyApplication) getActivity().getApplication()).sendBytes(AlertFormat.format("00010000", "00000000"));
+                    PreferencesUtils.putBoolean(getActivity(), "homePageAlertView", false);
+                    showMainLayout();
+
+                    dialog.dismiss();
+                }
+            })
+            .show();
+    }
+
+    /**
+     * 确认报警
+     */
+    private void confirmAlert() {
         PreferencesUtils.putBoolean(getActivity(), "homePageAlertView", false);
         showMainLayout();
+        ((MainActivity)getActivity()).gpsBar.flashAlert = true;
     }
 
 

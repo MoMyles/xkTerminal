@@ -59,6 +59,11 @@ dependencies {
     compile 'com.google.code.gson:gson:2.8.0'
     // 腾讯ui
     compile 'com.qmuiteam:qmui:1.0.6'
+    // butterknife
+    implementation 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+
+
 }
 
 realm {

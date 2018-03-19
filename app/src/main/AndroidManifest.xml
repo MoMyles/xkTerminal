@@ -1,20 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.cetcme.xkterminal">
+          package="com.cetcme.xkterminal">
 
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-
-    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
-
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-
     <uses-permission android:name="android.permission.CHANGE_CONFIGURATION"/>
 
     <application
@@ -25,32 +21,39 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <!--开机广播接受者-->
+
+        <!-- 开机广播接受者 -->
         <receiver android:name=".MyClass.BootBroadcastReceiver">
             <intent-filter>
-                <!--注册开机广播地址-->
+
+                <!-- 注册开机广播地址 -->
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <category android:name="android.intent.category.DEFAULT" />
+
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </receiver>
+
         <activity
             android:name=".MainActivity"
             android:screenOrientation="sensorLandscape">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
         <activity
             android:name=".IDCardActivity"
             android:launchMode="singleTask"
-            android:theme="@style/myDialogActivityStyle" />
+            android:theme="@style/myDialogActivityStyle"/>
         <activity
             android:name=".AlertActivity"
             android:launchMode="singleTask"
-            android:theme="@style/myDialogActivityStyle" />
+            android:theme="@style/myDialogActivityStyle"/>
         <activity android:name=".SerialTest.SerialPortActivity"/>
+        <activity android:name=".RescueMessageActivity"
+                  android:theme="@style/myDialogActivityStyle">
+        </activity>
     </application>
 
 </manifest>

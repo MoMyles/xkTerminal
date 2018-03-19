@@ -348,7 +348,7 @@ public class GPSBar extends RelativeLayout {
 //                    long sysTime = System.currentTimeMillis();
 //                    CharSequence sysTimeStr = DateFormat.format("HH:mm:ss", sysTime);
 //                    textView_time.setText(sysTimeStr); //更新时间
-                    textView_time.setText(DateUtil.Date2String(Constant.SYSTEM_DATE, "HH:mm:ss"));
+                    textView_time.setText(DateUtil.Date2String(Constant.SYSTEM_DATE, "yyyy年MM月dd日 HH:mm:ss"));
                     break;
                 case 3:
                     textView_location_status.setVisibility(textView_location_status.getVisibility() == VISIBLE ? INVISIBLE : VISIBLE);

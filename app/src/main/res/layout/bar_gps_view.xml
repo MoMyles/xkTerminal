@@ -4,6 +4,20 @@
     android:layout_width="match_parent"
     android:layout_height="60dp">
 
+    <TextView
+        android:id="@+id/textView_time"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:gravity="center_vertical"
+        android:text="00:00:00"
+        android:textSize="22sp" />
+
+    <!--经纬度航速航向 -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
@@ -52,19 +66,17 @@
 
     </LinearLayout>
 
+    <!--测试用-->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginStart="10dp"
-            android:textSize="22sp"
-            android:text="测试用："/>
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_toEndOf="@+id/textView_time"
+        android:layout_toRightOf="@+id/textView_time"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/sign_btn"
@@ -73,7 +85,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
             android:text="打卡"
-            android:textSize="16sp" />
+            android:textSize="16sp"/>
 
         <Button
             android:id="@+id/alert_btn"
@@ -82,7 +94,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginStart="20dp"
             android:text="报警"
-            android:textSize="16sp" />
+            android:textSize="16sp"/>
 
         <Button
             android:id="@+id/screen_btn"
@@ -91,7 +103,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginStart="20dp"
             android:text="截图"
-            android:textSize="16sp" />
+            android:textSize="16sp"/>
 
         <Button
             android:id="@+id/sms_btn"
@@ -100,7 +112,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginStart="20dp"
             android:text="收短信"
-            android:textSize="16sp" />
+            android:textSize="16sp"/>
 
         <Button
             android:id="@+id/bright_btn"
@@ -109,7 +121,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginStart="20dp"
             android:text="亮度"
-            android:textSize="16sp" />
+            android:textSize="16sp"/>
 
     </LinearLayout>
 
@@ -147,26 +159,15 @@
         android:layout_marginRight="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginTop="10dp"
-        android:layout_toLeftOf="@+id/textView_time"
-        android:layout_toStartOf="@+id/textView_time"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:gravity="center"
         android:text="-"
         android:textColor="#FFFFFF"
         android:background="@drawable/message_num_bg"
         android:textSize="14sp" />
 
-    <TextView
-        android:id="@+id/textView_time"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_marginRight="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:gravity="center_vertical"
-        android:text="00:00:00"
-        android:textSize="22sp" />
+
 
     <TextView
         android:layout_width="match_parent"

@@ -81,7 +81,7 @@ public class MessageNewFragment extends Fragment{
             titleBar.setTitle("转发短信");
 //            receiver_editText.setText(receive);
             content_editText.setText(content);
-            text_count_textView.setText(getCurrentContentLength());
+            text_count_textView.setText(getRemainContentLength() + "");
         }
 
         if (tg.equals("detail")) {
@@ -93,7 +93,7 @@ public class MessageNewFragment extends Fragment{
             receiver_editText.setTextColor(0xFF000000);
             content_editText.setEnabled(false);
             content_editText.setTextColor(0xFF000000);
-            text_count_textView.setText(getCurrentContentLength());
+            text_count_textView.setText(getRemainContentLength() + "");
 
             if (mainActivity.messageListStatus.equals("receive")) sender_or_receiver_textView.setText("发件人：");
         }
@@ -103,12 +103,12 @@ public class MessageNewFragment extends Fragment{
         content_editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                System.out.println(charSequence);
 
             }
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                
             }
 
             @Override

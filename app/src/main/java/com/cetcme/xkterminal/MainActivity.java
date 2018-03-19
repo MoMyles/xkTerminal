@@ -608,7 +608,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        byte[] messageBytes = MessageFormat.format(receiver, content);
+        byte[] messageBytes = MessageFormat.format(receiver, content, MessageFormat.MESSAGE_TYPE_NORMAL);
         ((MyApplication) getApplication()).sendBytes(messageBytes);
         System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
 

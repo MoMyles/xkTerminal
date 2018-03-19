@@ -269,7 +269,7 @@ public class MyApplication extends Application {
                         }
                     });
 
-                    byte[] messageBytes = MessageFormat.format(message.getReceiver(), message.getContent());
+                    byte[] messageBytes = MessageFormat.format(message.getReceiver(), message.getContent(), MessageFormat.MESSAGE_TYPE_NORMAL);
                     sendBytes(messageBytes);
                     System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
 
@@ -450,9 +450,9 @@ public class MyApplication extends Application {
         switch (i) {
             case 0:
                 // 测试接收短信
-                byte[] messageBytes = MessageFormat.format("123456", "我是第一条的短信。。。。");
+                byte[] messageBytes = MessageFormat.format("123456", "我是第一条的短信。。。。", MessageFormat.MESSAGE_TYPE_NORMAL);
                 sendBytes(messageBytes);
-                messageBytes = MessageFormat.format("123456", "我是第二条的短信!!!!");
+                messageBytes = MessageFormat.format("123456", "我是第二条的短信!!!!", MessageFormat.MESSAGE_TYPE_NORMAL);
                 sendBytes(messageBytes);
                 break;
             case 1:
@@ -476,7 +476,6 @@ public class MyApplication extends Application {
 
     @Override
     public void onTerminate() {
-        Log.e("Application", "onTerminate: ==============");
         super.onTerminate();
         realm.close();
     }
@@ -691,6 +690,9 @@ public class MyApplication extends Application {
                     String[] messageStrings = MessageFormat.unFormat(bytes);
                     String address = messageStrings[0];
                     String content = messageStrings[1];
+                    String type = messageStrings[2];
+
+                    // TODO 判断类型
                     mainActivity.addMessage(address, content);
                     mainActivity.modifyGpsBarMessageCount();
                     Toast.makeText(getApplicationContext(), "您有新的短信", Toast.LENGTH_SHORT).show();

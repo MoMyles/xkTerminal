@@ -14,9 +14,13 @@ import java.io.UnsupportedEncodingException;
 
 public class MessageFormat {
 
-    private static String messageHead = "$04";
+    public static final String MESSAGE_TYPE_NORMAL = "00";
+    public static final String MESSAGE_TYPE_RESCURE = "01";
 
-    public static final String MESSAGE_END_SYMBOL = "\r\n";
+
+    private static final String messageHead = "$04";
+
+    private static final String MESSAGE_END_SYMBOL = "\r\n";
 
     public static String[] unFormat(byte[] frameData) {
 
@@ -32,18 +36,18 @@ public class MessageFormat {
         int frameCount = Integer.parseInt(Util.byteToBit(b).substring(0, 2), 2);
         int messageLength = Integer.parseInt(Util.byteToBit(b).substring(2, 8), 2);
         String messageContent = null;
+        String typeString = null;
         try {
-            messageContent = new String(ByteUtil.subBytes(frameData, 15, 15 + messageLength), "GBK");
+            typeString = new String(ByteUtil.subBytes(frameData, 15, 16), "GB2312");
+            messageContent = new String(ByteUtil.subBytes(frameData, 16, 16 + messageLength), "GB2312");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
 
-
-
-        return new String[]{targetAddress, messageContent};
+        return new String[]{targetAddress, messageContent, typeString};
     }
 
-    public static byte[] format(String targetAddress, String message) {
+    public static byte[] format(String targetAddress, String message, String type) {
         targetAddress = Util.stringAddZero(targetAddress, 12);
         System.out.println(targetAddress);
         byte[] bytes = messageHead.getBytes();
@@ -52,7 +56,7 @@ public class MessageFormat {
         byte[] lengthBytes = new byte[]{getDataLengthByte(message, 0)};
         byte[] messageBytes = new byte[0];
         try {
-            messageBytes = message.getBytes("GBK");
+            messageBytes = message.getBytes("GB2312");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -64,6 +68,11 @@ public class MessageFormat {
         byte[] checkSumBytes = ByteUtil.byteMerger("*".getBytes(), new byte[]{(byte) checkSum});
         checkSumBytes = ByteUtil.byteMerger(checkSumBytes, MESSAGE_END_SYMBOL.getBytes());
 
+        try {
+            bytes = ByteUtil.byteMerger(bytes, type.getBytes("GB2312"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         bytes = ByteUtil.byteMerger(bytes, toCheckBytes);
         bytes = ByteUtil.byteMerger(bytes, checkSumBytes);
         return bytes;
@@ -107,7 +116,7 @@ public class MessageFormat {
 //        System.out.println(Util.bytesGetHead("$R1".getBytes(),3));
 
         try {
-            System.out.println(ConvertUtil.bytesToHexString("一条短信1".getBytes("GBK")));
+            System.out.println(ConvertUtil.bytesToHexString("一条短信1".getBytes("GB2312")));
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -117,7 +126,7 @@ public class MessageFormat {
     private static byte getDataLengthByte (String message, int frameCountInt) {
         String messageLengthBitStr = null;
         try {
-            messageLengthBitStr = Util.stringAddZero(Integer.toBinaryString(message.getBytes("GBK").length), 6);
+            messageLengthBitStr = Util.stringAddZero(Integer.toBinaryString(message.getBytes("GB2312").length), 6);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

@@ -39,6 +39,7 @@ import com.cetcme.xkterminal.MyClass.DensityUtil;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.MyClass.SoundPlay;
 import com.cetcme.xkterminal.RealmModels.Alert;
+import com.cetcme.xkterminal.RealmModels.Friend;
 import com.cetcme.xkterminal.RealmModels.Message;
 import com.cetcme.xkterminal.RealmModels.Sign;
 import com.cetcme.xkterminal.Socket.SocketServer;
@@ -217,6 +218,17 @@ public class MainActivity extends AppCompatActivity {
                 alert.setDeleted(false);
                 alert.setType(type);
                 alert.setTime(Constant.SYSTEM_DATE);
+            }
+        });
+    }
+
+    public void addFriend(final String name, final String number) {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                Friend friend = realm.createObject(Friend.class);
+                friend.setName(name);
+                friend.setNumber(number);
             }
         });
     }

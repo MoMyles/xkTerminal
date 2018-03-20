@@ -21,6 +21,7 @@ import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.DateUtil;
+import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.MyClass.ScreenBrightness;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.SerialTest.SerialPortActivity;
@@ -58,11 +59,7 @@ public class GPSBar extends RelativeLayout {
     private TextView textView_message_number;
     private TextView textView_alert;
 
-    private Realm realm;
-
     private boolean noGps = true;
-
-    public boolean flashAlert = false;
 
     private boolean flashTextViewVisible = true;
 
@@ -70,6 +67,8 @@ public class GPSBar extends RelativeLayout {
     private int clickTime = 0;
 
     private ArrayList<TextView> textViews = new ArrayList<>();
+
+    private Toast newMsgToast;
 
     public GPSBar(Context context) {
         super(context);
@@ -82,6 +81,8 @@ public class GPSBar extends RelativeLayout {
 
         bindView(view);
         setData();
+
+        newMsgToast = Toast.makeText(view.getContext(), "您有新的短信", Toast.LENGTH_SHORT);
 
         new TimeHandler().start();
     }
@@ -118,7 +119,7 @@ public class GPSBar extends RelativeLayout {
                                 // 解除报警操作
                                 ((MyApplication) mainActivity.getApplication()).sendBytes(AlertFormat.format("00010000", "00000000"));
 //                                PreferencesUtils.putBoolean(mainActivity, "homePageAlertView", false);
-                                flashAlert = false;
+                                PreferencesUtils.putBoolean(mainActivity, "flashAlert", false);
                                 textView_alert.setVisibility(INVISIBLE);
                                 dialog.dismiss();
                             }
@@ -183,7 +184,7 @@ public class GPSBar extends RelativeLayout {
 
                 mainActivity.addMessage("654321", "测试收到新的短消息");
                 mainActivity.modifyGpsBarMessageCount();
-                Toast.makeText(view.getContext(), "您有新的短信", Toast.LENGTH_SHORT).show();
+                newMsgToast.show();
             }
         });
 
@@ -361,8 +362,6 @@ public class GPSBar extends RelativeLayout {
                         Message message = new Message();
                         message.what = 3;
                         handler.sendMessage(message);
-
-
                     }
                     if (i == 10 * noGpsFlashTime) i = 0;
                 }
@@ -388,7 +387,7 @@ public class GPSBar extends RelativeLayout {
                         textView_location_status.setVisibility(flashTextViewVisible ? VISIBLE: INVISIBLE);
                     }
 
-                    if (flashAlert) {
+                    if (PreferencesUtils.getBoolean(mainActivity, "flashAlert", false)) {
                         textView_alert.setVisibility(flashTextViewVisible ? VISIBLE: INVISIBLE);
                     }
                     break;
@@ -400,9 +399,16 @@ public class GPSBar extends RelativeLayout {
 
     public void modifyMessageCount(long count) {
         if (count != 0) {
-            textView_message.setText("短信");
-            textView_message_number.setText(count + "");
-            textView_message_number.setVisibility(VISIBLE);
+            if (count < 100) {
+                textView_message.setText("短信");
+                textView_message_number.setText(count + "");
+                textView_message_number.setVisibility(VISIBLE);
+            } else {
+                textView_message.setText("短信");
+                textView_message_number.setText("..");
+                textView_message_number.setVisibility(VISIBLE);
+            }
+
         } else {
             textView_message.setText("无短信");
             textView_message_number.setText("-");

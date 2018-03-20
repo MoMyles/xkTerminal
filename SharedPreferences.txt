@@ -7,7 +7,7 @@ SharedPreferences：
 wifiSSID : string // wifi AP ssid
 
 homePageAlertView： boolen // 主界面显示紧急报警
-
+flashAlert: boolen //gps bar 闪烁报警
 time_zone: int // 0 ~ 24
 
 smsTemplate: string -> array 用`xk`sp`来间隔

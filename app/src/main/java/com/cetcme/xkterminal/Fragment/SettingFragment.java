@@ -13,10 +13,12 @@ import android.widget.Toast;
 
 import com.cetcme.xkterminal.ActionBar.TitleBar;
 import com.cetcme.xkterminal.MainActivity;
+import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.CommonUtil;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.R;
+import com.cetcme.xkterminal.RealmModels.Friend;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 
@@ -28,6 +30,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+
+import io.realm.Realm;
+import io.realm.RealmResults;
 
 /**
  * Created by qiuhong on 10/01/2018.
@@ -55,6 +60,10 @@ public class SettingFragment extends Fragment {
     private SeekBar time_zone_seekBar;
 
     private Toast time_zone_toast;
+    private String[] friend = {"", ""};
+
+    private MainActivity mainActivity;
+    private Realm realm;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -62,6 +71,9 @@ public class SettingFragment extends Fragment {
 
         initView(view);
         getData();
+
+        mainActivity = (MainActivity) getActivity();
+        realm = ((MyApplication) mainActivity.getApplication()).realm;
 
         return view;
     }
@@ -282,8 +294,15 @@ public class SettingFragment extends Fragment {
             return;
         }
         final String[] items = smsTempStr.split(getString(R.string.smsTemplateSeparate));
+        final String[] showItems = new String[items.length];
+        // 显示序号
+        if (Constant.SHOW_NUMBER_MSG_TEMP_LIST) {
+            for (int i = 0; i < showItems.length; i++) {
+                showItems[i] = (i + 1) + ". " + items[i];
+            }
+        }
         final QMUIDialog.MultiCheckableDialogBuilder builder = new QMUIDialog.MultiCheckableDialogBuilder(getActivity())
-                .addItems(items, new DialogInterface.OnClickListener() {
+                .addItems(showItems, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
@@ -316,12 +335,38 @@ public class SettingFragment extends Fragment {
         builder.show();
     }
 
-    int friendDialogStatus = 0;
 
     private void friendAdd() {
-        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
-        final String[] friend = {"", ""};
-        builder.setTitle("添加好友")
+
+        final QMUIDialog.EditTextDialogBuilder numberBuilder = new QMUIDialog.EditTextDialogBuilder(getActivity());
+        numberBuilder.setTitle("添加好友")
+                .setPlaceholder("在此输入好友号码")
+                .setInputType(InputType.TYPE_CLASS_TEXT)
+                .addAction("取消", new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
+                        dialog.dismiss();
+                    }
+                })
+                .addAction("确认", new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
+                        CharSequence text = numberBuilder.getEditText().getText();
+                        if (text != null && text.length() > 0) {
+                            friend[1] = text.toString();
+                            mainActivity.addFriend(friend[0], friend[1]);
+                            friend[0] = "";
+                            friend[1] = "";
+                            dialog.dismiss();
+                            Toast.makeText(getActivity(), "好友添加成功", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getActivity(), "请填入号码", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
+        final QMUIDialog.EditTextDialogBuilder nameBuilder = new QMUIDialog.EditTextDialogBuilder(getActivity());
+        nameBuilder.setTitle("添加好友")
                 .setPlaceholder("在此输入好友昵称")
                 .setInputType(InputType.TYPE_CLASS_TEXT)
                 .addAction("取消", new QMUIDialogAction.ActionListener() {
@@ -333,41 +378,34 @@ public class SettingFragment extends Fragment {
                 .addAction("确认", new QMUIDialogAction.ActionListener() {
                     @Override
                     public void onClick(QMUIDialog dialog, int index) {
-                        CharSequence text = builder.getEditText().getText();
+                        CharSequence text = nameBuilder.getEditText().getText();
                         if (text != null && text.length() > 0) {
 
-//                            if (friendDialogStatus == 0) {
-//                                friendDialogStatus++;
-//                                // 昵称
-//
-//                                friend[0] = text.toString();
-//                                System.out.println("好友昵称：" + friend[0]);
-//
-//                                builder.setPlaceholder("在此输入好友号码");
-//                                builder.show();
-//                            } else if (friendDialogStatus == 1) {
-//                                // 号码
-//                                friend[1] = text.toString();
-//                                System.out.println("好友昵称：" + friend[0] +"好友号码：" + friend[1]);
-//                                dialog.dismiss();
-//                            }
-
+                            friend[0] = text.toString();
+                            numberBuilder.show();
+                            dialog.dismiss();
 
                         } else {
-                            Toast.makeText(getActivity(), "请填入内容", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), "请填入姓名", Toast.LENGTH_SHORT).show();
                         }
                     }
                 })
                 .show();
+
     }
 
     private void friendDelete() {
-        String smsTempStr = PreferencesUtils.getString(getActivity(), "smsTemplate", "");
-        if (smsTempStr.isEmpty()) {
-            Toast.makeText(getActivity(), "自定义短信模版为空", Toast.LENGTH_SHORT).show();
+
+        final RealmResults<Friend> friends = realm.where(Friend.class).findAll();
+        if (friends.size() == 0) {
+            Toast.makeText(getActivity(), "好友列表为空", Toast.LENGTH_SHORT).show();
             return;
         }
-        final String[] items = smsTempStr.split(getString(R.string.smsTemplateSeparate));
+
+        final String[] items = new String[friends.size()];
+        for (int i = 0; i < friends.size(); i++) {
+            items[i] = (i + 1) + ". " + friends.get(i).getName() + "(" + friends.get(i).getNumber() + ")";
+        }
         final QMUIDialog.MultiCheckableDialogBuilder builder = new QMUIDialog.MultiCheckableDialogBuilder(getActivity())
                 .addItems(items, new DialogInterface.OnClickListener() {
                     @Override
@@ -385,17 +423,16 @@ public class SettingFragment extends Fragment {
             @Override
             public void onClick(QMUIDialog dialog, int index) {
                 int[] indexes = builder.getCheckedItemIndexes();
-                String newSmsTempStr = "";
-                for (int i = 0; i < items.length; i++) {
-                    if (!CommonUtil.useLoop(indexes, i)) {
-                        if (!newSmsTempStr.isEmpty()) {
-                            newSmsTempStr += getString(R.string.smsTemplateSeparate);
+                for (int i = 0; i < indexes.length; i++) {
+                    final Friend friend = friends.get(i);
+                    realm.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            friend.deleteFromRealm();
                         }
-                        newSmsTempStr += items[i];
-                    }
+                    });
                 }
-                PreferencesUtils.putString(getActivity(), "smsTemplate", newSmsTempStr);
-                Toast.makeText(getActivity(), "短信模版删除成功", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "好友删除成功", Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             }
         });

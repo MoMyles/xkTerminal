@@ -88,7 +88,7 @@ public class MessageFragment extends Fragment{
         //设置listView
         listView = view.findViewById(R.id.list_view);
         simpleAdapter = new SimpleAdapter(getActivity(), getMessageData(), R.layout.cell_message_list,
-                new String[]{"selected", "time", status, "content", "read"},
+                new String[]{"number", "time", status, "content", "read"},
                 new int[]{R.id.selected_in_message_cell, R.id.time_in_message_cell, R.id.sender_in_message_cell, R.id.content_in_message_cell, R.id.read_in_message_cell});
         listView.setAdapter(simpleAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -181,6 +181,7 @@ public class MessageFragment extends Fragment{
                 .equalTo("isSend" , tg.equals("send"))
                 .findAll();
         messages = messages.sort("send_time", Sort.DESCENDING);
+        int count = messages.size();
 
         totalPage = CommonUtil.getTotalPage(messages.size(), messagePerPage);
 
@@ -199,6 +200,7 @@ public class MessageFragment extends Fragment{
         for (int i = pageIndex * messagePerPage; i < lastMessageIndex; i++) {
             Message message = messages.get(i);
             Map<String, Object> map = new HashMap<>();
+            map.put("number", count - i);
             map.put("selected", "");
             map.put("time", DateUtil.Date2String(message.getSend_time()));
             map.put("sender", message.getSender());

@@ -135,7 +135,7 @@
         android:layout_toLeftOf="@+id/textView_location_status"
         android:layout_toStartOf="@+id/textView_location_status"
         android:gravity="center_vertical"
-        android:text="紧急报警"
+        android:text="点击解除紧急报警"
         android:textColor="@color/red"
         android:textSize="22sp" />
 

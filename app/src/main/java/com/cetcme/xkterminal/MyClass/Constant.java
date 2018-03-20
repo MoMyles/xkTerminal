@@ -44,4 +44,10 @@ public class Constant {
     // 串口码率
     public static final int SERIAL_PORT_BAUD_RATE = 9600;
 
+    // 显示序号
+    public static final boolean SHOW_NUMBER_MESSAGE_LIST = true;
+    public static final boolean SHOW_NUMBER_MSG_TEMP_LIST = true;
+    public static final boolean SHOW_NUMBER_FRIEND_LIST = true;
+
+
 }

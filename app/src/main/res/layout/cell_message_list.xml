@@ -15,7 +15,7 @@
 
         <TextView
             android:id="@+id/selected_in_message_cell"
-            android:layout_width="30dp"
+            android:layout_width="60dp"
             android:layout_height="match_parent"
             android:textSize="20sp"
             android:textColor="#000000"

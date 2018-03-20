@@ -20,14 +20,19 @@ import android.widget.Toast;
 
 import com.cetcme.xkterminal.ActionBar.TitleBar;
 import com.cetcme.xkterminal.MainActivity;
+import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.R;
+import com.cetcme.xkterminal.RealmModels.Friend;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+
+import io.realm.Realm;
+import io.realm.RealmResults;
 
 /**
  * Created by qiuhong on 11/01/2018.
@@ -52,6 +57,8 @@ public class MessageNewFragment extends Fragment{
     private TextView last_send_textView;
     private TextView sender_or_receiver_textView;
 
+    private Realm realm;
+
     public MessageNewFragment(String tg, String receive, String content, String time) {
         this.tg = tg;
         this.receive = receive;
@@ -63,6 +70,8 @@ public class MessageNewFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_message_new,container,false);
+
+        realm = ((MyApplication) mainActivity.getApplication()).realm;
 
         titleBar = view.findViewById(R.id.titleBar);
         receiver_editText = view.findViewById(R.id.receiver_editText);
@@ -129,8 +138,16 @@ public class MessageNewFragment extends Fragment{
             @Override
             public void onClick(View view) {
                 final String[] items = getSmsTempList();
+                final String[] showItems = new String[items.length];
+                // 显示序号
+                if (Constant.SHOW_NUMBER_MSG_TEMP_LIST) {
+                    for (int i = 0; i < showItems.length; i++) {
+                        showItems[i] = (i + 1) + ". " + items[i];
+                    }
+                }
+
                 new QMUIDialog.CheckableDialogBuilder(getActivity())
-                    .addItems(items, new DialogInterface.OnClickListener() {
+                    .addItems(showItems, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             content_editText.setText(items[which]);
@@ -138,6 +155,39 @@ public class MessageNewFragment extends Fragment{
                         }
                     })
                     .show();
+            }
+        });
+
+
+        // friend
+        view.findViewById(R.id.friend_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final String[] builtInFriendNames = mainActivity.getResources().getStringArray(R.array.friendName);
+                final String[] builtInFriendNumbers = mainActivity.getResources().getStringArray(R.array.friendNumber);
+
+                final RealmResults<Friend> friends = realm.where(Friend.class).findAll();
+
+                // 显示序号
+                final String[] showItems = new String[builtInFriendNames.length + friends.size()];
+                for (int i = 0; i < showItems.length; i++) {
+                    if (i < friends.size()) {
+                        showItems[i] = (i + 1) + ". " + friends.get(i).getName() + "(" + friends.get(i).getNumber() + ")";
+                    } else {
+                        showItems[i] = (i + 1) + ". " + builtInFriendNames[i - friends.size()] + "(" + builtInFriendNumbers[i - friends.size()] + ")";
+
+                    }
+                }
+
+                new QMUIDialog.CheckableDialogBuilder(getActivity())
+                        .addItems(showItems, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                receiver_editText.setText(which < friends.size() ? friends.get(which).getNumber() : builtInFriendNumbers[which - friends.size()]);
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
             }
         });
 

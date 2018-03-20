@@ -213,7 +213,7 @@ public class MainFragment extends Fragment{
     private void confirmAlert() {
         PreferencesUtils.putBoolean(getActivity(), "homePageAlertView", false);
         showMainLayout();
-        ((MainActivity)getActivity()).gpsBar.flashAlert = true;
+        PreferencesUtils.putBoolean(getActivity(), "flashAlert", true);
     }
 
 

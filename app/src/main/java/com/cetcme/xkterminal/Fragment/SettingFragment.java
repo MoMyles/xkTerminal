@@ -7,6 +7,7 @@ import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -57,9 +58,9 @@ public class SettingFragment extends Fragment {
     private TextView wifi_ssid_textView;
 
     private TextView time_zone_textView;
-    private SeekBar time_zone_seekBar;
+    private Button time_zone_minus_btn;
+    private Button time_zone_add_btn;
 
-    private Toast time_zone_toast;
     private String[] friend = {"", ""};
 
     private MainActivity mainActivity;
@@ -132,43 +133,27 @@ public class SettingFragment extends Fragment {
         });
 
         time_zone_textView = view.findViewById(R.id.time_zone_textView);
-        time_zone_seekBar = view.findViewById(R.id.time_zone_seekBar);
 
-        time_zone_toast = Toast.makeText(getActivity(), "时区", Toast.LENGTH_SHORT);
+        time_zone_minus_btn = view.findViewById(R.id.time_zone_minus_btn);
+        time_zone_add_btn = view.findViewById(R.id.time_zone_add_btn);
 
         int originalTimeZone = PreferencesUtils.getInt(getActivity(), "time_zone");
         if (originalTimeZone == -1) originalTimeZone = Constant.TIME_ZONE;
 
-        time_zone_textView.setText("时区：" + (originalTimeZone - 12));
-        time_zone_seekBar.setProgress(originalTimeZone);
+        modifyTimeZoneBtn(originalTimeZone);
+        int timeZone = originalTimeZone - 12;
+        time_zone_textView.setText( timeZone > 0 ? " + " + timeZone : timeZone + "");
 
-        time_zone_seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        time_zone_minus_btn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                time_zone_toast.setText("时区：" + (i - 12));
-                time_zone_toast.show();
+            public void onClick(View view) {
+                modifyTimeZone(false);
             }
-
+        });
+        time_zone_add_btn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                int originalTimeZone = PreferencesUtils.getInt(getActivity(), "time_zone");
-                if (originalTimeZone == -1) originalTimeZone = Constant.TIME_ZONE;
-                int deltZone = originalTimeZone - seekBar.getProgress();
-                if (deltZone != 0) {
-                    PreferencesUtils.putInt(getActivity(), "time_zone", seekBar.getProgress());
-
-                    // 修正时间
-                    long rightTime = Constant.SYSTEM_DATE.getTime() - deltZone * 3600 * 1000;
-                    Date rightDate = new Date(rightTime);
-                    Constant.SYSTEM_DATE = rightDate;
-
-                    time_zone_textView.setText("时区：" + (seekBar.getProgress() - 12));
-                }
+            public void onClick(View view) {
+                modifyTimeZone(true);
             }
         });
 
@@ -437,6 +422,44 @@ public class SettingFragment extends Fragment {
             }
         });
         builder.show();
+    }
+
+    private void modifyTimeZoneBtn(int zone) {
+        if (zone == 0) {
+            time_zone_minus_btn.setEnabled(false);
+        } else if (zone == 24) {
+            time_zone_add_btn.setEnabled(false);
+        } else {
+            time_zone_minus_btn.setEnabled(true);
+            time_zone_add_btn.setEnabled(true);
+        }
+    }
+
+    private void modifyTimeZone(boolean add) {
+        int zone = PreferencesUtils.getInt(getActivity(), "time_zone");
+        int del = 0;
+        if (add && zone != 24) {
+            // 加一个时区
+            del = 1;
+        }
+
+        if (!add && zone != 0) {
+            // 减一个时区
+            del = -1;
+        }
+        if (del != 0) {
+            int newZone = zone + del;
+            modifyTimeZoneBtn(newZone);
+            PreferencesUtils.putInt(getActivity(), "time_zone", newZone);
+
+            // 修正时间
+            long rightTime = Constant.SYSTEM_DATE.getTime() + del * 3600 * 1000;
+            Date rightDate = new Date(rightTime);
+            Constant.SYSTEM_DATE = rightDate;
+
+            time_zone_textView.setText(newZone - 12 > 0 ? "+" + (newZone - 12) : "" + (newZone - 12));
+        }
+
     }
 
 }

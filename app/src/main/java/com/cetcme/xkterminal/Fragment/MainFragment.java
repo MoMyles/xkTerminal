@@ -17,6 +17,7 @@ import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
+import com.cetcme.xkterminal.MyClass.SoundPlay;
 import com.cetcme.xkterminal.R;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
@@ -75,14 +76,14 @@ public class MainFragment extends Fragment{
 
         alert_tv = view.findViewById(R.id.alert_tv);
 
-        view.findViewById(R.id.app_name_tv).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                System.out.println("开始播放");
-                MyApplication.soundPlay();
-
-            }
-        });
+//        view.findViewById(R.id.app_name_tv).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                System.out.println("开始播放");
+//                MyApplication.soundPlay();
+//
+//            }
+//        });
 
 
         return view;
@@ -90,7 +91,8 @@ public class MainFragment extends Fragment{
 
     private void showMainLayout() {
         alert_need_flash = false;
-        PreferencesUtils.putBoolean(getActivity(), "loopAlertSound", false);
+        SoundPlay.stopAlertSound();
+
         main_layout.setVisibility(View.VISIBLE);
         alert_layout.setVisibility(View.GONE);
     }

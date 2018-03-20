@@ -37,6 +37,7 @@ import com.cetcme.xkterminal.Fragment.SettingFragment;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.DensityUtil;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
+import com.cetcme.xkterminal.MyClass.SoundPlay;
 import com.cetcme.xkterminal.RealmModels.Alert;
 import com.cetcme.xkterminal.RealmModels.Message;
 import com.cetcme.xkterminal.RealmModels.Sign;
@@ -244,15 +245,7 @@ public class MainActivity extends AppCompatActivity {
     public static boolean idCardDialogOpen = false;
 
     public void showDangerDialog() {
-
-        try {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("apiType", "alertSound");
-            EventBus.getDefault().post(new SmsEvent(jsonObject));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        MyApplication.soundPlay();
+        SoundPlay.startAlertSound(MainActivity.this);
 
         Intent intent = new Intent(MainActivity.this, AlertActivity.class);
         startActivity(intent);

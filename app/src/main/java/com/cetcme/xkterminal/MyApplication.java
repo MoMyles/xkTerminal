@@ -23,6 +23,7 @@ import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.MyClass.ScreenBrightness;
+import com.cetcme.xkterminal.MyClass.SoundPlay;
 import com.cetcme.xkterminal.Socket.SocketManager;
 import com.cetcme.xkterminal.Socket.SocketServer;
 
@@ -66,13 +67,7 @@ public class MyApplication extends Application {
     private OutputStream mOutputStream;
     private InputStream mInputStream;
 
-    private static MediaPlayer player;
-
     private boolean messageSendFailed = true;
-
-    public static void soundPlay() {
-        player.start();
-    }
 
     private static final int SERIAL_PORT_RECEIVE_NEW_MESSAGE = 0x01;
     private static final int SERIAL_PORT_MESSAGE_SEND_SUCCESS = 0x02;
@@ -85,7 +80,6 @@ public class MyApplication extends Application {
 
     // for file pick
     private Handler handler;
-    private SocketManager socketManager;
 
     private Toast tipToast;
 
@@ -101,16 +95,6 @@ public class MyApplication extends Application {
         Realm.setDefaultConfiguration(config);
 
         realm = Realm.getDefaultInstance();
-        
-        player = MediaPlayer.create(this, R.raw.alert);
-        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
-                if (PreferencesUtils.getBoolean(getApplicationContext(), "loopAlertSound")) {
-                    player.start();
-                }
-            }
-        });
 
         try {
             mSerialPort = getSerialPort();
@@ -128,13 +112,6 @@ public class MyApplication extends Application {
             DisplayError(R.string.error_configuration);
         }
 
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                // 测试接收
-//                testReceive(1);
-//            }
-//        },2000);
 
         new Thread() {
             @Override
@@ -165,7 +142,7 @@ public class MyApplication extends Application {
                 }
             }
         };
-        socketManager = new SocketManager(handler, getApplicationContext());
+        new SocketManager(handler, getApplicationContext());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -329,11 +306,6 @@ public class MyApplication extends Application {
                         }
                     });
 
-                    break;
-
-                case "alertSound":
-                    PreferencesUtils.putBoolean(this, "loopAlertSound", true);
-                    soundPlay();
                     break;
                 case "set_time":
                     Date date = new Date(receiveJson.getString("time"));
@@ -774,7 +746,7 @@ public class MyApplication extends Application {
                     }
 
                     PreferencesUtils.putBoolean(getApplicationContext(), "homePageAlertView", true);
-                    soundPlay();
+                    SoundPlay.startAlertSound(getApplicationContext());
 
                     byte[] alertBytes = ByteUtil.subBytes(bytes, 11, 13);
                     if (alertBytes[0] == 0x02 && alertBytes[1] == 0x00) {

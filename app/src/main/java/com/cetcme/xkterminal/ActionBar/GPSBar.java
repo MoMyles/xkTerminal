@@ -208,9 +208,12 @@ public class GPSBar extends RelativeLayout {
             @Override
             public void onClick(View view) {
                 screenshot();
+//                Intent intent = new Intent(mainActivity, TestActivity.class);
+//                mainActivity.startActivity(intent);
             }
         });
 
+        // TODO: for test 亮度
         findViewById(R.id.bright_btn).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -228,7 +231,6 @@ public class GPSBar extends RelativeLayout {
 
         for (TextView textview: textViews) {
             textview.getPaint().setFakeBoldText(true);
-//            textview.setTextSize(14); //22
             textview.setTextColor(0xFF000000);
         }
     }

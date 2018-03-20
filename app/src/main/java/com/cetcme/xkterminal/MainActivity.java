@@ -45,6 +45,7 @@ import com.cetcme.xkterminal.RealmModels.Sign;
 import com.cetcme.xkterminal.Socket.SocketServer;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.qiuhong.qhlibrary.Dialog.QHDialog;
+import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
 
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
@@ -711,5 +712,19 @@ public class MainActivity extends AppCompatActivity {
         bytes = ByteUtil.byteMerger(bytes, new byte[] {0x2A, 0x01});
         bytes = ByteUtil.byteMerger(bytes, "\r\n".getBytes());
         ((MyApplication) getApplication()).sendBytes(bytes);
+    }
+
+    public void showShutDownHud() {
+        final QMUITipDialog tipDialog = new QMUITipDialog.Builder(MainActivity.this)
+            .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
+            .setTipWord("关机中")
+            .create();
+        tipDialog.show();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                tipDialog.dismiss();
+            }
+        }, 1500);
     }
 }

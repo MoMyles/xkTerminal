@@ -101,13 +101,12 @@ public class MyApplication extends Application {
         Realm.setDefaultConfiguration(config);
 
         realm = Realm.getDefaultInstance();
-
-
+        
         player = MediaPlayer.create(this, R.raw.alert);
         player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
-                if (PreferencesUtils.getBoolean(getApplicationContext(), "needAlertSound")) {
+                if (PreferencesUtils.getBoolean(getApplicationContext(), "loopAlertSound")) {
                     player.start();
                 }
             }
@@ -333,7 +332,7 @@ public class MyApplication extends Application {
                     break;
 
                 case "alertSound":
-                    PreferencesUtils.putBoolean(this, "needAlertSound", true);
+                    PreferencesUtils.putBoolean(this, "loopAlertSound", true);
                     soundPlay();
                     break;
                 case "set_time":
@@ -690,12 +689,12 @@ public class MyApplication extends Application {
                     String[] messageStrings = MessageFormat.unFormat(bytes);
                     String address = messageStrings[0];
                     String content = messageStrings[1];
-                    String type = messageStrings[2];
+                    String type    = messageStrings[2];
 
-                    // TODO 判断类型
                     mainActivity.addMessage(address, content);
                     mainActivity.modifyGpsBarMessageCount();
                     Toast.makeText(getApplicationContext(), "您有新的短信", Toast.LENGTH_SHORT).show();
+                    // 判断类型 普通短信 还是 救护短信
                     if (type.equals(MessageFormat.MESSAGE_TYPE_RESCURE)) {
                         mainActivity.showRescueDialog(content);
                     }
@@ -793,7 +792,7 @@ public class MyApplication extends Application {
                     String id = idStrings[0];
                     String name = idStrings[1];
                     String nation = "--";
-                    String idAddress = "浙江省嘉兴市南湖区xx小区xx幢xx室";
+                    String idAddress = "xx市xx区xx小区xx幢xx室";
                     mainActivity.showIDCardDialog(id, name, nation, idAddress);
                     break;
                 case SERIAL_PORT_MODIFY_SCREEN_BRIGHTNESS:

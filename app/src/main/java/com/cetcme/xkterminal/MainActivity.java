@@ -3,6 +3,7 @@ package com.cetcme.xkterminal;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
@@ -130,56 +131,10 @@ public class MainActivity extends AppCompatActivity {
             PreferencesUtils.putString(this, "myNumber", myNumber);
         }
 
-        // 模拟弹窗
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                showRescueDialog("121231231232121");
-//                new Handler().postDelayed(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        showRescueDialog("121231231232121");
-//
-//                    }
-//                },2000);
-//            }
-//        },2000);
-
-        //模拟添加短信
-//        for (int i = 0; i < 10; i++) {
-//            addMessages();
-//        }
-//        addMessages();
-
-//        addAlertLog();
-//        addSignLog();
-
         modifyGpsBarMessageCount();
-
-//        int height = DensityUtil.getScreenHeight(this, this);
-//        int width = DensityUtil.getScreenWidth(this, this);
-//        System.out.println("========== height: " + height);
-//        System.out.println("========== width: " + width);
-
-//        try {
-//            SystemDateTime.setTime(11,11);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-
 
         mWifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         createWifiHotspot();
-
-
-//        RealmResults<Message> messages = realm.where(Message.class)
-//                .equalTo("sender", "654321")
-//                .equalTo("receiver", "538558556")
-//                .lessThan("send_time", new Date("2018/3/8 15:00:00"))
-//                .findAll();
-//        System.out.println(messages);
 
         // 发送启动$01，要求对方发时间
         sendBootData();
@@ -297,6 +252,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        MyApplication.soundPlay();
 
         Intent intent = new Intent(MainActivity.this, AlertActivity.class);
         startActivity(intent);

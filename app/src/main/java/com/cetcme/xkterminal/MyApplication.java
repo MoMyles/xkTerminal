@@ -237,6 +237,7 @@ public class MyApplication extends Application {
                         @Override
                         public void execute(Realm realm) {
                             com.cetcme.xkterminal.RealmModels.Message newMessage = realm.createObject(com.cetcme.xkterminal.RealmModels.Message.class);
+                            newMessage.setId(message.getId());
                             newMessage.setSender(myNumber);
                             newMessage.setReceiver(message.getReceiver());
                             newMessage.setContent(message.getContent());
@@ -417,20 +418,7 @@ public class MyApplication extends Application {
 
         for (int i = messages.size() - countPerPage; i < messages.size(); i++) {
             com.cetcme.xkterminal.RealmModels.Message message = messages.get(i);
-            JSONObject jsonObject = new JSONObject();
-            try {
-                jsonObject.put("id", message.getId());
-                jsonObject.put("sender", message.getSender());
-                jsonObject.put("receiver", message.getReceiver());
-                jsonObject.put("send_time", message.getSend_time());
-                jsonObject.put("content", message.getContent());
-                jsonObject.put("read", message.isRead());
-                jsonObject.put("deleted", message.isDeleted());
-                jsonObject.put("isSend", message.isSend());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
+            JSONObject jsonObject = message.toJson();
             smsList.put(jsonObject);
         }
         return smsList;

@@ -88,8 +88,8 @@ public class MessageFragment extends Fragment{
         //设置listView
         listView = view.findViewById(R.id.list_view);
         simpleAdapter = new SimpleAdapter(getActivity(), getMessageData(), R.layout.cell_message_list,
-                new String[]{"number", "time", status, "content", "read"},
-                new int[]{R.id.selected_in_message_cell, R.id.time_in_message_cell, R.id.sender_in_message_cell, R.id.content_in_message_cell, R.id.read_in_message_cell});
+                new String[]{"number", "time", status, "content", "status"},
+                new int[]{R.id.selected_in_message_cell, R.id.time_in_message_cell, R.id.sender_in_message_cell, R.id.content_in_message_cell, R.id.status_in_message_cell});
         listView.setAdapter(simpleAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -207,7 +207,11 @@ public class MessageFragment extends Fragment{
             map.put("receiver", message.getReceiver());
             map.put("content", message.getContent().replace("\n", " "));
             map.put("id", message.getId());
-            map.put("read", message.isRead() ? "" : tg.equals("send") ? "" : "未读");
+            if (tg.equals("send")) {
+                map.put("status", message.isSendOK() ? "" : "失败");
+            } else {
+                map.put("status", message.isRead() ? "" : "未读");
+            }
             dataList.add(map);
         }
 

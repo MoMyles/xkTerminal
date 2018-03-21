@@ -6,6 +6,17 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
+
+        <item name="qmui_tip_dialog_min_width">240dp</item>
+        <item name="qmui_tip_dialog_min_height">240dp</item>
+
+        <!--dialog-->
+        <item name="qmui_dialog_title_text_size">24sp</item>
+        <item name="qmui_dialog_content_message_text_size">20sp</item>
+        <item name="qmui_dialog_action_button_text_size">20sp</item>
+        <item name="qmui_dialog_content_list_item_text_size">18sp</item>
+
     </style>
 
     <!--弹窗activity-->

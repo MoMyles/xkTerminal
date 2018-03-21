@@ -56,6 +56,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import io.realm.Realm;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -71,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
     public SendBar sendBar;
 
     private MainFragment mainFragment;
-    private MessageFragment messageFragment;
+    public MessageFragment messageFragment;
     private LogFragment logFragment;
     private SettingFragment settingFragment;
     private AboutFragment aboutFragment;
@@ -95,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
     public WifiManager mWifiManager;
 
     public boolean messageSendFailed = true;
+    private String failedMessageId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,6 +169,7 @@ public class MainActivity extends AppCompatActivity {
                 .setDimAmount(0.3f);
     }
 
+    // 收到短信
     public void addMessage(final String address, final String content) {
         realm.executeTransaction(new Realm.Transaction() {
             @Override
@@ -178,6 +182,7 @@ public class MainActivity extends AppCompatActivity {
                 message.setSend_time(Constant.SYSTEM_DATE);
                 message.setRead(false);
                 message.setSend(false);
+                message.setSendOK(true);
 
                 // 短信推送
                 JSONObject sendJson = new JSONObject();
@@ -501,6 +506,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // 发送短信
     public void sendMessage() {
 
         SharedPreferences sharedPreferences = getSharedPreferences("xkTerminal", Context.MODE_PRIVATE); //私有数据
@@ -568,6 +574,7 @@ public class MainActivity extends AppCompatActivity {
         newMessage.setSend_time(Constant.SYSTEM_DATE);
         newMessage.setRead(true);
         newMessage.setSend(true);
+        newMessage.setSendOK(true);
 
         realm.executeTransaction(new Realm.Transaction() {
             @Override
@@ -580,6 +587,8 @@ public class MainActivity extends AppCompatActivity {
                 message.setSend_time(Constant.SYSTEM_DATE);
                 message.setRead(true);
                 message.setSend(true);
+                message.setSendOK(true);
+                failedMessageId = message.getId();
             }
         });
 
@@ -597,6 +606,17 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 if (messageSendFailed) {
                     Toast.makeText(MainActivity.this, "发送失败", Toast.LENGTH_SHORT).show();
+                    if (failedMessageId != null) {
+                        Message message = realm.where(Message.class).equalTo("id", failedMessageId).findFirst();
+                        if (message != null) {
+                            realm.beginTransaction();
+                            message.setSendOK(false);
+                            realm.commitTransaction();
+                        }
+                        if (fragmentName.equals("message") && messageFragment.tg.equals("send")) {
+                            messageFragment.reloadDate();
+                        }
+                    }
                 }
             }
         }, Constant.MESSAGE_FAIL_TIME);
@@ -715,15 +735,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showShutDownHud() {
-        final QMUITipDialog tipDialog = new QMUITipDialog.Builder(MainActivity.this)
-            .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
-            .setTipWord("关机中")
-            .create();
-        tipDialog.show();
+//        final QMUITipDialog tipDialog = new QMUITipDialog.Builder(MainActivity.this)
+//            .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
+//            .setTipWord("关机中")
+//            .create();
+//        tipDialog.show();
+
+
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                tipDialog.dismiss();
+//            }
+//        }, 1500);
+
+
+        kProgressHUD.setLabel("关机中");
+        kProgressHUD.show();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                tipDialog.dismiss();
+                kProgressHUD.dismiss();
             }
         }, 1500);
     }

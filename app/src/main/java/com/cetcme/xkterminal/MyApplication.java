@@ -83,6 +83,8 @@ public class MyApplication extends Application {
 
     private Toast tipToast;
 
+    private String failedMessageId;
+
     @SuppressLint("HandlerLeak")
     @Override
     public void onCreate() {
@@ -242,6 +244,9 @@ public class MyApplication extends Application {
                             newMessage.setSend_time(message.getSend_time());
                             newMessage.setRead(true);
                             newMessage.setSend(true);
+                            newMessage.setSendOK(true);
+                            failedMessageId = newMessage.getId();
+
                         }
                     });
 
@@ -254,16 +259,30 @@ public class MyApplication extends Application {
                         @Override
                         public void run() {
                             if (messageSendFailed) {
-                                // 返回成功socket
+                                // 返回失败socket
                                 JSONObject sendJson = new JSONObject();
                                 try {
                                     sendJson.put("apiType", "sms_send");
                                     sendJson.put("code", 1);
                                     sendJson.put("msg", "发送失败");
+                                    sendJson.put("id", failedMessageId);
 
                                     SocketServer.send(sendJson);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
+                                }
+
+                                if (failedMessageId != null) {
+                                    com.cetcme.xkterminal.RealmModels.Message message = realm.where(com.cetcme.xkterminal.RealmModels.Message.class).equalTo("id", failedMessageId).findFirst();
+                                    if (message != null) {
+                                        realm.beginTransaction();
+                                        message.setSendOK(false);
+                                        realm.commitTransaction();
+                                    }
+
+                                    if (mainActivity.fragmentName.equals("message") && mainActivity.messageFragment.tg.equals("send")) {
+                                        mainActivity.messageFragment.reloadDate();
+                                    }
                                 }
                             }
                         }

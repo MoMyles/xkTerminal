@@ -29,6 +29,19 @@ public class Message extends RealmObject {
     private boolean read;
     private boolean deleted;
     private boolean isSend;
+    private boolean sendOK;
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public boolean isSendOK() {
+        return sendOK;
+    }
+
+    public void setSendOK(boolean sendOK) {
+        this.sendOK = sendOK;
+    }
 
     public String getSender() {
         return sender;

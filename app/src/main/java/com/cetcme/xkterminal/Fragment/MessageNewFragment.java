@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -56,6 +57,9 @@ public class MessageNewFragment extends Fragment{
     private TextView text_count_textView;
     private TextView last_send_textView;
     private TextView sender_or_receiver_textView;
+
+    private Button sms_temp_btn;
+    private Button friend_btn;
 
     private Realm realm;
 
@@ -134,7 +138,8 @@ public class MessageNewFragment extends Fragment{
         });
 
         // sms temp
-        view.findViewById(R.id.sms_temp_btn).setOnClickListener(new View.OnClickListener() {
+        sms_temp_btn = view.findViewById(R.id.sms_temp_btn);
+        sms_temp_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 final String[] items = getSmsTempList();
@@ -160,7 +165,8 @@ public class MessageNewFragment extends Fragment{
 
 
         // friend
-        view.findViewById(R.id.friend_btn).setOnClickListener(new View.OnClickListener() {
+        friend_btn = view.findViewById(R.id.friend_btn);
+        friend_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 final String[] builtInFriendNames = mainActivity.getResources().getStringArray(R.array.friendName);
@@ -190,6 +196,11 @@ public class MessageNewFragment extends Fragment{
                         .show();
             }
         });
+
+        if (tg.equals("detail")) {
+            sms_temp_btn.setVisibility(View.GONE);
+            friend_btn.setVisibility(View.GONE);
+        }
 
         return view;
     }

@@ -38,8 +38,8 @@ public class MessageFormat {
         String messageContent = null;
         String typeString = null;
         try {
-            typeString = new String(ByteUtil.subBytes(frameData, 15, 16), "GB2312");
-            messageContent = new String(ByteUtil.subBytes(frameData, 16, 16 + messageLength), "GB2312");
+            typeString = new String(ByteUtil.subBytes(frameData, 15, 17), "GB2312");
+            messageContent = new String(ByteUtil.subBytes(frameData, 17, 15 + messageLength), "GB2312");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -48,6 +48,7 @@ public class MessageFormat {
     }
 
     public static byte[] format(String targetAddress, String message, String type) {
+        message = type + message;
         targetAddress = Util.stringAddZero(targetAddress, 12);
         System.out.println(targetAddress);
         byte[] bytes = messageHead.getBytes();
@@ -68,11 +69,6 @@ public class MessageFormat {
         byte[] checkSumBytes = ByteUtil.byteMerger("*".getBytes(), new byte[]{(byte) checkSum});
         checkSumBytes = ByteUtil.byteMerger(checkSumBytes, MESSAGE_END_SYMBOL.getBytes());
 
-        try {
-            bytes = ByteUtil.byteMerger(bytes, type.getBytes("GB2312"));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
         bytes = ByteUtil.byteMerger(bytes, toCheckBytes);
         bytes = ByteUtil.byteMerger(bytes, checkSumBytes);
         return bytes;
@@ -115,12 +111,19 @@ public class MessageFormat {
 //        System.out.println(ConvertUtil.bytesToHexString("$04".getBytes()));
 //        System.out.println(Util.bytesGetHead("$R1".getBytes(),3));
 
-        try {
-            System.out.println(ConvertUtil.bytesToHexString("一条短信1".getBytes("GB2312")));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            System.out.println(ConvertUtil.bytesToHexString("一条短信1".getBytes("GB2312")));
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
 
+//        System.out.println(ConvertUtil.bytesToHexString("01".getBytes()));
+
+        byte[] bytes = ConvertUtil.hexStringToByte("24303400000012345607D08F9A8F0C3030C7D7C6DDC8A5C8A5C8A52A1F0D0A");
+        String[] msg = unFormat(bytes);
+        System.out.println("targetAddress: " + msg[0]);
+        System.out.println("messageContent: " + msg[1]);
+        System.out.println("type: " + msg[2]);
     }
 
     private static byte getDataLengthByte (String message, int frameCountInt) {

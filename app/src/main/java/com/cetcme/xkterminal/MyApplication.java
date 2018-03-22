@@ -77,6 +77,7 @@ public class MyApplication extends Application {
     private static final int SERIAL_PORT_RECEIVE_NEW_SIGN = 0x06;
     private static final int SERIAL_PORT_RECEIVE_NEW_ALERT = 0x07;
     private static final int SERIAL_PORT_MODIFY_SCREEN_BRIGHTNESS = 0x08;
+    private static final int SERIAL_PORT_SHUT_DOWN = 0x09;
 
     // for file pick
     private Handler handler;
@@ -536,7 +537,7 @@ public class MyApplication extends Application {
         serialCount++;
         if (serialCount == 3) {
             String head = Util.bytesGetHead(serialBuffer, 3);
-            if (head.equals("$04") || head.equals("$R4") || head.equals("$R1") || head.equals("$R5") || head.equals("$R0") || head.equals("$R6")) {
+            if (head.equals("$04") || head.equals("$R4") || head.equals("$R1") || head.equals("$R5") || head.equals("$R0") || head.equals("$R6") || head.equals("$R7")) {
                 hasHead = true;
             } else {
                 Util.bytesRemoveFirst(serialBuffer, serialCount);
@@ -612,6 +613,12 @@ public class MyApplication extends Application {
                     case "$R6":
                         // 调节背光
                         message.what = SERIAL_PORT_MODIFY_SCREEN_BRIGHTNESS;
+                        message.setData(bundle);
+                        mHandler.sendMessage(message);
+                        break;
+                    case "$R7":
+                        // 关机
+                        message.what = SERIAL_PORT_SHUT_DOWN;
                         message.setData(bundle);
                         mHandler.sendMessage(message);
                         break;
@@ -777,6 +784,20 @@ public class MyApplication extends Application {
                 case SERIAL_PORT_MODIFY_SCREEN_BRIGHTNESS:
                     // 调节背光
                     ScreenBrightness.modifyBrightness(mainActivity);
+                    break;
+                case SERIAL_PORT_SHUT_DOWN:
+                    // 显示关机hud
+                    mainActivity.showShutDownHud();
+
+                    // 发送关机包
+                    byte[] sendBytes = "$07".getBytes();
+                    byte[] contentBytes = "OK".getBytes();
+                    int checkSum = Util.computeCheckSum(contentBytes, 0, contentBytes.length);
+                    byte[] checkSumBytes = ByteUtil.byteMerger("*".getBytes(), new byte[]{(byte) checkSum});
+                    checkSumBytes = ByteUtil.byteMerger(checkSumBytes, "\r\n".getBytes());
+                    sendBytes = ByteUtil.byteMerger(sendBytes, contentBytes);
+                    sendBytes = ByteUtil.byteMerger(sendBytes, checkSumBytes);
+                    sendBytes(sendBytes);
                     break;
                 default:
                     super.handleMessage(msg);//这里最好对不需要或者不关心的消息抛给父类，避免丢失消息

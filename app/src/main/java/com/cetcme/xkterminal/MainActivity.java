@@ -735,28 +735,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showShutDownHud() {
-//        final QMUITipDialog tipDialog = new QMUITipDialog.Builder(MainActivity.this)
-//            .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
-//            .setTipWord("关机中")
-//            .create();
-//        tipDialog.show();
-
-
+        kProgressHUD.setLabel("关机中");
+        kProgressHUD.show();
 //        new Handler().postDelayed(new Runnable() {
 //            @Override
 //            public void run() {
-//                tipDialog.dismiss();
+//                kProgressHUD.dismiss();
 //            }
 //        }, 1500);
-
-
-        kProgressHUD.setLabel("关机中");
-        kProgressHUD.show();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                kProgressHUD.dismiss();
-            }
-        }, 1500);
     }
 }

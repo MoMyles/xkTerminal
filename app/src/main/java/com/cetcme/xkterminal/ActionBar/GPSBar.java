@@ -23,6 +23,7 @@ import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.DateUtil;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.MyClass.ScreenBrightness;
+import com.cetcme.xkterminal.MyClass.SoundPlay;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.SerialTest.SerialPortActivity;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
@@ -186,6 +187,7 @@ public class GPSBar extends RelativeLayout {
             @Override
             public void onClick(View view) {
                 // 收到新短信
+                SoundPlay.playMessageSound(mainActivity);
 
                 mainActivity.addMessage("123456", "测试收到新的短消息", false);
                 mainActivity.modifyGpsBarMessageCount();

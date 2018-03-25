@@ -689,6 +689,8 @@ public class MyApplication extends Application {
                     String content = messageStrings[1];
                     String type    = messageStrings[2];
 
+                    SoundPlay.playMessageSound(getApplicationContext());
+
                     // 判断类型 普通短信 还是 救护短信
                     if (type.equals(MessageFormat.MESSAGE_TYPE_RESCURE)) {
                         mainActivity.showRescueDialog(content);

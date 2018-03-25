@@ -182,7 +182,7 @@ public class GPSBar extends RelativeLayout {
             public void onClick(View view) {
                 // 收到新短信
 
-                mainActivity.addMessage("654321", "测试收到新的短消息");
+                mainActivity.addMessage("123456", "测试收到新的短消息", false);
                 mainActivity.modifyGpsBarMessageCount();
                 newMsgToast.show();
             }
@@ -400,11 +400,11 @@ public class GPSBar extends RelativeLayout {
     public void modifyMessageCount(long count) {
         if (count != 0) {
             if (count < 100) {
-                textView_message.setText("短信");
+                textView_message.setText("新短信");
                 textView_message_number.setText(count + "");
                 textView_message_number.setVisibility(VISIBLE);
             } else {
-                textView_message.setText("短信");
+                textView_message.setText("新短信");
                 textView_message_number.setText("..");
                 textView_message_number.setVisibility(VISIBLE);
             }

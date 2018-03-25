@@ -77,7 +77,7 @@
                 android:id="@+id/alert_cancel_btn"
                 android:layout_width="200dp"
                 android:layout_height="50dp"
-                android:text="取消"
+                android:text="解除报警"
                 android:padding="10dp"
                 android:textSize="24sp"
                 android:layout_marginRight="50dp"

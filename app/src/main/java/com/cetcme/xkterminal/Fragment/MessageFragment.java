@@ -115,11 +115,17 @@ public class MessageFragment extends Fragment{
                 // 单击进入
                 mainActivity.messageIndex = i;
                 mainActivity.messageId = dataList.get(i).get("id").toString();
-                mainActivity.messageReceiver = dataList.get(i).get("receiver").toString();
+                if (tg.equals("receive")) {
+                    mainActivity.messageReceiver = dataList.get(i).get("sender").toString();
+                } else {
+                    mainActivity.messageReceiver = dataList.get(i).get("receiver").toString();
+                }
                 mainActivity.messageContent = dataList.get(i).get("content").toString();
                 mainActivity.messageTime = dataList.get(i).get("time").toString();
                 mainActivity.initNewFragment("detail");
 
+                dataList.get(i).put("status", "");
+                simpleAdapter.notifyDataSetChanged();
             }
         });
 

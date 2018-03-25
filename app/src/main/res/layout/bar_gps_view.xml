@@ -180,6 +180,13 @@
         android:background="@drawable/message_num_bg"
         android:textSize="14sp" />
 
+    <android.support.v4.widget.Space
+        android:id="@+id/end_space"
+        android:layout_width="20dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        />
 
 
     <TextView

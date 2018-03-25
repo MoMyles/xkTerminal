@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.cetcme.xkterminal.DataFormat.AlertFormat;
+import com.cetcme.xkterminal.MyClass.SoundPlay;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -22,6 +23,7 @@ public class RescueMessageActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rescue_message);
         ButterKnife.bind(this);
+        SoundPlay.startAlertSound(RescueMessageActivity.this);
 
         rescue_content_tv.setText(getIntent().getStringExtra("content"));
         confirm_bt.setOnClickListener(new View.OnClickListener() {
@@ -39,5 +41,10 @@ public class RescueMessageActivity extends Activity {
 
     public void onBackPressed() {
 
+    }
+
+    protected void onDestroy() {
+        SoundPlay.stopAlertSound();
+        super.onDestroy();
     }
 }

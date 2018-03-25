@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // 收到短信
-    public void addMessage(final String address, final String content) {
+    public void addMessage(final String address, final String content, final boolean read) {
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
                 message.setContent(content);
                 message.setDeleted(false);
                 message.setSend_time(Constant.SYSTEM_DATE);
-                message.setRead(false);
+                message.setRead(read);
                 message.setSend(false);
                 message.setSendOK(true);
 

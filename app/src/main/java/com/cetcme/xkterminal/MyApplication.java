@@ -575,6 +575,9 @@ public class MyApplication extends Application {
                 Bundle bundle = new Bundle();
                 bundle.putByteArray("bytes", serialBuffer);
                 switch (Util.bytesGetHead(serialBuffer, 3)) {
+                    case "$04":
+                        // 接收短信 如果短信内容有分号0x3B 将会进入此处 返回继续接收数据
+                        return;
                     case "$R4":
                         // 短信发送成功
                         message.what = SERIAL_PORT_MESSAGE_SEND_SUCCESS;

@@ -365,15 +365,10 @@ public class MyApplication extends Application {
             RealmResults<com.cetcme.xkterminal.RealmModels.Message> smses = query.findAll();
             com.cetcme.xkterminal.RealmModels.Message message = smses.last();
 
-            RealmQuery<com.cetcme.xkterminal.RealmModels.Message> unreadQuery = realm.where(com.cetcme.xkterminal.RealmModels.Message.class);
-            unreadQuery.equalTo("receiver", userAddress);
-            unreadQuery.equalTo("read", false);
-            if (userAddress.equals(myNumber)) {
-                unreadQuery.equalTo("sender", userAddress);
-            } else {
-                unreadQuery.or().equalTo("sender", userAddress);
-            }
-            RealmResults<com.cetcme.xkterminal.RealmModels.Message> unreadSmses = unreadQuery.findAll();
+            RealmResults<com.cetcme.xkterminal.RealmModels.Message> unreadSmses = realm.where(com.cetcme.xkterminal.RealmModels.Message.class)
+                    .equalTo("sender", userAddress)
+                    .equalTo("read", false)
+                    .findAll();
 
             JSONObject jsonObject = new JSONObject();
             try {
@@ -405,9 +400,9 @@ public class MyApplication extends Application {
                     .findAll();
         } else {
             messages = realm.where(com.cetcme.xkterminal.RealmModels.Message.class)
+                    .lessThan("send_time", new Date(timeBefore))
                     .equalTo("sender", userAddress)
                     .or().equalTo("receiver", userAddress)
-                    .lessThan("send_time", new Date(timeBefore))
                     .findAll();
         }
 

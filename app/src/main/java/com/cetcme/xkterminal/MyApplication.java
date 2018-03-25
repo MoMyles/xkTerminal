@@ -734,6 +734,7 @@ public class MyApplication extends Application {
 
                     int myNumber = Util.bytesToInt2(ByteUtil.subBytes(bytes, 17, 21), 0);
                     PreferencesUtils.putString(getApplicationContext(), "myNumber", myNumber + "");
+                    MainActivity.myNumber = myNumber + "";
                     System.out.println("myNumber: " + myNumber);
 
                     String status = Util.byteToBit(ByteUtil.subBytes(bytes, 21, 22)[0]);

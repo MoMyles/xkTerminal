@@ -44,4 +44,17 @@ public class DateUtil {
         }
         return date;
     }
+
+    public static String modifyDate(String dateStr) {
+        Date date = new Date(dateStr);
+        Date now = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd HH:mm");
+        if (now.getYear() != date.getYear()) {
+            sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        } else if (now.getMonth() == date.getMonth() && now.getDate() == date.getDate()) {
+            sdf = new SimpleDateFormat("HH:mm");
+        }
+
+        return  sdf.format(date);
+    }
 }

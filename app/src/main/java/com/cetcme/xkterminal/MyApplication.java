@@ -743,8 +743,13 @@ public class MyApplication extends Application {
 
                     long rightTime = date.getTime() + (originalTimeZone - 12) * 3600 * 1000;
                     Date rightDate = new Date(rightTime);
+
+                    SimpleDateFormat yearSdf = new SimpleDateFormat("yyyy");
+                    if (Integer.parseInt(yearSdf.format(rightDate)) >= 2018) {
+                        System.out.println("设置系统时间");
+                        Constant.SYSTEM_DATE = rightDate;
+                    }
                     System.out.println(rightDate);
-                    Constant.SYSTEM_DATE = rightDate;
 
                     int myNumber = Util.bytesToInt2(ByteUtil.subBytes(bytes, 17, 21), 0);
                     PreferencesUtils.putString(getApplicationContext(), "myNumber", myNumber + "");

@@ -79,7 +79,14 @@ public class MainFragment extends Fragment{
         view.findViewById(R.id.app_name_tv).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity)getActivity()).showShutDownHud();
+//                ((MainActivity)getActivity()).showShutDownHud();
+                ((MyApplication) getActivity().getApplication()).sendLightOn(true);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        ((MyApplication) getActivity().getApplication()).sendLightOn(false);
+                    }
+                }, 2000);
             }
         });
 

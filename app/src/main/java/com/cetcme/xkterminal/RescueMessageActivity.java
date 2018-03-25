@@ -36,8 +36,9 @@ public class RescueMessageActivity extends Activity {
     }
 
     private void confirmRescue() {
-        ((MyApplication) getApplication()).sendBytes(AlertFormat.format("00100000", "00000000"));
-        MyApplication.sendLightOn(false);
+        MyApplication myApplication = (MyApplication) getApplication();
+        myApplication.sendBytes(AlertFormat.format("00100000", "00000000"));
+        myApplication.sendLightOn(false);
     }
 
     public void onBackPressed() {

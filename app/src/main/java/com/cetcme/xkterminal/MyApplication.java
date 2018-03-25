@@ -621,11 +621,13 @@ public class MyApplication extends Application {
                         break;
                     case "$R8":
                         if (serialBuffer[3] == 0x01) {
+                            System.out.println("报警中");
                             // 报警中
                             message.what = SERIAL_PORT_ALERT_START;
                             message.setData(bundle);
                             mHandler.sendMessage(message);
                         } else if (serialBuffer[3] == 0x02) {
+                            System.out.println("报警失败");
                             // 报警失败
                             message.what = SERIAL_PORT_ALERT_FAIL;
                             message.setData(bundle);
@@ -779,11 +781,19 @@ public class MyApplication extends Application {
 
                     byte[] alertBytes = ByteUtil.subBytes(bytes, 11, 13);
                     if (alertBytes[0] == 0x02 && alertBytes[1] == 0x00) {
+                        // 落水报警
                         Toast.makeText(getApplicationContext(), "收到落水报警", Toast.LENGTH_SHORT).show();
                         mainActivity.addAlertLog("落水");
-                    } else {
-                        Toast.makeText(getApplicationContext(), "收到遇险报警", Toast.LENGTH_SHORT).show();
-                        mainActivity.addAlertLog("");
+                    } else if (alertBytes[0] == 0x10 && alertBytes[1] == 0x00){
+                        // 解除报警
+                        PreferencesUtils.putBoolean(getApplicationContext(), "homePageAlertView", false);
+                        if (mainActivity.mainFragment != null) {
+                            mainActivity.mainFragment.showMainLayout();
+                        } else {
+                            SoundPlay.stopAlertSound();
+                        }
+//                        Toast.makeText(getApplicationContext(), "收到遇险报警", Toast.LENGTH_SHORT).show();
+//                        mainActivity.addAlertLog("");
                     }
 
                     break;

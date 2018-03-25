@@ -30,11 +30,13 @@ public class MessageFormat {
             e.printStackTrace();
         }
 
-        String targetAddress = ConvertUtil.bcd2Str(ByteUtil.subBytes(frameData, 3, 9));
+        String targetAddress = ConvertUtil.bcd2Str(ByteUtil.subBytes(frameData, 3, 9)); // 3-9 地址 9-14随机
         targetAddress = Util.stringRemoveZero(targetAddress);
+
         byte b = frameData[14];
         int frameCount = Integer.parseInt(Util.byteToBit(b).substring(0, 2), 2);
         int messageLength = Integer.parseInt(Util.byteToBit(b).substring(2, 8), 2);
+
         String messageContent = null;
         String typeString = null;
         try {

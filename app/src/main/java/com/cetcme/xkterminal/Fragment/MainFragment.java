@@ -87,7 +87,7 @@ public class MainFragment extends Fragment{
         return view;
     }
 
-    private void showMainLayout() {
+    public void showMainLayout() {
         alert_need_flash = false;
         SoundPlay.stopAlertSound();
 

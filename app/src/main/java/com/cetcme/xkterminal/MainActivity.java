@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
     public BackBar backBar;
     public SendBar sendBar;
 
-    private MainFragment mainFragment;
+    public MainFragment mainFragment;
     public MessageFragment messageFragment;
     private LogFragment logFragment;
     private SettingFragment settingFragment;

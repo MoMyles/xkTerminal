@@ -689,13 +689,13 @@ public class MyApplication extends Application {
                     String content = messageStrings[1];
                     String type    = messageStrings[2];
 
-                    SoundPlay.playMessageSound(getApplicationContext());
-
                     // 判断类型 普通短信 还是 救护短信
                     if (type.equals(MessageFormat.MESSAGE_TYPE_RESCURE)) {
+                        sendLightOn(true);
                         mainActivity.showRescueDialog(content);
                         mainActivity.addMessage(address, content, true);
                     } else {
+                        SoundPlay.playMessageSound(getApplicationContext());
                         mainActivity.addMessage(address, content, false);
                         mainActivity.modifyGpsBarMessageCount();
                         Toast.makeText(getApplicationContext(), "您有新的短信", Toast.LENGTH_SHORT).show();
@@ -839,4 +839,17 @@ public class MyApplication extends Application {
             }
         }
     };
+
+    public void sendLightOn(boolean on) {
+        System.out.println("控制灯：" + on);
+        byte[] bytes;
+        if (on) {
+            bytes ="$08".getBytes();
+        } else {
+            bytes ="$09".getBytes();
+        }
+        bytes = ByteUtil.byteMerger(bytes, new byte[] {0x01});
+        bytes = ByteUtil.byteMerger(bytes, "\r\n".getBytes());
+        sendBytes(bytes);
+    }
 }

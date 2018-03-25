@@ -15,7 +15,7 @@
         <item name="qmui_dialog_title_text_size">24sp</item>
         <item name="qmui_dialog_content_message_text_size">20sp</item>
         <item name="qmui_dialog_action_button_text_size">20sp</item>
-        <item name="qmui_dialog_content_list_item_text_size">18sp</item>
+        <item name="qmui_dialog_content_list_item_text_size">20sp</item>
 
     </style>
 

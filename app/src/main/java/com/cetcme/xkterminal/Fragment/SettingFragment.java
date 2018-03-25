@@ -31,6 +31,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -338,12 +340,22 @@ public class SettingFragment extends Fragment {
                     public void onClick(QMUIDialog dialog, int index) {
                         CharSequence text = numberBuilder.getEditText().getText();
                         if (text != null && text.length() > 0) {
-                            friend[1] = text.toString();
-                            mainActivity.addFriend(friend[0], friend[1]);
-                            friend[0] = "";
-                            friend[1] = "";
-                            dialog.dismiss();
-                            Toast.makeText(getActivity(), "好友添加成功", Toast.LENGTH_SHORT).show();
+                            if (text.length() > 12) {
+                                Toast.makeText(getActivity(), "超过多大长度12", Toast.LENGTH_SHORT).show();
+                            } else {
+
+                                if (isNumer(text.toString())) {
+                                    friend[1] = text.toString();
+                                    mainActivity.addFriend(friend[0], friend[1]);
+                                    friend[0] = "";
+                                    friend[1] = "";
+                                    dialog.dismiss();
+                                    Toast.makeText(getActivity(), "好友添加成功", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(getActivity(), "请填入正确号码", Toast.LENGTH_SHORT).show();
+                                }
+
+                            }
                         } else {
                             Toast.makeText(getActivity(), "请填入号码", Toast.LENGTH_SHORT).show();
                         }
@@ -462,4 +474,9 @@ public class SettingFragment extends Fragment {
 
     }
 
+    private boolean isNumer(String txt) {
+        Pattern p = Pattern.compile("[0-9]*");
+        Matcher m = p.matcher(txt);
+        return m.matches();
+    }
 }

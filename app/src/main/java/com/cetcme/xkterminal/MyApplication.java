@@ -78,6 +78,8 @@ public class MyApplication extends Application {
     private static final int SERIAL_PORT_RECEIVE_NEW_ALERT = 0x07;
     private static final int SERIAL_PORT_MODIFY_SCREEN_BRIGHTNESS = 0x08;
     private static final int SERIAL_PORT_SHUT_DOWN = 0x09;
+    private static final int SERIAL_PORT_ALERT_START = 0x10;
+    private static final int SERIAL_PORT_ALERT_FAIL = 0x11;
 
     // for file pick
     private Handler handler;
@@ -532,7 +534,7 @@ public class MyApplication extends Application {
         serialCount++;
         if (serialCount == 3) {
             String head = Util.bytesGetHead(serialBuffer, 3);
-            if (head.equals("$04") || head.equals("$R4") || head.equals("$R1") || head.equals("$R5") || head.equals("$R0") || head.equals("$R6") || head.equals("$R7")) {
+            if (head.equals("$04") || head.equals("$R4") || head.equals("$R1") || head.equals("$R5") || head.equals("$R0") || head.equals("$R6") || head.equals("$R7") || head.equals("$R8")) {
                 hasHead = true;
             } else {
                 Util.bytesRemoveFirst(serialBuffer, serialCount);
@@ -616,6 +618,19 @@ public class MyApplication extends Application {
                         message.what = SERIAL_PORT_SHUT_DOWN;
                         message.setData(bundle);
                         mHandler.sendMessage(message);
+                        break;
+                    case "$R8":
+                        if (serialBuffer[3] == 0x01) {
+                            // 报警中
+                            message.what = SERIAL_PORT_ALERT_START;
+                            message.setData(bundle);
+                            mHandler.sendMessage(message);
+                        } else if (serialBuffer[3] == 0x02) {
+                            // 报警失败
+                            message.what = SERIAL_PORT_ALERT_FAIL;
+                            message.setData(bundle);
+                            mHandler.sendMessage(message);
+                        }
                         break;
                     default:
                         hasHead = false;
@@ -740,15 +755,17 @@ public class MyApplication extends Application {
                     break;
                 case SERIAL_PORT_ALERT_SEND_SUCCESS:
                     // 报警发送成功
+                    mainActivity.gpsBar.showAlerting(false);
                     Toast.makeText(getApplicationContext(), "遇险报警发送成功", Toast.LENGTH_SHORT).show();
                     break;
                 case SERIAL_PORT_SHOW_ALERT_ACTIVITY:
                     // 显示报警activity
+                    mainActivity.gpsBar.showAlerting(false);
                     mainActivity.showDangerDialog();
                     break;
                 case SERIAL_PORT_RECEIVE_NEW_ALERT:
                     // 增加报警记录，显示收到报警
-
+                    mainActivity.gpsBar.showAlerting(false);
                     try {
                         JSONObject jsonObject = new JSONObject();
                         jsonObject.put("apiType", "showAlertInHomePage");
@@ -796,6 +813,13 @@ public class MyApplication extends Application {
                     sendBytes = ByteUtil.byteMerger(sendBytes, contentBytes);
                     sendBytes = ByteUtil.byteMerger(sendBytes, checkSumBytes);
                     sendBytes(sendBytes);
+                    break;
+                case SERIAL_PORT_ALERT_START:
+                    mainActivity.gpsBar.showAlerting(true);
+                    break;
+                case SERIAL_PORT_ALERT_FAIL:
+                    mainActivity.gpsBar.showAlerting(false);
+                    mainActivity.showAlertFailDialog();
                     break;
                 default:
                     super.handleMessage(msg);//这里最好对不需要或者不关心的消息抛给父类，避免丢失消息

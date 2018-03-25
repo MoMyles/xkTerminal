@@ -126,6 +126,20 @@
     </LinearLayout>
 
     <TextView
+        android:id="@+id/textView_alerting"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_toLeftOf="@+id/textView_alert"
+        android:layout_toStartOf="@+id/textView_alert"
+        android:gravity="center_vertical"
+        android:text="报警中"
+        android:textColor="@color/red"
+        android:textSize="22sp" />
+
+    <TextView
         android:id="@+id/textView_alert"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"

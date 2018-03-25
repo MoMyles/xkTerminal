@@ -45,6 +45,8 @@ import com.cetcme.xkterminal.RealmModels.Sign;
 import com.cetcme.xkterminal.Socket.SocketServer;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.qiuhong.qhlibrary.Dialog.QHDialog;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
 
 import org.greenrobot.eventbus.EventBus;
@@ -743,5 +745,18 @@ public class MainActivity extends AppCompatActivity {
 //                kProgressHUD.dismiss();
 //            }
 //        }, 1500);
+    }
+
+    public void showAlertFailDialog() {
+        new QMUIDialog.MessageDialogBuilder(MainActivity.this)
+            .setTitle("提示")
+            .setMessage("报警失败!")
+            .addAction("确认", new QMUIDialogAction.ActionListener() {
+                @Override
+                public void onClick(QMUIDialog dialog, int index) {
+                    dialog.dismiss();
+                }
+            })
+            .show();
     }
 }

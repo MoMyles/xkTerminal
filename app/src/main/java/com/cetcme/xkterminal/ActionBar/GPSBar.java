@@ -58,6 +58,7 @@ public class GPSBar extends RelativeLayout {
 
     private TextView textView_message_number;
     private TextView textView_alert;
+    private TextView textView_alerting;
 
     private boolean noGps = true;
 
@@ -99,7 +100,7 @@ public class GPSBar extends RelativeLayout {
         textView_message_number     = view.findViewById(R.id.textView_message_number);
 
         textView_alert              = view.findViewById(R.id.textView_alert);
-        textView_alert.setVisibility(INVISIBLE);
+        textView_alert.setVisibility(GONE);
         textView_alert.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -120,13 +121,17 @@ public class GPSBar extends RelativeLayout {
                                 ((MyApplication) mainActivity.getApplication()).sendBytes(AlertFormat.format("00010000", "00000000"));
 //                                PreferencesUtils.putBoolean(mainActivity, "homePageAlertView", false);
                                 PreferencesUtils.putBoolean(mainActivity, "flashAlert", false);
-                                textView_alert.setVisibility(INVISIBLE);
+                                textView_alert.setVisibility(GONE);
                                 dialog.dismiss();
                             }
                         })
                         .show();
             }
         });
+
+        textView_alerting = view.findViewById(R.id.textView_alerting);
+        textView_alerting.setVisibility(INVISIBLE);
+
 
         textView_message.setOnClickListener(new OnClickListener() {
             @Override
@@ -414,6 +419,10 @@ public class GPSBar extends RelativeLayout {
             textView_message_number.setText("-");
             textView_message_number.setVisibility(INVISIBLE);
         }
+    }
+
+    public void showAlerting(boolean show) {
+        textView_alerting.setVisibility(show ? VISIBLE : GONE);
     }
 
 

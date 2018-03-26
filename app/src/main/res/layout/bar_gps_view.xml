@@ -68,6 +68,7 @@
 
     <!--测试用-->
     <LinearLayout
+        android:id="@+id/debug_btn_layout"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
@@ -76,7 +77,8 @@
         android:layout_toEndOf="@+id/textView_time"
         android:layout_toRightOf="@+id/textView_time"
         android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:visibility="gone">
 
         <Button
             android:id="@+id/sign_btn"

@@ -12,6 +12,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -61,6 +62,8 @@ public class GPSBar extends RelativeLayout {
     private TextView textView_alert;
     private TextView textView_alerting;
 
+    private LinearLayout debug_btn_layout;
+
     private boolean noGps = true;
 
     private boolean flashTextViewVisible = true;
@@ -90,6 +93,9 @@ public class GPSBar extends RelativeLayout {
     }
 
     private void bindView(View view) {
+
+        debug_btn_layout            = view.findViewById(R.id.debug_btn_layout);
+
         textView_latitude           = view.findViewById(R.id.textView_latitude);
         textView_longitude          = view.findViewById(R.id.textView_longitude);
         textView_speed              = view.findViewById(R.id.textView_speed);
@@ -428,4 +434,8 @@ public class GPSBar extends RelativeLayout {
     }
 
 
+    public void setDebugButtonLayoutShow(boolean show) {
+        System.out.println((show ? "打开" : "关闭") + "DEBUG按钮组");
+        debug_btn_layout.setVisibility(show ? VISIBLE : INVISIBLE);
+    }
 }

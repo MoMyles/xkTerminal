@@ -333,7 +333,17 @@ public class MyApplication extends Application {
                 case "set_time":
                     Date date = new Date(receiveJson.getString("time"));
                     if (Math.abs(date.getTime() - Constant.SYSTEM_DATE.getTime()) > 3600 * 1000) {
+                        Toast.makeText(getApplicationContext(), "设置时间", Toast.LENGTH_SHORT).show();
                         Constant.SYSTEM_DATE = date;
+                    }
+                    break;
+                case "debug":
+                    int orderCode = receiveJson.getInt("code");
+                    int orderContent = receiveJson.getInt("content");
+                    switch (orderCode) {
+                        case 0:
+                            mainActivity.gpsBar.setDebugButtonLayoutShow(orderContent == 0);
+                            break;
                     }
                     break;
             }
@@ -393,7 +403,6 @@ public class MyApplication extends Application {
 
     public JSONArray getSmsDetail(String userAddress, int countPerPage, String timeBefore) {
         RealmResults<com.cetcme.xkterminal.RealmModels.Message> messages;
-
         if (userAddress.equals(myNumber)) {
             messages = realm.where(com.cetcme.xkterminal.RealmModels.Message.class)
                     .equalTo("sender", userAddress)
@@ -401,11 +410,13 @@ public class MyApplication extends Application {
                     .lessThan("send_time", new Date(timeBefore))
                     .findAll();
         } else {
-            messages = realm.where(com.cetcme.xkterminal.RealmModels.Message.class)
-                    .lessThan("send_time", new Date(timeBefore))
-                    .equalTo("sender", userAddress)
-                    .or().equalTo("receiver", userAddress)
-                    .findAll();
+            RealmQuery query = realm.where(com.cetcme.xkterminal.RealmModels.Message.class);
+            query.beginGroup()
+                .equalTo("sender", userAddress)
+                .or().equalTo("receiver", userAddress)
+                .endGroup();
+            query.lessThan("send_time", new Date(timeBefore));
+            messages = query.findAll();
         }
 
         messages = messages.sort("send_time", Sort.ASCENDING);
@@ -799,6 +810,7 @@ public class MyApplication extends Application {
                         PreferencesUtils.putBoolean(getApplicationContext(), "homePageAlertView", false);
                         if (mainActivity.mainFragment != null) {
                             mainActivity.mainFragment.showMainLayout();
+                            mainActivity.gpsBar.showAlerting(false);
                         } else {
                             SoundPlay.stopAlertSound();
                         }

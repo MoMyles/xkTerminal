@@ -80,13 +80,13 @@ public class MainFragment extends Fragment{
             @Override
             public void onClick(View view) {
 //                ((MainActivity)getActivity()).showShutDownHud();
-                ((MyApplication) getActivity().getApplication()).sendLightOn(true);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        ((MyApplication) getActivity().getApplication()).sendLightOn(false);
-                    }
-                }, 2000);
+//                ((MyApplication) getActivity().getApplication()).sendLightOn(true);
+//                new Handler().postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        ((MyApplication) getActivity().getApplication()).sendLightOn(false);
+//                    }
+//                }, 2000);
             }
         });
 

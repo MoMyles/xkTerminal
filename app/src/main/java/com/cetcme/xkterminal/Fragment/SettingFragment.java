@@ -449,6 +449,7 @@ public class SettingFragment extends Fragment {
 
     private void modifyTimeZone(boolean add) {
         int zone = PreferencesUtils.getInt(getActivity(), "time_zone");
+        if (zone == -1) zone = Constant.TIME_ZONE;
         int del = 0;
         if (add && zone != 24) {
             // 加一个时区

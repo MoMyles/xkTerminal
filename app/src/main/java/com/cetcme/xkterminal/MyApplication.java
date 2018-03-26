@@ -810,10 +810,10 @@ public class MyApplication extends Application {
                         PreferencesUtils.putBoolean(getApplicationContext(), "homePageAlertView", false);
                         if (mainActivity.mainFragment != null) {
                             mainActivity.mainFragment.showMainLayout();
-                            mainActivity.gpsBar.showAlerting(false);
-                        } else {
-                            SoundPlay.stopAlertSound();
                         }
+                        PreferencesUtils.putBoolean(mainActivity, "flashAlert", false);
+                        SoundPlay.stopAlertSound();
+
 //                        Toast.makeText(getApplicationContext(), "收到遇险报警", Toast.LENGTH_SHORT).show();
 //                        mainActivity.addAlertLog("");
                     }

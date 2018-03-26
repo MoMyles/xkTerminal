@@ -384,7 +384,6 @@ public class GPSBar extends RelativeLayout {
         }
     }
 
-
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler(){
         @Override
@@ -437,5 +436,10 @@ public class GPSBar extends RelativeLayout {
     public void setDebugButtonLayoutShow(boolean show) {
         System.out.println((show ? "打开" : "关闭") + "DEBUG按钮组");
         debug_btn_layout.setVisibility(show ? VISIBLE : INVISIBLE);
+    }
+
+    public void cancelAlert() {
+        PreferencesUtils.putBoolean(mainActivity, "flashAlert", false);
+        textView_alert.setVisibility(INVISIBLE);
     }
 }

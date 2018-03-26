@@ -811,9 +811,8 @@ public class MyApplication extends Application {
                         if (mainActivity.mainFragment != null) {
                             mainActivity.mainFragment.showMainLayout();
                         }
-                        PreferencesUtils.putBoolean(mainActivity, "flashAlert", false);
+                        mainActivity.gpsBar.cancelAlert();
                         SoundPlay.stopAlertSound();
-
 //                        Toast.makeText(getApplicationContext(), "收到遇险报警", Toast.LENGTH_SHORT).show();
 //                        mainActivity.addAlertLog("");
                     }

@@ -115,6 +115,14 @@ public class MessageProxy {
     }
 
 
+    /**
+     * 分页查询短信
+     * @param db
+     * @param isSend
+     * @param perPage
+     * @param page
+     * @return
+     */
     public static List<MessageBean> getByPage(DbManager db, boolean isSend, int perPage, int page) {
         List<MessageBean> list = null;
         try {

@@ -61,8 +61,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Date;
 
-import io.realm.Realm;
-
 public class MainActivity extends AppCompatActivity {
 
     // TODO: fot test
@@ -95,8 +93,6 @@ public class MainActivity extends AppCompatActivity {
     //back toast
     private Toast backToast;
 
-    public Realm realm;
-
     public KProgressHUD kProgressHUD;
     public KProgressHUD okHUD;
 
@@ -120,24 +116,11 @@ public class MainActivity extends AppCompatActivity {
 
         db = ((MyApplication) getApplication()).db;
 
-        realm = ((MyApplication) getApplication()).realm;
         ((MyApplication) getApplication()).mainActivity = this;
 
         bindView();
         initMainFragment();
         initHud();
-
-
-        // 删除 所有消息
-//        final RealmResults<Message> messages = realm.where(Message.class).findAll();
-//        realm.executeTransaction(new Realm.Transaction() {
-//            @Override
-//            public void execute(Realm realm) {
-//                for (Message message : messages) {
-//                    message.deleteFromRealm();
-//                }
-//            }
-//        });
 
         myNumber = PreferencesUtils.getString(this, "myNumber");
         if (myNumber == null || myNumber.isEmpty()) {
@@ -179,34 +162,6 @@ public class MainActivity extends AppCompatActivity {
 
     // 收到短信
     public void addMessage(final String address, final String content, final boolean read) {
-//        realm.executeTransaction(new Realm.Transaction() {
-//            @Override
-//            public void execute(Realm realm) {
-//                Message message = realm.createObject(Message.class);
-//                message.setSender(address);
-//                message.setReceiver(myNumber);
-//                message.setContent(content);
-//                message.setDeleted(false);
-//                message.setSend_time(Constant.SYSTEM_DATE);
-//                message.setRead(read);
-//                message.setSend(false);
-//                message.setSendOK(true);
-//
-//                // 短信推送
-//                JSONObject sendJson = new JSONObject();
-//                try {
-//                    sendJson.put("apiType", "sms_push");
-//                    sendJson.put("userAddress", "sms_push");
-//                    sendJson.put("data", message.toJson());
-//
-//                    SocketServer.send(sendJson);
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
-
-
         MessageBean message = new MessageBean();
         message.setSender(address);
         message.setReceiver(myNumber);
@@ -236,42 +191,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void addSignLog(String id, String name) {
-//        realm.executeTransaction(new Realm.Transaction() {
-//            @Override
-//            public void execute(Realm realm) {
-//                Sign sign = realm.createObject(Sign.class);
-//                sign.setDeleted(false);
-//                sign.setIdCard(id);
-//                sign.setName(name);
-//                sign.setTime(Constant.SYSTEM_DATE);
-//            }
-//        });
         SignProxy.insert(db, id, name, Constant.SYSTEM_DATE, false);
     }
 
     public void addAlertLog(String type) {
-//        realm.executeTransaction(new Realm.Transaction() {
-//            @Override
-//            public void execute(Realm realm) {
-//                Alert alert = realm.createObject(Alert.class);
-//                alert.setDeleted(false);
-//                alert.setType(type);
-//                alert.setTime(Constant.SYSTEM_DATE);
-//            }
-//        });
         AlertProxy.insert(db, type, Constant.SYSTEM_DATE, false);
-
     }
 
     public void addFriend(String name, String number) {
-//        realm.executeTransaction(new Realm.Transaction() {
-//            @Override
-//            public void execute(Realm realm) {
-//                Friend friend = realm.createObject(Friend.class);
-//                friend.setName(name);
-//                friend.setNumber(number);
-//            }
-//        });
         FriendProxy.insert(db, name, number);
     }
 
@@ -612,22 +539,6 @@ public class MainActivity extends AppCompatActivity {
         newMessage.setSend(true);
         newMessage.setSendOK(true);
 
-//        realm.executeTransaction(new Realm.Transaction() {
-//            @Override
-//            public void execute(Realm realm) {
-//                Message message = realm.createObject(Message.class);
-//                message.setSender(myNumber);
-//                message.setReceiver(receiver);
-//                message.setContent(content);
-//                message.setDeleted(false);
-//                message.setSend_time(Constant.SYSTEM_DATE);
-//                message.setRead(true);
-//                message.setSend(true);
-//                message.setSendOK(true);
-//                failedMessageId = message.getId();
-//            }
-//        });
-
         MessageProxy.insert(db, newMessage);
         failedMessageId = newMessage.getId();
 
@@ -646,12 +557,6 @@ public class MainActivity extends AppCompatActivity {
                 if (messageSendFailed) {
                     Toast.makeText(MainActivity.this, "发送失败", Toast.LENGTH_SHORT).show();
                     if (failedMessageId != 0) {
-//                        Message message = realm.where(Message.class).equalTo("id", failedMessageId).findFirst();
-//                        if (message != null) {
-//                            realm.beginTransaction();
-//                            message.setSendOK(false);
-//                            realm.commitTransaction();
-//                        }
                         MessageProxy.setMessageFailed(db, failedMessageId);
                         if (fragmentName.equals("message") && messageFragment.tg.equals("send")) {
                             messageFragment.reloadDate();
@@ -676,11 +581,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void modifyGpsBarMessageCount() {
-//        long count = realm.where(com.cetcme.xkterminal.RealmModels.Message.class)
-//                .equalTo("receiver", myNumber)
-//                .equalTo("isSend", false)
-//                .equalTo("read", false)
-//                .count();
         long count = MessageProxy.getUnreadMessageCount(db, myNumber);
         gpsBar.modifyMessageCount(count);
     }

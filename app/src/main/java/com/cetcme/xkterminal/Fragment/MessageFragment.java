@@ -23,7 +23,6 @@ import com.cetcme.xkterminal.MyClass.CommonUtil;
 import com.cetcme.xkterminal.MyClass.DateUtil;
 import com.cetcme.xkterminal.MyClass.DensityUtil;
 import com.cetcme.xkterminal.R;
-import com.cetcme.xkterminal.RealmModels.Message;
 import com.cetcme.xkterminal.Sqlite.Bean.MessageBean;
 import com.cetcme.xkterminal.Sqlite.Proxy.MessageProxy;
 
@@ -35,10 +34,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.realm.Realm;
-import io.realm.RealmChangeListener;
-import io.realm.RealmResults;
-import io.realm.Sort;
 
 /**
  * Created by qiuhong on 10/01/2018.
@@ -60,7 +55,6 @@ public class MessageFragment extends Fragment{
     private int pageIndex = 0;
     private int totalPage = 1;
 
-    private Realm realm;
     public String status;
 
     private DbManager db;
@@ -72,8 +66,6 @@ public class MessageFragment extends Fragment{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        realm = ((MyApplication) getActivity().getApplication()).realm;
-
         db = ((MyApplication) getActivity().getApplication()).db;
 
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_message,container,false);

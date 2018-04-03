@@ -3,7 +3,6 @@ package com.cetcme.xkterminal;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.MediaPlayer;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
@@ -27,7 +26,6 @@ import com.cetcme.xkterminal.DataFormat.Util.ByteUtil;
 import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
 import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
 import com.cetcme.xkterminal.DataFormat.Util.Util;
-import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.Fragment.AboutFragment;
 import com.cetcme.xkterminal.Fragment.LogFragment;
 import com.cetcme.xkterminal.Fragment.MainFragment;
@@ -43,34 +41,40 @@ import com.cetcme.xkterminal.RealmModels.Friend;
 import com.cetcme.xkterminal.RealmModels.Message;
 import com.cetcme.xkterminal.RealmModels.Sign;
 import com.cetcme.xkterminal.Socket.SocketServer;
+import com.cetcme.xkterminal.Sqlite.Bean.MessageBean;
+import com.cetcme.xkterminal.Sqlite.DBUtil;
+import com.cetcme.xkterminal.Sqlite.Proxy.AlertProxy;
+import com.cetcme.xkterminal.Sqlite.Proxy.FriendProxy;
+import com.cetcme.xkterminal.Sqlite.Proxy.MessageProxy;
+import com.cetcme.xkterminal.Sqlite.Proxy.SignProxy;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.qiuhong.qhlibrary.Dialog.QHDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
-import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
 
-import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.xutils.DbManager;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Date;
 
 import io.realm.Realm;
-import io.realm.RealmQuery;
-import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity {
 
     // TODO: fot test
     public static String myNumber = "";
 
+    private DbManager db;
+
     public GPSBar gpsBar;
 
     public BottomBar bottomBar;
-    public  MessageBar messageBar;
-    public  PageBar pageBar;
+    public MessageBar messageBar;
+    public PageBar pageBar;
     public BackBar backBar;
     public SendBar sendBar;
 
@@ -99,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
     public WifiManager mWifiManager;
 
     public boolean messageSendFailed = true;
-    private String failedMessageId;
+    private int failedMessageId = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +117,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         //隐藏动作条
         getSupportActionBar().hide();
+
+        db = ((MyApplication) getApplication()).db;
 
         realm = ((MyApplication) getApplication()).realm;
         ((MyApplication) getApplication()).mainActivity = this;
@@ -173,72 +179,100 @@ public class MainActivity extends AppCompatActivity {
 
     // 收到短信
     public void addMessage(final String address, final String content, final boolean read) {
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                Message message = realm.createObject(Message.class);
-                message.setSender(address);
-                message.setReceiver(myNumber);
-                message.setContent(content);
-                message.setDeleted(false);
-                message.setSend_time(Constant.SYSTEM_DATE);
-                message.setRead(read);
-                message.setSend(false);
-                message.setSendOK(true);
+//        realm.executeTransaction(new Realm.Transaction() {
+//            @Override
+//            public void execute(Realm realm) {
+//                Message message = realm.createObject(Message.class);
+//                message.setSender(address);
+//                message.setReceiver(myNumber);
+//                message.setContent(content);
+//                message.setDeleted(false);
+//                message.setSend_time(Constant.SYSTEM_DATE);
+//                message.setRead(read);
+//                message.setSend(false);
+//                message.setSendOK(true);
+//
+//                // 短信推送
+//                JSONObject sendJson = new JSONObject();
+//                try {
+//                    sendJson.put("apiType", "sms_push");
+//                    sendJson.put("userAddress", "sms_push");
+//                    sendJson.put("data", message.toJson());
+//
+//                    SocketServer.send(sendJson);
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
 
-                // 短信推送
-                JSONObject sendJson = new JSONObject();
-                try {
-                    sendJson.put("apiType", "sms_push");
-                    sendJson.put("userAddress", "sms_push");
-                    sendJson.put("data", message.toJson());
 
-                    SocketServer.send(sendJson);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        MessageBean message = new MessageBean();
+        message.setSender(address);
+        message.setReceiver(myNumber);
+        message.setContent(content);
+        message.setSend_time(Constant.SYSTEM_DATE);
+        message.setRead(read);
+        message.setDeleted(false);
+        message.setSend(false);
+        message.setSendOK(true);
+        MessageProxy.insert(db, message);
+
+        // 短信推送
+        JSONObject sendJson = new JSONObject();
+        try {
+            sendJson.put("apiType", "sms_push");
+            sendJson.put("userAddress", "sms_push");
+            sendJson.put("data", message.toJson());
+
+            SocketServer.send(sendJson);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         if (fragmentName.equals("message") && messageFragment.tg.equals("receive")) {
             messageFragment.reloadDate();
         }
     }
 
-    public void addSignLog(final String id, final String name) {
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                Sign sign = realm.createObject(Sign.class);
-                sign.setDeleted(false);
-                sign.setIdCard(id);
-                sign.setName(name);
-                sign.setTime(Constant.SYSTEM_DATE);
-            }
-        });
+    public void addSignLog(String id, String name) {
+//        realm.executeTransaction(new Realm.Transaction() {
+//            @Override
+//            public void execute(Realm realm) {
+//                Sign sign = realm.createObject(Sign.class);
+//                sign.setDeleted(false);
+//                sign.setIdCard(id);
+//                sign.setName(name);
+//                sign.setTime(Constant.SYSTEM_DATE);
+//            }
+//        });
+        SignProxy.insert(db, id, name, Constant.SYSTEM_DATE, false);
     }
 
-    public void addAlertLog(final String type) {
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                Alert alert = realm.createObject(Alert.class);
-                alert.setDeleted(false);
-                alert.setType(type);
-                alert.setTime(Constant.SYSTEM_DATE);
-            }
-        });
+    public void addAlertLog(String type) {
+//        realm.executeTransaction(new Realm.Transaction() {
+//            @Override
+//            public void execute(Realm realm) {
+//                Alert alert = realm.createObject(Alert.class);
+//                alert.setDeleted(false);
+//                alert.setType(type);
+//                alert.setTime(Constant.SYSTEM_DATE);
+//            }
+//        });
+        AlertProxy.insert(db, type, Constant.SYSTEM_DATE, false);
+
     }
 
-    public void addFriend(final String name, final String number) {
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                Friend friend = realm.createObject(Friend.class);
-                friend.setName(name);
-                friend.setNumber(number);
-            }
-        });
+    public void addFriend(String name, String number) {
+//        realm.executeTransaction(new Realm.Transaction() {
+//            @Override
+//            public void execute(Realm realm) {
+//                Friend friend = realm.createObject(Friend.class);
+//                friend.setName(name);
+//                friend.setNumber(number);
+//            }
+//        });
+        FriendProxy.insert(db, name, number);
     }
 
     public void showIDCardDialog(String id, String name, String nation, String address) {
@@ -568,7 +602,7 @@ public class MainActivity extends AppCompatActivity {
         editor.putString("lastSendTimeSave", DateUtil.parseDateToString(Constant.SYSTEM_DATE, DateUtil.DatePattern.YYYYMMDDHHMMSS));
         editor.apply(); //提交修改
 
-        final Message newMessage = new Message();
+        final MessageBean newMessage = new MessageBean();
         newMessage.setSender(myNumber);
         newMessage.setReceiver(receiver);
         newMessage.setContent(content);
@@ -578,21 +612,24 @@ public class MainActivity extends AppCompatActivity {
         newMessage.setSend(true);
         newMessage.setSendOK(true);
 
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                Message message = realm.createObject(Message.class);
-                message.setSender(myNumber);
-                message.setReceiver(receiver);
-                message.setContent(content);
-                message.setDeleted(false);
-                message.setSend_time(Constant.SYSTEM_DATE);
-                message.setRead(true);
-                message.setSend(true);
-                message.setSendOK(true);
-                failedMessageId = message.getId();
-            }
-        });
+//        realm.executeTransaction(new Realm.Transaction() {
+//            @Override
+//            public void execute(Realm realm) {
+//                Message message = realm.createObject(Message.class);
+//                message.setSender(myNumber);
+//                message.setReceiver(receiver);
+//                message.setContent(content);
+//                message.setDeleted(false);
+//                message.setSend_time(Constant.SYSTEM_DATE);
+//                message.setRead(true);
+//                message.setSend(true);
+//                message.setSendOK(true);
+//                failedMessageId = message.getId();
+//            }
+//        });
+
+        MessageProxy.insert(db, newMessage);
+        failedMessageId = newMessage.getId();
 
         byte[] messageBytes = MessageFormat.format(receiver, content, MessageFormat.MESSAGE_TYPE_NORMAL);
         ((MyApplication) getApplication()).sendBytes(messageBytes);
@@ -608,16 +645,18 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 if (messageSendFailed) {
                     Toast.makeText(MainActivity.this, "发送失败", Toast.LENGTH_SHORT).show();
-                    if (failedMessageId != null) {
-                        Message message = realm.where(Message.class).equalTo("id", failedMessageId).findFirst();
-                        if (message != null) {
-                            realm.beginTransaction();
-                            message.setSendOK(false);
-                            realm.commitTransaction();
-                        }
+                    if (failedMessageId != 0) {
+//                        Message message = realm.where(Message.class).equalTo("id", failedMessageId).findFirst();
+//                        if (message != null) {
+//                            realm.beginTransaction();
+//                            message.setSendOK(false);
+//                            realm.commitTransaction();
+//                        }
+                        MessageProxy.setMessageFailed(db, failedMessageId);
                         if (fragmentName.equals("message") && messageFragment.tg.equals("send")) {
                             messageFragment.reloadDate();
                         }
+                        failedMessageId = 0;
                     }
                 }
             }
@@ -637,34 +676,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void modifyGpsBarMessageCount() {
-        long count = realm.where(com.cetcme.xkterminal.RealmModels.Message.class)
-                .equalTo("receiver", myNumber)
-                .equalTo("isSend", false)
-                .equalTo("read", false)
-                .count();
+//        long count = realm.where(com.cetcme.xkterminal.RealmModels.Message.class)
+//                .equalTo("receiver", myNumber)
+//                .equalTo("isSend", false)
+//                .equalTo("read", false)
+//                .count();
+        long count = MessageProxy.getUnreadMessageCount(db, myNumber);
         gpsBar.modifyMessageCount(count);
     }
-
-//    @Override
-//    public boolean onKeyDown(int keyCode, KeyEvent event) {
-//        System.out.println(keyCode);
-//        switch(keyCode){
-//            case KeyEvent.KEYCODE_HOME:return true;
-//            case KeyEvent.KEYCODE_BACK:return true;
-//            case KeyEvent.KEYCODE_CALL:return true;
-//            case KeyEvent.KEYCODE_SYM: return true;
-//            case KeyEvent.KEYCODE_VOLUME_DOWN: return true;
-//            case KeyEvent.KEYCODE_VOLUME_UP: return true;
-//            case KeyEvent.KEYCODE_STAR: return true;
-//        }
-//
-//        return super.onKeyDown(keyCode, event);
-//    }
-
-//    public void onAttachedToWindow() {
-//        this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD);
-//        super.onAttachedToWindow();
-//    }
 
     /**
      * 创建Wifi热点

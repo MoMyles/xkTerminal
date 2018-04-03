@@ -26,6 +26,8 @@ import com.cetcme.xkterminal.MyClass.ScreenBrightness;
 import com.cetcme.xkterminal.MyClass.SoundPlay;
 import com.cetcme.xkterminal.Socket.SocketManager;
 import com.cetcme.xkterminal.Socket.SocketServer;
+import com.cetcme.xkterminal.Sqlite.Bean.MessageBean;
+import com.cetcme.xkterminal.Sqlite.Proxy.MessageProxy;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -33,6 +35,9 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.xutils.DbManager;
+import org.xutils.db.table.TableEntity;
+import org.xutils.x;
 
 import java.io.File;
 import java.io.IOException;
@@ -92,6 +97,8 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        x.Ext.init(this);
+//        x.Ext.setDebug(BuildConfig.DEBUG); // 开启debug会影响性能
 
         EventBus.getDefault().register(this);
 
@@ -148,6 +155,50 @@ public class MyApplication extends Application {
             }
         };
         new SocketManager(handler, getApplicationContext());
+
+        initDb();
+    }
+
+
+    public DbManager db;
+
+    public void initDb(){
+        DbManager.DaoConfig daoConfig = new DbManager.DaoConfig()
+                .setDbName("xkTerminal.db")
+                // 不设置dbDir时, 默认存储在app的私有目录.
+                //.setDbDir(new File(Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+"mswcs/db")) //设置数据库.db文件存放的目录,默认为包名下databases目录下
+                .setDbVersion(1)//设置数据库版本,每次启动应用时将会检查该版本号,
+                //发现数据库版本低于这里设置的值将进行数据库升级并触发DbUpgradeListener
+                .setAllowTransaction(true)//设置是否开启事务,默认为false关闭事务
+                .setDbOpenListener(new DbManager.DbOpenListener() {
+                    @Override
+                    public void onDbOpened(DbManager db) {
+                        // 开启WAL, 对写入加速提升巨大
+                        db.getDatabase().enableWriteAheadLogging();
+                    }
+                })
+                .setTableCreateListener(new DbManager.TableCreateListener() {
+                    @Override
+                    public void onTableCreated(DbManager db, TableEntity<?> table) {
+
+                    }
+                })//设置数据库创建时的Listener
+                //设置数据库升级时的Listener,这里可以执行相关数据库表的相关修改,比如alter语句增加字段等
+                .setDbUpgradeListener(new DbManager.DbUpgradeListener() {
+                    @Override
+                    public void onUpgrade(DbManager db, int oldVersion, int newVersion) {
+                        // TODO: ...
+                        // db.addColumn(...);
+                        // db.dropTable(...);
+                        // ...
+                        // or
+                        // db.dropDb();
+                        if(newVersion>oldVersion){
+
+                        }
+                    }
+                });
+        db = x.getDb(daoConfig);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

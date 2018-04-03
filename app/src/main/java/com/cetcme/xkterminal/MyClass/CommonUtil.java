@@ -9,7 +9,7 @@ import android.content.Context;
 
 public class CommonUtil {
 
-    public static int getTotalPage(int total, int perPage) {
+    public static int getTotalPage(long total, int perPage) {
         return (int) Math.ceil((float) total / perPage);
     }
 

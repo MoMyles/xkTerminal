@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,23 +18,20 @@ import com.cetcme.xkterminal.MyClass.CommonUtil;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.R;
-import com.cetcme.xkterminal.RealmModels.Friend;
+import com.cetcme.xkterminal.Sqlite.Bean.FriendBean;
+import com.cetcme.xkterminal.Sqlite.Proxy.FriendProxy;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.xutils.DbManager;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import io.realm.Realm;
-import io.realm.RealmResults;
 
 /**
  * Created by qiuhong on 10/01/2018.
@@ -66,7 +62,7 @@ public class SettingFragment extends Fragment {
     private String[] friend = {"", ""};
 
     private MainActivity mainActivity;
-    private Realm realm;
+    private DbManager db;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -76,7 +72,7 @@ public class SettingFragment extends Fragment {
         getData();
 
         mainActivity = (MainActivity) getActivity();
-        realm = ((MyApplication) mainActivity.getApplication()).realm;
+        db = ((MyApplication) mainActivity.getApplication()).db;
 
         return view;
     }
@@ -393,7 +389,7 @@ public class SettingFragment extends Fragment {
 
     private void friendDelete() {
 
-        final RealmResults<Friend> friends = realm.where(Friend.class).findAll();
+        final List<FriendBean> friends = FriendProxy.getAll(db);
         if (friends.size() == 0) {
             Toast.makeText(getActivity(), "好友列表为空", Toast.LENGTH_SHORT).show();
             return;
@@ -421,13 +417,7 @@ public class SettingFragment extends Fragment {
             public void onClick(QMUIDialog dialog, int index) {
                 int[] indexes = builder.getCheckedItemIndexes();
                 for (int i = 0; i < indexes.length; i++) {
-                    final Friend friend = friends.get(i);
-                    realm.executeTransaction(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm realm) {
-                            friend.deleteFromRealm();
-                        }
-                    });
+                    FriendProxy.deleteById(db, friends.get(i).getId());
                 }
                 Toast.makeText(getActivity(), "好友删除成功", Toast.LENGTH_SHORT).show();
                 dialog.dismiss();

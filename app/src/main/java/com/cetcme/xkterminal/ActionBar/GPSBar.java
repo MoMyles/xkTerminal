@@ -40,8 +40,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import io.realm.Realm;
-
 /**
  * Created by qiuhong on 10/01/2018.
  */

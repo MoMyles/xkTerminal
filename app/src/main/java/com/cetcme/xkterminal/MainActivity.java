@@ -36,13 +36,8 @@ import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.DensityUtil;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.MyClass.SoundPlay;
-import com.cetcme.xkterminal.RealmModels.Alert;
-import com.cetcme.xkterminal.RealmModels.Friend;
-import com.cetcme.xkterminal.RealmModels.Message;
-import com.cetcme.xkterminal.RealmModels.Sign;
 import com.cetcme.xkterminal.Socket.SocketServer;
 import com.cetcme.xkterminal.Sqlite.Bean.MessageBean;
-import com.cetcme.xkterminal.Sqlite.DBUtil;
 import com.cetcme.xkterminal.Sqlite.Proxy.AlertProxy;
 import com.cetcme.xkterminal.Sqlite.Proxy.FriendProxy;
 import com.cetcme.xkterminal.Sqlite.Proxy.MessageProxy;
@@ -59,7 +54,6 @@ import org.xutils.DbManager;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -135,6 +129,8 @@ public class MainActivity extends AppCompatActivity {
 
         // 发送启动$01，要求对方发时间
         sendBootData();
+
+        MessageProxy.getAddress(db);
     }
 
     private void initHud() {
@@ -514,16 +510,6 @@ public class MainActivity extends AppCompatActivity {
             qhDialog.show();
             return;
         }
-
-//        QHDialog qhDialog = new QHDialog(this,"提示", "短信发送成功");
-//        qhDialog.setPositiveButton("ok", 0, new DialogInterface.OnClickListener(){
-//            @Override
-//            public void onClick(DialogInterface dialog, int which){
-//                backToMessageFragment();
-//                dialog.dismiss();
-//            }
-//        });
-//        qhDialog.show();
 
         SharedPreferences.Editor editor = sharedPreferences.edit();//获取编辑器
         editor.putString("lastSendTimeSave", DateUtil.parseDateToString(Constant.SYSTEM_DATE, DateUtil.DatePattern.YYYYMMDDHHMMSS));

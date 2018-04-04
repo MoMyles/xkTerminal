@@ -2,15 +2,12 @@ package com.cetcme.xkterminal.Fragment;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -21,7 +18,6 @@ import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.CommonUtil;
 import com.cetcme.xkterminal.MyClass.DateUtil;
-import com.cetcme.xkterminal.MyClass.DensityUtil;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.Sqlite.Bean.MessageBean;
 import com.cetcme.xkterminal.Sqlite.Proxy.MessageProxy;
@@ -29,7 +25,6 @@ import com.cetcme.xkterminal.Sqlite.Proxy.MessageProxy;
 import org.xutils.DbManager;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -222,7 +217,7 @@ public class MessageFragment extends Fragment{
         simpleAdapter.notifyDataSetChanged();
 
         int id = Integer.parseInt(dataList.get(index).get("id").toString());
-        MessageProxy.setMessageRead(db, id);
+        MessageProxy.setMessageReadById(db, id);
         mainActivity.modifyGpsBarMessageCount();
     }
 

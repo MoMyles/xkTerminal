@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'realm-android'
 
 android {
     compileSdkVersion 26
@@ -10,22 +9,6 @@ android {
         versionCode 1
         versionName '1.0'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        //过滤掉不支持的平台
-        packagingOptions {
-            exclude "lib/arm64-v8a/librealm-jni.so"
-            exclude "lib/mips/librealm-jni.so"
-            exclude "lib/x86/librealm-jni.so"
-            exclude "lib/x86_64/librealm-jni.so"
-        }
-
-        splits {
-            abi {
-                enable true
-                reset()
-                include 'armeabi-v7a'
-//                include 'armeabi', 'armeabi-v7a'
-            }
-        }
     }
     buildTypes {
         release {
@@ -65,8 +48,4 @@ dependencies {
 
     implementation 'org.xutils:xutils:3.5.0'
 
-}
-
-realm {
-    syncEnabled = true
 }

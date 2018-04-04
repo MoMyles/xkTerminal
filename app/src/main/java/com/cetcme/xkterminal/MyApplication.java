@@ -6,11 +6,9 @@ import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.DataFormat.MessageFormat;
@@ -46,16 +44,12 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidParameterException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import android_serialport_api.SerialPort;
 import android_serialport_api.SerialPortFinder;
-import io.realm.Realm;
-import io.realm.RealmConfiguration;
-import io.realm.RealmQuery;
-import io.realm.RealmResults;
-import io.realm.Sort;
+
 
 import static com.cetcme.xkterminal.MainActivity.myNumber;
 
@@ -68,7 +62,6 @@ public class MyApplication extends Application {
     public MainActivity mainActivity;
     public IDCardActivity idCardActivity;
 
-    public Realm realm;
     private OutputStream mOutputStream;
     private InputStream mInputStream;
 
@@ -91,7 +84,7 @@ public class MyApplication extends Application {
 
     private Toast tipToast;
 
-    private String failedMessageId;
+    private int failedMessageId = 0;
 
     @SuppressLint("HandlerLeak")
     @Override
@@ -101,12 +94,6 @@ public class MyApplication extends Application {
 //        x.Ext.setDebug(BuildConfig.DEBUG); // 开启debug会影响性能
 
         EventBus.getDefault().register(this);
-
-        Realm.init(this);
-        RealmConfiguration config = new RealmConfiguration.Builder().name("myrealm.realm").build();
-        Realm.setDefaultConfiguration(config);
-
-        realm = Realm.getDefaultInstance();
 
         try {
             mSerialPort = getSerialPort();
@@ -233,7 +220,7 @@ public class MyApplication extends Application {
                     break;
 
                 case "sms_send":
-                    final com.cetcme.xkterminal.RealmModels.Message message = new com.cetcme.xkterminal.RealmModels.Message();
+                    final MessageBean message = new MessageBean();
                     message.fromJson(receiveJson.getJSONObject("data"));
 
                     SharedPreferences sharedPreferences = getSharedPreferences("xkTerminal", Context.MODE_PRIVATE); //私有数据
@@ -287,23 +274,8 @@ public class MyApplication extends Application {
                     editor.putString("lastSendTimeSave", DateUtil.parseDateToString(Constant.SYSTEM_DATE, DateUtil.DatePattern.YYYYMMDDHHMMSS));
                     editor.apply(); //提交修改
 
-                    realm.executeTransaction(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm realm) {
-                            com.cetcme.xkterminal.RealmModels.Message newMessage = realm.createObject(com.cetcme.xkterminal.RealmModels.Message.class);
-                            newMessage.setId(message.getId());
-                            newMessage.setSender(myNumber);
-                            newMessage.setReceiver(message.getReceiver());
-                            newMessage.setContent(message.getContent());
-                            newMessage.setDeleted(false);
-                            newMessage.setSend_time(message.getSend_time());
-                            newMessage.setRead(true);
-                            newMessage.setSend(true);
-                            newMessage.setSendOK(true);
-                            failedMessageId = newMessage.getId();
-
-                        }
-                    });
+                    MessageProxy.insert(db, message);
+                    failedMessageId = message.getId();
 
                     byte[] messageBytes = MessageFormat.format(message.getReceiver(), message.getContent(), MessageFormat.MESSAGE_TYPE_NORMAL);
                     sendBytes(messageBytes);
@@ -327,13 +299,8 @@ public class MyApplication extends Application {
                                     e.printStackTrace();
                                 }
 
-                                if (failedMessageId != null) {
-                                    com.cetcme.xkterminal.RealmModels.Message message = realm.where(com.cetcme.xkterminal.RealmModels.Message.class).equalTo("id", failedMessageId).findFirst();
-                                    if (message != null) {
-                                        realm.beginTransaction();
-                                        message.setSendOK(false);
-                                        realm.commitTransaction();
-                                    }
+                                if (failedMessageId != 0) {
+                                    MessageProxy.setMessageFailed(db, failedMessageId);
 
                                     if (mainActivity.fragmentName.equals("message") && mainActivity.messageFragment.tg.equals("send")) {
                                         mainActivity.messageFragment.reloadDate();
@@ -346,40 +313,14 @@ public class MyApplication extends Application {
                     break;
                 case "sms_read":
                     final String userAddress1 = receiveJson.getString("userAddress");
-                    realm.executeTransaction(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm realm) {
-                            //先查找后得到User对象
-                            RealmResults<com.cetcme.xkterminal.RealmModels.Message> messages = realm.where(com.cetcme.xkterminal.RealmModels.Message.class)
-                                    .equalTo("sender", userAddress1)
-                                    .equalTo("read", false)
-                                    .findAll();
-                            for (com.cetcme.xkterminal.RealmModels.Message message : messages) {
-                                message.setRead(true);
-                            }
-                            mainActivity.modifyGpsBarMessageCount();
-                        }
-                    });
+                    MessageProxy.setMessageReadBySender(db, userAddress1);
+                    mainActivity.modifyGpsBarMessageCount();
                     break;
                 case "sms_delete":
                     final String userAddress2 = receiveJson.getString("userAddress");
                     // 删除 所有消息
-                    RealmQuery<com.cetcme.xkterminal.RealmModels.Message> query = realm.where(com.cetcme.xkterminal.RealmModels.Message.class);
-                    query.equalTo("receiver", userAddress2);
-                    if (userAddress2.equals(myNumber)) {
-                        query.equalTo("receiver", userAddress2);
-                    }
-                    final RealmResults<com.cetcme.xkterminal.RealmModels.Message> messages = query.findAll();
-                    realm.executeTransaction(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm realm) {
-                            for (com.cetcme.xkterminal.RealmModels.Message message : messages) {
-                                message.deleteFromRealm();
-                            }
-                            mainActivity.modifyGpsBarMessageCount();
-                        }
-                    });
-
+                    MessageProxy.deleteAllByAddress(db, userAddress2, myNumber);
+                    mainActivity.modifyGpsBarMessageCount();
                     break;
                 case "set_time":
                     Date date = new Date(receiveJson.getString("time"));
@@ -405,117 +346,48 @@ public class MyApplication extends Application {
     }
 
     public JSONArray getSmsList() {
-        RealmResults<com.cetcme.xkterminal.RealmModels.Message> messages = realm.where(com.cetcme.xkterminal.RealmModels.Message.class)
-                .findAll();
-        messages = messages.sort("send_time", Sort.DESCENDING);
-
-        ArrayList<String> userAddresses = new ArrayList<>();
-        for (com.cetcme.xkterminal.RealmModels.Message message: messages) {
-            if (message.isSend() && !userAddresses.contains(message.getReceiver())) userAddresses.add(message.getReceiver());
-            if (!message.isSend() && !userAddresses.contains(message.getSender())) userAddresses.add(message.getSender());
-        }
+        List<String> userAddresses = MessageProxy.getAddress(db);
 
         JSONArray smsList = new JSONArray();
         for (String userAddress : userAddresses) {
-            RealmQuery<com.cetcme.xkterminal.RealmModels.Message> query = realm.where(com.cetcme.xkterminal.RealmModels.Message.class);
-            query.equalTo("receiver", userAddress);
-            if (userAddress.equals(myNumber)) {
-                query.equalTo("sender", userAddress);
-            } else {
-                query.or().equalTo("sender", userAddress);
-            }
-            query.sort("send_time", Sort.ASCENDING);
-            RealmResults<com.cetcme.xkterminal.RealmModels.Message> smses = query.findAll();
-            com.cetcme.xkterminal.RealmModels.Message message = smses.last();
 
-            RealmResults<com.cetcme.xkterminal.RealmModels.Message> unreadSmses = realm.where(com.cetcme.xkterminal.RealmModels.Message.class)
-                    .equalTo("sender", userAddress)
-                    .equalTo("read", false)
-                    .findAll();
+            MessageBean message = MessageProxy.getLast(db, userAddress, myNumber);
+            if (message != null) {
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("lastSmsContent", message.getContent());
+                    jsonObject.put("userAddress", userAddress);
+                    jsonObject.put("lastSmsTime", message.getSend_time());
+                    jsonObject.put("hasUnread", MessageProxy.getUnReadCountByAddress(db, userAddress) != 0);
 
-            JSONObject jsonObject = new JSONObject();
-            try {
-                jsonObject.put("lastSmsContent", message.getContent());
-                jsonObject.put("userAddress", userAddress);
-                jsonObject.put("lastSmsTime", message.getSend_time());
-                jsonObject.put("hasUnread", unreadSmses.size() != 0);
-                System.out.println(jsonObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
-            } catch (JSONException e) {
-                e.printStackTrace();
+                smsList.put(jsonObject);
             }
 
-            smsList.put(jsonObject);
         }
 
-//        System.out.println("+++++smsList" + smsList);
         return smsList;
     }
 
     public JSONArray getSmsDetail(String userAddress, int countPerPage, String timeBefore) {
-        RealmResults<com.cetcme.xkterminal.RealmModels.Message> messages;
-        if (userAddress.equals(myNumber)) {
-            messages = realm.where(com.cetcme.xkterminal.RealmModels.Message.class)
-                    .equalTo("sender", userAddress)
-                    .equalTo("receiver", userAddress)
-                    .lessThan("send_time", new Date(timeBefore))
-                    .findAll();
-        } else {
-            RealmQuery query = realm.where(com.cetcme.xkterminal.RealmModels.Message.class);
-            query.beginGroup()
-                .equalTo("sender", userAddress)
-                .or().equalTo("receiver", userAddress)
-                .endGroup();
-            query.lessThan("send_time", new Date(timeBefore));
-            messages = query.findAll();
-        }
-
-        messages = messages.sort("send_time", Sort.ASCENDING);
+        List<MessageBean> messages = MessageProxy.getByAddressAndTime(db, userAddress, myNumber, countPerPage, timeBefore);
 
         JSONArray smsList = new JSONArray();
-        if (messages.size() < countPerPage) countPerPage = messages.size();
 
-
-        for (int i = messages.size() - countPerPage; i < messages.size(); i++) {
-            com.cetcme.xkterminal.RealmModels.Message message = messages.get(i);
+        for (int i = 0; i < messages.size(); i++) {
+            MessageBean message = messages.get(i);
             JSONObject jsonObject = message.toJson();
             smsList.put(jsonObject);
         }
         return smsList;
     }
 
-    private void testReceive(int i) {
-        switch (i) {
-            case 0:
-                // 测试接收短信
-                byte[] messageBytes = MessageFormat.format("123456", "我是第一条的短信。。。。", MessageFormat.MESSAGE_TYPE_NORMAL);
-                sendBytes(messageBytes);
-                messageBytes = MessageFormat.format("123456", "我是第二条的短信!!!!", MessageFormat.MESSAGE_TYPE_NORMAL);
-                sendBytes(messageBytes);
-                break;
-            case 1:
-                // 测试接收身份证信息
-                sendBytes(SignFormat.format());
-                break;
-            case 2:
-                // 测试接收报警
-                byte[] frameData = "$R5".getBytes();
-                frameData = ByteUtil.byteMerger(frameData, "12345678".getBytes());
-//                frameData = ByteUtil.byteMerger(frameData, new byte[]{(byte) 0x00});
-                frameData = ByteUtil.byteMerger(frameData, "OK".getBytes());
-                frameData = ByteUtil.byteMerger(frameData, "*h".getBytes());
-                frameData = ByteUtil.byteMerger(frameData, new byte[]{(byte) 0x0D, (byte) 0x0A});
-                sendBytes(frameData);
-                break;
-            default:
-                break;
-        }
-    }
-
     @Override
     public void onTerminate() {
         super.onTerminate();
-        realm.close();
     }
 
 

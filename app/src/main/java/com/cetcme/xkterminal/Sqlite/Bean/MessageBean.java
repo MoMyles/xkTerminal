@@ -138,4 +138,19 @@ public class MessageBean implements Serializable {
 
         return jsonObject;
     }
+
+    public void fromJson(JSONObject jsonObject) {
+        try {
+            this.sender = jsonObject.getString("sender");
+            this.receiver = jsonObject.getString("receiver");
+            this.send_time = new Date(jsonObject.getString("send_time"));
+            this.content = jsonObject.getString("content");
+            this.read = jsonObject.getBoolean("read");
+            this.deleted = jsonObject.getBoolean("deleted");
+            this.isSend = jsonObject.getBoolean("isSend");
+            this.sendOK = jsonObject.getBoolean("sendOK");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 }

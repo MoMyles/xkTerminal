@@ -15,7 +15,8 @@ import java.io.UnsupportedEncodingException;
 public class MessageFormat {
 
     public static final String MESSAGE_TYPE_NORMAL = "00";
-    public static final String MESSAGE_TYPE_RESCURE = "01";
+    public static final String MESSAGE_TYPE_RESCUE = "01";
+    public static final String MESSAGE_TYPE_CELLPHONE = "02";
 
 
     private static final String messageHead = "$04";

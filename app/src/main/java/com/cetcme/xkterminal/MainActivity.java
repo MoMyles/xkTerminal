@@ -528,7 +528,7 @@ public class MainActivity extends AppCompatActivity {
         MessageProxy.insert(db, newMessage);
         failedMessageId = newMessage.getId();
 
-        byte[] messageBytes = MessageFormat.format(receiver, content, MessageFormat.MESSAGE_TYPE_NORMAL);
+        byte[] messageBytes = MessageFormat.format(receiver, content, receiver.length() == 11 ? MessageFormat.MESSAGE_TYPE_CELLPHONE : MessageFormat.MESSAGE_TYPE_NORMAL);
         ((MyApplication) getApplication()).sendBytes(messageBytes);
         System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
 

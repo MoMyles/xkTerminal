@@ -277,7 +277,7 @@ public class MyApplication extends Application {
                     MessageProxy.insert(db, message);
                     failedMessageId = message.getId();
 
-                    byte[] messageBytes = MessageFormat.format(message.getReceiver(), message.getContent(), MessageFormat.MESSAGE_TYPE_NORMAL);
+                    byte[] messageBytes = MessageFormat.format(message.getReceiver(), message.getContent(), message.getReceiver().length() == 11 ? MessageFormat.MESSAGE_TYPE_CELLPHONE : MessageFormat.MESSAGE_TYPE_NORMAL);
                     sendBytes(messageBytes);
                     System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
 
@@ -627,7 +627,7 @@ public class MyApplication extends Application {
                     String type    = messageStrings[2];
 
                     // 判断类型 普通短信 还是 救护短信
-                    if (type.equals(MessageFormat.MESSAGE_TYPE_RESCURE)) {
+                    if (type.equals(MessageFormat.MESSAGE_TYPE_RESCUE)) {
                         sendLightOn(true);
                         mainActivity.showRescueDialog(content);
                         mainActivity.addMessage(address, content, true);

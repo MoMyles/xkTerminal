@@ -27,6 +27,8 @@ import com.cetcme.xkterminal.Socket.SocketManager;
 import com.cetcme.xkterminal.Socket.SocketServer;
 import com.cetcme.xkterminal.Sqlite.Bean.MessageBean;
 import com.cetcme.xkterminal.Sqlite.Proxy.MessageProxy;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -738,7 +740,18 @@ public class MyApplication extends Application {
                         e.printStackTrace();
                     }
                     SocketServer.send(sendJSON);
+//                    Toast.makeText(getApplicationContext(), "终端ID：" + deviceID, Toast.LENGTH_SHORT).show();
 
+                    new QMUIDialog.MessageDialogBuilder(mainActivity)
+                            .setTitle("终端ID")
+                            .setMessage(deviceID)
+                            .addAction("确定", new QMUIDialogAction.ActionListener() {
+                                @Override
+                                public void onClick(QMUIDialog dialog, int index) {
+                                    dialog.dismiss();
+                                }
+                            })
+                            .show();
                     break;
                 case SERIAL_PORT_ALERT_SEND_SUCCESS:
                     // 报警发送成功

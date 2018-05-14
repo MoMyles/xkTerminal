@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.widget.Toast;
 
+import com.cetcme.xkterminal.DataFormat.IDFormat;
 import com.cetcme.xkterminal.DataFormat.MessageFormat;
 import com.cetcme.xkterminal.DataFormat.SignFormat;
 import com.cetcme.xkterminal.DataFormat.Util.ByteUtil;
@@ -78,6 +79,7 @@ public class MyApplication extends Application {
     private static final int SERIAL_PORT_SHUT_DOWN = 0x09;
     private static final int SERIAL_PORT_ALERT_START = 0x10;
     private static final int SERIAL_PORT_ALERT_FAIL = 0x11;
+    private static final int SERIAL_PORT_ID_EDIT_OK = 0x12;
 
     // for file pick
     private Handler handler;
@@ -146,7 +148,6 @@ public class MyApplication extends Application {
         initDb();
     }
 
-
     public DbManager db;
 
     public void initDb(){
@@ -195,6 +196,20 @@ public class MyApplication extends Application {
             String apiType = receiveJson.getString("apiType");
             JSONObject jsonObject = new JSONObject();
             switch (apiType) {
+                case "device_info_set":
+
+                    JSONObject data = receiveJson.getJSONObject("data");
+                    String newID = data.getString("deviceID");
+
+//                    PreferencesUtils.putString(getApplicationContext(), "myNumber", myNumber + "");
+//                    System.out.println("手机设置 myNumber: " + myNumber);
+
+                    sendBytes(IDFormat.format(newID));
+
+                    break;
+                case "device_id":
+                    sendBytes(IDFormat.getID());
+                    break;
                 case "sms_list":
                     JSONArray smsList = getSmsList();
 
@@ -468,7 +483,7 @@ public class MyApplication extends Application {
         serialCount++;
         if (serialCount == 3) {
             String head = Util.bytesGetHead(serialBuffer, 3);
-            if (head.equals("$04") || head.equals("$R4") || head.equals("$R1") || head.equals("$R5") || head.equals("$R0") || head.equals("$R6") || head.equals("$R7") || head.equals("$R8")) {
+            if (head.equals("$04") || head.equals("$R4") || head.equals("$R1") || head.equals("$R2") || head.equals("$R5") || head.equals("$R0") || head.equals("$R6") || head.equals("$R7") || head.equals("$R8")) {
                 hasHead = true;
             } else {
                 Util.bytesRemoveFirst(serialBuffer, serialCount);
@@ -521,6 +536,12 @@ public class MyApplication extends Application {
                     case "$R1":
                         // 接收时间
                         message.what = SERIAL_PORT_TIME_NUMBER_AND_COMMUNICATION_FROM;
+                        message.setData(bundle);
+                        mHandler.sendMessage(message);
+                        break;
+                    case "$R2":
+                        // 接收时间
+                        message.what = SERIAL_PORT_ID_EDIT_OK;
                         message.setData(bundle);
                         mHandler.sendMessage(message);
                         break;
@@ -688,16 +709,36 @@ public class MyApplication extends Application {
                     }
                     System.out.println(rightDate);
 
-                    int myNumber = Util.bytesToInt2(ByteUtil.subBytes(bytes, 17, 21), 0);
-                    PreferencesUtils.putString(getApplicationContext(), "myNumber", myNumber + "");
-                    MainActivity.myNumber = myNumber + "";
-                    System.out.println("myNumber: " + myNumber);
+                    // 兼容老设备
+                    if (bytes.length > 22) {
+                        int myNumber = Util.bytesToInt2(ByteUtil.subBytes(bytes, 17, 21), 0);
+                        PreferencesUtils.putString(getApplicationContext(), "myNumber", myNumber + "");
+                        MainActivity.myNumber = myNumber + "";
+                        System.out.println("myNumber: " + myNumber);
 
-                    String status = Util.byteToBit(ByteUtil.subBytes(bytes, 21, 22)[0]);
-                    boolean gpsStatus = status.charAt(7) == '1';
-                    mainActivity.gpsBar.setGPSStatus(gpsStatus);
-                    String communication_from = status.charAt(6) == '1' ? "北斗" : "GPRS";
-                    PreferencesUtils.putString(getApplicationContext(), "communication_from", communication_from);
+                        String status = Util.byteToBit(ByteUtil.subBytes(bytes, 21, 22)[0]);
+                        boolean gpsStatus = status.charAt(7) == '1';
+                        mainActivity.gpsBar.setGPSStatus(gpsStatus);
+                        String communication_from = status.charAt(6) == '1' ? "北斗" : "GPRS";
+                        PreferencesUtils.putString(getApplicationContext(), "communication_from", communication_from);
+                    }
+                    break;
+                case SERIAL_PORT_ID_EDIT_OK:
+                    // $R2 刷卡器id修改成功 获取 获取成功
+                    String deviceID = IDFormat.unFormat(bytes);
+                    System.out.println("deviceID: " + deviceID);
+
+                    JSONObject sendJSON = new JSONObject();
+                    try {
+                        sendJSON.put("apiType", "device_id");
+                        sendJSON.put("code", "0");
+                        sendJSON.put("msg", "获取成功");
+                        sendJSON.put("deviceID", deviceID);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    SocketServer.send(sendJSON);
+
                     break;
                 case SERIAL_PORT_ALERT_SEND_SUCCESS:
                     // 报警发送成功

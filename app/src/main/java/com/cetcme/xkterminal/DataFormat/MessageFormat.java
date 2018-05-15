@@ -40,14 +40,20 @@ public class MessageFormat {
 
         String messageContent = null;
         String typeString = null;
+
+        int groupId = -1;
         try {
-            typeString = new String(ByteUtil.subBytes(frameData, 15, 17), "GB2312");
+            byte[] typeBytes = ByteUtil.subBytes(frameData, 15, 17);
+            typeString = new String(typeBytes, "GB2312");
+            if (typeString.substring(0, 1).equals("A")) {
+                groupId = (int) typeBytes[1];
+            }
             messageContent = new String(ByteUtil.subBytes(frameData, 17, 15 + messageLength), "GB2312");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
 
-        return new String[]{targetAddress, messageContent, typeString};
+        return new String[]{targetAddress, messageContent, typeString, groupId + ""};
     }
 
     public static byte[] format(String targetAddress, String message, String type) {

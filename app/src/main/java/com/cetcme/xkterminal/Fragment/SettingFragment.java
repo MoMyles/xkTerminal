@@ -55,6 +55,8 @@ public class SettingFragment extends Fragment {
 
     private TextView wifi_ssid_textView;
 
+    private TextView group_textView;
+
     private TextView time_zone_textView;
     private Button time_zone_minus_btn;
     private Button time_zone_add_btn;
@@ -96,6 +98,8 @@ public class SettingFragment extends Fragment {
         sun_voltage_textView        = view.findViewById(R.id.sun_voltage_textView);
 
         wifi_ssid_textView          = view.findViewById(R.id.wifi_ssid_textView);
+
+        group_textView              = view.findViewById(R.id.group_textView);
 
         wifi_ssid_textView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -171,7 +175,6 @@ public class SettingFragment extends Fragment {
         });
 
         // 通讯录
-
         view.findViewById(R.id.friend_add_textView).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -183,6 +186,14 @@ public class SettingFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 friendDelete();
+            }
+        });
+
+        // 分组
+        group_textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                editGroup();
             }
         });
     }
@@ -205,6 +216,9 @@ public class SettingFragment extends Fragment {
             } else {
                 wifi_ssid_textView.setText(getString(R.string.wifi_ssid));
             }
+
+            int group = PreferencesUtils.getInt(getActivity(), "group");
+            group_textView.setText(group == -1 ? "无" : group + "");
 
             signal_textView         .setText(jsonObject.getString("signal"));
             location_freq_textView  .setText(jsonObject.getString("location_per"));
@@ -469,5 +483,43 @@ public class SettingFragment extends Fragment {
         Pattern p = Pattern.compile("[0-9]*");
         Matcher m = p.matcher(txt);
         return m.matches();
+    }
+
+    private void editGroup() {
+        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
+        builder.setTitle("用户分组")
+                .setPlaceholder("在此输入您的分组编号（1 - 255）")
+                .setInputType(InputType.TYPE_CLASS_NUMBER)
+                .addAction("取消", new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
+                        dialog.dismiss();
+                    }
+                })
+                .addAction("确定", new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
+                        CharSequence text = builder.getEditText().getText();
+                        if (text != null && text.length() > 0) {
+
+                            if (!isNumer(text.toString())) {
+                                Toast.makeText(getActivity(), "请输入正确的分组编号", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            int group = Integer.parseInt(text.toString());
+                            if (group < 1 || group > 255) {
+                                Toast.makeText(getActivity(), "请输入正确的分组编号(1 - 255)", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                            PreferencesUtils.putInt(getActivity(), "group", group);
+                            Toast.makeText(getActivity(), "分组编号设置成功：" + group, Toast.LENGTH_SHORT).show();
+
+                        } else {
+                            Toast.makeText(getActivity(), "输入您的分组编号（1 - 255）", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                })
+                .show();
     }
 }

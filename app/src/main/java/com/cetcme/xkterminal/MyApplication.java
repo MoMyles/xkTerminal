@@ -654,6 +654,7 @@ public class MyApplication extends Application {
                     String address = messageStrings[0];
                     String content = messageStrings[1];
                     String type    = messageStrings[2];
+                    int group   = Integer.parseInt(messageStrings[3]);
 
                     // 判断类型 普通短信 还是 救护短信
                     if (type.equals(MessageFormat.MESSAGE_TYPE_RESCUE)) {
@@ -661,10 +662,16 @@ public class MyApplication extends Application {
                         mainActivity.showRescueDialog(content);
                         mainActivity.addMessage(address, content, true);
                     } else {
-                        SoundPlay.playMessageSound(getApplicationContext());
-                        mainActivity.addMessage(address, content, false);
-                        mainActivity.modifyGpsBarMessageCount();
-                        Toast.makeText(getApplicationContext(), "您有新的短信", Toast.LENGTH_SHORT).show();
+
+                        // 判断分组 group -1为非分组短信，其他为组号，
+                        int ownGroup = PreferencesUtils.getInt(mainActivity, "group");
+                        if (group == -1 || group == ownGroup) { // 判断是分组短信
+                            SoundPlay.playMessageSound(getApplicationContext());
+                            mainActivity.addMessage(address, content, false);
+                            mainActivity.modifyGpsBarMessageCount();
+                            Toast.makeText(getApplicationContext(), "您有新的短信", Toast.LENGTH_SHORT).show();
+                        }
+
                     }
                     break;
                 case SERIAL_PORT_MESSAGE_SEND_SUCCESS:

@@ -152,16 +152,6 @@ public class GPSBar extends RelativeLayout {
             }
         });
 
-
-        // TODO: for test串口调试界面 看是否通
-        textView_location_status.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //显示串口测试activity
-                mainActivity.startActivity(new Intent(mainActivity, SerialPortActivity.class));
-            }
-        });
-
         // TODO: for test 多次点击退出app
         textView_time.setOnClickListener(new OnClickListener() {
             @Override
@@ -183,6 +173,16 @@ public class GPSBar extends RelativeLayout {
                     System.exit(0);
                 }
 
+            }
+        });
+
+        /*
+        // TODO: for test串口调试界面 看是否通
+        textView_location_status.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //显示串口测试activity
+                mainActivity.startActivity(new Intent(mainActivity, SerialPortActivity.class));
             }
         });
 
@@ -232,6 +232,8 @@ public class GPSBar extends RelativeLayout {
                 ScreenBrightness.modifyBrightness(mainActivity);
             }
         });
+
+        */
 
         textViews.add(textView_latitude);
         textViews.add(textView_longitude);

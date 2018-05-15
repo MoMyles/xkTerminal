@@ -473,7 +473,7 @@ public class MainActivity extends AppCompatActivity {
         if (!lastSendTime.isEmpty()) {
             Long sendDate = DateUtil.parseStringToDate(lastSendTime, DateUtil.DatePattern.YYYYMMDDHHMMSS).getTime();
             Long now = Constant.SYSTEM_DATE.getTime();
-            if (now - sendDate <= Constant.MESSAGE_SEND_LIMIT_TIME) {
+            if (now - sendDate <= Constant.MESSAGE_SEND_LIMIT_TIME && now - sendDate > 0) {
                 long remainSecond = (Constant.MESSAGE_SEND_LIMIT_TIME - (now - sendDate)) / 1000;
                 Toast.makeText(this, "发送时间间隔不到1分钟，请等待" + remainSecond + "秒", Toast.LENGTH_SHORT).show();
                 return;

@@ -78,7 +78,7 @@
         android:layout_toRightOf="@+id/textView_time"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <Button
             android:id="@+id/sign_btn"

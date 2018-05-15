@@ -73,6 +73,8 @@ public class MyApplication extends Application {
     private static final int SERIAL_PORT_RECEIVE_NEW_MESSAGE = 0x01;
     private static final int SERIAL_PORT_MESSAGE_SEND_SUCCESS = 0x02;
     private static final int SERIAL_PORT_TIME_NUMBER_AND_COMMUNICATION_FROM = 0x03;
+    private static final int SERIAL_PORT_TIME = 0x13;
+
     private static final int SERIAL_PORT_ALERT_SEND_SUCCESS = 0x04;
     private static final int SERIAL_PORT_SHOW_ALERT_ACTIVITY = 0x05;
     private static final int SERIAL_PORT_RECEIVE_NEW_SIGN = 0x06;
@@ -537,7 +539,11 @@ public class MyApplication extends Application {
                         break;
                     case "$R1":
                         // 接收时间
-                        message.what = SERIAL_PORT_TIME_NUMBER_AND_COMMUNICATION_FROM;
+                        if (serialCount == 25) {
+                            message.what = SERIAL_PORT_TIME_NUMBER_AND_COMMUNICATION_FROM;
+                        } else if (serialCount == 20){
+                            message.what = SERIAL_PORT_TIME;
+                        }
                         message.setData(bundle);
                         mHandler.sendMessage(message);
                         break;
@@ -687,6 +693,19 @@ public class MyApplication extends Application {
 
                     break;
                 case SERIAL_PORT_TIME_NUMBER_AND_COMMUNICATION_FROM:
+                    // 先处理后面部分，时间部分由下一个case处理，不加break
+                    int myNumber = Util.bytesToInt2(ByteUtil.subBytes(bytes, 17, 21), 0);
+                    PreferencesUtils.putString(getApplicationContext(), "myNumber", myNumber + "");
+                    MainActivity.myNumber = myNumber + "";
+                    System.out.println("myNumber: " + myNumber);
+
+                    String status = Util.byteToBit(ByteUtil.subBytes(bytes, 21, 22)[0]);
+                    boolean gpsStatus = status.charAt(7) == '1';
+                    mainActivity.gpsBar.setGPSStatus(gpsStatus);
+                    String communication_from = status.charAt(6) == '1' ? "北斗" : "GPRS";
+                    PreferencesUtils.putString(getApplicationContext(), "communication_from", communication_from);
+                    // 这里不加break
+                case SERIAL_PORT_TIME:
                     // 接收时间
                     int year = ByteUtil.subBytes(bytes, 11, 12)[0]  & 0xFF;
                     int month = ByteUtil.subBytes(bytes, 12, 13)[0]  & 0xFF;
@@ -710,20 +729,6 @@ public class MyApplication extends Application {
                         Constant.SYSTEM_DATE = rightDate;
                     }
                     System.out.println(rightDate);
-
-                    // 兼容老设备
-                    if (bytes.length > 22) {
-                        int myNumber = Util.bytesToInt2(ByteUtil.subBytes(bytes, 17, 21), 0);
-                        PreferencesUtils.putString(getApplicationContext(), "myNumber", myNumber + "");
-                        MainActivity.myNumber = myNumber + "";
-                        System.out.println("myNumber: " + myNumber);
-
-                        String status = Util.byteToBit(ByteUtil.subBytes(bytes, 21, 22)[0]);
-                        boolean gpsStatus = status.charAt(7) == '1';
-                        mainActivity.gpsBar.setGPSStatus(gpsStatus);
-                        String communication_from = status.charAt(6) == '1' ? "北斗" : "GPRS";
-                        PreferencesUtils.putString(getApplicationContext(), "communication_from", communication_from);
-                    }
                     break;
                 case SERIAL_PORT_ID_EDIT_OK:
                     // $R2 刷卡器id修改成功 获取 获取成功

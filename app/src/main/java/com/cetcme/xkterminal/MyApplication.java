@@ -752,18 +752,18 @@ public class MyApplication extends Application {
                         e.printStackTrace();
                     }
                     SocketServer.send(sendJSON);
-//                    Toast.makeText(getApplicationContext(), "终端ID：" + deviceID, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "终端ID：" + deviceID, Toast.LENGTH_LONG).show();
 
-                    new QMUIDialog.MessageDialogBuilder(mainActivity)
-                            .setTitle("终端ID")
-                            .setMessage(deviceID)
-                            .addAction("确定", new QMUIDialogAction.ActionListener() {
-                                @Override
-                                public void onClick(QMUIDialog dialog, int index) {
-                                    dialog.dismiss();
-                                }
-                            })
-                            .show();
+//                    new QMUIDialog.MessageDialogBuilder(mainActivity)
+//                            .setTitle("终端ID")
+//                            .setMessage(deviceID)
+//                            .addAction("确定", new QMUIDialogAction.ActionListener() {
+//                                @Override
+//                                public void onClick(QMUIDialog dialog, int index) {
+//                                    dialog.dismiss();
+//                                }
+//                            })
+//                            .show();
                     break;
                 case SERIAL_PORT_ALERT_SEND_SUCCESS:
                     // 报警发送成功

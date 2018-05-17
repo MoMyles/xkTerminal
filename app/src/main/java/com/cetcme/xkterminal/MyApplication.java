@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.DataFormat.IDFormat;
@@ -17,6 +18,8 @@ import com.cetcme.xkterminal.DataFormat.SignFormat;
 import com.cetcme.xkterminal.DataFormat.Util.ByteUtil;
 import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
 import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
+import com.cetcme.xkterminal.DataFormat.Util.GpsInfo;
+import com.cetcme.xkterminal.DataFormat.Util.GpsParse;
 import com.cetcme.xkterminal.DataFormat.Util.Util;
 import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.MyClass.Constant;
@@ -25,10 +28,9 @@ import com.cetcme.xkterminal.MyClass.ScreenBrightness;
 import com.cetcme.xkterminal.MyClass.SoundPlay;
 import com.cetcme.xkterminal.Socket.SocketManager;
 import com.cetcme.xkterminal.Socket.SocketServer;
+import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 import com.cetcme.xkterminal.Sqlite.Bean.MessageBean;
 import com.cetcme.xkterminal.Sqlite.Proxy.MessageProxy;
-import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
-import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -52,6 +54,7 @@ import java.util.List;
 
 import android_serialport_api.SerialPort;
 import android_serialport_api.SerialPortFinder;
+import yimamapapi.skia.YimaLib;
 
 
 import static com.cetcme.xkterminal.MainActivity.myNumber;
@@ -65,25 +68,21 @@ public class MyApplication extends Application {
     public MainActivity mainActivity;
     public IDCardActivity idCardActivity;
 
+    private static MyApplication mContext;
+    public DbManager db;
+
+    public DataHandler mHandler;
+
+    public SerialPortFinder mSerialPortFinder = new SerialPortFinder();
+    private SerialPort mSerialPort = null;
     private OutputStream mOutputStream;
     private InputStream mInputStream;
 
-    private boolean messageSendFailed = true;
+    private SerialPort gpsSerialPort = null;
+    private OutputStream gpsOutputStream;
+    private InputStream gpsInputStream;
 
-    private static final int SERIAL_PORT_RECEIVE_NEW_MESSAGE = 0x01;
-    private static final int SERIAL_PORT_MESSAGE_SEND_SUCCESS = 0x02;
-    private static final int SERIAL_PORT_TIME_NUMBER_AND_COMMUNICATION_FROM = 0x03;
-    private static final int SERIAL_PORT_TIME = 0x13;
-
-    private static final int SERIAL_PORT_ALERT_SEND_SUCCESS = 0x04;
-    private static final int SERIAL_PORT_SHOW_ALERT_ACTIVITY = 0x05;
-    private static final int SERIAL_PORT_RECEIVE_NEW_SIGN = 0x06;
-    private static final int SERIAL_PORT_RECEIVE_NEW_ALERT = 0x07;
-    private static final int SERIAL_PORT_MODIFY_SCREEN_BRIGHTNESS = 0x08;
-    private static final int SERIAL_PORT_SHUT_DOWN = 0x09;
-    private static final int SERIAL_PORT_ALERT_START = 0x10;
-    private static final int SERIAL_PORT_ALERT_FAIL = 0x11;
-    private static final int SERIAL_PORT_ID_EDIT_OK = 0x12;
+    public boolean messageSendFailed = true;
 
     // for file pick
     private Handler handler;
@@ -92,10 +91,24 @@ public class MyApplication extends Application {
 
     private int failedMessageId = 0;
 
+    /**
+     * 加载库文件（只需调用一次）
+     */
+    static {
+        YimaLib.LoadLib();
+    }
+
     @SuppressLint("HandlerLeak")
     @Override
     public void onCreate() {
         super.onCreate();
+        mContext = this;
+
+        if (!PreferencesUtils.getBoolean(this, "copiedYimaFile")) {
+            copyYimaFile();
+            PreferencesUtils.putBoolean(this, "copiedYimaFile", true);
+        }
+
         x.Ext.init(this);
 //        x.Ext.setDebug(BuildConfig.DEBUG); // 开启debug会影响性能
 
@@ -106,9 +119,16 @@ public class MyApplication extends Application {
             mOutputStream = mSerialPort.getOutputStream();
             mInputStream = mSerialPort.getInputStream();
 
+            gpsSerialPort = getGpsSerialPort();
+            gpsOutputStream = gpsSerialPort.getOutputStream();
+            gpsInputStream = gpsSerialPort.getInputStream();
+
 			/* Create a receiving thread */
             ReadThread mReadThread = new ReadThread();
             mReadThread.start();
+
+            GpsReadThread gpsReadThread = new GpsReadThread();
+            gpsReadThread.start();
         } catch (SecurityException e) {
             DisplayError(R.string.error_security);
         } catch (IOException e) {
@@ -117,6 +137,11 @@ public class MyApplication extends Application {
             DisplayError(R.string.error_configuration);
         }
 
+//        显示所有path
+//        String[] paths =  mSerialPortFinder.getAllDevicesPath();
+//        for (String path : paths) {
+//            Log.i("qh_port", "onCreate: " + path);
+//        }
 
         new Thread() {
             @Override
@@ -149,10 +174,29 @@ public class MyApplication extends Application {
         };
         new SocketManager(handler, getApplicationContext());
 
+        mHandler = new DataHandler(mainActivity, this);
+
         initDb();
     }
 
-    public DbManager db;
+
+    public static MyApplication getInstance(){
+        return mContext;
+    }
+    public DbManager getDb() {
+        return db;
+    }
+    /**
+     * 文件复制: 把assets目录下的workDir目录拷贝到data/data/包名/files目录下。（只需调用一次，用户也可以自己实现）
+     */
+    private void copyYimaFile() {
+        String strFile = getApplicationContext().getFilesDir().getAbsolutePath();
+        long startTime = System.currentTimeMillis();
+        YimaLib.CopyWorkDir(getApplicationContext(), strFile);
+        long endTime = System.currentTimeMillis(); //获取结束时间
+        System.out.println("Yima WorkDir 文件拷贝: " + String.valueOf(endTime - startTime) + "ms");
+//        Toast.makeText(MainActivity.this, "文件拷贝" + String.valueOf(endTime - startTime), Toast.LENGTH_SHORT).show();
+    }
 
     public void initDb(){
         DbManager.DaoConfig daoConfig = new DbManager.DaoConfig()
@@ -201,15 +245,9 @@ public class MyApplication extends Application {
             JSONObject jsonObject = new JSONObject();
             switch (apiType) {
                 case "device_info_set":
-
                     JSONObject data = receiveJson.getJSONObject("data");
                     String newID = data.getString("deviceID");
-
-//                    PreferencesUtils.putString(getApplicationContext(), "myNumber", myNumber + "");
-//                    System.out.println("手机设置 myNumber: " + myNumber);
-
                     sendBytes(IDFormat.format(newID));
-
                     break;
                 case "device_id":
                     sendBytes(IDFormat.getID());
@@ -410,9 +448,6 @@ public class MyApplication extends Application {
     }
 
 
-    public SerialPortFinder mSerialPortFinder = new SerialPortFinder();
-    private SerialPort mSerialPort = null;
-
     public SerialPort getSerialPort() throws SecurityException, IOException, InvalidParameterException {
         if (mSerialPort == null) {
 			/* Read serial port parameters */
@@ -420,8 +455,8 @@ public class MyApplication extends Application {
 //            String path = sp.getString("DEVICE", "");
 //            path = "/dev/ttyS3";
 //            int baudrate = Integer.decode(sp.getString("BAUDRATE", "-1"));
-            String path = "/dev/ttyS3";
-            int baudrate = Constant.SERIAL_PORT_BAUD_RATE;
+            String path = Constant.SERIAL_DATA_PORT_PATH;
+            int baudrate = Constant.SERIAL_DATA_PORT_BAUD_RATE;
 
 			/* Check parameters */
             if ( (path.length() == 0) || (baudrate == -1)) {
@@ -432,6 +467,23 @@ public class MyApplication extends Application {
             mSerialPort = new SerialPort(new File(path), baudrate, 0);
         }
         return mSerialPort;
+    }
+
+    public SerialPort getGpsSerialPort() throws SecurityException, IOException, InvalidParameterException {
+        if (gpsSerialPort == null) {
+			/* Read serial port parameters */
+            String path = Constant.SERIAL_GPS_PORT_PATH;
+            int baudrate = Constant.SERIAL_GPS_PORT_BAUD_RATE;
+
+			/* Check parameters */
+            if ( (path.length() == 0) || (baudrate == -1)) {
+                throw new InvalidParameterException();
+            }
+
+			/* Open the serial port */
+            gpsSerialPort = new SerialPort(new File(path), baudrate, 0);
+        }
+        return gpsSerialPort;
     }
 
     public void closeSerialPort() {
@@ -478,6 +530,31 @@ public class MyApplication extends Application {
         }
     }
 
+    private class GpsReadThread extends Thread {
+
+        @Override
+        public void run() {
+            super.run();
+            while(!isInterrupted()) {
+                int size;
+                try {
+                    Thread.sleep(1000);
+                    byte[] buffer = new byte[200];
+                    if (gpsInputStream == null) return;
+                    size = gpsInputStream.read(buffer);
+                    if (size > 0) {
+                        onGpsDataReceived(buffer, size);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return;
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
     byte[] serialBuffer = new byte[100];
     int serialCount = 0;
     boolean hasHead = false;
@@ -509,7 +586,7 @@ public class MyApplication extends Application {
                 switch (Util.bytesGetHead(serialBuffer, 3)) {
                     case "$04":
                         // 接收短信
-                        message.what = SERIAL_PORT_RECEIVE_NEW_MESSAGE;
+                        message.what = DataHandler.SERIAL_PORT_RECEIVE_NEW_MESSAGE;
                         message.setData(bundle);
                         mHandler.sendMessage(message);
                         break;
@@ -533,55 +610,55 @@ public class MyApplication extends Application {
                         return;
                     case "$R4":
                         // 短信发送成功
-                        message.what = SERIAL_PORT_MESSAGE_SEND_SUCCESS;
+                        message.what = DataHandler.SERIAL_PORT_MESSAGE_SEND_SUCCESS;
                         message.setData(bundle);
                         mHandler.sendMessage(message);
                         break;
                     case "$R1":
                         // 接收时间
                         if (serialCount == 25) {
-                            message.what = SERIAL_PORT_TIME_NUMBER_AND_COMMUNICATION_FROM;
+                            message.what = DataHandler.SERIAL_PORT_TIME_NUMBER_AND_COMMUNICATION_FROM;
                         } else if (serialCount == 20){
-                            message.what = SERIAL_PORT_TIME;
+                            message.what = DataHandler.SERIAL_PORT_TIME;
                         }
                         message.setData(bundle);
                         mHandler.sendMessage(message);
                         break;
                     case "$R2":
                         // 接收时间
-                        message.what = SERIAL_PORT_ID_EDIT_OK;
+                        message.what = DataHandler.SERIAL_PORT_ID_EDIT_OK;
                         message.setData(bundle);
                         mHandler.sendMessage(message);
                         break;
                     case "$R5":
                         if (serialCount == 14) {
                             // 紧急报警成功
-                            message.what = SERIAL_PORT_ALERT_SEND_SUCCESS;
+                            message.what = DataHandler.SERIAL_PORT_ALERT_SEND_SUCCESS;
                         } else if (serialCount == 15) {
                             // 显示报警activity
-                            message.what = SERIAL_PORT_SHOW_ALERT_ACTIVITY;
+                            message.what = DataHandler.SERIAL_PORT_SHOW_ALERT_ACTIVITY;
                         } else if (serialCount == 16) {
                             // 增加报警记录，显示收到报警
-                            message.what = SERIAL_PORT_RECEIVE_NEW_ALERT;
+                            message.what = DataHandler.SERIAL_PORT_RECEIVE_NEW_ALERT;
                         }
                         message.setData(bundle);
                         mHandler.sendMessage(message);
                         break;
                     case "$R0":
                         // 接收身份证信息
-                        message.what = SERIAL_PORT_RECEIVE_NEW_SIGN;
+                        message.what = DataHandler.SERIAL_PORT_RECEIVE_NEW_SIGN;
                         message.setData(bundle);
                         mHandler.sendMessage(message);
                         break;
                     case "$R6":
                         // 调节背光
-                        message.what = SERIAL_PORT_MODIFY_SCREEN_BRIGHTNESS;
+                        message.what = DataHandler.SERIAL_PORT_MODIFY_SCREEN_BRIGHTNESS;
                         message.setData(bundle);
                         mHandler.sendMessage(message);
                         break;
                     case "$R7":
                         // 关机
-                        message.what = SERIAL_PORT_SHUT_DOWN;
+                        message.what = DataHandler.SERIAL_PORT_SHUT_DOWN;
                         message.setData(bundle);
                         mHandler.sendMessage(message);
                         break;
@@ -589,13 +666,13 @@ public class MyApplication extends Application {
                         if (serialBuffer[3] == 0x01) {
                             System.out.println("报警中");
                             // 报警中
-                            message.what = SERIAL_PORT_ALERT_START;
+                            message.what = DataHandler.SERIAL_PORT_ALERT_START;
                             message.setData(bundle);
                             mHandler.sendMessage(message);
                         } else if (serialBuffer[3] == 0x02) {
                             System.out.println("报警失败");
                             // 报警失败
-                            message.what = SERIAL_PORT_ALERT_FAIL;
+                            message.what = DataHandler.SERIAL_PORT_ALERT_FAIL;
                             message.setData(bundle);
                             mHandler.sendMessage(message);
                         }
@@ -613,6 +690,33 @@ public class MyApplication extends Application {
 
         }
 
+    }
+
+    String TAG = "GPS Serial Port";
+
+    protected void onGpsDataReceived(byte[] buffer, int size) {
+
+        Log.i(TAG, "onGpsDataReceived: ");
+        Log.i(TAG, "size: " + size);
+
+        String gpsDataStr = new String(ByteUtil.subBytes(buffer, 0, size));
+        String[] strings = gpsDataStr.split("\n");
+
+        for (String string : strings) {
+            if (string.startsWith("$GNRMC")) {
+                string = string.replace("$GNRMC", "$GPRMC");
+                GpsInfo gpsInfo = GpsParse.parse(string);
+                Log.i(TAG, gpsInfo.longtitude + ", " + gpsInfo.latititude + ", " + gpsInfo.speed + ", " + gpsInfo.course + ", " + gpsInfo.cal1.getTime().toString());
+                LocationBean locationBean = new LocationBean();
+                locationBean.setLatitude(gpsInfo.latititude);
+                locationBean.setLongitude(gpsInfo.longtitude);
+                locationBean.setSpeed(gpsInfo.speed);
+                locationBean.setHeading(gpsInfo.course);
+                locationBean.setAcqtime(gpsInfo.cal1.getTime());
+
+                EventBus.getDefault().post(gpsInfo);
+            }
+        }
     }
 
     public void sendBytes(byte[] buffer) {
@@ -639,6 +743,20 @@ public class MyApplication extends Application {
         }
     }
 
+    public void sendLightOn(boolean on) {
+        System.out.println("控制灯：" + on);
+        byte[] bytes;
+        if (on) {
+            bytes ="$08".getBytes();
+        } else {
+            bytes ="$09".getBytes();
+        }
+        bytes = ByteUtil.byteMerger(bytes, new byte[] {0x01});
+        bytes = ByteUtil.byteMerger(bytes, "\r\n".getBytes());
+        sendBytes(bytes);
+    }
+
+    /*
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
         @Override public void handleMessage(Message msg) {//覆盖handleMessage方法
@@ -654,7 +772,7 @@ public class MyApplication extends Application {
                     String address = messageStrings[0];
                     String content = messageStrings[1];
                     String type    = messageStrings[2];
-                    int group   = Integer.parseInt(messageStrings[3]);
+                    int group      = Integer.parseInt(messageStrings[3]);
 
                     // 判断类型 普通短信 还是 救护短信
                     if (type.equals(MessageFormat.MESSAGE_TYPE_RESCUE)) {
@@ -848,16 +966,5 @@ public class MyApplication extends Application {
         }
     };
 
-    public void sendLightOn(boolean on) {
-        System.out.println("控制灯：" + on);
-        byte[] bytes;
-        if (on) {
-            bytes ="$08".getBytes();
-        } else {
-            bytes ="$09".getBytes();
-        }
-        bytes = ByteUtil.byteMerger(bytes, new byte[] {0x01});
-        bytes = ByteUtil.byteMerger(bytes, "\r\n".getBytes());
-        sendBytes(bytes);
-    }
+    */
 }

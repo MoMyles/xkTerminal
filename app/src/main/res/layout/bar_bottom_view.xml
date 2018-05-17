@@ -77,6 +77,20 @@
         android:text="系统参数"
         android:textSize="16sp" />
 
+    <Button
+        android:id="@+id/button_navigate"
+        android:layout_width="120sp"
+        android:layout_height="44dp"
+        android:layout_marginTop="8dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_toEndOf="@+id/button_setting"
+        android:layout_toRightOf="@+id/button_setting"
+        android:gravity="center"
+        android:text="导航管理"
+        android:textSize="16sp" />
+
     <!--<Button-->
         <!--android:id="@+id/button_about"-->
         <!--android:layout_width="120sp"-->

@@ -1,6 +1,7 @@
 package com.cetcme.xkterminal.ActionBar;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 
 import com.cetcme.xkterminal.MainActivity;
+import com.cetcme.xkterminal.MapMainActivity;
 import com.cetcme.xkterminal.R;
 
 import java.util.ArrayList;
@@ -25,6 +27,7 @@ public class BottomBar extends RelativeLayout implements View.OnClickListener {
     private Button button_sign;
     private Button button_alert;
     private Button button_setting;
+    private Button button_navigate;
     private Button button_about;
 
     private ArrayList<Button> buttons = new ArrayList<>();
@@ -47,6 +50,7 @@ public class BottomBar extends RelativeLayout implements View.OnClickListener {
         button_sign     = view.findViewById(R.id.button_sign);
         button_alert    = view.findViewById(R.id.button_alert);
         button_setting  = view.findViewById(R.id.button_setting);
+        button_navigate = view.findViewById(R.id.button_navigate);
         button_about    = view.findViewById(R.id.button_about);
 
         buttons.add(button_receive);
@@ -54,6 +58,7 @@ public class BottomBar extends RelativeLayout implements View.OnClickListener {
         buttons.add(button_sign);
         buttons.add(button_alert);
         buttons.add(button_setting);
+        buttons.add(button_navigate);
         buttons.add(button_about);
 
         for (Button button: buttons) {
@@ -82,6 +87,9 @@ public class BottomBar extends RelativeLayout implements View.OnClickListener {
                 break;
             case R.id.button_setting:
                 mainActivity.initSettingFragment();
+                break;
+            case R.id.button_navigate:
+                mainActivity.startActivity(new Intent(mainActivity, MapMainActivity.class));
                 break;
             case R.id.button_about:
                 mainActivity.initAboutFragment();

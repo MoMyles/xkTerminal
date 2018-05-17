@@ -48,4 +48,6 @@ dependencies {
 
     implementation 'org.xutils:xutils:3.5.0'
 
+    implementation files('libs/YimaApi.jar')
+
 }

@@ -9,7 +9,8 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 
 import com.cetcme.xkterminal.MainActivity;
-import com.cetcme.xkterminal.MapMainActivity;
+import com.cetcme.xkterminal.Navigation.NavigationActivity;
+import com.cetcme.xkterminal.Navigation.NavigationMainActivity;
 import com.cetcme.xkterminal.R;
 
 import java.util.ArrayList;
@@ -89,7 +90,7 @@ public class BottomBar extends RelativeLayout implements View.OnClickListener {
                 mainActivity.initSettingFragment();
                 break;
             case R.id.button_navigate:
-                mainActivity.startActivity(new Intent(mainActivity, MapMainActivity.class));
+                mainActivity.startActivity(new Intent(mainActivity, NavigationMainActivity.class));
                 break;
             case R.id.button_about:
                 mainActivity.initAboutFragment();

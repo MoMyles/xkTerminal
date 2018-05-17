@@ -44,6 +44,18 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".Navigation.RouteListActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="sensorLandscape"
+            android:theme="@style/myDialogActivityStyle">
+        </activity>
+        <activity
+            android:name=".Navigation.NavigationActivity"
+            android:screenOrientation="sensorLandscape"/>
+        <activity
+            android:name=".Navigation.NavigationMainActivity"
+            android:screenOrientation="sensorLandscape"/>
+        <activity
             android:name=".IDCardActivity"
             android:launchMode="singleTask"
             android:theme="@style/myDialogActivityStyle"/>
@@ -55,8 +67,6 @@
         <activity
             android:name=".RescueMessageActivity"
             android:theme="@style/myDialogActivityStyle">
-        </activity>
-        <activity android:name=".MapMainActivity">
         </activity>
     </application>
 

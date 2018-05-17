@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.cetcme.xkterminal.Navigation.SkiaDrawView
+        android:id="@+id/skiaView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <TextView
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:layout_marginStart="38dp"
+        android:layout_marginTop="38dp"
+        android:background="@mipmap/title_icon_back_2x"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:onClick="Back_Event"
+        android:layout_marginLeft="8dp"/>
+
+    <com.joanzapata.iconify.widget.IconTextView
+        android:id="@+id/id_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="38dp"
+        android:layout_marginTop="38dp"
+        android:text="{fa-bars}"
+        android:textColor="#048af1"
+        android:textSize="50sp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/clearTrack"
+        android:layout_width="128dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="16dp"
+        android:layout_marginRight="16dp"
+        android:text="清空轨迹"
+        android:textColor="#000"
+        android:textSize="14sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/ll_zoom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/ly_bottom"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginRight="8dp">
+
+        <Button
+            android:id="@+id/btn_zoom_out"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="ZoomOutClick_Event"
+            android:text="-" />
+
+        <Button
+            android:id="@+id/btn_zoom_in"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="ZoomInClick_Event"
+            android:text="+" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/ll_navigator"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:gravity="right"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/id_menu">
+
+
+        <Button
+            android:id="@+id/navi_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="取消" />
+
+        <Button
+            android:id="@+id/navi_go"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="ClearRoute_Event"
+            android:text="导航" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/ly_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:gravity="right"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+
+        <Button
+            android:id="@+id/btn_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="PointCancel_Event"
+            android:text="撤销" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="ClearRoute_Event"
+            android:text="清空" />
+
+        <Button
+            android:id="@+id/btn_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="RouteSave_Event"
+            android:text="保存" />
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

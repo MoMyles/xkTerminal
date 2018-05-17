@@ -1,7 +1,9 @@
-package com.cetcme.xkterminal.DataFormat.Util;
+package com.cetcme.xkterminal.Navigation;
 
 import java.sql.Time;
 import java.util.Calendar;
+
+
 
 /**
  * Created by promoter on 2017/9/1.
@@ -101,15 +103,15 @@ public class GpsParse {
                     String timeSecond = timeStr.substring(4, 6);
                     gpsInfo.cal1 = Calendar.getInstance();
                     gpsInfo.cal1.set(Calendar.DATE, Integer.valueOf(dateDD));
-                    gpsInfo.cal1.set(Calendar.MONTH, Integer.valueOf(dateMM));
+                    gpsInfo.cal1.set(Calendar.MONTH, Integer.valueOf(dateMM) - 1);
                     gpsInfo.cal1.set(Calendar.YEAR, 2000 + Integer.valueOf(dateYY));
                     gpsInfo.cal1.set(Calendar.HOUR, Integer.valueOf(timeHour));
                     gpsInfo.cal1.set(Calendar.MINUTE, Integer.valueOf(timeMinute));
                     gpsInfo.cal1.set(Calendar.SECOND, Integer.valueOf(timeSecond));
                 }
-                String longStr = arrStr[3];
-                String longStr2 = arrStr[4];
-                if(longStr2.equals("N"))   {
+                String longStr = arrStr[5];
+                String longStr2 = arrStr[6];
+                if(longStr2.equals("E"))   {
                     if(!longStr.equals(""))
                         gpsInfo.longtitude =  (int)(Float.valueOf(longStr) * 100000);
                 }
@@ -118,9 +120,9 @@ public class GpsParse {
                         gpsInfo.longtitude =  (int)(- Float.valueOf(longStr) * 100000);
                 }
 
-                String latiStr = arrStr[5];
-                String latiStr2 = arrStr[6];
-                if(latiStr2.equals("E"))   {
+                String latiStr = arrStr[3];
+                String latiStr2 = arrStr[4];
+                if(latiStr2.equals("N"))   {
                     if(!latiStr.equals(""))
                         gpsInfo.latititude =  (int)(Float.valueOf(latiStr) * 100000);
                 }

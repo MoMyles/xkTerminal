@@ -14,23 +14,24 @@ import android.widget.Toast;
 
 import com.cetcme.xkterminal.DataFormat.IDFormat;
 import com.cetcme.xkterminal.DataFormat.MessageFormat;
-import com.cetcme.xkterminal.DataFormat.SignFormat;
 import com.cetcme.xkterminal.DataFormat.Util.ByteUtil;
 import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
 import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
-import com.cetcme.xkterminal.DataFormat.Util.GpsInfo;
-import com.cetcme.xkterminal.DataFormat.Util.GpsParse;
 import com.cetcme.xkterminal.DataFormat.Util.Util;
 import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
-import com.cetcme.xkterminal.MyClass.ScreenBrightness;
-import com.cetcme.xkterminal.MyClass.SoundPlay;
+import com.cetcme.xkterminal.Navigation.GpsInfo;
+import com.cetcme.xkterminal.Navigation.GpsParse;
 import com.cetcme.xkterminal.Socket.SocketManager;
 import com.cetcme.xkterminal.Socket.SocketServer;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 import com.cetcme.xkterminal.Sqlite.Bean.MessageBean;
 import com.cetcme.xkterminal.Sqlite.Proxy.MessageProxy;
+import com.iflytek.cloud.SpeechConstant;
+import com.iflytek.cloud.SpeechUtility;
+import com.joanzapata.iconify.Iconify;
+import com.joanzapata.iconify.fonts.FontAwesomeModule;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -114,6 +115,7 @@ public class MyApplication extends Application {
 
         EventBus.getDefault().register(this);
 
+
         try {
             mSerialPort = getSerialPort();
             mOutputStream = mSerialPort.getOutputStream();
@@ -123,7 +125,7 @@ public class MyApplication extends Application {
             gpsOutputStream = gpsSerialPort.getOutputStream();
             gpsInputStream = gpsSerialPort.getInputStream();
 
-			/* Create a receiving thread */
+			// Create a receiving thread
             ReadThread mReadThread = new ReadThread();
             mReadThread.start();
 
@@ -176,7 +178,18 @@ public class MyApplication extends Application {
 
         mHandler = new DataHandler(mainActivity, this);
 
+
         initDb();
+
+        // 语音
+        Iconify.with(new FontAwesomeModule());
+
+        StringBuffer param = new StringBuffer();
+        param.append("appid=5afb90f6");
+        param.append(",");
+        // 设置使用v5+
+        param.append(SpeechConstant.ENGINE_MODE+"="+ SpeechConstant.MODE_MSC);
+        SpeechUtility.createUtility(this, param.toString());
     }
 
 
@@ -700,21 +713,26 @@ public class MyApplication extends Application {
         Log.i(TAG, "size: " + size);
 
         String gpsDataStr = new String(ByteUtil.subBytes(buffer, 0, size));
-        String[] strings = gpsDataStr.split("\n");
 
-        for (String string : strings) {
-            if (string.startsWith("$GNRMC")) {
-                string = string.replace("$GNRMC", "$GPRMC");
-                GpsInfo gpsInfo = GpsParse.parse(string);
-                Log.i(TAG, gpsInfo.longtitude + ", " + gpsInfo.latititude + ", " + gpsInfo.speed + ", " + gpsInfo.course + ", " + gpsInfo.cal1.getTime().toString());
+        // 过滤掉GPGAA
+        int loc = gpsDataStr.indexOf("$GNRMC");
+        if (loc == -1) return; // 不包含的话
+        String string = gpsDataStr.substring(loc);
+
+        Log.i(TAG, "onGpsDataReceived: " + string);
+        if (string.startsWith("$GNRMC") && string.endsWith("\r\n")) {
+            Log.i(TAG, "onGpsDataReceived: 完整");
+            string = string.replace("$GNRMC", "$GPRMC");
+            GpsInfo gpsInfo = GpsParse.parse(string);
+            if (gpsInfo != null) {
                 LocationBean locationBean = new LocationBean();
                 locationBean.setLatitude(gpsInfo.latititude);
                 locationBean.setLongitude(gpsInfo.longtitude);
                 locationBean.setSpeed(gpsInfo.speed);
                 locationBean.setHeading(gpsInfo.course);
                 locationBean.setAcqtime(gpsInfo.cal1.getTime());
-
-                EventBus.getDefault().post(gpsInfo);
+                // TODO: 测试导航时去掉了
+                //EventBus.getDefault().post(locationBean);
             }
         }
     }

@@ -1,4 +1,4 @@
-package com.cetcme.xkterminal.DataFormat.Util;
+package com.cetcme.xkterminal.Navigation;
 
 import java.util.Calendar;
 import java.util.Date;

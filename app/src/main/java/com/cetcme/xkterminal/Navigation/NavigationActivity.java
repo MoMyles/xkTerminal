@@ -91,13 +91,16 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                 if (myLocation == null) {
                     toast.setText("未获取自身定位");
                     toast.show();
+                    NavigationMainActivity.play("未获取自身定位");
                     return;
                 }
 
                 if (inNavigating) {
                     toast.setText("导航结束");
                     toast.show();
+                    NavigationMainActivity.play("导航结束");
                     btn_navigation.setText("开始导航");
+
                     needCenterOwnShip = false;
 //                    new Handler().postDelayed(new Runnable() {
 //                        @Override
@@ -109,18 +112,21 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                     if (myLocation.x == 0 && myLocation.y == 0) {
                         toast.setText("未获取自身定位");
                         toast.show();
+                        NavigationMainActivity.play("未获取自身定位");
                         return;
                     }
 
                     if (routeID == -1) {
                         toast.setText("请设置导航终点");
                         toast.show();
+                        NavigationMainActivity.play("请设置导航终点");
                         return;
                     }
 
                     needCenterOwnShip = true;
                     toast.setText("开始导航");
                     toast.show();
+                    NavigationMainActivity.play("开始导航");
 
                     btn_navigation.setText("结束导航");
 
@@ -180,6 +186,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                 if (myLocation == null) {
                     toast.setText("未获取自身定位");
                     toast.show();
+                    NavigationMainActivity.play("未获取自身定位");
                     return;
                 }
 
@@ -384,6 +391,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                 }
                 toast.setText(msg);
                 toast.show();
+                NavigationMainActivity.play(msg);
             } else {
                 isDanger = false;
             }
@@ -392,6 +400,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
             if (getNavigationEndDistance(myLocation, endWp) < Constant.NAVIGATION_END_DIST) {
                 toast.setText("已到达目的地附件，导航结束");
                 toast.show();
+                NavigationMainActivity.play("已到达目的地附件，导航结束");
                 btn_navigation.setText("开始导航");
                 inNavigating = false;
             }

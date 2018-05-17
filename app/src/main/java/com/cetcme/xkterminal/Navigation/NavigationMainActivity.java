@@ -527,7 +527,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
 
 
     // 语音合成对象
-    private SpeechSynthesizer mTts;
+    private static SpeechSynthesizer mTts;
 
     private InitListener mTtsInitListener = new InitListener() {
         @Override
@@ -550,7 +550,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
      *
      * @return
      */
-    private void setParam() {
+    private static void setParam() {
         // 清空参数
         mTts.setParameter(SpeechConstant.PARAMS, null);
 
@@ -579,17 +579,17 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
     }
 
     //获取发音人资源路径
-    private String getResourcePath() {
+    private static String getResourcePath() {
         StringBuffer tempBuffer = new StringBuffer();
         //合成通用资源
-        tempBuffer.append(ResourceUtil.generateResourcePath(this, ResourceUtil.RESOURCE_TYPE.assets, "tts/common.jet"));
+        tempBuffer.append(ResourceUtil.generateResourcePath(MyApplication.getInstance(), ResourceUtil.RESOURCE_TYPE.assets, "tts/common.jet"));
         tempBuffer.append(";");
         //发音人资源
-        tempBuffer.append(ResourceUtil.generateResourcePath(this, ResourceUtil.RESOURCE_TYPE.assets, "tts/xiaoyan.jet"));
+        tempBuffer.append(ResourceUtil.generateResourcePath(MyApplication.getInstance(), ResourceUtil.RESOURCE_TYPE.assets, "tts/xiaoyan.jet"));
         return tempBuffer.toString();
     }
 
-    public void play(String text) {
+    public static void play(String text) {
         if (mTts == null) return;
         setParam();
         int code = mTts.startSpeaking(text, new SynthesizerListener() {

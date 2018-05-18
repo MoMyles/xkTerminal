@@ -17,7 +17,7 @@ public class MessageFormat {
     public static final String MESSAGE_TYPE_NORMAL = "00";
     public static final String MESSAGE_TYPE_RESCUE = "01";
     public static final String MESSAGE_TYPE_CELLPHONE = "02";
-
+    public static final String MESSAGE_TYPE_INOUT = "03";
 
     private static final String messageHead = "$04";
 

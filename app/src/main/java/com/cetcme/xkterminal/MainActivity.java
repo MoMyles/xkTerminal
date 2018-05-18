@@ -57,7 +57,6 @@ import java.lang.reflect.Method;
 
 public class MainActivity extends AppCompatActivity {
 
-    // TODO: fot test
     public static String myNumber = "";
 
     private DbManager db;
@@ -371,7 +370,12 @@ public class MainActivity extends AppCompatActivity {
         transaction.replace(R.id.main_frame_layout, logFragment);
         transaction.commit();
 
-        showPageBar();
+        if (tg.equals("inout")) {
+            showMessageBar();
+            messageBar.isInout = true;
+        } else {
+            showPageBar();
+        }
         fragmentName = "log";
     }
 

@@ -18,18 +18,18 @@ public class ScreenBrightness {
      */
     public static boolean isAutoBrightness(Context context) {
         ContentResolver resolver = context.getContentResolver();
-        boolean automicBrightness = false;
+        boolean autoBrightness = false;
 
         try {
-            automicBrightness = Settings.System.getInt(resolver,
+            autoBrightness = Settings.System.getInt(resolver,
 
-                    Settings.System.SCREEN_BRIGHTNESS_MODE) == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC;
+            Settings.System.SCREEN_BRIGHTNESS_MODE) == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC;
 
         } catch (Settings.SettingNotFoundException e) {
             e.printStackTrace();
         }
 
-        return automicBrightness;
+        return autoBrightness;
     }
 
     /**

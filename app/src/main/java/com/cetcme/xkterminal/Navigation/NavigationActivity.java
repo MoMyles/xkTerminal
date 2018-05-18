@@ -22,6 +22,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.xutils.DbManager;
 import org.xutils.ex.DbException;
 
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -100,14 +101,16 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                     toast.show();
                     NavigationMainActivity.play("导航结束");
                     btn_navigation.setText("开始导航");
-
+                    isDanger = false;
                     needCenterOwnShip = false;
-//                    new Handler().postDelayed(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            finish();
-//                        }
-//                    }, 1000);
+                    isBackWrite = true;
+
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            setStatusDander(false);
+                        }
+                    }, 500);
                 } else {
                     if (myLocation.x == 0 && myLocation.y == 0) {
                         toast.setText("未获取自身定位");
@@ -295,7 +298,14 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
         } else if (crossingSafety) {
             msg = "已进入危险水域，水深" + Constant.NAVIGATION_APPROACH_DIST_LIMIT + "米";
         } else if (offRoute.bOffRoute) {
-            msg = "已偏航" + offRoute.offDistByMeter + "米";
+            int meter = (int) offRoute.offDistByMeter;
+            if (meter < 1852) {
+                msg = "已偏航" + meter + "米";
+            } else {
+                meter = (int) (offRoute.offDistByMeter / 1852);
+                msg = "已偏航" + meter + "海里";
+            }
+
         }
         Log.i(TAG, "航行监控: approachDanger: " + approachDanger + ", crossingSafety: " + crossingSafety
                 + ", ShipOffRoute: " + offRoute.bOffRoute + ", " + offRoute.offDistByMeter);
@@ -328,18 +338,22 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
         @Override
         public void handleMessage(Message msg) {
             if (msg.what == MESSAGE_TYPE_FLASH_BACK_COLOR){
-                ly_status.setBackgroundColor(isBackWrite ? getResources().getColor(R.color.navigation_status_danger) : getResources().getColor(R.color.navigation_status_normal));
-//                tv_lon.setTextColor(isBackWrite? getResources().getColor(android.R.color.white) : getResources().getColor(android.R.color.black));
-//                tv_lat.setTextColor(isBackWrite? getResources().getColor(android.R.color.white) : getResources().getColor(android.R.color.black));
-//                tv_head.setTextColor(isBackWrite? getResources().getColor(android.R.color.white) : getResources().getColor(android.R.color.black));
-//                tv_speed.setTextColor(isBackWrite? getResources().getColor(android.R.color.white) : getResources().getColor(android.R.color.black));
+                setStatusDander(isBackWrite);
                 isBackWrite = !isBackWrite;
+
             } else if (msg.what == MESSAGE_TYPE_SET_NEED_CENTER_OWN_SHIP) {
                 if (inNavigating) needCenterOwnShip = true;
             }
         }
     };
 
+    private void setStatusDander(boolean danger) {
+        ly_status.setBackgroundColor(danger ? getResources().getColor(R.color.navigation_status_danger) : getResources().getColor(R.color.navigation_status_normal));
+//                tv_lon.setTextColor(isBackWrite? getResources().getColor(android.R.color.white) : getResources().getColor(android.R.color.black));
+//                tv_lat.setTextColor(isBackWrite? getResources().getColor(android.R.color.white) : getResources().getColor(android.R.color.black));
+//                tv_head.setTextColor(isBackWrite? getResources().getColor(android.R.color.white) : getResources().getColor(android.R.color.black));
+//                tv_speed.setTextColor(isBackWrite? getResources().getColor(android.R.color.white) : getResources().getColor(android.R.color.black));
+    }
 
     @Override
     protected void onDestroy() {
@@ -349,6 +363,8 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
     }
 
     private boolean needCenterOwnShip = false;
+
+    private long lastDangerTime = -1;
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onLocationEvent(LocationBean locationBean) {
@@ -389,20 +405,40 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                     isDanger = true;
                     flashStatusBackColor();
                 }
-                toast.setText(msg);
-                toast.show();
-                NavigationMainActivity.play(msg);
+
+                // 记录上次报警时间，如果没有则赋值
+                if (lastDangerTime == -1) {
+                    lastDangerTime = new Date().getTime();
+                    toast.setText(msg);
+                    toast.show();
+                    NavigationMainActivity.play(msg);
+                } else {
+                    // 判断上次报警时间是否是10秒之前
+                    if (new Date().getTime() - lastDangerTime > 10 * 1000) {
+                        toast.setText(msg);
+                        toast.show();
+                        NavigationMainActivity.play(msg);
+                        lastDangerTime = new Date().getTime();
+                    }
+                }
             } else {
                 isDanger = false;
             }
 
             // 计算终点距离，判断是否结束导航
             if (getNavigationEndDistance(myLocation, endWp) < Constant.NAVIGATION_END_DIST) {
-                toast.setText("已到达目的地附件，导航结束");
+                toast.setText("已到达目的地附近，导航结束");
                 toast.show();
-                NavigationMainActivity.play("已到达目的地附件，导航结束");
+                NavigationMainActivity.play("已到达目的地附近，导航结束");
                 btn_navigation.setText("开始导航");
                 inNavigating = false;
+                isBackWrite = true;
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        setStatusDander(false);
+                    }
+                }, 500);
             }
         }
     }

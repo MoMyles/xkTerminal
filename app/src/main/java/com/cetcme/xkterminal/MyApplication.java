@@ -70,6 +70,7 @@ public class MyApplication extends Application {
     public IDCardActivity idCardActivity;
 
     private static MyApplication mContext;
+    private static LocationBean currentLocation;
     public DbManager db;
 
     public DataHandler mHandler;
@@ -116,6 +117,8 @@ public class MyApplication extends Application {
         EventBus.getDefault().register(this);
 
 
+        //TODO:
+        /*
         try {
             mSerialPort = getSerialPort();
             mOutputStream = mSerialPort.getOutputStream();
@@ -137,7 +140,7 @@ public class MyApplication extends Application {
             DisplayError(R.string.error_unknown);
         } catch (InvalidParameterException e) {
             DisplayError(R.string.error_configuration);
-        }
+        }*/
 
 //        显示所有path
 //        String[] paths =  mSerialPortFinder.getAllDevicesPath();
@@ -199,6 +202,10 @@ public class MyApplication extends Application {
     public DbManager getDb() {
         return db;
     }
+    public LocationBean getCurrentLocation() {
+        return currentLocation;
+    }
+
     /**
      * 文件复制: 把assets目录下的workDir目录拷贝到data/data/包名/files目录下。（只需调用一次，用户也可以自己实现）
      */
@@ -734,8 +741,10 @@ public class MyApplication extends Application {
                 locationBean.setSpeed(gpsInfo.speed);
                 locationBean.setHeading(gpsInfo.course);
                 locationBean.setAcqtime(gpsInfo.cal1.getTime());
+                currentLocation = locationBean;
                 // TODO: 测试导航时去掉了
-                //EventBus.getDefault().post(locationBean);
+
+                // EventBus.getDefault().post(locationBean);
             }
         }
     }

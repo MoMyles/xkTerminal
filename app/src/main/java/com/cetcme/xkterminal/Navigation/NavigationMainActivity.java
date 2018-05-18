@@ -100,14 +100,6 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
         btnNaviGo = findViewById(R.id.navi_go);
         btnNaviCancel.setOnClickListener(this);
         btnNaviGo.setOnClickListener(this);
-//        1.	public static GpsInfo GpsParse::Parse(String gpsStr)
-//        GpsInfo gpsInfoGAA = GpsParse.parse("$GPGGA,021249.000,3046.2510,N,12039.4931,E,1,07,2.2,9.8,M,0.0,M,,*79");
-//        GpsInfo gpsInfoRMC = GpsParse.parse("$GPRMC,021249.000,A,3046.2510,N,12039.4931,E,0.00,292.25,170518,,,A*79");
-//
-//        System.out.println(gpsInfoRMC.longtitude + ", " + gpsInfoRMC.latititude + ", " + gpsInfoRMC.cal1 + ", " + gpsInfoRMC.speed + ", " + gpsInfoRMC.course);
-//        System.out.println(gpsInfoRMC.cal1.getTime().toString());
-
-
     }
 
     /**
@@ -148,17 +140,6 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
             fMainView.mYimaLib.DeleteRouteWayPoint(routeID, count - 1, 1);
             fMainView.mYimaLib.DeleteWayPoint(ids[ids.length - 1]);
             fMainView.postInvalidate();
-
-//            fMainView.mYimaLib.DeleteRouteWayPoint(routeID, count - 1, 1);
-//            fMainView.mYimaLib.DeleteWayPoint(ids[ids.length - 1]);
-//            fMainView.postInvalidate();
-//
-//            if (count == 1) {
-//                firstWp = -1;
-//                routeID = -1;
-//            } else if (count == 2) {
-//                secondWp = -1;
-//            }
         }
     }
 
@@ -229,29 +210,6 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
      */
     private int getLocationInt(double location) {
         return (int) (location * 10000000);
-    }
-
-    /**
-     * 获取屏幕参数
-     */
-    public void getAndroidScreenProperty() {
-        WindowManager wm = (WindowManager) this.getSystemService(Context.WINDOW_SERVICE);
-        DisplayMetrics dm = new DisplayMetrics();
-        wm.getDefaultDisplay().getMetrics(dm);
-        int width = dm.widthPixels;         // 屏幕宽度（像素）
-        int height = dm.heightPixels;       // 屏幕高度（像素）
-        float density = dm.density;         // 屏幕密度（0.75 / 1.0 / 1.5）
-        int densityDpi = dm.densityDpi;     // 屏幕密度dpi（120 / 160 / 240）
-        // 屏幕宽度算法:屏幕宽度（像素）/屏幕密度
-        int screenWidth = (int) (width / density);  // 屏幕宽度(dp)
-        int screenHeight = (int) (height / density);// 屏幕高度(dp)
-
-        System.out.println("屏幕宽度（像素）：" + width);
-        System.out.println("屏幕高度（像素）：" + height);
-        System.out.println("屏幕密度（0.75 / 1.0 / 1.5）：" + density);
-        System.out.println("屏幕密度dpi（120 / 160 / 240）：" + densityDpi);
-        System.out.println("屏幕宽度（dp）：" + screenWidth);
-        System.out.println("屏幕高度（dp）：" + screenHeight);
     }
 
     /**

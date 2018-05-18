@@ -153,7 +153,8 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                 fMainView.postInvalidate();
 
 
-                //TODO: test 添加自身位置，实际需要从Event中取
+                // test 添加自身位置，实际需要从Event中取
+                /*
                 timer = new Timer();
                 timer.schedule(new TimerTask() {
                     @Override
@@ -168,6 +169,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                     }
                 }, 1000, 1000);
 
+                */
                 // end
 
             }

@@ -152,7 +152,7 @@ public class GPSBar extends RelativeLayout {
             }
         });
 
-        // TODO: for test 多次点击退出app
+        //: for test 多次点击退出app
         textView_time.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -177,7 +177,7 @@ public class GPSBar extends RelativeLayout {
         });
 
         /*
-        // TODO: for test串口调试界面 看是否通
+        // for test串口调试界面 看是否通
         textView_location_status.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -186,7 +186,7 @@ public class GPSBar extends RelativeLayout {
             }
         });
 
-        // TODO: for test 测试收到新的短信息
+        // for test 测试收到新的短信息
         findViewById(R.id.sms_btn).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -199,7 +199,7 @@ public class GPSBar extends RelativeLayout {
             }
         });
 
-        // TODO: for test 测试打卡
+        // for test 测试打卡
         findViewById(R.id.sign_btn).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -207,7 +207,7 @@ public class GPSBar extends RelativeLayout {
             }
         });
 
-        // TODO: for test 测试收到报警
+        // for test 测试收到报警
         findViewById(R.id.alert_btn).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -215,7 +215,7 @@ public class GPSBar extends RelativeLayout {
             }
         });
 
-        // TODO: for test 截图
+        // for test 截图
         findViewById(R.id.screen_btn).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -225,7 +225,7 @@ public class GPSBar extends RelativeLayout {
             }
         });
 
-        // TODO: for test 亮度
+        // for test 亮度
         findViewById(R.id.bright_btn).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {

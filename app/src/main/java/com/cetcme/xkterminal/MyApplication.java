@@ -117,8 +117,7 @@ public class MyApplication extends Application {
         EventBus.getDefault().register(this);
 
 
-        //TODO:
-        /*
+
         try {
             mSerialPort = getSerialPort();
             mOutputStream = mSerialPort.getOutputStream();
@@ -140,7 +139,7 @@ public class MyApplication extends Application {
             DisplayError(R.string.error_unknown);
         } catch (InvalidParameterException e) {
             DisplayError(R.string.error_configuration);
-        }*/
+        }
 
 //        显示所有path
 //        String[] paths =  mSerialPortFinder.getAllDevicesPath();
@@ -243,7 +242,6 @@ public class MyApplication extends Application {
                 .setDbUpgradeListener(new DbManager.DbUpgradeListener() {
                     @Override
                     public void onUpgrade(DbManager db, int oldVersion, int newVersion) {
-                        // TODO: ...
                         // db.addColumn(...);
                         // db.dropTable(...);
                         // ...
@@ -742,9 +740,8 @@ public class MyApplication extends Application {
                 locationBean.setHeading(gpsInfo.course);
                 locationBean.setAcqtime(gpsInfo.cal1.getTime());
                 currentLocation = locationBean;
-                // TODO: 测试导航时去掉了
 
-                // EventBus.getDefault().post(locationBean);
+                EventBus.getDefault().post(locationBean);
             }
         }
     }

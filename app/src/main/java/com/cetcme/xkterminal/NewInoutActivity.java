@@ -69,10 +69,12 @@ public class NewInoutActivity extends Activity {
     public void postInout(View view) {
         LocationBean currentLocation = MyApplication.getInstance().getCurrentLocation();
 
-        //TODO: 测试
+        //test: 测试
+        /*
         currentLocation = new LocationBean();
         currentLocation.setLongitude(1212312340);
         currentLocation.setLatitude(312300000);
+        */
 
         if (currentLocation == null) {
             Toast.makeText(this, "未获取到自身定位", Toast.LENGTH_SHORT).show();

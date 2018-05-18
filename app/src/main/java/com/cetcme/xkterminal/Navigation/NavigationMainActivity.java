@@ -504,10 +504,10 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
 
     private void buildFunction(View contentView) {
         // 本船信息
-        final TextView tvOwnShipInfo = contentView.findViewById(R.id.tv_own_ship_info);
+        final LinearLayout tvOwnShipInfo = contentView.findViewById(R.id.tv_own_ship_info);
         tvOwnShipInfo.setOnClickListener(this);
         // 航迹
-        final TextView tvShipTrack = contentView.findViewById(R.id.tv_ship_track);
+        final LinearLayout tvShipTrack = contentView.findViewById(R.id.tv_ship_track);
         tvShipTrack.setOnClickListener(this);
         // 渔区控制
         final CheckBox checkBox = contentView.findViewById(R.id.id_enable_fish_area);
@@ -516,12 +516,12 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 fMainView.changeFishState(b);
-                menu.dismiss();
+                //menu.dismiss();
             }
         });
-        final TextView tvRoute = contentView.findViewById(R.id.tv_route);
+        final LinearLayout tvRoute = contentView.findViewById(R.id.tv_route);
         tvRoute.setOnClickListener(this);
-        final TextView tvNavigator = contentView.findViewById(R.id.tv_navigator);
+        final LinearLayout tvNavigator = contentView.findViewById(R.id.tv_navigator);
         tvNavigator.setOnClickListener(this);
     }
 

@@ -101,13 +101,14 @@ public class RouteListActivity extends Activity {
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                final String fileName = dataList.get(i).get("fileName").toString();
+                Map<String, Object> item = (Map<String, Object>) adapterView.getAdapter().getItem(i);
+                final String fileName = item.get("fileName").toString();
                 File filePath = new File(Constant.ROUTE_FILE_PATH + "/" + fileName);
                 if (filePath.exists()) {
                     filePath.delete();
                 }
                 Toast.makeText(context, "删除成功", Toast.LENGTH_SHORT).show();
-                dataList.remove(i);
+                dataList.remove(item);
                 testAdapter.notifyDataSetChanged();
                 return true;
             }

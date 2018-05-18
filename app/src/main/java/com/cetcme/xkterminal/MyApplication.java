@@ -507,6 +507,8 @@ public class MyApplication extends Application {
     }
 
     private void DisplayError(int resourceId) {
+        Log.e("MyApplication", "DisplayError: " + getString(resourceId), null);
+        /*
         AlertDialog.Builder b = new AlertDialog.Builder(this);
         b.setTitle("Error");
         b.setMessage(resourceId);
@@ -516,6 +518,7 @@ public class MyApplication extends Application {
             }
         });
         b.show();
+        */
     }
 
     private class ReadThread extends Thread {

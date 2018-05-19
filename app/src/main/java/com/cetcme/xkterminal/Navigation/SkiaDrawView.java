@@ -133,7 +133,9 @@ public class SkiaDrawView extends View {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
 //                Log.i(tag, "down");
-                onMapClickListener.onMapTouched(MotionEvent.ACTION_DOWN);
+                if (onMapClickListener != null) {
+                    onMapClickListener.onMapTouched(MotionEvent.ACTION_DOWN);
+                }
                 mLastX = (int) event.getX();
                 mLastY = (int) event.getY();
 
@@ -153,7 +155,9 @@ public class SkiaDrawView extends View {
                 break;
             case MotionEvent.ACTION_MOVE:
 //                Log.i(tag, "move");
-                onMapClickListener.onMapTouched(MotionEvent.ACTION_MOVE);
+                if (onMapClickListener != null) {
+                    onMapClickListener.onMapTouched(MotionEvent.ACTION_MOVE);
+                }
                 dragingMap = true;
 
                 mLastX =  (int) event.getX();
@@ -239,7 +243,9 @@ public class SkiaDrawView extends View {
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
-                onMapClickListener.onMapTouched(MotionEvent.ACTION_UP);
+                if (onMapClickListener != null) {
+                    onMapClickListener.onMapTouched(MotionEvent.ACTION_UP);
+                }
 //                Log.i(tag, "up");
                 mLastX0 = mLastY0 = mLastX1 = mLastY1 = mFirstX = mFirstY = 0;
 

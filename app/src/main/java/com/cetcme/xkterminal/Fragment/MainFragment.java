@@ -1,10 +1,11 @@
 package com.cetcme.xkterminal.Fragment;
 
 import android.annotation.SuppressLint;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
-import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,12 +14,14 @@ import android.widget.TextView;
 
 import com.cetcme.xkterminal.DataFormat.AlertFormat;
 import com.cetcme.xkterminal.Event.SmsEvent;
-import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.Constant;
+import com.cetcme.xkterminal.MyClass.GPSFormatUtils;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.MyClass.SoundPlay;
+import com.cetcme.xkterminal.Navigation.SkiaDrawView;
 import com.cetcme.xkterminal.R;
+import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton;
@@ -29,14 +32,23 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import yimamapapi.skia.M_POINT;
+
 /**
  * Created by qiuhong on 10/01/2018.
  */
 
-public class MainFragment extends Fragment{
+public class MainFragment extends Fragment {
 
-    private LinearLayout main_layout;
+    private SkiaDrawView skiaDrawView;
+    //    private LinearLayout main_layout;
     private LinearLayout alert_layout;
+
+
+    private TextView tv_lon;
+    private TextView tv_lat;
+    private TextView tv_head;
+    private TextView tv_speed;
 
     private QMUIRoundButton alert_confirm_btn;
     private QMUIRoundButton alert_cancel_btn;
@@ -46,11 +58,17 @@ public class MainFragment extends Fragment{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_main,container,false);
+        View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_main, container, false);
         EventBus.getDefault().register(this);
 
-        main_layout = view.findViewById(R.id.main_layout);
+//        main_layout = view.findViewById(R.id.main_layout);
+        skiaDrawView = view.findViewById(R.id.skiaView);
         alert_layout = view.findViewById(R.id.alert_layout);
+
+        tv_lon = view.findViewById(R.id.tv_lon);
+        tv_lat = view.findViewById(R.id.tv_lat);
+        tv_head = view.findViewById(R.id.tv_head);
+        tv_speed = view.findViewById(R.id.tv_speed);
 
         if (PreferencesUtils.getBoolean(getActivity(), "homePageAlertView")) {
             showAlertLayout();
@@ -98,12 +116,14 @@ public class MainFragment extends Fragment{
         alert_need_flash = false;
         SoundPlay.stopAlertSound();
 
-        main_layout.setVisibility(View.VISIBLE);
+//        main_layout.setVisibility(View.VISIBLE);
+        skiaDrawView.setVisibility(View.VISIBLE);
         alert_layout.setVisibility(View.GONE);
     }
 
     private void showAlertLayout() {
-        main_layout.setVisibility(View.GONE);
+//        main_layout.setVisibility(View.GONE);
+        skiaDrawView.setVisibility(View.GONE);
         alert_layout.setVisibility(View.VISIBLE);
         alert_need_flash = true;
         if (Constant.ALERT_FLASH_TIME != 0) {
@@ -140,7 +160,7 @@ public class MainFragment extends Fragment{
     }
 
 
-    class TimeHandler extends Thread{
+    class TimeHandler extends Thread {
         @Override
         public void run() {
             super.run();
@@ -149,8 +169,7 @@ public class MainFragment extends Fragment{
 
                 try {
                     Thread.sleep(100);
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
 
                 }
 
@@ -170,7 +189,7 @@ public class MainFragment extends Fragment{
     }
 
     @SuppressLint("HandlerLeak")
-    private Handler handler = new Handler(){
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -189,27 +208,27 @@ public class MainFragment extends Fragment{
      */
     public void cancelAlert() {
         new QMUIDialog.MessageDialogBuilder(getActivity())
-            .setTitle("解除报警")
-            .setMessage("确定要解除吗？")
-            .addAction("取消", new QMUIDialogAction.ActionListener() {
-                @Override
-                public void onClick(QMUIDialog dialog, int index) {
-                    dialog.dismiss();
-                }
-            })
-            .addAction(0, "解除", QMUIDialogAction.ACTION_PROP_NEGATIVE, new QMUIDialogAction.ActionListener() {
-                @Override
-                public void onClick(QMUIDialog dialog, int index) {
+                .setTitle("解除报警")
+                .setMessage("确定要解除吗？")
+                .addAction("取消", new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
+                        dialog.dismiss();
+                    }
+                })
+                .addAction(0, "解除", QMUIDialogAction.ACTION_PROP_NEGATIVE, new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
 
-                    // 解除报警操作
-                    ((MyApplication) getActivity().getApplication()).sendBytes(AlertFormat.format("00010000", "00000000"));
-                    PreferencesUtils.putBoolean(getActivity(), "homePageAlertView", false);
-                    showMainLayout();
+                        // 解除报警操作
+                        ((MyApplication) getActivity().getApplication()).sendBytes(AlertFormat.format("00010000", "00000000"));
+                        PreferencesUtils.putBoolean(getActivity(), "homePageAlertView", false);
+                        showMainLayout();
 
-                    dialog.dismiss();
-                }
-            })
-            .show();
+                        dialog.dismiss();
+                    }
+                })
+                .show();
     }
 
     /**
@@ -221,5 +240,53 @@ public class MainFragment extends Fragment{
         PreferencesUtils.putBoolean(getActivity(), "flashAlert", true);
     }
 
+
+    private M_POINT myLocation;
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onLocationEvent(LocationBean locationBean) {
+        Log.i("TAG", "onLocationEvent: 收到自身位置");
+        Log.i("TAG", "onLocationEvent: 纬度lat:" + locationBean.getLatitude());
+        Log.i("TAG", "onLocationEvent: 经度lon:" + locationBean.getLongitude());
+        if (myLocation == null) {
+            myLocation = new M_POINT();
+            myLocation.x = locationBean.getLongitude();
+            myLocation.y = locationBean.getLatitude();
+            skiaDrawView.mYimaLib.CenterMap(myLocation.x, myLocation.y);
+        } else {
+            myLocation.x = locationBean.getLongitude();
+            myLocation.y = locationBean.getLatitude();
+        }
+
+        // 根据每次gps信息更新位置
+        setOwnShip(myLocation, locationBean.getHeading(), false);
+
+        // 更新框
+        updateShipInfo(locationBean);
+    }
+
+    /**
+     * 设置本船
+     */
+    public void setOwnShip(M_POINT m_point, float heading, boolean rotateScreen) {
+        skiaDrawView.mYimaLib.SetOwnShipBasicInfo("本船", "123456789", 100, 50);
+        skiaDrawView.mYimaLib.SetOwnShipCurrentInfo(m_point.x, m_point.y, heading, 50, 50, 0, 0);
+        skiaDrawView.mYimaLib.SetOwnShipShowSymbol(false, 4, true, 16, 5000000);
+        skiaDrawView.mYimaLib.RotateMapByScrnCenter(rotateScreen ? 0 - heading : 0);
+        skiaDrawView.mYimaLib.CenterMap(myLocation.x, myLocation.y);
+        skiaDrawView.postInvalidate();
+    }
+
+    /**
+     * 更新GPS状态框
+     *
+     * @param locationBean
+     */
+    private void updateShipInfo(LocationBean locationBean) {
+        tv_lon.setText(GPSFormatUtils.DDtoDMS(locationBean.getLongitude() / 10000000d, true));
+        tv_lat.setText(GPSFormatUtils.DDtoDMS(locationBean.getLatitude() / 10000000d, false));
+        tv_head.setText(locationBean.getHeading() + "°");
+        tv_speed.setText(String.format("%.1f", locationBean.getSpeed()) + "kn");
+    }
 
 }

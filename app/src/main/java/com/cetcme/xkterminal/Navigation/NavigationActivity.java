@@ -1,6 +1,7 @@
 package com.cetcme.xkterminal.Navigation;
 
 import android.annotation.SuppressLint;
+import android.content.Loader;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -48,7 +49,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
     private int startWp = -1;
     private int endWp = -1;
     private int routeID = -1;
-    private M_POINT myLocation;
+    private LocationBean myLocation;
 
     private boolean inNavigating = false;
     private Toast toast;
@@ -60,6 +61,8 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
     String routeFileName = null;
 
     String TAG = "NavigationActivity";
+
+    private double endDistToRead = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +84,14 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
             fMainView.mYimaLib.AddRoutesFromFile(Constant.ROUTE_FILE_PATH + "/" + routeFileName);
             int routeCount = fMainView.mYimaLib.GetRoutesCount();
             routeID = fMainView.mYimaLib.GetRouteIDFromPos(routeCount - 1);
+            int[] wpids = fMainView.mYimaLib.GetRouteWayPointsID(routeID);
+
+            endDistToRead = 0.0;
+            for (int i = 0; i < wpids.length - 1; i++) {
+                M_POINT startPoint = fMainView.mYimaLib.getWayPointCoor(wpids[i]);
+                M_POINT endPoint = fMainView.mYimaLib.getWayPointCoor(wpids[i + 1]);
+                endDistToRead += fMainView.mYimaLib.GetDistBetwTwoPoint(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+            }
         }
 
         fMainView.setOnMapClickListener(this);
@@ -104,15 +115,15 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                     isDanger = false;
                     needCenterOwnShip = false;
                     isBackWrite = true;
-
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             setStatusDander(false);
+                            finish();
                         }
                     }, 500);
                 } else {
-                    if (myLocation.x == 0 && myLocation.y == 0) {
+                    if (myLocation.getLongitude() == 0 && myLocation.getLatitude() == 0) {
                         toast.setText("未获取自身定位");
                         toast.show();
                         NavigationMainActivity.play("未获取自身定位");
@@ -129,13 +140,27 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                     needCenterOwnShip = true;
                     toast.setText("开始导航");
                     toast.show();
-                    NavigationMainActivity.play("开始导航");
+
+                    if (endDistToRead == -1) {
+                        // 选取终点
+                        M_POINT startPoint = fMainView.mYimaLib.getWayPointCoor(startWp);
+                        M_POINT endPoint = fMainView.mYimaLib.getWayPointCoor(endWp);
+                        endDistToRead = fMainView.mYimaLib.GetDistBetwTwoPoint(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+                        double bearing = Math.abs(fMainView.mYimaLib.GetBearingBetwTwoPoint(startPoint.x, startPoint.y, endPoint.x, endPoint.y) - myLocation.getHeading());
+                        String bearingStr = String.format("%.2f", bearing);
+                        NavigationMainActivity.play("开始导航,总里程" + (int)endDistToRead + "海里,夹角" + bearingStr + "度");
+                    } else {
+                        // 航线
+                        NavigationMainActivity.play("开始导航,航线总里程" + (int)endDistToRead + "海里");
+                    }
+                    lastReportTime = new Date().getTime();
+
 
                     btn_navigation.setText("结束导航");
 
                 }
                 inNavigating = !inNavigating;
-                fMainView.mYimaLib.CenterMap(myLocation.x, myLocation.y);
+                fMainView.mYimaLib.CenterMap(myLocation.getLongitude(), myLocation.getLatitude());
             }
         });
     }
@@ -153,8 +178,8 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                 fMainView.postInvalidate();
 
 
-                // test 添加自身位置，实际需要从Event中取
-                /*
+                // TODO: test 添加自身位置，实际需要从Event中取
+
                 timer = new Timer();
                 timer.schedule(new TimerTask() {
                     @Override
@@ -169,7 +194,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                     }
                 }, 1000, 1000);
 
-                */
+
                 // end
 
             }
@@ -197,7 +222,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
 
                 if (routeID == -1) {
                     // 创建航线，添加自己定位
-                    startWp = fMainView.mYimaLib.AddWayPoint(myLocation.x, myLocation.y, "1", 20, "1");
+                    startWp = fMainView.mYimaLib.AddWayPoint(myLocation.getLongitude(), myLocation.getLatitude(), "1", 20, "1");
                     int[] wpids = new int[]{startWp};
                     routeID = fMainView.mYimaLib.AddRoute("导航航线", wpids, 1, true);
                 }
@@ -255,8 +280,8 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
      * @param view
      */
     public void OwnCenterClick_Event(View view){
-        if (myLocation.x == 0.0 && myLocation.y == 0.0) return;
-        fMainView.mYimaLib.CenterMap(myLocation.x, myLocation.y);
+        if (myLocation.getLongitude() == 0.0 && myLocation.getLatitude() == 0.0) return;
+        fMainView.mYimaLib.CenterMap(myLocation.getLongitude(), myLocation.getLatitude());
         fMainView.postInvalidate();//刷新fMainView
     }
 
@@ -271,29 +296,29 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
     /**
      * 设置本船
      */
-    public void setOwnShip(M_POINT m_point, float heading, boolean rotateScreen) {
+    public void setOwnShip(LocationBean locationBean, float heading, boolean rotateScreen) {
         fMainView.mYimaLib.SetOwnShipBasicInfo("本船", "123456789", 100, 50);
-        fMainView.mYimaLib.SetOwnShipCurrentInfo(m_point.x, m_point.y, heading, 50, 50, 0, 0);
+        fMainView.mYimaLib.SetOwnShipCurrentInfo(locationBean.getLongitude(), locationBean.getLatitude(), heading, 50, 50, 0, 0);
         fMainView.mYimaLib.SetOwnShipShowSymbol(false, 4, true, 16, 5000000);
         fMainView.mYimaLib.RotateMapByScrnCenter(rotateScreen ? 0 - heading : 0);
         if (needCenterOwnShip) {
-            fMainView.mYimaLib.CenterMap(myLocation.x, myLocation.y);
+            fMainView.mYimaLib.CenterMap(myLocation.getLongitude(), myLocation.getLatitude());
         }
         fMainView.postInvalidate();
     }
 
     /**
      * 航行监控，获取位置后调用此方法，无信息则返回null
-     * @param m_point
+     * @param locationBean
      * @param heading
      * @param routeID
      * @return
      */
-    private String safetyControl(M_POINT m_point, float heading, int routeID) {
+    private String safetyControl(LocationBean locationBean, float heading, int routeID) {
         String msg = null;
-        boolean approachDanger = fMainView.mYimaLib.IsShipApproachingIsolatedDanger(m_point.x, m_point.y, Constant.NAVIGATION_TO_DANGER_DIST_LIMIT);
-        boolean crossingSafety = fMainView.mYimaLib.IsShipCrossingSafetyContour(m_point.x, m_point.y, heading, Constant.NAVIGATION_APPROACH_DIST_LIMIT);
-        ShipOffRoute offRoute = fMainView.mYimaLib.isShipOffRoute(m_point.x, m_point.y, routeID, Constant.NAVIGATION_OFF_ROUTE_LIMIT);
+        boolean approachDanger = fMainView.mYimaLib.IsShipApproachingIsolatedDanger(locationBean.getLongitude(), locationBean.getLatitude(), Constant.NAVIGATION_TO_DANGER_DIST_LIMIT);
+        boolean crossingSafety = fMainView.mYimaLib.IsShipCrossingSafetyContour(locationBean.getLongitude(), locationBean.getLatitude(), heading, Constant.NAVIGATION_APPROACH_DIST_LIMIT);
+        ShipOffRoute offRoute = fMainView.mYimaLib.isShipOffRoute(locationBean.getLongitude(), locationBean.getLatitude(), routeID, Constant.NAVIGATION_OFF_ROUTE_LIMIT);
 
         if (approachDanger) {
             msg = "即将进入危险区，距离" + Constant.NAVIGATION_TO_DANGER_DIST_LIMIT + "米";
@@ -304,8 +329,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
             if (meter < 1852) {
                 msg = "已偏航" + meter + "米";
             } else {
-                meter = (int) (offRoute.offDistByMeter / 1852);
-                msg = "已偏航" + meter + "海里";
+                msg = String.format("已偏航%2.f海里", offRoute.offDistByMeter / 1852);
             }
 
         }
@@ -366,7 +390,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
 
     private boolean needCenterOwnShip = false;
 
-    private long lastDangerTime = -1;
+    private long lastReportTime = -1;
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onLocationEvent(LocationBean locationBean) {
@@ -374,17 +398,14 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
         Log.i(TAG, "onLocationEvent: 纬度lat:" + locationBean.getLatitude());
         Log.i(TAG, "onLocationEvent: 经度lon:" + locationBean.getLongitude());
         if (myLocation == null) {
-            myLocation = new M_POINT();
-            myLocation.x = locationBean.getLongitude();
-            myLocation.y = locationBean.getLatitude();
-            fMainView.mYimaLib.CenterMap(myLocation.x, myLocation.y);
+            myLocation = locationBean;
+            fMainView.mYimaLib.CenterMap(myLocation.getLongitude(), myLocation.getLatitude());
         } else {
-            myLocation.x = locationBean.getLongitude();
-            myLocation.y = locationBean.getLatitude();
+            myLocation = locationBean;
         }
 
         // 更新路径起点
-        if (!inNavigating) fMainView.mYimaLib.SetWayPointCoor(startWp, myLocation.x, myLocation.y);
+        if (!inNavigating) fMainView.mYimaLib.SetWayPointCoor(startWp, myLocation.getLongitude(), myLocation.getLatitude());
 
         // 根据每次gps信息更新位置
         setOwnShip(myLocation, locationBean.getHeading(), inNavigating);
@@ -409,18 +430,18 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                 }
 
                 // 记录上次报警时间，如果没有则赋值
-                if (lastDangerTime == -1) {
-                    lastDangerTime = new Date().getTime();
+                if (lastReportTime == -1) {
+                    lastReportTime = new Date().getTime();
                     toast.setText(msg);
                     toast.show();
                     NavigationMainActivity.play(msg);
                 } else {
                     // 判断上次报警时间是否是10秒之前
-                    if (new Date().getTime() - lastDangerTime > 10 * 1000) {
+                    if (new Date().getTime() - lastReportTime > 10 * 1000) {
                         toast.setText(msg);
                         toast.show();
                         NavigationMainActivity.play(msg);
-                        lastDangerTime = new Date().getTime();
+                        lastReportTime = new Date().getTime();
                     }
                 }
             } else {
@@ -439,15 +460,16 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                     @Override
                     public void run() {
                         setStatusDander(false);
+                        finish();
                     }
                 }, 500);
             }
         }
     }
 
-    private double getNavigationEndDistance(M_POINT m_point, int endWp) {
+    private double getNavigationEndDistance(LocationBean locationBean, int endWp) {
         M_POINT wpCoor = fMainView.mYimaLib.getWayPointCoor(endWp);
-        double dist = fMainView.mYimaLib.GetDistBetwTwoPoint(wpCoor.x, wpCoor.y, m_point.x, m_point.y) * 1852;
+        double dist = fMainView.mYimaLib.GetDistBetwTwoPoint(wpCoor.x, wpCoor.y, locationBean.getLongitude(), locationBean.getLatitude()) * 1852;
         Log.i(TAG, "计算导航终点的距离: " + dist);
         return dist;
     }

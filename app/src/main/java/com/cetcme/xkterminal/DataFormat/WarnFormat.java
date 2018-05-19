@@ -9,14 +9,14 @@ import java.util.Date;
 
 import static com.cetcme.xkterminal.MyClass.GPSFormatUtils.formatGps;
 
-public class InoutFormat {
+public class WarnFormat {
 
-    public static final String MESSAGE_TYPE_INOUT = "03";
+    public static final String MESSAGE_TYPE_INOUT = "04";
     private static final String messageHead = "$04";
 
     private static final String MESSAGE_END_SYMBOL = "\r\n";
 
-    public static byte[] format(String targetAddress, int type, int count, int lon, int lat, Date time) {
+    public static byte[] format(String targetAddress, String warnInfo) {
 
         targetAddress = Util.stringAddZero(targetAddress, 12);
 
@@ -24,19 +24,12 @@ public class InoutFormat {
         String unique = ConvertUtil.rc4ToHex();
         byte[] addressBytes = ByteUtil.byteMerger(ConvertUtil.str2Bcd(targetAddress), ConvertUtil.str2Bcd(unique));
 
-        byte[] typeBytes = type == 1 ? new byte[]{0x01} : new byte[]{0x02};
-        byte[] countBytes = new byte[] {(byte) count};
-        byte[] lonBytes = formatGps((double) lon / 10000000);
-        byte[] latBytes = formatGps((double) lat / 10000000);
-        String dateStr = DateUtil.Date2String(time, "yyMMddHHmmss");
-        byte[] timeBytes = ConvertUtil.str2Bcd(dateStr);
-
+        if (warnInfo.length() > 27) {
+            warnInfo = warnInfo.substring(0, 27);
+        }
+        byte[] msgBytes = warnInfo.getBytes();
         byte[] messageBytes;
-        messageBytes = ByteUtil.byteMerger(MESSAGE_TYPE_INOUT.getBytes(), typeBytes);
-        messageBytes = ByteUtil.byteMerger(messageBytes, countBytes);
-        messageBytes = ByteUtil.byteMerger(messageBytes, lonBytes);
-        messageBytes = ByteUtil.byteMerger(messageBytes, latBytes);
-        messageBytes = ByteUtil.byteMerger(messageBytes, timeBytes);
+        messageBytes = ByteUtil.byteMerger(MESSAGE_TYPE_INOUT.getBytes(), msgBytes);
 
         int messageLength = messageBytes.length;
         byte[] lengthBytes = new byte[]{(byte) messageLength};

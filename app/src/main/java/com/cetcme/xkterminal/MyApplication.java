@@ -1,14 +1,13 @@
 package com.cetcme.xkterminal;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -18,6 +17,7 @@ import com.cetcme.xkterminal.DataFormat.Util.ByteUtil;
 import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
 import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
 import com.cetcme.xkterminal.DataFormat.Util.Util;
+import com.cetcme.xkterminal.DataFormat.WarnFormat;
 import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
@@ -55,8 +55,9 @@ import java.util.List;
 
 import android_serialport_api.SerialPort;
 import android_serialport_api.SerialPortFinder;
+import yimamapapi.skia.AisInfo;
+import yimamapapi.skia.YimaAisParse;
 import yimamapapi.skia.YimaLib;
-
 
 import static com.cetcme.xkterminal.MainActivity.myNumber;
 
@@ -80,9 +81,12 @@ public class MyApplication extends Application {
     private OutputStream mOutputStream;
     private InputStream mInputStream;
 
-    private SerialPort gpsSerialPort = null;
-    private OutputStream gpsOutputStream;
-    private InputStream gpsInputStream;
+    //    private SerialPort gpsSerialPort = null;
+//    private OutputStream gpsOutputStream;
+//    private InputStream gpsInputStream;
+    private SerialPort aisSerialPort = null;
+    private OutputStream aisOutputStream;
+    private InputStream aisInputStream;
 
     public boolean messageSendFailed = true;
 
@@ -117,21 +121,27 @@ public class MyApplication extends Application {
         EventBus.getDefault().register(this);
 
 
-
+        /*
         try {
             mSerialPort = getSerialPort();
             mOutputStream = mSerialPort.getOutputStream();
             mInputStream = mSerialPort.getInputStream();
 
-            gpsSerialPort = getGpsSerialPort();
-            gpsOutputStream = gpsSerialPort.getOutputStream();
-            gpsInputStream = gpsSerialPort.getInputStream();
+//            gpsSerialPort = getGpsSerialPort();
+//            gpsOutputStream = gpsSerialPort.getOutputStream();
+//            gpsInputStream = gpsSerialPort.getInputStream();
 
-			// Create a receiving thread
+            aisSerialPort = getAisSerialPort();
+            aisOutputStream = aisSerialPort.getOutputStream();
+            aisInputStream = aisSerialPort.getInputStream();
+
+            // Create a receiving thread
             ReadThread mReadThread = new ReadThread();
             mReadThread.start();
-
-            GpsReadThread gpsReadThread = new GpsReadThread();
+//
+//            GpsReadThread gpsReadThread = new GpsReadThread();
+//            gpsReadThread.start();
+            AisReadThread gpsReadThread = new AisReadThread();
             gpsReadThread.start();
         } catch (SecurityException e) {
             DisplayError(R.string.error_security);
@@ -140,6 +150,7 @@ public class MyApplication extends Application {
         } catch (InvalidParameterException e) {
             DisplayError(R.string.error_configuration);
         }
+        */
 
 //        显示所有path
 //        String[] paths =  mSerialPortFinder.getAllDevicesPath();
@@ -156,10 +167,10 @@ public class MyApplication extends Application {
 
         tipToast = Toast.makeText(getApplicationContext(), "", Toast.LENGTH_SHORT);
 
-        handler = new Handler(){
+        handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
-                switch(msg.what){
+                switch (msg.what) {
                     case 0:
                         SimpleDateFormat format = new SimpleDateFormat("hh:mm:ss");
                         String str = "[" + format.format(Constant.SYSTEM_DATE) + "]" + msg.obj.toString();
@@ -190,17 +201,19 @@ public class MyApplication extends Application {
         param.append("appid=5afb90f6");
         param.append(",");
         // 设置使用v5+
-        param.append(SpeechConstant.ENGINE_MODE+"="+ SpeechConstant.MODE_MSC);
+        param.append(SpeechConstant.ENGINE_MODE + "=" + SpeechConstant.MODE_MSC);
         SpeechUtility.createUtility(this, param.toString());
     }
 
 
-    public static MyApplication getInstance(){
+    public static MyApplication getInstance() {
         return mContext;
     }
+
     public DbManager getDb() {
         return db;
     }
+
     public LocationBean getCurrentLocation() {
         return currentLocation;
     }
@@ -217,7 +230,7 @@ public class MyApplication extends Application {
 //        Toast.makeText(MainActivity.this, "文件拷贝" + String.valueOf(endTime - startTime), Toast.LENGTH_SHORT).show();
     }
 
-    public void initDb(){
+    public void initDb() {
         DbManager.DaoConfig daoConfig = new DbManager.DaoConfig()
                 .setDbName("xkTerminal.db")
                 // 不设置dbDir时, 默认存储在app的私有目录.
@@ -247,7 +260,7 @@ public class MyApplication extends Application {
                         // ...
                         // or
                         // db.dropDb();
-                        if(newVersion>oldVersion){
+                        if (newVersion > oldVersion) {
 
                         }
                     }
@@ -468,7 +481,7 @@ public class MyApplication extends Application {
 
     public SerialPort getSerialPort() throws SecurityException, IOException, InvalidParameterException {
         if (mSerialPort == null) {
-			/* Read serial port parameters */
+            /* Read serial port parameters */
 //            SharedPreferences sp = getSharedPreferences("android_serialport_api.sample_preferences", MODE_PRIVATE);
 //            String path = sp.getString("DEVICE", "");
 //            path = "/dev/ttyS3";
@@ -477,7 +490,7 @@ public class MyApplication extends Application {
             int baudrate = Constant.SERIAL_DATA_PORT_BAUD_RATE;
 
 			/* Check parameters */
-            if ( (path.length() == 0) || (baudrate == -1)) {
+            if ((path.length() == 0) || (baudrate == -1)) {
                 throw new InvalidParameterException();
             }
 
@@ -487,21 +500,37 @@ public class MyApplication extends Application {
         return mSerialPort;
     }
 
-    public SerialPort getGpsSerialPort() throws SecurityException, IOException, InvalidParameterException {
-        if (gpsSerialPort == null) {
-			/* Read serial port parameters */
-            String path = Constant.SERIAL_GPS_PORT_PATH;
-            int baudrate = Constant.SERIAL_GPS_PORT_BAUD_RATE;
+    //    public SerialPort getGpsSerialPort() throws SecurityException, IOException, InvalidParameterException {
+//        if (gpsSerialPort == null) {
+//			/* Read serial port parameters */
+//            String path = Constant.SERIAL_GPS_PORT_PATH;
+//            int baudrate = Constant.SERIAL_GPS_PORT_BAUD_RATE;
+//
+//			/* Check parameters */
+//            if ( (path.length() == 0) || (baudrate == -1)) {
+//                throw new InvalidParameterException();
+//            }
+//
+//			/* Open the serial port */
+//            gpsSerialPort = new SerialPort(new File(path), baudrate, 0);
+//        }
+//        return gpsSerialPort;
+//    }
+    public SerialPort getAisSerialPort() throws SecurityException, IOException, InvalidParameterException {
+        if (aisSerialPort == null) {
+                /* Read serial port parameters */
+            String path = Constant.SERIAL_AIS_PORT_PATH;
+            int baudrate = Constant.SERIAL_AIS_PORT_BAUD_RATE;
 
-			/* Check parameters */
-            if ( (path.length() == 0) || (baudrate == -1)) {
+                /* Check parameters */
+            if ((path.length() == 0) || (baudrate == -1)) {
                 throw new InvalidParameterException();
             }
 
-			/* Open the serial port */
-            gpsSerialPort = new SerialPort(new File(path), baudrate, 0);
+                /* Open the serial port */
+            aisSerialPort = new SerialPort(new File(path), baudrate, 0);
         }
-        return gpsSerialPort;
+        return aisSerialPort;
     }
 
     public void closeSerialPort() {
@@ -531,7 +560,7 @@ public class MyApplication extends Application {
         @Override
         public void run() {
             super.run();
-            while(!isInterrupted()) {
+            while (!isInterrupted()) {
                 int size;
                 try {
                     Thread.sleep(10);
@@ -551,20 +580,45 @@ public class MyApplication extends Application {
         }
     }
 
-    private class GpsReadThread extends Thread {
+//    private class GpsReadThread extends Thread {
+//
+//        @Override
+//        public void run() {
+//            super.run();
+//            while(!isInterrupted()) {
+//                int size;
+//                try {
+//                    Thread.sleep(1000);
+//                    byte[] buffer = new byte[200];
+//                    if (gpsInputStream == null) return;
+//                    size = gpsInputStream.read(buffer);
+//                    if (size > 0) {
+//                        onGpsDataReceived(buffer, size);
+//                    }
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                    return;
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+//    }
+
+    private class AisReadThread extends Thread {
 
         @Override
         public void run() {
             super.run();
-            while(!isInterrupted()) {
+            while (!isInterrupted()) {
                 int size;
                 try {
                     Thread.sleep(1000);
                     byte[] buffer = new byte[200];
-                    if (gpsInputStream == null) return;
-                    size = gpsInputStream.read(buffer);
+                    if (aisInputStream == null) return;
+                    size = aisInputStream.read(buffer);
                     if (size > 0) {
-                        onGpsDataReceived(buffer, size);
+                        onAisDataReceived(buffer, size);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -639,7 +693,7 @@ public class MyApplication extends Application {
                         // 接收时间
                         if (serialCount == 25) {
                             message.what = DataHandler.SERIAL_PORT_TIME_NUMBER_AND_COMMUNICATION_FROM;
-                        } else if (serialCount == 20){
+                        } else if (serialCount == 20) {
                             message.what = DataHandler.SERIAL_PORT_TIME;
                         }
                         message.setData(bundle);
@@ -746,6 +800,42 @@ public class MyApplication extends Application {
         }
     }
 
+    protected void onAisDataReceived(byte[] buffer, int size) {
+
+        Log.i(TAG, "onAisDataReceived: ");
+        Log.i(TAG, "size: " + size);
+//        AisInfo a = YimaAisParse.mParseAISSentence("!AIVDM,1,1,,A,15MgK45P3@G?fl0E`JbR0OwT0@MS,0*4E");
+        String gpsDataStr = new String(ByteUtil.subBytes(buffer, 0, size));
+
+        if (gpsDataStr.startsWith("!AIVDM") || gpsDataStr.startsWith("!AIVDO")) {
+            AisInfo aisInfo = YimaAisParse.mParseAISSentence(gpsDataStr);
+            if (aisInfo != null) {
+                Log.i(TAG, aisInfo.MsgType + "");
+
+                if (14 == aisInfo.MsgType) {
+                    // 报警信息
+                    if (aisInfo.mmsi > 0) {
+                        String message = aisInfo.warnMsgInfo;
+                        if (TextUtils.isEmpty(message)) {
+                            message = "AIS报警";
+                        }
+                        sendBytes(WarnFormat.format("" + aisInfo.mmsi, message));
+                    }
+                } else {
+                    LocationBean locationBean = new LocationBean();
+                    locationBean.setLatitude(aisInfo.latititude);
+                    locationBean.setLongitude(aisInfo.longtitude);
+                    locationBean.setSpeed(aisInfo.SOG);
+                    locationBean.setHeading(aisInfo.COG);
+                    locationBean.setAcqtime(new Date());
+                    currentLocation = locationBean;
+
+                    EventBus.getDefault().post(locationBean);
+                }
+            }
+        }
+    }
+
     public void sendBytes(byte[] buffer) {
         new SendingThread(buffer).start();
         System.out.println("发送包：" + ConvertUtil.bytesToHexString(buffer));
@@ -758,6 +848,7 @@ public class MyApplication extends Application {
         SendingThread(byte[] buffer) {
             this.buffer = buffer;
         }
+
         @Override
         public void run() {
             try {
@@ -774,11 +865,11 @@ public class MyApplication extends Application {
         System.out.println("控制灯：" + on);
         byte[] bytes;
         if (on) {
-            bytes ="$08".getBytes();
+            bytes = "$08".getBytes();
         } else {
-            bytes ="$09".getBytes();
+            bytes = "$09".getBytes();
         }
-        bytes = ByteUtil.byteMerger(bytes, new byte[] {0x01});
+        bytes = ByteUtil.byteMerger(bytes, new byte[]{0x01});
         bytes = ByteUtil.byteMerger(bytes, "\r\n".getBytes());
         sendBytes(bytes);
     }

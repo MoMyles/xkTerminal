@@ -2,6 +2,7 @@ package com.cetcme.xkterminal.MyClass;
 
 import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
 
+import java.text.NumberFormat;
 import java.util.Date;
 
 public class GPSFormatUtils {
@@ -10,10 +11,26 @@ public class GPSFormatUtils {
      * 功能：         度-->度分秒
      * @param d 传入待转化格式的经度或者纬度
      */
-    public static String DDtoDMS(Double d){
+    public static String DDtoDMS(Double d, boolean isJd){
 
         String[] array=d.toString().split("[.]");
         String degrees=array[0];//得到度
+        if (d < 0) {
+            // 西经 南纬
+            degrees = degrees.replace("-", "");
+            if (isJd) {
+                degrees = "W " + degrees;
+            } else {
+                degrees = "S " + degrees;
+            }
+        } else {
+            // 东经  北纬
+            if (isJd) {
+                degrees = "E " + degrees;
+            } else {
+                degrees = "N " + degrees;
+            }
+        }
 
         Double m=Double.parseDouble("0."+array[1])*60;
         String[] array1=m.toString().split("[.]");
@@ -22,7 +39,7 @@ public class GPSFormatUtils {
         Double s=Double.parseDouble("0."+array1[1])*60;
         String[] array2=s.toString().split("[.]");
         int seconds = Integer.parseInt(array2[0]);//得到秒
-        return  degrees + "°" + m + '’';
+        return  degrees + "°" + String.format("%.3f", m) + '’';
     }
 
     /**

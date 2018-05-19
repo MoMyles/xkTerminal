@@ -2,7 +2,6 @@ package com.cetcme.xkterminal;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -119,11 +118,12 @@ public class NewInoutActivity extends Activity {
         }
 
         // TODO：发送编码 北斗号要确认下
+
         MyApplication.getInstance().sendBytes(
-                InoutFormat.format("123456", MainActivity.myNumber, type, count, lon, lat, now)
+                InoutFormat.format(MainActivity.myNumber, type, count, lon, lat, now)
         );
 
-        Toast.makeText(this, "申报完成",Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "申报完成", Toast.LENGTH_SHORT).show();
 
         try {
             JSONObject jsonObject = new JSONObject();

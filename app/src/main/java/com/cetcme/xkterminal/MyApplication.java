@@ -27,6 +27,7 @@ import com.cetcme.xkterminal.Socket.SocketManager;
 import com.cetcme.xkterminal.Socket.SocketServer;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 import com.cetcme.xkterminal.Sqlite.Bean.MessageBean;
+import com.cetcme.xkterminal.Sqlite.Bean.OtherShipBean;
 import com.cetcme.xkterminal.Sqlite.Proxy.MessageProxy;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
@@ -41,6 +42,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.xutils.DbManager;
 import org.xutils.db.table.TableEntity;
+import org.xutils.ex.DbException;
 import org.xutils.x;
 
 import java.io.File;
@@ -121,7 +123,7 @@ public class MyApplication extends Application {
         EventBus.getDefault().register(this);
 
 
-        /*
+
         try {
             mSerialPort = getSerialPort();
             mOutputStream = mSerialPort.getOutputStream();
@@ -141,8 +143,8 @@ public class MyApplication extends Application {
 //
 //            GpsReadThread gpsReadThread = new GpsReadThread();
 //            gpsReadThread.start();
-            AisReadThread gpsReadThread = new AisReadThread();
-            gpsReadThread.start();
+            AisReadThread aisReadThread = new AisReadThread();
+            aisReadThread.start();
         } catch (SecurityException e) {
             DisplayError(R.string.error_security);
         } catch (IOException e) {
@@ -150,7 +152,6 @@ public class MyApplication extends Application {
         } catch (InvalidParameterException e) {
             DisplayError(R.string.error_configuration);
         }
-        */
 
 //        显示所有path
 //        String[] paths =  mSerialPortFinder.getAllDevicesPath();
@@ -203,6 +204,12 @@ public class MyApplication extends Application {
         // 设置使用v5+
         param.append(SpeechConstant.ENGINE_MODE + "=" + SpeechConstant.MODE_MSC);
         SpeechUtility.createUtility(this, param.toString());
+
+        try {
+            db.delete(OtherShipBean.class);
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -614,7 +621,7 @@ public class MyApplication extends Application {
                 int size;
                 try {
                     Thread.sleep(1000);
-                    byte[] buffer = new byte[200];
+                    byte[] buffer = new byte[1024];
                     if (aisInputStream == null) return;
                     size = aisInputStream.read(buffer);
                     if (size > 0) {
@@ -806,7 +813,7 @@ public class MyApplication extends Application {
         Log.i(TAG, "size: " + size);
 //        AisInfo a = YimaAisParse.mParseAISSentence("!AIVDM,1,1,,A,15MgK45P3@G?fl0E`JbR0OwT0@MS,0*4E");
         String gpsDataStr = new String(ByteUtil.subBytes(buffer, 0, size));
-
+        Toast.makeText(this, "receiveInfo: " + gpsDataStr, Toast.LENGTH_SHORT).show();
         if (gpsDataStr.startsWith("!AIVDM") || gpsDataStr.startsWith("!AIVDO")) {
             AisInfo aisInfo = YimaAisParse.mParseAISSentence(gpsDataStr);
             if (aisInfo != null) {
@@ -822,15 +829,20 @@ public class MyApplication extends Application {
                         sendBytes(WarnFormat.format("" + aisInfo.mmsi, message));
                     }
                 } else {
-                    LocationBean locationBean = new LocationBean();
-                    locationBean.setLatitude(aisInfo.latititude);
-                    locationBean.setLongitude(aisInfo.longtitude);
-                    locationBean.setSpeed(aisInfo.SOG);
-                    locationBean.setHeading(aisInfo.COG);
-                    locationBean.setAcqtime(new Date());
-                    currentLocation = locationBean;
+                    if (aisInfo.bOwnShip) {
+                        LocationBean locationBean = new LocationBean();
+                        locationBean.setLatitude(aisInfo.latititude);
+                        locationBean.setLongitude(aisInfo.longtitude);
+                        locationBean.setSpeed(aisInfo.SOG);
+                        locationBean.setHeading(aisInfo.COG);
+                        locationBean.setAcqtime(new Date());
+                        currentLocation = locationBean;
 
-                    EventBus.getDefault().post(locationBean);
+                        EventBus.getDefault().post(locationBean);
+                    } else {
+                        // 判断是否存在mmsi
+                        EventBus.getDefault().post(aisInfo);
+                    }
                 }
             }
         }

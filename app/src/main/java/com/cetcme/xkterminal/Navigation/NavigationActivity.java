@@ -393,76 +393,79 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
     private long lastReportTime = -1;
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onLocationEvent(LocationBean locationBean) {
-        Log.i(TAG, "onLocationEvent: 收到自身位置");
-        Log.i(TAG, "onLocationEvent: 纬度lat:" + locationBean.getLatitude());
-        Log.i(TAG, "onLocationEvent: 经度lon:" + locationBean.getLongitude());
-        if (myLocation == null) {
-            myLocation = locationBean;
-            fMainView.mYimaLib.CenterMap(myLocation.getLongitude(), myLocation.getLatitude());
-        } else {
-            myLocation = locationBean;
-        }
-
-        // 更新路径起点
-        if (!inNavigating) fMainView.mYimaLib.SetWayPointCoor(startWp, myLocation.getLongitude(), myLocation.getLatitude());
-
-        // 根据每次gps信息更新位置
-        setOwnShip(myLocation, locationBean.getHeading(), inNavigating);
-
-        // 更新框
-        updateShipInfo(locationBean);
-
-        if (inNavigating) {
-            try {
-                db.saveBindingId(locationBean);
-            } catch (DbException e) {
-                e.printStackTrace();
+    public void onLocationEvent(Object obj) {
+        if (obj instanceof LocationBean) {
+            LocationBean lb = (LocationBean) obj;
+            Log.i("TAG", "onLocationEvent: 收到自身位置");
+            Log.i("TAG", "onLocationEvent: 纬度lat:" + lb.getLatitude());
+            Log.i("TAG", "onLocationEvent: 经度lon:" + lb.getLongitude());
+            if (myLocation == null) {
+                myLocation = lb;
+                fMainView.mYimaLib.CenterMap(myLocation.getLongitude(), myLocation.getLatitude());
+            } else {
+                myLocation = lb;
             }
 
-            // 判断是否有危险
-            String msg = safetyControl(myLocation, locationBean.getHeading(), routeID);
-            if (msg != null) {
-                // 如果有危险
-                if (!isDanger) {
-                    isDanger = true;
-                    flashStatusBackColor();
+            // 更新路径起点
+            if (!inNavigating) fMainView.mYimaLib.SetWayPointCoor(startWp, myLocation.getLongitude(), myLocation.getLatitude());
+
+            // 根据每次gps信息更新位置
+            setOwnShip(myLocation, lb.getHeading(), inNavigating);
+
+            // 更新框
+            updateShipInfo(lb);
+
+            if (inNavigating) {
+                try {
+                    db.saveBindingId(lb);
+                } catch (DbException e) {
+                    e.printStackTrace();
                 }
 
-                // 记录上次报警时间，如果没有则赋值
-                if (lastReportTime == -1) {
-                    lastReportTime = new Date().getTime();
-                    toast.setText(msg);
-                    toast.show();
-                    NavigationMainActivity.play(msg);
-                } else {
-                    // 判断上次报警时间是否是10秒之前
-                    if (new Date().getTime() - lastReportTime > 10 * 1000) {
+                // 判断是否有危险
+                String msg = safetyControl(myLocation, lb.getHeading(), routeID);
+                if (msg != null) {
+                    // 如果有危险
+                    if (!isDanger) {
+                        isDanger = true;
+                        flashStatusBackColor();
+                    }
+
+                    // 记录上次报警时间，如果没有则赋值
+                    if (lastReportTime == -1) {
+                        lastReportTime = new Date().getTime();
                         toast.setText(msg);
                         toast.show();
                         NavigationMainActivity.play(msg);
-                        lastReportTime = new Date().getTime();
+                    } else {
+                        // 判断上次报警时间是否是10秒之前
+                        if (new Date().getTime() - lastReportTime > 10 * 1000) {
+                            toast.setText(msg);
+                            toast.show();
+                            NavigationMainActivity.play(msg);
+                            lastReportTime = new Date().getTime();
+                        }
                     }
+                } else {
+                    isDanger = false;
                 }
-            } else {
-                isDanger = false;
-            }
 
-            // 计算终点距离，判断是否结束导航
-            if (getNavigationEndDistance(myLocation, endWp) < Constant.NAVIGATION_END_DIST) {
-                toast.setText("已到达目的地附近，导航结束");
-                toast.show();
-                NavigationMainActivity.play("已到达目的地附近，导航结束");
-                btn_navigation.setText("开始导航");
-                inNavigating = false;
-                isBackWrite = true;
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        setStatusDander(false);
-                        finish();
-                    }
-                }, 500);
+                // 计算终点距离，判断是否结束导航
+                if (getNavigationEndDistance(myLocation, endWp) < Constant.NAVIGATION_END_DIST) {
+                    toast.setText("已到达目的地附近，导航结束");
+                    toast.show();
+                    NavigationMainActivity.play("已到达目的地附近，导航结束");
+                    btn_navigation.setText("开始导航");
+                    inNavigating = false;
+                    isBackWrite = true;
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            setStatusDander(false);
+                            finish();
+                        }
+                    }, 500);
+                }
             }
         }
     }

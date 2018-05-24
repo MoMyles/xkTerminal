@@ -84,7 +84,7 @@
                     android:id="@+id/tv_lon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="121.231"
+                    android:text="0"
                     android:textSize="20sp" />
 
             </LinearLayout>
@@ -105,7 +105,7 @@
                     android:id="@+id/tv_lat"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="31.231"
+                    android:text="0"
                     android:textSize="20sp" />
             </LinearLayout>
 
@@ -125,7 +125,7 @@
                     android:id="@+id/tv_speed"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="31.2"
+                    android:text="0kn"
                     android:textSize="20sp" />
             </LinearLayout>
 
@@ -145,12 +145,18 @@
                     android:id="@+id/tv_head"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="31.2"
+                    android:text="0°"
                     android:textSize="20sp" />
             </LinearLayout>
 
 
         </LinearLayout>
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:id="@+id/ais_info_lv"
+            app:layout_constraintBottom_toTopOf="parent"></ListView>
 
     </android.support.constraint.ConstraintLayout>
 

@@ -1,0 +1,2537 @@
+BEGIN
+<
+Attribute: 产品责任机构
+Acronym: AGENCY
+Code: 1
+Attribute type: A
+>
+<
+Attribute: 立标形状
+Acronym: BCNSHP
+Code: 2
+Attribute type: E
+1 : 桩,杆,秆,竿,柱  
+2 : 柳条  
+3 : 立标塔  
+4 : 格状立标  
+5 : 大立标
+6 : 堆石标  
+7 : 浮动立标  
+enum end
+>
+<
+Attribute: 建筑形状
+Acronym: BUISHP
+Code: 3
+Attribute type: E
+1 : no specific shape
+2 : tower
+3 : spire
+4 : cupola (dome)
+5 : 高层建筑
+6 : 角锥形
+7 : 圆柱形
+8 : 球形
+9 : 立方体形
+enum end
+>
+<
+Attribute: 浮标形状
+Acronym: BOYSHP
+Code: 4
+Attribute type: E
+1 : 锥形(纺锤形\尖顶式形)  
+2 : 罐形(圆柱形)  
+3 : 球形  
+4 : 标柱形  
+5 : 椽子形  
+6 : 圆桶形(大桶)  
+7 : 超大型浮标  
+8 : 冰区浮标
+enum end
+>
+<
+Attribute: 埋置深度
+Acronym: BURDEP
+Code: 5
+Attribute type: F
+>
+<
+Attribute: 呼叫信号
+Acronym: CALSGN
+Code: 6
+Attribute type: S
+>
+<
+Attribute: 机场类
+Acronym: CATAIR
+Code: 7
+Attribute type: L
+1 : 军用机场
+2 : 民用机场
+3 : 军用直升机机场
+4 : 民用直升机机场
+5 : 滑翔机机场
+6 : 小型飞机机场
+7 : helicopter platform
+8 : 应急机场
+enum end
+>
+<
+Attribute: 锚地类
+Acronym: CATACH
+Code: 8
+Attribute type: L
+1 : 无限制的锚地
+2 : 深水锚地  
+3 : 油轮锚地  
+4 : 易爆物锚地  
+5 : 检疫锚地  
+6 : 海上飞机锚地  
+7 : 小型船锚地
+8 : 小型船系泊区  
+9 : 当日锚地(24小时)  
+10 : anchorage for a limited period of time
+enum end
+>
+<
+Attribute: 桥梁类
+Acronym: CATBRG
+Code: 9
+Attribute type: L
+1 : 永固式桥  
+2 : 敞空式桥  
+3 : 平旋式桥  
+4 : 吊桥  
+5 : 开合桥  
+6 : 浮桥  
+7 : 牵引桥  
+8 : 传送带桥  
+9 : 步行桥
+10 : 高架桥
+11 : 水道桥
+12 : 悬索桥
+enum end
+>
+<
+Attribute: 建筑群区类
+Acronym: CATBUA
+Code: 10
+Attribute type: E
+1 : 市区  
+2 : 住宅区  
+3 : 村庄   
+4 : 市镇
+5 : 都市
+6 : 度假村
+enum end
+>
+<
+Attribute: 电缆类
+Acronym: CATCBL
+Code: 11
+Attribute type: E
+1 : 电力线  
+2 : telephone/telegraph
+3 : 传输线
+4 : 电话线  
+5 : 电报线  
+6 : 系缆/链
+enum end
+>
+<
+Attribute: 渠道类
+Acronym: CATCAN
+Code: 12
+Attribute type: E
+1 : 运输:用于航行作为运输系统的一部分的水道
+2 : 下水道:用于排放围绕地面过量水的水道
+3 : 灌溉:用于灌溉目的的渠道
+enum end
+>
+<
+Attribute: 方位标志类
+Acronym: CATCAM
+Code: 13
+Attribute type: E
+1 : 北方位标  
+2 : 东方位标  
+3 : 南方位标  
+4 : 西方位标  
+enum end
+>
+<
+Attribute: 检查站类
+Acronym: CATCHP
+Code: 14
+Attribute type: E
+1 : 海关
+enum end
+>
+<
+Attribute: 海岸线类
+Acronym: CATCOA
+Code: 15
+Attribute type: E
+1 : 陡坡海岸  
+2 : 平坦海岸  
+3 : 沙滩海岸  
+4 : 坚硬海岸  
+5 : 粗砾海岸  
+6 : 冰川海岸(向海的一端)  
+7 : 红树林  
+8 : 沼泽海岸  
+9 : 珊瑚礁
+10 : 冻结的海岸  
+11 : shelly shore
+enum end
+>
+<
+Attribute: 控制点类
+Acronym: CATCTR
+Code: 16
+Attribute type: E
+1 : 三角点  
+2 : 观测点  
+3 : 固定点  
+4 : 基准点  
+5 : 界标  
+6 : 水平控制,主测点
+7 : 水平控制,副测点
+enum end
+>
+<
+Attribute: 传送装置类
+Acronym: CATCON
+Code: 17
+Attribute type: E
+1 : 架空缆索(电话的)  
+2 : 传送带
+enum end
+>
+<
+Attribute: 作用范围类
+Acronym: CATCOV
+Code: 18
+Attribute type: E
+1 : 有效作用范围
+2 : 无有效作用范围
+enum end
+>
+<
+Attribute: 起重机类
+Acronym: CATCRN
+Code: 19
+Attribute type: E
+1 : crane without specific construction
+2 : 集装箱起重机/门吊  
+3 : 人字起重架  
+4 : 移动式起重架  
+5 : "A"字框架
+enum end
+>
+<
+Attribute: 水坝类
+Acronym: CATDAM
+Code: 20
+Attribute type: E
+1 : 堰
+2 : 坝  
+3 : 防洪闸  
+enum end
+>
+<
+Attribute: 距离标志类
+Acronym: CATDIS
+Code: 21
+Attribute type: E
+1 : 无实物距离标志  
+2 : 杆形可视标志  
+3 : 板形可视标志  
+4 : 形状不定可视标志  
+enum end
+>
+<
+Attribute: 船坞类
+Acronym: CATDOC
+Code: 22
+Attribute type: E
+1 : 潮汐型  
+2 : 非潮汐型(干坞)  
+enum end
+>
+<
+Attribute: 倾废场类
+Acronym: CATDPG
+Code: 23
+Attribute type: L
+1 : general dumping ground
+2 : 化学品废物倾倒场  
+3 : 核废物倾倒场
+4 : 爆炸废物倾倒场  
+5 : 抛泥场  
+6 : 船舶抛弃场
+enum end
+>
+<
+Attribute: 栅栏类
+Acronym: CATFNC
+Code: 24
+Attribute type: E
+1 : 栅栏
+2 : muir
+3 : 树篱
+4 : 砖墙
+enum end
+>
+<
+Attribute: 轮渡类
+Acronym: CATFRY
+Code: 25
+Attribute type: E
+1 : 自由轮渡  
+2 : 缆渡  
+3 : 冰渡
+enum end
+>
+<
+Attribute: 捕鱼设备类
+Acronym: CATFIF
+Code: 26
+Attribute type: E
+1 : 鱼栅  
+2 : 渔网  
+3 : 渔梁  
+4 : 金枪鱼渔网  
+enum end
+>
+<
+Attribute: 雾号类
+Acronym: CATFOG
+Code: 27
+Attribute type: E
+1 : 爆响雾笛  
+2 : 低音雾笛  
+3 : 雾笛  
+4 : 电雾笛  
+5 : 舌簧笛  
+6 : 气笛  
+7 : 雾钟  
+8 : 雾哨  
+9 : 雾锣  
+10 : 号角  
+enum end
+>
+<
+Attribute: 防御工事类
+Acronym: CATFOR
+Code: 28
+Attribute type: E
+1 : 城堡  
+2 : 堡垒  
+3 : 炮台  
+4 : 碉堡  
+5 : 马铁罗塔
+6 : redoubt
+enum end
+>
+<
+Attribute: 门类
+Acronym: CATGAT
+Code: 29
+Attribute type: E
+1 : gate in general
+2 : 防洪闸  
+3 : 坞门  
+4 : 闸门  
+5 : 堤坝闸门
+6 : sluice
+enum end
+>
+<
+Attribute: 港口设备类
+Acronym: CATHAF
+Code: 30
+Attribute type: L
+1 : 滚装码头  
+2 : timber yard
+3 : 渡轮码头
+4 : 渔港  
+5 : 游艇码头/小船停泊区  
+6 : 海军基地
+7 : 油码头
+8 : 客运码头passenger terminal
+9 : 船厂
+10 : 集装箱码头
+11 : 散货码头
+12 : syncrolift
+13 : straddle carrier
+enum end
+>
+<
+Attribute: 报废船（趸船）类
+Acronym: CATHLK
+Code: 31
+Attribute type: L
+1 : 水上饭店
+2 : 历史古船
+3 : 博物馆
+4 : 膳宿供应
+5 : 浮动防波堤
+enum end
+>
+<
+Attribute: 冰类
+Acronym: CATICE
+Code: 32
+Attribute type: L
+1 : 固定冰  
+2 : 海冰  
+3 : 小冰山
+4 : 饼状冰
+5 : 冰川  
+6 : ice peak
+7 : 浮冰群
+8 : 极地冰
+enum end
+>
+<
+Attribute: 作业浮标类
+Acronym: CATINB
+Code: 33
+Attribute type: E
+1 : 悬链锚泊(CALM)  
+2 : 单浮筒系泊(SBM或SPM)  
+enum end
+>
+<
+Attribute: 地面地带类
+Acronym: CATLND
+Code: 34
+Attribute type: L
+1 : 沼地
+2 : 湿地  
+3 : 泽地/泥沼地
+4 : 荒地
+5 : 山脉区
+6 : 低洼地
+7 : 峡谷地
+8 : 稻田
+9 : 农业用地
+10 : 大草原/大草地
+11 : 公园
+12 : 沼泽地  
+13 : 塌方
+14 : 熔岩流  
+15 : 盐田  
+16 : 冰堆山
+17 : 火山口
+18 : 岩洞
+19 : 岩石柱或尖峰
+20 : cay
+enum end
+>
+<
+Attribute: 陆标类
+Acronym: CATLMK
+Code: 35
+Attribute type: L
+1 : 堆石标  
+2 : 墓地  
+3 : 烟囱  
+4 : 盘形天线  
+5 : 旗杆(旗竿)  
+6 : 废气燃烧烟道  
+7 : 桅杆
+8 : 风向标
+9 : 纪念碑  
+10 : 圆柱(柱状物)
+11 : 装饰纪念碑
+12 : 方尖柱碑
+13 : 雕像
+14 : 十字架  
+15 : 圆顶  
+16 : 雷达天线  
+17 : 塔  
+18 : 风车  
+19 : 风力发动机  
+20 : 塔尖/伊斯兰教教寺  
+21 : large rock or boulder on land
+enum end
+>
+<
+Attribute: 侧面标志类
+Acronym: CATLAM
+Code: 36
+Attribute type: E
+1 : 左侧标  
+2 : 右侧标  
+3 : 推荐航道左侧标  
+4 : 推荐航道右侧标   
+enum end
+>
+<
+Attribute: 灯标类
+Acronym: CATLIT
+Code: 37
+Attribute type: L
+1 : 指向灯  
+2 : rear/upper light
+3 : front/lower light
+4 : 导向灯  
+5 : 航空灯  
+6 : 航空障碍灯  
+7 : 探雾灯  
+8 : 泛光灯  
+9 : 条形灯  
+10 : 辅灯  
+11 : 聚光灯
+12 : 前灯
+13 : 后灯
+14 : 低灯
+15 : 高灯
+16 : 波纹作用灯  
+17 : 应急灯
+18 : 方位灯  
+19 : 水平灯组
+20 : 垂直灯组
+enum end
+>
+<
+Attribute: 海上养殖场类
+Acronym: CATMFA
+Code: 38
+Attribute type: E
+1 : 甲壳类  
+2 : 牡蛎/蛏类  
+3 : 鱼  
+4 : 海藻
+5 : pearl culture farm
+enum end
+>
+<
+Attribute: 军事演习区类
+Acronym: CATMPA
+Code: 39
+Attribute type: L
+1 : practice area in general  
+2 : 鱼雷演习区
+3 : 潜艇演习区  
+4 : 射击危险区  
+5 : 布雷训练区  
+6 : 小型军用射击靶场
+enum end
+>
+<
+Attribute: 系泊绞缆设备类
+Acronym: CATMOR
+Code: 40
+Attribute type: E
+1 : 系船墩  
+2 : 系船桩  
+3 : 系缆桩
+4 : 系船坝
+5 : 桩或柱  
+6 : 链/索/缆  
+7 : 系船浮筒  
+enum end
+>
+<
+Attribute: 导航线类
+Acronym: CATNAV
+Code: 41
+Attribute type: E
+1 : 安全线  
+2 : 叠标线  
+3 : 导向线指向-推荐航线 
+enum end
+>
+<
+Attribute: 障碍物类
+Acronym: CATOBS
+Code: 42
+Attribute type: E
+1 : 水中隐树/桩墩  
+2 : 井盖  
+3 : 扩散器  
+4 : 木笼  
+5 : 鱼礁  
+6 : 险恶区  
+7 : 险恶地  
+8 : 浮冰防栅
+9 : 锚泊索具  
+10 : boom
+enum end
+>
+<
+Attribute: 海上平台类
+Acronym: CATOFP
+Code: 43
+Attribute type: L
+1 : 油井架/钻井平台  
+2 : 生产平台  
+3 : 观测/勘测平台  
+4 : 铰接式装卸输油平台(ALP)
+5 : 单锚系泊平台(SALM)  
+6 : 系泊平台
+7 : 人工岛  
+8 : 浮式采油, 贮油, 卸油船(FPSO)  
+9 : 生活平台
+10 : 导航, 通信和控制浮筒(NCCB)
+enum end
+>
+<
+Attribute: 油障类
+Acronym: CATOLB
+Code: 44
+Attribute type: E
+1 : 租油器(高压管)  
+2 : 围油栏  
+enum end
+>
+<
+Attribute: 桩类
+Acronym: CATPLE
+Code: 45
+Attribute type: E
+1 : 桩
+2 : 柱
+3 : post  
+4 : 三脚架
+enum end
+>
+<
+Attribute: 引航员登船点类
+Acronym: CATPIL
+Code: 46
+Attribute type: E
+1 : 由引航巡逻艇登船  
+2 : 由直升飞机登船  
+3 : 引航员从岸上来  
+enum end
+>
+<
+Attribute: 管道/导管类
+Acronym: CATPIP
+Code: 47
+Attribute type: L
+1 : pipeline in general
+2 : 排泄管道  
+3 : 抽吸管道 
+4 : 下水道 
+5 : 鼓泡系统
+6 : supply pipe  
+enum end
+>
+<
+Attribute: 生产区域类
+Acronym: CATPRA
+Code: 48
+Attribute type: E
+1 : 采石场  
+2 : 矿山  
+3 : 仓储区
+4 : 电站区
+5 : 炼油区  
+6 : 贮木场  
+7 : 工厂区
+8 : 油罐群  
+9 : 风车区
+10 : slag heap/spoil heap
+enum end
+>
+<
+Attribute: 桥塔类
+Acronym: CATPYL
+Code: 49
+Attribute type: E
+1 : 电力传输线塔/杆
+2 : 电话/电报线塔/杆
+3 : 架空索道/高架塔
+4 : 桥梁塔/塔台
+5 : 桥墩
+enum end
+>
+<
+Attribute: 数据质量类
+Acronym: CATQUA
+Code: 50
+Attribute type: E
+1 : 数据质量A
+2 : 数据质量B
+3 : 数据质量C
+4 : 数据质量D
+5 : 数据质量E
+6 : 未确定质量
+enum end
+>
+<
+Attribute: 雷达站类
+Acronym: CATRAS
+Code: 51
+Attribute type: E
+1 : 雷达监视站  
+2 : 海岸雷达站  
+enum end
+>
+<
+Attribute: 雷达应答信标类
+Acronym: CATRTB
+Code: 52
+Attribute type: E
+1 : 雷达指向标(连续发射雷达信标)  
+2 : 雷康(雷达应答标)  
+3 : 导向雷康/雷达应答标  
+enum end
+>
+<
+Attribute: 无线电台类
+Acronym: CATROS
+Code: 53
+Attribute type: L
+1 : 环射(全向)海上或海空无线电指向标  
+2 : 定向无线电指向标  
+3 : 旋转型无线电标向标  
+4 : 康索尔航标  
+5 : 无线电测向台  
+6 : 提供QTG服务的海岸无线电台  
+7 : 航空无线电指向标  
+8 : 台卡
+9 : 罗兰C
+10 : 差分GPS
+11 : 道朗
+12 : 奥米伽
+13 : 塞雷的斯
+14 : 才卡
+enum end
+>
+<
+Attribute: 推荐航线类
+Acronym: CATTRK
+Code: 54
+Attribute type: E
+1 : 基于固定标志系统  
+2 : 不基于固定标志系统  
+enum end
+>
+<
+Attribute: 救助站类
+Acronym: CATRSC
+Code: 55
+Attribute type: L
+1 : 有救生船的救助站  
+2 : 有火箭的救助站  
+3 : rescue station with lifeboat and rocket
+4 : 沉船海员避护所  
+5 : 潮间带行人避护所  
+6 : 泊地停靠的救生船  
+7 : aid radio station
+8 : first aid equipment
+enum end
+>
+<
+Attribute: 限制区类
+Acronym: CATREA
+Code: 56
+Attribute type: L
+1 : 沿岸安全带  
+2 : anchoring prohibition area
+3 : fishing prohibition area
+4 : 自然保护区  
+5 : 鸟类禁猎区  
+6 : 狩猎畜养场  
+7 : 海豹禁猎区
+8 : 消磁观测场 
+9 : 军事区 
+10 : 历史沉船区 
+11 : inshore traffic zone
+12 : 航行标志安全带  
+13 : danger of stranding area
+14 : 水雷区  
+15 : diving prohibition area
+16 : area to be avoided
+17 : Prohibited area
+18 : 游泳场
+19 : 待泊区
+20 : 搜索区
+21 : 疏浚区  
+22 : 鱼类禁捕区
+23 : 生态保护区
+24 : 无伴流区
+25 : swinging area
+26 : water skiing area
+enum end
+>
+<
+Attribute: 道路类
+Acronym: CATROD
+Code: 57
+Attribute type: E
+1 : 快车道  
+2 : 主干公路  
+3 : 支线公路  
+4 : 小路/人行道  
+5 : 大街道 
+6 : 小街道
+7 : 交叉口
+enum end
+>
+<
+Attribute: 跑道类
+Acronym: CATRUN
+Code: 58
+Attribute type: E
+1 : 飞机跑道
+2 : 直升飞机起降台
+enum end
+>
+<
+Attribute: 海域类
+Acronym: CATSEA
+Code: 59
+Attribute type: E
+1 : sea area in general
+2 : 滩间水道
+3 : 沙滩
+4 : 深渊
+5 : 海湾
+6 : 海沟
+7 : 深海盆地
+8 : 泥潭
+9 : 礁
+10 : 礁脉
+11 : 峡谷
+12 : 峡水道
+13 : 浅滩
+14 : 圆丘
+15 : 山脊
+16 : 海底山
+17 : 尖峰
+18 : 深海平原
+19 : 高原
+20 : 支脉
+21 : 大陆架
+22 : 海谷
+23 : 凹谷
+24 : 深海丘陵
+25 : 边沿
+26 : 群岛边沿
+27 : 边缘地
+28 : 大陆边缘
+29 : 大陆升高
+30 : 悬崖
+31 : 扇形海底
+32 : 断裂带
+33 : 山凹
+34 : 平顶山
+35 : 山丘
+36 : 海底穴
+37 : 冲积堤
+38 : 中央海谷
+39 : 壕沟
+40 : 山
+41 : 峰
+42 : 海区
+43 : 升高
+44 : 海槽
+45 : 海底山链
+46 : 陆架外缘
+47 : 海槛
+48 : 斜坡
+49 : 台地
+50 : 谷地
+51 : 运河
+52 : 湖
+53 : 河
+54 : reach
+enum end
+>
+<
+Attribute: 岸线建筑物类
+Acronym: CATSLC
+Code: 60
+Attribute type: E
+1 : 防波堤  
+2 : 排流堤  
+3 : 突堤  
+4 : 突码头  
+5 : 栈桥式码头  
+6 : 顺岸码头  
+7 : 导流堤  
+8 : 堆石堤
+9 : 护岸
+10 : 海堤  
+11 : 登岸阶梯  
+12 : 跳板  
+13 : 船台滑道  
+14 : 碰垫
+15 : solid face wharf
+16 : open face wharf
+17 : log ramp
+enum end
+>
+<
+Attribute: 交通信号站类
+Acronym: CATSIT
+Code: 61
+Attribute type: L
+1 : 港口管理台站  
+2 : 进出港台站
+3 : 国际港口交通台站  
+4 : 系泊台站
+5 : 船坞台站
+6 : 船闸台站  
+7 : 拦洪坝台站
+8 : 过桥台站  
+9 : 疏浚台站
+10 : traffic control light  
+enum end
+>
+<
+Attribute: 告警信号站类
+Acronym: CATSIW
+Code: 62
+Attribute type: L
+1 : 危险信号  
+2 : 海上障碍物信号
+3 : 电缆信号
+4 : 军事演习信号  
+5 : 遇险信号  
+6 : 天气信号  
+7 : 风暴信号  
+8 : 冰况信号  
+9 : 时间信号  
+10 : 潮汐信号  
+11 : 潮流信号  
+12 : 经潮仪  
+13 : 潮标  
+14 : diving
+15 : water level gauge  
+enum end
+>
+<
+Attribute: 筒仓/罐类
+Acronym: CATSIL
+Code: 63
+Attribute type: E
+1 : 一般粮仓  
+2 : 一般储液罐  
+3 : 谷物仓库
+4 : 水塔
+enum end
+>
+<
+Attribute: 斜坡类
+Acronym: CATSLO
+Code: 64
+Attribute type: E
+1 : 路堑  
+2 : 路堤  
+3 : 沙丘  
+4 : 小丘
+5 : 冻土高地
+6 : 陡岸  
+7 : 岩屑堆
+enum end
+>
+<
+Attribute: 小型船用设施类
+Acronym: CATSCF
+Code: 65
+Attribute type: E
+1 : 游客码头  
+2 : 航海俱乐部  
+3 : 吊艇绞车  
+4 : 帆具厂 
+5 : 小船修造厂  
+6 : 公共旅馆  
+7 : 餐馆  
+8 : 供应商  
+9 : 食品供应点  
+10 : 医疗点 
+11 : 药房 
+12 : 水龙头 
+13 : 燃料站 
+14 : 电力站  
+15 : 罐装煤气  
+16 : 淋浴  
+17 : 洗衣店 
+18 : 公共厕所  
+19 : 邮箱  
+20 : 公用电话  
+21 : 垃圾箱  
+22 : 停车场 
+23 : 小船和拖车停靠处 
+24 : 旅行车场址 
+25 : 野营基地  
+26 : 污水排放站
+27 : 应急电话
+28 : 小艇上岸/下水地方  
+29 : 游艇船系泊地 
+30 : 檫洗泊位
+31 : 野餐场所
+32 : mechanics workshop
+33 : guard and/or security service
+enum end
+>
+<
+Attribute: 专用标志类
+Acronym: CATSPM
+Code: 66
+Attribute type: L
+1 : 射击危险区标志  
+2 : 目标标志  
+3 : 标志船  
+4 : 消磁区标志  
+5 : 驳船标志  
+6 : 电缆标志  
+7 : 废品场地标志  
+8 : 排出口标志  
+9 : 海洋资料探测系统(ODAS) 
+10 : 记录标志  
+11 : 水上飞机锚地标志  
+12 : 娱乐区标志  
+13 : 私有标志  
+14 : 锚泊标志  
+15 : 大型自动助航浮标(LANBY) 
+16 : 导航  
+17 : 测距标志  
+18 : 通告标志  
+19 : 分道通航制标志 
+20 : 禁止下航标志
+21 : 禁止系泊标志
+22 : 禁止追越标志
+23 : 禁止双向通行标志
+24 : 减少伴流标志
+25 : 限速标志  
+26 : 停止标志
+27 : 一般警告标志
+28 : 鸣笛标志
+29 : 限制垂直净空标志
+30 : 最大船舶吃水标志
+31 : 限制横向间距标志
+32 : 强流警告标志
+33 : 允许靠泊标志
+34 : 架空电力电缆标志
+35 : 航道边缘坡度标志
+36 : 电话标志
+37 : 渡船交汇标志
+38 : marine traffic lights
+39 : 管道标志
+40 : 锚地标志
+41 : 安全导航标志  
+42 : 控制标志
+43 : 潜水标志
+44 : 避难地标志
+45 : 险恶地标志
+46 : 游艇标志
+47 : 直升飞机机场标志
+48 : 全球定位系统GPS标志
+49 : 水上飞机降落标志
+50 : 禁止入内标志
+51 : 正在作业标志
+52 : mark with unknown purpose
+53 : wellhead mark  
+54 : channel separation mark
+55 : marine farm mark
+56 : artificial reef mark
+enum end
+>
+<
+Attribute: 潮流类
+Acronym: CAT_TS
+Code: 188
+Attribute type: E
+1 : 洪水流  
+2 : 退潮溪流  
+3 : 其他潮流
+enum end
+>
+<
+Attribute: 分道通航制类
+Acronym: CATTSS
+Code: 67
+Attribute type: E
+1 : IMO采纳
+2 : 非IMO采纳
+enum end
+>
+<
+Attribute: 植被类
+Acronym: CATVEG
+Code: 68
+Attribute type: L
+1 : 草
+2 : paddy field
+3 : 灌木丛
+4 : 落叶性树林
+5 : 针叶树林
+6 : 普通树林(包括杂树林)  
+7 : 红树林  
+8 : park
+9 : parkland
+10 : 混合作物
+11 : 芦苇
+12 : 苔、藓
+13 : 普通树  
+14 : 常绿树  
+15 : 针叶树 
+16 : 棕榈树  
+17 : 聂帕榈树  
+18 : 大麻黄树 
+19 : 桉树 
+20 : 落叶树 
+21 : 红树  
+22 : 垂枝大麻黄树  
+enum end
+>
+<
+Attribute: 紊流类
+Acronym: CATWAT
+Code: 69
+Attribute type: E
+1 : 拍案浪 
+2 : 涡流 
+3 : 溢流 
+4 : 潮激  
+5 : 爆波(浪)
+enum end
+>
+<
+Attribute: 海草/巨型海藻类
+Acronym: CATWED
+Code: 70
+Attribute type: E
+1 : 巨型海藻  
+2 : 海藻  
+3 : 海草
+4 : 马尾藻
+enum end
+>
+<
+Attribute: 沉船类
+Acronym: CATWRK
+Code: 71
+Attribute type: E
+1 : 非危险沉船  
+2 : 危险沉船  
+3 : 散布的沉船残骸(险恶地)  
+4 : 露桅沉船  
+5 : 部分船体或上层建筑裸露的沉船  
+enum end
+>
+<
+Attribute: 数据置信度区类
+Acronym: CATZOC
+Code: 72
+Attribute type: E
+1 : A1置信度区
+2 : A2置信度区
+3 : B置信度区
+4 : C置信度区
+5 : D置信度区
+6 : U置信度区(没有审估的数据)
+enum end
+>
+<
+Attribute: 字符空格
+Acronym: $SPACE
+Code: 73
+Attribute type: E
+1 : 扩大/压缩
+2 : 标准
+enum end
+>
+<
+Attribute: 字符说明
+Acronym: $CHARS
+Code: 74
+Attribute type: A
+>
+<
+Attribute: 颜色
+Acronym: COLOUR
+Code: 75
+Attribute type: L
+1 : 白 
+2 : 黑
+3 : 红  
+4 : 绿  
+5 : 蓝 
+6 : 黄 
+7 : 灰
+8 : 棕
+9 : 琥珀  
+10 : 紫  
+11 : 橙黄  
+12 : 洋红
+13 : 粉红
+enum end
+>
+<
+Attribute: 彩色图案
+Acronym: COLPAT
+Code: 76
+Attribute type: L
+1 : 横条纹
+2 : 竖条纹
+3 : 斜条纹
+4 : 正方形
+5 : 条纹(方向未知)
+6 : 条纹边界
+enum end
+>
+<
+Attribute: 通信频道
+Acronym: COMCHA
+Code: 77
+Attribute type: A
+>
+<
+Attribute: 罗经花尺寸
+Acronym: $CSIZE
+Code: 78
+Attribute type: F
+>
+<
+Attribute: 汇编日期
+Acronym: CPDATE
+Code: 79
+Attribute type: A
+>
+<
+Attribute: 编辑比例尺
+Acronym: CSCALE
+Code: 80
+Attribute type: I
+>
+<
+Attribute: 状态
+Acronym: CONDTN
+Code: 81
+Attribute type: E
+1 : 建造中  
+2 : 废弃的 
+3 : 改造中  
+4 : 无侧翼的  
+5 : 计划建造的
+enum end
+>
+<
+Attribute: 雷达可视
+Acronym: CONRAD
+Code: 82
+Attribute type: E
+1 : 雷达显见 
+2 : 雷达不显见
+3 : 雷达显见(有雷达反射器)
+enum end
+>
+<
+Attribute: 视觉可见
+Acronym: CONVIS
+Code: 83
+Attribute type: E
+1 : 视觉显见  
+2 : 视觉不显见
+enum end
+>
+<
+Attribute: 海流速度
+Acronym: CURVEL
+Code: 84
+Attribute type: F
+>
+<
+Attribute: 结束日期
+Acronym: DATEND
+Code: 85
+Attribute type: A
+>
+<
+Attribute: 开始日期
+Acronym: DATSTA
+Code: 86
+Attribute type: A
+>
+<
+Attribute: 深度值1
+Acronym: DRVAL1
+Code: 87
+Attribute type: F
+>
+<
+Attribute: 深度值2
+Acronym: DRVAL2
+Code: 88
+Attribute type: F
+>
+<
+Attribute: 深度单位
+Acronym: DUNITS
+Code: 89
+Attribute type: E
+1 : 米
+2 : 吋及英尺
+3 : 英尺
+4 : 吋及分数
+enum end
+>
+<
+Attribute: 海拔高度
+Acronym: ELEVAT
+Code: 90
+Attribute type: F
+>
+<
+Attribute: 预计传输范围
+Acronym: ESTRNG
+Code: 91
+Attribute type: F
+>
+<
+Attribute: 灯质显示状态
+Acronym: EXCLIT
+Code: 92
+Attribute type: E
+1 : 灯质固定灯
+2 : 昼灯  
+3 : 雾灯  
+4 : 夜灯
+enum end
+>
+<
+Attribute: 水深说明
+Acronym: EXPSOU
+Code: 93
+Attribute type: E
+1 : 在周围水深区的深度范围内
+2 : 浅于周围水深区的深度范围
+3 : 深于周围水深区的深度范围
+enum end
+>
+<
+Attribute: 功能
+Acronym: FUNCTN
+Code: 94
+Attribute type: L
+1 : 无功能/服务的主要权益
+2 : 港务局长办公室  
+3 : 海关  
+4 : 保健站  
+5 : 医院 
+6 : 邮局 
+7 : 旅馆
+8 : 火车站  
+9 : 警察局
+10 : 水上警察局
+11 : 引航站  
+12 : 引航瞭望长江台  
+13 : 银行
+14 : 地区管理总部
+15 : 转运棚或仓库  
+16 : 工厂
+17 : 电站
+18 : 办公楼  
+19 : 教育机构
+20 : 教堂  
+21 : 小教堂  
+22 : 寺庙 
+23 : 宝塔 
+24 : 神道殿堂  
+25 : 佛教的寺庙  
+26 : 清真寺  
+27 : 伊斯兰教教堂  
+28 : 瞭望
+29 : 通信
+30 : 电视台
+31 : 无线电台
+32 : 雷达
+33 : 灯架
+34 : 微波站
+35 : 冷却
+36 : 观察
+37 : 报时球
+38 : 时钟
+39 : 控制
+40 : 飞艇停泊
+41 : 体育场
+42 : 公交车站
+enum end
+>
+<
+Attribute: 高度
+Acronym: HEIGHT
+Code: 95
+Attribute type: F
+>
+<
+Attribute: 高度/长度单位
+Acronym: HUNITS
+Code: 96
+Attribute type: E
+1 : 米
+2 : 英尺
+enum end
+>
+<
+Attribute: 平面精度
+Acronym: HORACC
+Code: 97
+Attribute type: F
+>
+<
+Attribute: 水平净空
+Acronym: HORCLR
+Code: 98
+Attribute type: F
+>
+<
+Attribute: 水平长度
+Acronym: HORLEN
+Code: 99
+Attribute type: F
+>
+<
+Attribute: 水平宽度
+Acronym: HORWID
+Code: 100
+Attribute type: F
+>
+<
+Attribute: 冰况系数
+Acronym: ICEFAC
+Code: 101
+Attribute type: F
+>
+<
+Attribute: 信息
+Acronym: INFORM
+Code: 102
+Attribute type: S
+>
+<
+Attribute: 管辖范围
+Acronym: JRSDTN
+Code: 103
+Attribute type: E
+1 : 国际
+2 : 国家
+3 : 国家下属地区
+enum end
+>
+<
+Attribute: 水平对齐
+Acronym: $JUSTH
+Code: 104
+Attribute type: E
+1 : 居中
+2 : 右对齐
+3 : 左对齐
+enum end
+>
+<
+Attribute: 垂直对齐
+Acronym: $JUSTV
+Code: 105
+Attribute type: E
+1 : bottom justified
+2 : centre justified
+3 : top justified
+enum end
+>
+<
+Attribute: 起重能力
+Acronym: LIFCAP
+Code: 106
+Attribute type: F
+>
+<
+Attribute: 灯质
+Acronym: LITCHR
+Code: 107
+Attribute type: E
+1 : 定光  
+2 : 闪光  
+3 : 长闪光 
+4 : 快闪光  
+5 : 甚快闪光  
+6 : 超快闪光  
+7 : 等明暗光  
+8 : 明暗光  
+9 : 联快闪光  
+10 : 联甚快闪光 
+11 : 联超快闪光  
+12 : 莫尔斯光  
+13 : 定闪光  
+14 : 闪长闪光
+15 : 明暗闪光
+16 : 定长闪光
+17 : 明暗互闪光
+18 : 长互闪光
+19 : 互闪光
+20 : 互联闪光
+21 : 2 fixed (vertical)
+22 : 2 fixed (horizontal)
+23 : 3 fixed (vertical)
+24 : 3 fixed (horizontal)
+25 : 快闪加长闪
+26 : 甚快闪加长闪
+27 : 超快闪加长闪
+28 : 互光
+29 : 定光和互闪光
+enum end
+>
+<
+Attribute: 灯标能见度
+Acronym: LITVIS
+Code: 108
+Attribute type: L
+1 : 高光强灯  
+2 : 低光强灯  
+3 : 弱光强灯
+4 : 光增强灯  
+5 : 未增强灯
+6 : 故意限制能见灯  
+7 : 遮蔽灯 
+8 : 部分遮蔽灯
+enum end
+>
+<
+Attribute: 海上标志体系
+Acronym: MARSYS
+Code: 109
+Attribute type: E
+1 : 国际航标协会(IALA)A  
+2 : 国际航标协会(IALA)B  
+3 : modified US
+4 : old US
+5 : US intracoastal waterway
+6 : US uniform state
+7 : US western rivers
+8 : SIGNI
+9 : 无体系
+10 : 其他体系
+enum end
+>
+<
+Attribute: 灯光组合
+Acronym: MLTYLT
+Code: 110
+Attribute type: I
+>
+<
+Attribute: 国籍
+Acronym: NATION
+Code: 111
+Attribute type: A
+>
+<
+Attribute: 建筑结构性质
+Acronym: NATCON
+Code: 112
+Attribute type: L
+1 : 砖石结构  
+2 : 混凝土结构  
+3 : 散石结构  
+4 : 硬表面结构  
+5 : 表面未处理结构  
+6 : 木质结构
+7 : 金属结构
+8 : 玻璃钢结构
+9 : 油漆结构  
+enum end
+>
+<
+Attribute: 表面性质
+Acronym: NATSUR
+Code: 113
+Attribute type: L
+1 : 泥  
+2 : 粘土 
+3 : 泥沙  
+4 : 沙  
+5 : 石  
+6 : 砾石  
+7 : 卵石 
+8 : 中石  
+9 : 岩石  
+10 : marsh
+11 : 熔岩
+12 : 雪
+13 : 冰
+14 : 珊瑚  
+15 : swamp
+16 : bog/moor
+17 : 贝壳  
+18 : 圆石
+enum end
+>
+<
+Attribute: 表面性质限定术语
+Acronym: NATQUA
+Code: 114
+Attribute type: L
+1 : 精细  
+2 : 中等 
+3 : 粗糙  
+4 : 破碎  
+5 : 粘性  
+6 : 柔软  
+7 : 刚性 
+8 : 熔岩 
+9 : 石灰质  
+10 : 坚硬  
+enum end
+>
+<
+Attribute: 航海通告日期
+Acronym: NMDATE
+Code: 115
+Attribute type: A
+>
+<
+Attribute: 物标名称
+Acronym: OBJNAM
+Code: 116
+Attribute type: S
+>
+<
+Attribute: 方位
+Acronym: ORIENT
+Code: 117
+Attribute type: F
+>
+<
+Attribute: 周期性结束日期
+Acronym: PEREND
+Code: 118
+Attribute type: A
+>
+<
+Attribute: 周期性开始日期
+Acronym: PERSTA
+Code: 119
+Attribute type: A
+>
+<
+Attribute: 图弄显示
+Acronym: PICREP
+Code: 120
+Attribute type: S
+>
+<
+Attribute: 引航区域
+Acronym: PILDST
+Code: 121
+Attribute type: S
+>
+<
+Attribute: 定位精度单位
+Acronym: PUNITS
+Code: 189
+Attribute type: E
+1 : 米
+2 : 度的弧
+3 : 毫米
+4 : feet
+5 : cables
+enum end
+>
+<
+Attribute: 生产国家
+Acronym: PRCTRY
+Code: 122
+Attribute type: A
+>
+<
+Attribute: 产品
+Acronym: PRODCT
+Code: 123
+Attribute type: L
+1 : 油  
+2 : 气  
+3 : 水  
+4 : 石
+5 : 煤
+6 : 矿石
+7 : 化学品   
+8 : 饮用水
+9 : 奶乳
+10 : 铝土矿
+11 : 焦炭
+12 : 铁锭
+13 : 盐
+14 : 砂
+15 : 木材
+16 : 木屑/木片
+17 : 废金属
+18 : liquified natural gas (LNG)
+19 : liquified petroleum gas (LPG)
+20 : wine
+21 : cement
+22 : grain
+enum end
+>
+<
+Attribute: 出版物参考
+Acronym: PUBREF
+Code: 124
+Attribute type: S
+>
+<
+Attribute: 水深测量特性
+Acronym: QUASOU
+Code: 125
+Attribute type: L
+1 : 已知深度
+2 : 未知深度  
+3 : 可疑水深  
+4 : 不可靠水深  
+5 : "未测到底"水深 
+6 : 已知最浅深度  
+7 : 未知最浅深度(给出安全富余量)  
+8 : 报告水深值(未经测量)  
+9 : 报告水深值(未经核实)  
+10 : 维护深度  
+11 : 不定期维护
+enum end
+>
+<
+Attribute: 雷达波长
+Acronym: RADWAL
+Code: 126
+Attribute type: A
+>
+<
+Attribute: 半径
+Acronym: RADIUS
+Code: 127
+Attribute type: F
+>
+<
+Attribute: 记录日期
+Acronym: RECDAT
+Code: 128
+Attribute type: A
+>
+<
+Attribute: 记录表示法
+Acronym: RECIND
+Code: 129
+Attribute type: A
+>
+<
+Attribute: 磁差参考年份
+Acronym: RYRMGV
+Code: 130
+Attribute type: A
+>
+<
+Attribute: 限制区
+Acronym: RESTRN
+Code: 131
+Attribute type: L
+1 : 禁止抛锚  
+2 : 限制抛锚
+3 : 禁止捕捞  
+4 : 限制捕捞
+5 : 禁止拖网
+6 : 限制拖网
+7 : 禁止进入  
+8 : 限制进入
+9 : 禁止疏浚
+10 : 限制疏浚
+11 : 禁止潜水
+12 : 限制潜水
+13 : 无伴流
+14 : 避航区  
+15 : construction prohibited
+16 : discharging prohibited
+17 : discharging restricted
+18 : industrial or mineral exploration/development prohibited
+19 : industrial or mineral exploration/development restricted
+20 : drilling prohibited
+21 : drilling restricted
+22 : removal of historical artifacts prohibited
+23 : cargo transhipment (lightering) prohibited
+24 : dragging prohibited
+25 : stopping prohibited
+26 : landing prohibited
+27 : speed restricted
+enum end
+>
+<
+Attribute: 最大比例尺
+Acronym: SCAMAX
+Code: 132
+Attribute type: I
+>
+<
+Attribute: 最小比例尺
+Acronym: SCAMIN
+Code: 133
+Attribute type: I
+>
+<
+Attribute: 比例值1
+Acronym: SCVAL1
+Code: 134
+Attribute type: I
+>
+<
+Attribute: 比例值2
+Acronym: SCVAL2
+Code: 135
+Attribute type: I
+>
+<
+Attribute: 扇形界线1
+Acronym: SECTR1
+Code: 136
+Attribute type: F
+>
+<
+Attribute: 扇形界线2
+Acronym: SECTR2
+Code: 137
+Attribute type: F
+>
+<
+Attribute: 偏移参数
+Acronym: SHIPAM
+Code: 138
+Attribute type: A
+>
+<
+Attribute: 信号频率
+Acronym: SIGFRQ
+Code: 139
+Attribute type: I
+>
+<
+Attribute: 信号生成
+Acronym: SIGGEN
+Code: 140
+Attribute type: E
+1 : 自动的
+2 : 波浪作用  
+3 : 手动
+4 : 风力作用
+enum end
+>
+<
+Attribute: 信号组
+Acronym: SIGGRP
+Code: 141
+Attribute type: A
+>
+<
+Attribute: 信号周期
+Acronym: SIGPER
+Code: 142
+Attribute type: F
+>
+<
+Attribute: 信号时序
+Acronym: SIGSEQ
+Code: 143
+Attribute type: A
+>
+<
+Attribute: 测深精度
+Acronym: SOUACC
+Code: 144
+Attribute type: F
+>
+<
+Attribute: 最大测深间距
+Acronym: SDISMX
+Code: 145
+Attribute type: I
+>
+<
+Attribute: 最小测深间距
+Acronym: SDISMN
+Code: 146
+Attribute type: I
+>
+<
+Attribute: 数据来源日期
+Acronym: SORDAT
+Code: 147
+Attribute type: A
+>
+<
+Attribute: 数据来源表示
+Acronym: SORIND
+Code: 148
+Attribute type: A
+>
+<
+Attribute: 状况
+Acronym: STATUS
+Code: 149
+Attribute type: L
+1 : 永久的
+2 : 偶然的  
+3 : 推荐的  
+4 : 不用的  
+5 : 周期的/间歇的  
+6 : 备用的  
+7 : 临时的  
+8 : 私有的 
+9 : 强制性的
+10 : destroyed/ruined
+11 : 毁灭的
+12 : 发光的
+13 : 历史的
+14 : 公共的
+15 : 同步的
+16 : 有人看守的
+17 : 无人看守的
+18 : 疑存的
+enum end
+>
+<
+Attribute: 测量机构
+Acronym: SURATH
+Code: 150
+Attribute type: S
+>
+<
+Attribute: 测量结束日期
+Acronym: SUREND
+Code: 151
+Attribute type: A
+>
+<
+Attribute: 测量开始日期
+Acronym: SURSTA
+Code: 152
+Attribute type: A
+>
+<
+Attribute: 测量类型
+Acronym: SURTYP
+Code: 153
+Attribute type: L
+1 : 勘察/草测
+2 : 控制测量
+3 : unsurveyed
+4 : 检查测量
+5 : 航行测量
+6 : 遥测、遥感
+enum end
+>
+<
+Attribute: 符号缩放系数
+Acronym: $SCALE
+Code: 154
+Attribute type: F
+>
+<
+Attribute: 符号代码
+Acronym: $SCODE
+Code: 155
+Attribute type: A
+>
+<
+Attribute: 水深测量技术
+Acronym: TECSOU
+Code: 156
+Attribute type: L
+1 : 回声测深仪测定
+2 : 侧向扫描声纳测定
+3 : 多波束扫描
+4 : 潜水员探摸
+5 : 测深锤(水砣绳)测深
+6 : 扫海拖索  
+7 : 激光测距测深
+8 : 垂直回声测深系统扫描
+9 : 电磁传感器探测
+10 : 摄影测量法
+11 : 卫星成像测定
+12 : 水准测量方法
+13 : 侧向扫描声纳扫测
+14 : 计算机生成
+enum end
+>
+<
+Attribute: 正文串
+Acronym: $TXSTR
+Code: 157
+Attribute type: S
+>
+<
+Attribute: 正文描述
+Acronym: TXTDSC
+Code: 158
+Attribute type: S
+>
+<
+Attribute: 潮流表值
+Acronym: TS_TSP
+Code: 159
+Attribute type: A
+>
+<
+Attribute: 潮汐时序值
+Acronym: TS_TSV
+Code: 160
+Attribute type: A
+>
+<
+Attribute: 潮汐潮位精度
+Acronym: T_ACWL
+Code: 161
+Attribute type: E
+1 : 比10分钟和0.1米好(潮时、潮高差)
+2 : 比10分钟和0.1米差(潮时、潮高差)
+enum end
+>
+<
+Attribute: 潮汐高低潮值
+Acronym: T_HWLW
+Code: 162
+Attribute type: A
+>
+<
+Attribute: 潮汐预报方法
+Acronym: T_MTOD
+Code: 163
+Attribute type: E
+1 : 简化的调和潮汐预报
+2 : 完全的调和潮汐预报
+3 : 潮时潮高差非调和预报
+enum end
+>
+<
+Attribute: 潮汐潮时与潮高差
+Acronym: T_THDF
+Code: 164
+Attribute type: A
+>
+<
+Attribute: 潮汐时序值
+Acronym: T_TSVL
+Code: 166
+Attribute type: A
+>
+<
+Attribute: 潮汐调和分潮值
+Acronym: T_VAHC
+Code: 167
+Attribute type: A
+>
+<
+Attribute: 潮汐时间间隔值
+Acronym: T_TINT
+Code: 165
+Attribute type: I
+>
+<
+Attribute: 终止时间
+Acronym: TIMEND
+Code: 168
+Attribute type: A
+>
+<
+Attribute: 开始时间
+Acronym: TIMSTA
+Code: 169
+Attribute type: A
+>
+<
+Attribute: 色调
+Acronym: $TINTS
+Code: 170
+Attribute type: E
+1 : 深蓝
+2 : 浅蓝
+3 : 淡蓝
+enum end
+>
+<
+Attribute: 顶标/昼标形状
+Acronym: TOPSHP
+Code: 171
+Attribute type: E
+1 : 尖向上锥形
+2 : 尖向下锥形
+3 : 球形体
+4 : 双球体
+5 : 圆柱形
+6 : 牌形
+7 : X形(圣?安德路十字)
+8 : 竖直十字形(圣?乔治十字)
+9 : 顶上立方体
+10 : 顶点相对双锥体
+11 : 顶点相背双锥体
+12 : 菱形(钻石形)
+13 : 顶点朝上双锥体
+14 : 顶点朝下双锥体
+15 : 顶点上扫帚形(扫帚或杆形)
+16 : 顶点下扫帚形(扫帚或杆形)
+17 : 旗
+18 : 球体在菱形上
+19 : 正方形
+20 : 平放长方形
+21 : 竖放长方形
+22 : 直立梯形
+23 : 倒立梯形
+24 : 尖向上三角形
+25 : 尖向下三角形
+26 : 圆形
+27 : 双十字(一个在另一个之上)
+28 : T型
+29 : 圆上方的尖朝上三角形
+30 : 竖直十字在圆上
+31 : 菱形在圆上
+32 : 圆在三角形顶尖上
+33 : 其他形状(见INFORM)
+enum end
+>
+<
+Attribute: 交通流
+Acronym: TRAFIC
+Code: 172
+Attribute type: E
+1 : 驶进
+2 : 驶出
+3 : 单向
+4 : 双向
+enum end
+>
+<
+Attribute: 磁差年变率
+Acronym: VALACM
+Code: 173
+Attribute type: F
+>
+<
+Attribute: 等深线值
+Acronym: VALDCO
+Code: 174
+Attribute type: F
+>
+<
+Attribute: 局部磁力异常值
+Acronym: VALLMA
+Code: 175
+Attribute type: F
+>
+<
+Attribute: 磁差值
+Acronym: VALMAG
+Code: 176
+Attribute type: F
+>
+<
+Attribute: 最大作用距离
+Acronym: VALMXR
+Code: 177
+Attribute type: F
+>
+<
+Attribute: 标定作用距离
+Acronym: VALNMR
+Code: 178
+Attribute type: F
+>
+<
+Attribute: 水深值
+Acronym: VALSOU
+Code: 179
+Attribute type: F
+>
+<
+Attribute: 垂直精度
+Acronym: VERACC
+Code: 180
+Attribute type: F
+>
+<
+Attribute: 竖向净空
+Acronym: VERCLR
+Code: 181
+Attribute type: F
+>
+<
+Attribute: 封闭竖向净空
+Acronym: VERCCL
+Code: 182
+Attribute type: F
+>
+<
+Attribute: 开启竖向净空
+Acronym: VERCOP
+Code: 183
+Attribute type: F
+>
+<
+Attribute: 安全竖向净空
+Acronym: VERCSA
+Code: 184
+Attribute type: F
+>
+<
+Attribute: 垂直基准面
+Acronym: VERDAT
+Code: 185
+Attribute type: E
+1 : 平均大潮低潮面
+2 : 平均大潮低低潮面
+3 : 平均海面
+4 : 最低低潮面
+5 : 平均低潮面
+6 : 最低大潮低潮面
+7 : 近似平均大潮低潮面
+8 : 印度大潮低潮面
+9 : 大潮低潮面
+10 : 近似最低天文潮面
+11 : 接近最低低潮面
+12 : 平均低低潮面
+13 : 低水位
+14 : 近似平均低潮面
+15 : 近似平均低低潮面
+16 : 平均高潮面
+17 : 平均大潮高潮面
+18 : 高潮面
+19 : 近似平均海面
+20 : 大潮高潮面
+21 : 平均高高潮面
+22 : 分点大潮低潮面
+23 : 最低天文潮面
+24 : 当地基准面
+25 : 国际大湖基准面1985
+26 : 平均水平面
+27 : 大潮低低潮面
+28 : 大潮高高潮面
+29 : Nearly highest high water
+30 : Highest astronomical tide (HAT)
+enum end
+>
+<
+Attribute: 垂直高度
+Acronym: VERLEN
+Code: 186
+Attribute type: F
+>
+<
+Attribute: 水位效应
+Acronym: WATLEV
+Code: 187
+Attribute type: E
+1 : 高潮时部分淹没  
+2 : 高出  
+3 : 水下/淹没  
+4 : 干出  
+5 : 适淹  
+6 : 洪水泛滥淹没
+7 : floating
+enum end
+>
+<
+Attribute: 用本国语言表示的信息
+Acronym: NINFOM
+Code: 300
+Attribute type: S
+>
+<
+Attribute: 用本国语言表示的物标名称
+Acronym: NOBJNM
+Code: 301
+Attribute type: S
+>
+<
+Attribute: 用本国语言表示的引航区
+Acronym: NPLDST
+Code: 302
+Attribute type: S
+>
+<
+Attribute: 用本国语言表示的文本串
+Acronym: $NTXST
+Code: 303
+Attribute type: S
+>
+<
+Attribute: 用本国语言表示的正文
+Acronym: NTXTDS
+Code: 304
+Attribute type: S
+>
+<
+Attribute: 水基准面
+Acronym: HORDAT
+Code: 400
+Attribute type: E
+1 : 全球地心坐标系WGS 72
+2 : 全球地心坐标系WGS 84
+3 : 欧洲坐标系1950
+4 : 波茨坦基准面
+5 : Adindan
+6 : Afgooye
+7 : Ain el Abd 1970
+8 : Anna 1 Astro 1965
+9 : Antigua Island Astro 1943
+10 : Arc 1950
+11 : Arc 1960
+12 : Ascension Island 1958
+13 : Astro beacon "E" 1945
+14 : Astro DOS 71/4
+15 : Astro Tern Island (FRIG) 1961
+16 : Astronomical Station 1952
+17 : Australian Geodetic 1966
+18 : Australian Geodetic 1984
+19 : Ayabelle Lighthouse
+20 : Bellevue (IGN)
+21 : Bermuda 1957
+22 : Bissau
+23 : Bogota Observatory
+24 : Bukit Rimpah
+25 : Camp Area Astro
+26 : Campo Inchauspe 1969
+27 : Canton Astro 1966
+28 : Cape
+29 : Cape Canaveral
+30 : Carthage
+31 : Chatam Island Astro 1971
+32 : Chua Astro
+33 : Corrego Alegre
+34 : Dabola
+35 : Djakarta (Batavia)
+36 : DOS 1968
+37 : Easter Island 1967
+38 : European 1979
+39 : Fort Thomas 1955
+40 : Gan 1970
+41 : Geodetic Datum 1949
+42 : Graciosa Base SW 1948
+43 : Guam 1963
+44 : Gunung Segara
+45 : GUX 1 Astro
+46 : Herat North
+47 : Hjorsey 1955
+48 : Hong Kong 1963
+49 : Hu-Tzu-Shan
+50 : Indian
+51 : Indian 1954
+52 : Indian 1975
+53 : Ireland 1965
+54 : ISTS 061 Astro 1968
+55 : ISTS 073 Astro 1969
+56 : Johnston Island 1961
+57 : Kandawala
+58 : Kerguelen Island 1949
+59 : Kertau 1948
+60 : Kusaie Astro 1951
+61 : L. C. 5 Astro 1961
+62 : Leigon
+63 : Liberia 1964
+64 : Luzon
+65 : Mahe 1971
+66 : Massawa
+67 : Merchich
+68 : Midway Astro 1961
+69 : Minna
+70 : Montserrat Island Astro 1958
+71 : M=Poraloko
+72 : Nahrwan
+73 : Naparima, BWI
+74 : North American 1927
+75 : North American 1983
+76 : Observatorio Meteorologico 1939
+77 : Old Egyptian 1907
+78 : Old Hawaiian
+79 : Oman
+80 : Ordnance Survey of Great Britain 1936
+81 : Pico de las Nieves
+82 : Pitcairn Astro 1967
+83 : Point 58
+84 : Pointe Noire 1948
+85 : Porto Santo 1936
+86 : Provisional South American 1956
+87 : Provisional South Chilean 1963 (also known as Hito XVIII 1963)
+88 : Puerto Rico
+89 : Qatar national
+90 : Qornoq
+91 : Reunion
+92 : Rome 1940
+93 : Santo (DOS) 1965
+94 : Sao Braz
+95 : Sapper Hill 1943
+96 : Schwarzeck
+97 : Selvagem Grande 1938
+98 : South American 1969
+99 : South Asia
+100 : Tananarive Observatory 1925
+101 : Timbalai 1948
+102 : Tokyo
+103 : Tristan Astro 1968
+104 : Viti Levu 1916
+105 : Wake-Eniwetok 1960
+106 : Wake Island Astro 1952
+107 : Yacare
+108 : Zanderij
+109 : American Samoa 1962
+110 : Deception Island
+111 : Indian 1960
+112 : Indonesian 1974
+113 : North Sahara 1959
+114 : Pulkovo 1942
+115 : S-42 (Pulkovo 1942)
+116 : S-JYSK
+117 : Voirol 1950
+118 : Average Terrestrial System 1977
+119 : Compensation Géodésique du Québec 1977
+120 : Finnish (KKJ)
+121 : Ordnance Survey of Ireland
+122 : Revised Kertau
+123 : Revised Nahrwan
+124 : GGRS 76 (Greece)
+125 : Nouvelle Triangulation de France
+126 : RT 90 (Sweden)
+127 : Geocentric Datum of Australia (GDA)
+128 : BJZ54 (A954 Beijing Coordinates)
+129 : Modified BJZ54
+130 : GDZ80
+131 : Local datum
+enum end
+>
+<
+Attribute: 位置精度
+Acronym: POSACC
+Code: 401
+Attribute type: F
+>
+<
+Attribute: 位置性质
+Acronym: QUAPOS
+Code: 402
+Attribute type: E
+1 : 已经测量的
+2 : 未经测量的  
+3 : 未详细测量的(草测) 
+4 : 近似的(不精确的)  
+5 : 位置可疑  
+6 : 不可靠的
+7 : 报告未测量的
+8 : 报告未证实的  
+9 : 估计的
+10 : 确切已知的
+11 : 计算的
+enum end
+>
+<
+Attribute: Depth Value
+Acronym: DEPVAL
+Code: 1000
+Attribute type: F
+>
+<
+Attribute: Is Floating Topmark
+Acronym: BFLOAT
+Code: 1001
+Attribute type: B
+>
+<
+Attribute: Is Safe contour
+Acronym: BESAFE
+Code: 1002
+Attribute type: B
+>
+<
+Attribute: Contain UnderQuality edge data
+Acronym: UNDQUA
+Code: 1003
+Attribute type: B
+>
+<
+Attribute: Underwater harzard is isolated danger
+Acronym: BISODNG
+Code: 1004
+Attribute type: B
+>
+<
+Attribute: My Area Depth Value
+Acronym: MARDPT
+Code: 1005
+Attribute type: F
+> 
+<
+Attribute: Unknown attribute
+Acronym: UKNOWN
+Code: 2000
+Attribute type: B
+>
+<
+Attribute: Planned track ID
+Acronym: PLTKID
+Code: 2001
+Attribute type: I
+>
+<
+Attribute: Planned track name
+Acronym: PLTKNM
+Code: 2002
+Attribute type: S
+>
+<
+Attribute: Planned track create date
+Acronym: PLTKCD
+Code: 2003
+Attribute type: S
+>
+<
+Attribute: Planned track update date
+Acronym: PLTKUD
+Code: 2004
+Attribute type: S
+> 
+<
+Attribute: Past track start date
+Acronym: PSTKSD
+Code: 2005
+Attribute type: S
+>
+<
+Attribute: Past track end date
+Acronym: PSTKED
+Code: 2006
+Attribute type: S
+>
+<
+Attribute: Ship code
+Acronym: SHPCOD
+Code: 2007
+Attribute type: S
+>
+<
+Attribute: Ship name
+Acronym: SHPNAM
+Code: 2008
+Attribute type: S
+> 
+<
+Attribute: Ship length
+Acronym: SHPLEN
+Code: 2009
+Attribute type: I
+>
+<
+Attribute: Ship width
+Acronym: SHPWTH
+Code: 2010
+Attribute type: I
+>
+<
+Attribute: Ship weight
+Acronym: SHPWGT
+Code: 2011
+Attribute type: I
+>
+END
+
+	

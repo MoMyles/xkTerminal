@@ -13,16 +13,14 @@ import com.cetcme.xkterminal.DataFormat.AlertFormat;
 import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
-import com.cetcme.xkterminal.RealmModels.Alert;
+import com.cetcme.xkterminal.Sqlite.Proxy.AlertProxy;
 
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.xutils.DbManager;
 
 import java.util.ArrayList;
-import java.util.Date;
-
-import io.realm.Realm;
 
 public class AlertActivity extends Activity implements View.OnClickListener{
 
@@ -38,7 +36,7 @@ public class AlertActivity extends Activity implements View.OnClickListener{
     private Button cancel_button;
     private Button confirm_button;
 
-    private Realm realm;
+    private DbManager db;
 
     boolean needDismissActivity = true;
 
@@ -49,7 +47,7 @@ public class AlertActivity extends Activity implements View.OnClickListener{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alert);
 
-        realm = ((MyApplication) getApplication()).realm;
+        db = ((MyApplication) getApplication()).db;
 
         bindView();
 
@@ -141,14 +139,6 @@ public class AlertActivity extends Activity implements View.OnClickListener{
     }
 
     private void addAlertLog(final String type) {
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                Alert alert = realm.createObject(Alert.class);
-                alert.setDeleted(false);
-                alert.setType(AlertFormat.getStringType(type));
-                alert.setTime(Constant.SYSTEM_DATE);
-            }
-        });
+        AlertProxy.insert(db, AlertFormat.getStringType(type), Constant.SYSTEM_DATE, false);
     }
 }

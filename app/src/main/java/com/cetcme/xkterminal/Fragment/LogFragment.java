@@ -14,23 +14,30 @@ import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.ActionBar.TitleBar;
+import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.CommonUtil;
 import com.cetcme.xkterminal.MyClass.DateUtil;
-import com.cetcme.xkterminal.MyClass.DensityUtil;
 import com.cetcme.xkterminal.R;
-import com.cetcme.xkterminal.RealmModels.Alert;
-import com.cetcme.xkterminal.RealmModels.Sign;
+import com.cetcme.xkterminal.Sqlite.Bean.AlertBean;
+import com.cetcme.xkterminal.Sqlite.Bean.InoutBean;
+import com.cetcme.xkterminal.Sqlite.Bean.SignBean;
+import com.cetcme.xkterminal.Sqlite.Proxy.AlertProxy;
+import com.cetcme.xkterminal.Sqlite.Proxy.InoutProxy;
+import com.cetcme.xkterminal.Sqlite.Proxy.SignProxy;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.xutils.DbManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import io.realm.Realm;
-import io.realm.RealmResults;
-import io.realm.Sort;
 
 /**
  * Created by qiuhong on 10/01/2018.
@@ -50,7 +57,7 @@ public class LogFragment extends Fragment{
     private int pageIndex = 0;
     private int totalPage = 1;
 
-    private Realm realm;
+    private DbManager db;
 
     public LogFragment(String tg) {
         this.tg = tg;
@@ -60,7 +67,8 @@ public class LogFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        realm = ((MyApplication) getActivity().getApplication()).realm;
+        db = ((MyApplication) getActivity().getApplication()).db;
+        EventBus.getDefault().register(this);
 
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_log,container,false);
 
@@ -69,17 +77,24 @@ public class LogFragment extends Fragment{
         titleBar = view.findViewById(R.id.titleBar);
         if (tg.equals("sign")) {
             titleBar.setTitle("打卡记录");
-            view.findViewById(R.id.title_alert_layout).setVisibility(View.GONE);
+            view.findViewById(R.id.title_sign_layout).setVisibility(View.VISIBLE);
             simpleAdapter = new SimpleAdapter(getActivity(), getSignData(), R.layout.cell_sign_list,
                     new String[]{"number", "idCard", "name", "time"},
                     new int[]{R.id.number_in_sign_cell, R.id.idCard_in_sign_cell, R.id.name_in_sign_cell, R.id.time_in_sign_cell});
         }
         if (tg.equals("alert")) {
             titleBar.setTitle("报警记录");
-            view.findViewById(R.id.title_sign_layout).setVisibility(View.GONE);
+            view.findViewById(R.id.title_alert_layout).setVisibility(View.VISIBLE);
             simpleAdapter = new SimpleAdapter(getActivity(), getAlertData(), R.layout.cell_alert_list,
                     new String[]{"number", "type", "time"},
                     new int[]{R.id.number_in_alert_cell, R.id.type_in_alert_cell, R.id.time_in_alert_cell});
+        }
+        if (tg.equals("inout")) {
+            titleBar.setTitle("进出港申报");
+            view.findViewById(R.id.title_inout_layout).setVisibility(View.VISIBLE);
+            simpleAdapter = new SimpleAdapter(getActivity(), getInoutData(), R.layout.cell_inout_list,
+                    new String[] {"number", "type", "count", "lon", "lat", "time"},
+                    new int[] {R.id.number_in_inout_cell, R.id.type_in_inout_cell, R.id.count_in_inout_cell, R.id.lon_in_inout_cell, R.id.lat_in_inout_cell, R.id.time_in_inout_cell});
         }
 
         //设置listView
@@ -102,6 +117,9 @@ public class LogFragment extends Fragment{
         if (tg.equals("alert")) {
             getAlertData();
         }
+        if (tg.equals("inout")) {
+            getInoutData();
+        }
         simpleAdapter.notifyDataSetChanged();
 
         modifyPageButton(pageIndex, totalPage);
@@ -118,6 +136,7 @@ public class LogFragment extends Fragment{
         pageIndex--;
         if (tg.equals("sign")) getSignData();
         if (tg.equals("alert")) getAlertData();
+        if (tg.equals("inout")) getInoutData();
         simpleAdapter.notifyDataSetChanged();
 
         modifyPageButton(pageIndex, totalPage);
@@ -127,29 +146,21 @@ public class LogFragment extends Fragment{
 
     private List<Map<String, Object>> getSignData() {
         dataList.clear();
-
-        RealmResults<Sign> signs = realm.where(Sign.class)
-                .findAll();
-        signs = signs.sort("time", Sort.DESCENDING);
-
-        totalPage = CommonUtil.getTotalPage(signs.size(), logPerPage);
-
-        int lastIndex;
-        if (signs.size() == 0) {
-            lastIndex = 0;
+        long count = SignProxy.getCount(db);
+        totalPage = CommonUtil.getTotalPage(count, logPerPage);
+        if (count == 0) {
             totalPage = 1;
-        } else {
-            if (pageIndex == totalPage - 1) {
-                lastIndex = signs.size();
-            } else {
-                lastIndex = (pageIndex + 1) * logPerPage;
-            }
         }
 
-        for (int i = pageIndex * logPerPage; i < lastIndex; i++) {
-            Sign sign = signs.get(i);
+        List<SignBean> list = SignProxy.getByPage(db, logPerPage, pageIndex);
+        if (list == null) {
+            return dataList;
+        }
+
+        for (int i = 0; i < list.size(); i++) {
+            SignBean sign = list.get(i);
             Map<String, Object> map = new HashMap<>();
-            map.put("number", signs.size() - i);
+            map.put("number", count - pageIndex * logPerPage - i);
             map.put("time", DateUtil.Date2String(sign.getTime()));
             map.put("idCard", sign.getIdCard());
             map.put("name", sign.getName());
@@ -158,49 +169,26 @@ public class LogFragment extends Fragment{
 
         modifyPageButton(pageIndex, totalPage);
 
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                mainActivity.kProgressHUD.dismiss();
-//                mainActivity.okHUD.show();
-//                new Handler().postDelayed(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        mainActivity.okHUD.dismiss();
-//                    }
-//                },700);
-//            }
-//        },500);
-
         return dataList;
     }
 
     private List<Map<String, Object>> getAlertData() {
-
         dataList.clear();
-
-        RealmResults<Alert> alerts = realm.where(Alert.class)
-                .findAll();
-        alerts = alerts.sort("time", Sort.DESCENDING);
-
-        totalPage = CommonUtil.getTotalPage(alerts.size(), logPerPage);
-
-        int lastIndex;
-        if (alerts.size() == 0) {
-            lastIndex = 0;
+        long count = AlertProxy.getCount(db);
+        totalPage = CommonUtil.getTotalPage(count, logPerPage);
+        if (count == 0) {
             totalPage = 1;
-        } else {
-            if (pageIndex == totalPage - 1) {
-                lastIndex = alerts.size();
-            } else {
-                lastIndex = (pageIndex + 1) * logPerPage;
-            }
         }
 
-        for (int i = pageIndex * logPerPage; i < lastIndex; i++) {
-            Alert alert = alerts.get(i);
+        List<AlertBean> list = AlertProxy.getByPage(db, logPerPage, pageIndex);
+        if (list == null) {
+            return dataList;
+        }
+
+        for (int i = 0; i < list.size(); i++) {
+            AlertBean alert = list.get(i);
             Map<String, Object> map = new HashMap<>();
-            map.put("number", alerts.size() - i);
+            map.put("number", count - pageIndex * logPerPage - i);
             map.put("time", DateUtil.Date2String(alert.getTime()));
             map.put("type", alert.getType());
             dataList.add(map);
@@ -208,19 +196,37 @@ public class LogFragment extends Fragment{
 
         modifyPageButton(pageIndex, totalPage);
 
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                mainActivity.kProgressHUD.dismiss();
-//                mainActivity.okHUD.show();
-//                new Handler().postDelayed(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        mainActivity.okHUD.dismiss();
-//                    }
-//                },700);
-//            }
-//        },500);
+        return dataList;
+    }
+
+    private List<Map<String, Object>> getInoutData() {
+
+        dataList.clear();
+        long count = InoutProxy.getCount(db);
+        totalPage = CommonUtil.getTotalPage(count, logPerPage);
+        if (count == 0) {
+            totalPage = 1;
+        }
+
+        List<InoutBean> list = InoutProxy.getByPage(db, logPerPage, pageIndex);
+        if (list == null) {
+            return dataList;
+        }
+
+        // "number", "type", "count", "lon", "lat", "time"
+        for (int i = 0; i < list.size(); i++) {
+            InoutBean inoutBean = list.get(i);
+            Map<String, Object> map = new HashMap<>();
+            map.put("number", count - pageIndex * logPerPage - i);
+            map.put("time", DateUtil.Date2String(inoutBean.getTime()));
+            map.put("type", inoutBean.getType() == 1 ? "出港" : "进港");
+            map.put("count", inoutBean.getCount());
+            map.put("lon", String.format("%.3f",inoutBean.getLon() / 10000000f));
+            map.put("lat", String.format("%.3f",inoutBean.getLat() / 10000000f));
+            dataList.add(map);
+        }
+
+        modifyPageButton(pageIndex, totalPage);
 
         return dataList;
     }
@@ -238,5 +244,30 @@ public class LogFragment extends Fragment{
         } else {
             mainActivity.pageBar.setPrevButtonEnable(true);
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void Event(SmsEvent smsEvent) {
+
+        try {
+            JSONObject receiveJson = smsEvent.getReceiveJson();
+            String apiType = receiveJson.getString("apiType");
+            switch (apiType) {
+                case "refreshInout":
+                    if (tg.equals("inout")) {
+                        getInoutData();
+                        simpleAdapter.notifyDataSetChanged();
+                    }
+                    break;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
     }
 }

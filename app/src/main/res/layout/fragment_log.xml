@@ -18,14 +18,15 @@
         android:layout_marginLeft="20dp"
         android:layout_marginStart="20dp"
         android:layout_marginRight="20dp"
-        android:layout_marginEnd="20dp">
+        android:layout_marginEnd="20dp"
+        android:visibility="gone">
 
         <TextView
             android:layout_width="50dp"
             android:layout_height="match_parent"
             android:textSize="20sp"
             android:textColor="#000000"
-            android:text="编号"
+            android:text="序号"
             android:gravity="center_vertical"/>
 
         <TextView
@@ -53,14 +54,15 @@
         android:layout_marginLeft="20dp"
         android:layout_marginStart="20dp"
         android:layout_marginRight="20dp"
-        android:layout_marginEnd="20dp">
+        android:layout_marginEnd="20dp"
+        android:visibility="gone">
 
         <TextView
             android:layout_width="50dp"
             android:layout_height="match_parent"
             android:textSize="20sp"
             android:textColor="#000000"
-            android:text="编号"
+            android:text="序号"
             android:gravity="center_vertical"/>
 
         <TextView
@@ -85,6 +87,66 @@
             android:textSize="20sp"
             android:textColor="#000000"
             android:text="打卡时间"
+            android:gravity="center_vertical"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/title_inout_layout"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginEnd="20dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:textSize="20sp"
+            android:textColor="#000000"
+            android:text="序号"
+            android:gravity="center_vertical"/>
+
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="match_parent"
+            android:textSize="20sp"
+            android:textColor="#000000"
+            android:text="类型"
+            android:gravity="center_vertical"/>
+
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:textSize="20sp"
+            android:textColor="#000000"
+            android:text="人数"
+            android:gravity="center"/>
+
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:textSize="20sp"
+            android:textColor="#000000"
+            android:text="经度"
+            android:gravity="center"/>
+
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:textSize="20sp"
+            android:textColor="#000000"
+            android:text="纬度"
+            android:gravity="center"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textSize="20sp"
+            android:textColor="#000000"
+            android:text="申报时间"
             android:gravity="center_vertical"/>
     </LinearLayout>
 

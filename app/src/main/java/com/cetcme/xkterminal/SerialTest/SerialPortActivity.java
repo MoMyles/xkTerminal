@@ -139,7 +139,8 @@ public class SerialPortActivity extends Activity {
 
 		mApplication = (MyApplication) getApplication();
 		try {
-			mSerialPort = mApplication.getSerialPort();
+//			mSerialPort = mApplication.getGpsSerialPort();
+			mSerialPort = mApplication.getAisSerialPort();
 			mOutputStream = mSerialPort.getOutputStream();
 			mInputStream = mSerialPort.getInputStream();
 

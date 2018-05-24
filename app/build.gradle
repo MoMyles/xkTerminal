@@ -1,31 +1,14 @@
 apply plugin: 'com.android.application'
-apply plugin: 'realm-android'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 27
     defaultConfig {
         applicationId "com.cetcme.xkterminal"
         minSdkVersion 16
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 1
         versionName '1.0'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        //过滤掉不支持的平台
-        packagingOptions {
-            exclude "lib/arm64-v8a/librealm-jni.so"
-            exclude "lib/mips/librealm-jni.so"
-            exclude "lib/x86/librealm-jni.so"
-            exclude "lib/x86_64/librealm-jni.so"
-        }
-
-        splits {
-            abi {
-                enable true
-                reset()
-                include 'armeabi-v7a'
-//                include 'armeabi', 'armeabi-v7a'
-            }
-        }
     }
     buildTypes {
         release {
@@ -44,7 +27,9 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:animated-vector-drawable:27.1.1'
+    implementation 'com.android.support:design:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
@@ -63,9 +48,15 @@ dependencies {
     implementation 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 
+    // 数据库要用
+    implementation 'org.xutils:xutils:3.5.0'
+    // 字符图标
+    implementation 'com.joanzapata.iconify:android-iconify-ionicons:2.2.2'
+    implementation 'com.joanzapata.iconify:android-iconify-fontawesome:2.2.2'
+    // 时间选择
+    implementation 'com.contrarywind:Android-PickerView:4.1.3'
 
-}
+    implementation files('libs/Msc.jar')
+    implementation files('libs/YimaApi.jar')
 
-realm {
-    syncEnabled = true
 }

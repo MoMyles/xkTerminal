@@ -1,13 +1,16 @@
 package com.cetcme.xkterminal.ActionBar;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.cetcme.xkterminal.MainActivity;
+import com.cetcme.xkterminal.NewInoutActivity;
 import com.cetcme.xkterminal.R;
 
 import java.util.ArrayList;
@@ -26,6 +29,8 @@ public class MessageBar extends RelativeLayout implements View.OnClickListener {
     private Button button_prev;
     private Button button_next;
     public Button button_back;
+
+    public boolean isInout = false;
 
     private ArrayList<Button> buttons = new ArrayList<>();
 
@@ -72,7 +77,11 @@ public class MessageBar extends RelativeLayout implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.button_new:
-                mainActivity.initNewFragment("new");
+                if (isInout) {
+                    mainActivity.startActivity(new Intent(mainActivity, NewInoutActivity.class));
+                } else {
+                    mainActivity.initNewFragment("new");
+                }
                 break;
             case R.id.button_detail:
                 mainActivity.initNewFragment("detail");
@@ -88,6 +97,7 @@ public class MessageBar extends RelativeLayout implements View.OnClickListener {
                 break;
             case R.id.button_back:
                 mainActivity.initMainFragment();
+                isInout = false;
                 break;
             default:
                 break;

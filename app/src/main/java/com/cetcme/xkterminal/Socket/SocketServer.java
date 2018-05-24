@@ -19,8 +19,6 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import io.realm.Realm;
-
 /**
  * Created by qiuhong on 28/11/2016.
  */

@@ -25,15 +25,14 @@ import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.R;
-import com.cetcme.xkterminal.RealmModels.Friend;
+import com.cetcme.xkterminal.Sqlite.Bean.FriendBean;
+import com.cetcme.xkterminal.Sqlite.Proxy.FriendProxy;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
-import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
+
+import org.xutils.DbManager;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-
-import io.realm.Realm;
-import io.realm.RealmResults;
+import java.util.List;
 
 /**
  * Created by qiuhong on 11/01/2018.
@@ -61,7 +60,7 @@ public class MessageNewFragment extends Fragment{
     private Button sms_temp_btn;
     private Button friend_btn;
 
-    private Realm realm;
+    private DbManager db;
 
     public MessageNewFragment(String tg, String receive, String content, String time) {
         this.tg = tg;
@@ -75,7 +74,7 @@ public class MessageNewFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_message_new,container,false);
 
-        realm = ((MyApplication) mainActivity.getApplication()).realm;
+        db = ((MyApplication) mainActivity.getApplication()).db;
 
         titleBar = view.findViewById(R.id.titleBar);
         receiver_editText = view.findViewById(R.id.receiver_editText);
@@ -172,7 +171,7 @@ public class MessageNewFragment extends Fragment{
                 final String[] builtInFriendNames = mainActivity.getResources().getStringArray(R.array.friendName);
                 final String[] builtInFriendNumbers = mainActivity.getResources().getStringArray(R.array.friendNumber);
 
-                final RealmResults<Friend> friends = realm.where(Friend.class).findAll();
+                final List<FriendBean> friends = FriendProxy.getAll(db);
 
                 // 显示序号
                 final String[] showItems = new String[builtInFriendNames.length + friends.size()];

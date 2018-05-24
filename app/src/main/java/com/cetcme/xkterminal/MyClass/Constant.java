@@ -41,8 +41,16 @@ public class Constant {
     // 紧急报警闪烁间隔，0为不闪烁，ms
     public static final int ALERT_FLASH_TIME = 500;
 
-    // 串口码率
-    public static final int SERIAL_PORT_BAUD_RATE = 9600;
+    // 数据串口码率
+    public static final int SERIAL_DATA_PORT_BAUD_RATE = 9600;
+    // gps串口码率
+    public static final int SERIAL_GPS_PORT_BAUD_RATE = 9600;
+    public static final int SERIAL_AIS_PORT_BAUD_RATE = 38400;
+    // GPS串口路径
+    public static final String SERIAL_GPS_PORT_PATH = "/dev/ttyS1";
+    public static final String SERIAL_AIS_PORT_PATH = "/dev/ttyS3";
+    // 数据串口路径
+    public static final String SERIAL_DATA_PORT_PATH = "/dev/ttyS3";
 
     // 显示序号
     public static final boolean SHOW_NUMBER_MESSAGE_LIST = true;

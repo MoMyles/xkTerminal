@@ -8,9 +8,12 @@
     <color name="no_gps">#D0021B</color>
     <color name="red">#D0021B</color>
 
-    <color name="QHTitleColor">#333c58</color>
+    <color name="QHTitleColor">#157CFB</color>
 
     <color name="border_clo">#ccc</color>
 
     <color name="separate_clo">#494949</color>
+
+    <color name="navigation_status_normal">#EEFFFFFF</color>
+    <color name="navigation_status_danger">#edec3333</color>
 </resources>

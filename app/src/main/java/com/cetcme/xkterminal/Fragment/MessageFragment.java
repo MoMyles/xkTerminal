@@ -2,15 +2,12 @@ package com.cetcme.xkterminal.Fragment;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -21,20 +18,17 @@ import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.CommonUtil;
 import com.cetcme.xkterminal.MyClass.DateUtil;
-import com.cetcme.xkterminal.MyClass.DensityUtil;
 import com.cetcme.xkterminal.R;
-import com.cetcme.xkterminal.RealmModels.Message;
+import com.cetcme.xkterminal.Sqlite.Bean.MessageBean;
+import com.cetcme.xkterminal.Sqlite.Proxy.MessageProxy;
+
+import org.xutils.DbManager;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.realm.Realm;
-import io.realm.RealmChangeListener;
-import io.realm.RealmResults;
-import io.realm.Sort;
 
 /**
  * Created by qiuhong on 10/01/2018.
@@ -56,8 +50,9 @@ public class MessageFragment extends Fragment{
     private int pageIndex = 0;
     private int totalPage = 1;
 
-    private Realm realm;
     public String status;
+
+    private DbManager db;
 
     public MessageFragment(String tg) {
         this.tg = tg;
@@ -66,7 +61,7 @@ public class MessageFragment extends Fragment{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        realm = ((MyApplication) getActivity().getApplication()).realm;
+        db = ((MyApplication) getActivity().getApplication()).db;
 
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_message,container,false);
 
@@ -180,33 +175,23 @@ public class MessageFragment extends Fragment{
     }
 
     private List<Map<String, Object>> getMessageData() {
-//        mainActivity.kProgressHUD.show();
         dataList.clear();
 
-        RealmResults<Message> messages = realm.where(Message.class)
-                .equalTo("isSend" , tg.equals("send"))
-                .findAll();
-        messages = messages.sort("send_time", Sort.DESCENDING);
-        int count = messages.size();
+        long count = MessageProxy.getCount(db, tg.equals("send"));
 
-        totalPage = CommonUtil.getTotalPage(messages.size(), messagePerPage);
-
-        int lastMessageIndex;
-        if (messages.size() == 0) {
-            lastMessageIndex = 0;
+        totalPage = CommonUtil.getTotalPage(count, messagePerPage);
+        if (count == 0) {
             totalPage = 1;
-        } else {
-            if (pageIndex == totalPage - 1) {
-                lastMessageIndex = messages.size();
-            } else {
-                lastMessageIndex = (pageIndex + 1) * messagePerPage;
-            }
         }
 
-        for (int i = pageIndex * messagePerPage; i < lastMessageIndex; i++) {
-            Message message = messages.get(i);
+        List<MessageBean> list = MessageProxy.getByPage(db, tg.equals("send"), messagePerPage, pageIndex);
+        if (list == null) {
+            return dataList;
+        }
+        for (int i = 0; i < list.size(); i++) {
+            MessageBean message = list.get(i);
             Map<String, Object> map = new HashMap<>();
-            map.put("number", count - i);
+            map.put("number", count - pageIndex * messagePerPage - i);
             map.put("selected", "");
             map.put("time", DateUtil.Date2String(message.getSend_time()));
             map.put("sender", message.getSender());
@@ -223,20 +208,6 @@ public class MessageFragment extends Fragment{
 
         modifyPageButton(pageIndex, totalPage);
 
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                mainActivity.kProgressHUD.dismiss();
-//                mainActivity.okHUD.show();
-//                new Handler().postDelayed(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        mainActivity.okHUD.dismiss();
-//                    }
-//                },700);
-//            }
-//        },500);
-
         return dataList;
     }
 
@@ -245,15 +216,8 @@ public class MessageFragment extends Fragment{
         dataList.get(index).put("read", "");
         simpleAdapter.notifyDataSetChanged();
 
-        final String id = dataList.get(index).get("id").toString();
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                //先查找后得到User对象
-                Message message = realm.where(Message.class).equalTo("id", id).findFirst();
-                message.setRead(true);
-            }
-        });
+        int id = Integer.parseInt(dataList.get(index).get("id").toString());
+        MessageProxy.setMessageReadById(db, id);
         mainActivity.modifyGpsBarMessageCount();
     }
 

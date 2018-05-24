@@ -2,6 +2,8 @@ package com.cetcme.xkterminal.MyClass;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
 
 /**
  * Created by qiuhong on 15/01/2018.
@@ -9,7 +11,7 @@ import android.content.Context;
 
 public class CommonUtil {
 
-    public static int getTotalPage(int total, int perPage) {
+    public static int getTotalPage(long total, int perPage) {
         return (int) Math.ceil((float) total / perPage);
     }
 

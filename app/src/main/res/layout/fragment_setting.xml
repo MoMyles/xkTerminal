@@ -61,10 +61,10 @@
                     android:gravity="center_vertical"
                     android:textColor="#000000"
                     android:textSize="18sp"
-                    android:text="定位来源："/>
+                    android:text="通讯来源："/>
 
                 <TextView
-                    android:id="@+id/location_from_textView"
+                    android:id="@+id/communication_from_textView"
                     android:layout_width="250dp"
                     android:layout_weight="1"
                     android:layout_height="match_parent"
@@ -87,7 +87,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:visibility="gone"
+                >
                 <TextView
                     android:layout_width="250dp"
                     android:layout_weight="1"
@@ -120,10 +122,10 @@
                     android:gravity="center_vertical"
                     android:textColor="#000000"
                     android:textSize="18sp"
-                    android:text="通讯来源："/>
+                    android:text="定位来源："/>
 
                 <TextView
-                    android:id="@+id/communication_from_textView"
+                    android:id="@+id/location_from_textView"
                     android:layout_width="250dp"
                     android:layout_weight="1"
                     android:layout_height="match_parent"
@@ -139,13 +141,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="1px"
                 android:layout_alignParentBottom="true"
-                android:background="#b7b7b7" />
+                android:background="#b7b7b7"
+                android:visibility="gone"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:visibility="gone">
 
                 <TextView
                     android:layout_width="250dp"
@@ -199,13 +203,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="1px"
                 android:layout_alignParentBottom="true"
-                android:background="#b7b7b7" />
+                android:background="#b7b7b7"
+                android:visibility="gone"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:visibility="gone">
                 <TextView
                     android:layout_width="250dp"
                     android:layout_weight="1"
@@ -257,13 +263,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="1px"
                 android:layout_alignParentBottom="true"
-                android:background="#b7b7b7" />
+                android:background="#b7b7b7"
+                android:visibility="gone"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:visibility="gone">
 
                 <TextView
                     android:layout_width="250dp"
@@ -317,13 +325,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="1px"
                 android:layout_alignParentBottom="true"
-                android:background="#b7b7b7" />
+                android:background="#b7b7b7"
+                android:visibility="gone"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:visibility="gone">
                 <TextView
                     android:layout_width="250dp"
                     android:layout_weight="1"
@@ -375,7 +385,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="1px"
                 android:layout_alignParentBottom="true"
-                android:background="#b7b7b7" />
+                android:background="#b7b7b7"
+                android:visibility="gone" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -456,6 +467,61 @@
                 android:layout_height="1px"
                 android:layout_alignParentBottom="true"
                 android:background="#b7b7b7" />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="250dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:layout_marginLeft="200dp"
+                    android:layout_marginStart="200dp"
+                    android:textColor="#000000"
+                    android:textSize="18sp"
+                    android:text="用户分组："/>
+
+                <TextView
+                    android:id="@+id/group_textView"
+                    android:layout_width="250dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:textColor="#000000"
+                    android:textSize="18sp"
+                    android:text="---"/>
+
+                <android.support.v4.widget.Space
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"/>
+
+                <TextView
+                    android:layout_width="250dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:textColor="#000000"
+                    android:textSize="18sp"
+                    android:text=""/>
+
+                <TextView
+                    android:id="@+id/beiyong_textView"
+                    android:layout_width="250dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:textColor="#000000"
+                    android:layout_marginRight="200dp"
+                    android:layout_marginEnd="200dp"
+                    android:textSize="18sp"
+                    android:text=""/>
+
+            </LinearLayout>
 
             <TextView
                 android:layout_width="match_parent"
@@ -552,6 +618,7 @@
                 android:layout_height="1px"
                 android:layout_alignParentBottom="true"
                 android:background="#b7b7b7" />
+
 
         </LinearLayout>
 

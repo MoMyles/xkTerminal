@@ -1,31 +1,38 @@
 package com.cetcme.xkterminal;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.cetcme.xkterminal.DataFormat.IDFormat;
 import com.cetcme.xkterminal.DataFormat.MessageFormat;
-import com.cetcme.xkterminal.DataFormat.SignFormat;
 import com.cetcme.xkterminal.DataFormat.Util.ByteUtil;
 import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
 import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
 import com.cetcme.xkterminal.DataFormat.Util.Util;
+import com.cetcme.xkterminal.DataFormat.WarnFormat;
 import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
-import com.cetcme.xkterminal.MyClass.ScreenBrightness;
-import com.cetcme.xkterminal.MyClass.SoundPlay;
+import com.cetcme.xkterminal.Navigation.GpsInfo;
+import com.cetcme.xkterminal.Navigation.GpsParse;
 import com.cetcme.xkterminal.Socket.SocketManager;
 import com.cetcme.xkterminal.Socket.SocketServer;
+import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
+import com.cetcme.xkterminal.Sqlite.Bean.MessageBean;
+import com.cetcme.xkterminal.Sqlite.Bean.OtherShipBean;
+import com.cetcme.xkterminal.Sqlite.Proxy.MessageProxy;
+import com.iflytek.cloud.SpeechConstant;
+import com.iflytek.cloud.SpeechUtility;
+import com.joanzapata.iconify.Iconify;
+import com.joanzapata.iconify.fonts.FontAwesomeModule;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -33,6 +40,10 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.xutils.DbManager;
+import org.xutils.db.table.TableEntity;
+import org.xutils.ex.DbException;
+import org.xutils.x;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,16 +52,14 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidParameterException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import android_serialport_api.SerialPort;
 import android_serialport_api.SerialPortFinder;
-import io.realm.Realm;
-import io.realm.RealmConfiguration;
-import io.realm.RealmQuery;
-import io.realm.RealmResults;
-import io.realm.Sort;
+import yimamapapi.skia.AisInfo;
+import yimamapapi.skia.YimaAisParse;
+import yimamapapi.skia.YimaLib;
 
 import static com.cetcme.xkterminal.MainActivity.myNumber;
 
@@ -63,52 +72,79 @@ public class MyApplication extends Application {
     public MainActivity mainActivity;
     public IDCardActivity idCardActivity;
 
-    public Realm realm;
+    private static MyApplication mContext;
+    private static LocationBean currentLocation;
+    public DbManager db;
+
+    public DataHandler mHandler;
+
+    public SerialPortFinder mSerialPortFinder = new SerialPortFinder();
+    private SerialPort mSerialPort = null;
     private OutputStream mOutputStream;
     private InputStream mInputStream;
 
-    private boolean messageSendFailed = true;
+    //    private SerialPort gpsSerialPort = null;
+//    private OutputStream gpsOutputStream;
+//    private InputStream gpsInputStream;
+    private SerialPort aisSerialPort = null;
+    private OutputStream aisOutputStream;
+    private InputStream aisInputStream;
 
-    private static final int SERIAL_PORT_RECEIVE_NEW_MESSAGE = 0x01;
-    private static final int SERIAL_PORT_MESSAGE_SEND_SUCCESS = 0x02;
-    private static final int SERIAL_PORT_TIME_NUMBER_AND_COMMUNICATION_FROM = 0x03;
-    private static final int SERIAL_PORT_ALERT_SEND_SUCCESS = 0x04;
-    private static final int SERIAL_PORT_SHOW_ALERT_ACTIVITY = 0x05;
-    private static final int SERIAL_PORT_RECEIVE_NEW_SIGN = 0x06;
-    private static final int SERIAL_PORT_RECEIVE_NEW_ALERT = 0x07;
-    private static final int SERIAL_PORT_MODIFY_SCREEN_BRIGHTNESS = 0x08;
-    private static final int SERIAL_PORT_SHUT_DOWN = 0x09;
-    private static final int SERIAL_PORT_ALERT_START = 0x10;
-    private static final int SERIAL_PORT_ALERT_FAIL = 0x11;
+    public boolean messageSendFailed = true;
 
     // for file pick
     private Handler handler;
 
     private Toast tipToast;
 
-    private String failedMessageId;
+    private int failedMessageId = 0;
+
+    /**
+     * 加载库文件（只需调用一次）
+     */
+    static {
+        YimaLib.LoadLib();
+    }
 
     @SuppressLint("HandlerLeak")
     @Override
     public void onCreate() {
         super.onCreate();
+        mContext = this;
+
+        if (!PreferencesUtils.getBoolean(this, "copiedYimaFile")) {
+            copyYimaFile();
+            PreferencesUtils.putBoolean(this, "copiedYimaFile", true);
+        }
+
+        x.Ext.init(this);
+//        x.Ext.setDebug(BuildConfig.DEBUG); // 开启debug会影响性能
 
         EventBus.getDefault().register(this);
 
-        Realm.init(this);
-        RealmConfiguration config = new RealmConfiguration.Builder().name("myrealm.realm").build();
-        Realm.setDefaultConfiguration(config);
 
-        realm = Realm.getDefaultInstance();
 
         try {
             mSerialPort = getSerialPort();
             mOutputStream = mSerialPort.getOutputStream();
             mInputStream = mSerialPort.getInputStream();
 
-			/* Create a receiving thread */
+//            gpsSerialPort = getGpsSerialPort();
+//            gpsOutputStream = gpsSerialPort.getOutputStream();
+//            gpsInputStream = gpsSerialPort.getInputStream();
+
+            aisSerialPort = getAisSerialPort();
+            aisOutputStream = aisSerialPort.getOutputStream();
+            aisInputStream = aisSerialPort.getInputStream();
+
+            // Create a receiving thread
             ReadThread mReadThread = new ReadThread();
             mReadThread.start();
+//
+//            GpsReadThread gpsReadThread = new GpsReadThread();
+//            gpsReadThread.start();
+            AisReadThread aisReadThread = new AisReadThread();
+            aisReadThread.start();
         } catch (SecurityException e) {
             DisplayError(R.string.error_security);
         } catch (IOException e) {
@@ -117,6 +153,11 @@ public class MyApplication extends Application {
             DisplayError(R.string.error_configuration);
         }
 
+//        显示所有path
+//        String[] paths =  mSerialPortFinder.getAllDevicesPath();
+//        for (String path : paths) {
+//            Log.i("qh_port", "onCreate: " + path);
+//        }
 
         new Thread() {
             @Override
@@ -127,10 +168,10 @@ public class MyApplication extends Application {
 
         tipToast = Toast.makeText(getApplicationContext(), "", Toast.LENGTH_SHORT);
 
-        handler = new Handler(){
+        handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
-                switch(msg.what){
+                switch (msg.what) {
                     case 0:
                         SimpleDateFormat format = new SimpleDateFormat("hh:mm:ss");
                         String str = "[" + format.format(Constant.SYSTEM_DATE) + "]" + msg.obj.toString();
@@ -148,6 +189,90 @@ public class MyApplication extends Application {
             }
         };
         new SocketManager(handler, getApplicationContext());
+
+        mHandler = new DataHandler(mainActivity, this);
+
+
+        initDb();
+
+        // 语音
+        Iconify.with(new FontAwesomeModule());
+
+        StringBuffer param = new StringBuffer();
+        param.append("appid=5afb90f6");
+        param.append(",");
+        // 设置使用v5+
+        param.append(SpeechConstant.ENGINE_MODE + "=" + SpeechConstant.MODE_MSC);
+        SpeechUtility.createUtility(this, param.toString());
+
+        try {
+            db.delete(OtherShipBean.class);
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public static MyApplication getInstance() {
+        return mContext;
+    }
+
+    public DbManager getDb() {
+        return db;
+    }
+
+    public LocationBean getCurrentLocation() {
+        return currentLocation;
+    }
+
+    /**
+     * 文件复制: 把assets目录下的workDir目录拷贝到data/data/包名/files目录下。（只需调用一次，用户也可以自己实现）
+     */
+    private void copyYimaFile() {
+        String strFile = getApplicationContext().getFilesDir().getAbsolutePath();
+        long startTime = System.currentTimeMillis();
+        YimaLib.CopyWorkDir(getApplicationContext(), strFile);
+        long endTime = System.currentTimeMillis(); //获取结束时间
+        System.out.println("Yima WorkDir 文件拷贝: " + String.valueOf(endTime - startTime) + "ms");
+//        Toast.makeText(MainActivity.this, "文件拷贝" + String.valueOf(endTime - startTime), Toast.LENGTH_SHORT).show();
+    }
+
+    public void initDb() {
+        DbManager.DaoConfig daoConfig = new DbManager.DaoConfig()
+                .setDbName("xkTerminal.db")
+                // 不设置dbDir时, 默认存储在app的私有目录.
+                //.setDbDir(new File(Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+"mswcs/db")) //设置数据库.db文件存放的目录,默认为包名下databases目录下
+                .setDbVersion(1)//设置数据库版本,每次启动应用时将会检查该版本号,
+                //发现数据库版本低于这里设置的值将进行数据库升级并触发DbUpgradeListener
+                .setAllowTransaction(true)//设置是否开启事务,默认为false关闭事务
+                .setDbOpenListener(new DbManager.DbOpenListener() {
+                    @Override
+                    public void onDbOpened(DbManager db) {
+                        // 开启WAL, 对写入加速提升巨大
+                        db.getDatabase().enableWriteAheadLogging();
+                    }
+                })
+                .setTableCreateListener(new DbManager.TableCreateListener() {
+                    @Override
+                    public void onTableCreated(DbManager db, TableEntity<?> table) {
+
+                    }
+                })//设置数据库创建时的Listener
+                //设置数据库升级时的Listener,这里可以执行相关数据库表的相关修改,比如alter语句增加字段等
+                .setDbUpgradeListener(new DbManager.DbUpgradeListener() {
+                    @Override
+                    public void onUpgrade(DbManager db, int oldVersion, int newVersion) {
+                        // db.addColumn(...);
+                        // db.dropTable(...);
+                        // ...
+                        // or
+                        // db.dropDb();
+                        if (newVersion > oldVersion) {
+
+                        }
+                    }
+                });
+        db = x.getDb(daoConfig);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -157,6 +282,14 @@ public class MyApplication extends Application {
             String apiType = receiveJson.getString("apiType");
             JSONObject jsonObject = new JSONObject();
             switch (apiType) {
+                case "device_info_set":
+                    JSONObject data = receiveJson.getJSONObject("data");
+                    String newID = data.getString("deviceID");
+                    sendBytes(IDFormat.format(newID));
+                    break;
+                case "device_id":
+                    sendBytes(IDFormat.getID());
+                    break;
                 case "sms_list":
                     JSONArray smsList = getSmsList();
 
@@ -182,7 +315,7 @@ public class MyApplication extends Application {
                     break;
 
                 case "sms_send":
-                    final com.cetcme.xkterminal.RealmModels.Message message = new com.cetcme.xkterminal.RealmModels.Message();
+                    final MessageBean message = new MessageBean();
                     message.fromJson(receiveJson.getJSONObject("data"));
 
                     SharedPreferences sharedPreferences = getSharedPreferences("xkTerminal", Context.MODE_PRIVATE); //私有数据
@@ -236,25 +369,10 @@ public class MyApplication extends Application {
                     editor.putString("lastSendTimeSave", DateUtil.parseDateToString(Constant.SYSTEM_DATE, DateUtil.DatePattern.YYYYMMDDHHMMSS));
                     editor.apply(); //提交修改
 
-                    realm.executeTransaction(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm realm) {
-                            com.cetcme.xkterminal.RealmModels.Message newMessage = realm.createObject(com.cetcme.xkterminal.RealmModels.Message.class);
-                            newMessage.setId(message.getId());
-                            newMessage.setSender(myNumber);
-                            newMessage.setReceiver(message.getReceiver());
-                            newMessage.setContent(message.getContent());
-                            newMessage.setDeleted(false);
-                            newMessage.setSend_time(message.getSend_time());
-                            newMessage.setRead(true);
-                            newMessage.setSend(true);
-                            newMessage.setSendOK(true);
-                            failedMessageId = newMessage.getId();
+                    MessageProxy.insert(db, message);
+                    failedMessageId = message.getId();
 
-                        }
-                    });
-
-                    byte[] messageBytes = MessageFormat.format(message.getReceiver(), message.getContent(), MessageFormat.MESSAGE_TYPE_NORMAL);
+                    byte[] messageBytes = MessageFormat.format(message.getReceiver(), message.getContent(), message.getReceiver().length() == 11 ? MessageFormat.MESSAGE_TYPE_CELLPHONE : MessageFormat.MESSAGE_TYPE_NORMAL);
                     sendBytes(messageBytes);
                     System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
 
@@ -276,13 +394,8 @@ public class MyApplication extends Application {
                                     e.printStackTrace();
                                 }
 
-                                if (failedMessageId != null) {
-                                    com.cetcme.xkterminal.RealmModels.Message message = realm.where(com.cetcme.xkterminal.RealmModels.Message.class).equalTo("id", failedMessageId).findFirst();
-                                    if (message != null) {
-                                        realm.beginTransaction();
-                                        message.setSendOK(false);
-                                        realm.commitTransaction();
-                                    }
+                                if (failedMessageId != 0) {
+                                    MessageProxy.setMessageFailed(db, failedMessageId);
 
                                     if (mainActivity.fragmentName.equals("message") && mainActivity.messageFragment.tg.equals("send")) {
                                         mainActivity.messageFragment.reloadDate();
@@ -295,40 +408,14 @@ public class MyApplication extends Application {
                     break;
                 case "sms_read":
                     final String userAddress1 = receiveJson.getString("userAddress");
-                    realm.executeTransaction(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm realm) {
-                            //先查找后得到User对象
-                            RealmResults<com.cetcme.xkterminal.RealmModels.Message> messages = realm.where(com.cetcme.xkterminal.RealmModels.Message.class)
-                                    .equalTo("sender", userAddress1)
-                                    .equalTo("read", false)
-                                    .findAll();
-                            for (com.cetcme.xkterminal.RealmModels.Message message : messages) {
-                                message.setRead(true);
-                            }
-                            mainActivity.modifyGpsBarMessageCount();
-                        }
-                    });
+                    MessageProxy.setMessageReadBySender(db, userAddress1);
+                    mainActivity.modifyGpsBarMessageCount();
                     break;
                 case "sms_delete":
                     final String userAddress2 = receiveJson.getString("userAddress");
                     // 删除 所有消息
-                    RealmQuery<com.cetcme.xkterminal.RealmModels.Message> query = realm.where(com.cetcme.xkterminal.RealmModels.Message.class);
-                    query.equalTo("receiver", userAddress2);
-                    if (userAddress2.equals(myNumber)) {
-                        query.equalTo("receiver", userAddress2);
-                    }
-                    final RealmResults<com.cetcme.xkterminal.RealmModels.Message> messages = query.findAll();
-                    realm.executeTransaction(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm realm) {
-                            for (com.cetcme.xkterminal.RealmModels.Message message : messages) {
-                                message.deleteFromRealm();
-                            }
-                            mainActivity.modifyGpsBarMessageCount();
-                        }
-                    });
-
+                    MessageProxy.deleteAllByAddress(db, userAddress2, myNumber);
+                    mainActivity.modifyGpsBarMessageCount();
                     break;
                 case "set_time":
                     Date date = new Date(receiveJson.getString("time"));
@@ -354,135 +441,63 @@ public class MyApplication extends Application {
     }
 
     public JSONArray getSmsList() {
-        RealmResults<com.cetcme.xkterminal.RealmModels.Message> messages = realm.where(com.cetcme.xkterminal.RealmModels.Message.class)
-                .findAll();
-        messages = messages.sort("send_time", Sort.DESCENDING);
-
-        ArrayList<String> userAddresses = new ArrayList<>();
-        for (com.cetcme.xkterminal.RealmModels.Message message: messages) {
-            if (message.isSend() && !userAddresses.contains(message.getReceiver())) userAddresses.add(message.getReceiver());
-            if (!message.isSend() && !userAddresses.contains(message.getSender())) userAddresses.add(message.getSender());
-        }
+        List<String> userAddresses = MessageProxy.getAddress(db);
 
         JSONArray smsList = new JSONArray();
         for (String userAddress : userAddresses) {
-            RealmQuery<com.cetcme.xkterminal.RealmModels.Message> query = realm.where(com.cetcme.xkterminal.RealmModels.Message.class);
-            query.equalTo("receiver", userAddress);
-            if (userAddress.equals(myNumber)) {
-                query.equalTo("sender", userAddress);
-            } else {
-                query.or().equalTo("sender", userAddress);
-            }
-            query.sort("send_time", Sort.ASCENDING);
-            RealmResults<com.cetcme.xkterminal.RealmModels.Message> smses = query.findAll();
-            com.cetcme.xkterminal.RealmModels.Message message = smses.last();
 
-            RealmResults<com.cetcme.xkterminal.RealmModels.Message> unreadSmses = realm.where(com.cetcme.xkterminal.RealmModels.Message.class)
-                    .equalTo("sender", userAddress)
-                    .equalTo("read", false)
-                    .findAll();
+            MessageBean message = MessageProxy.getLast(db, userAddress, myNumber);
+            if (message != null) {
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("lastSmsContent", message.getContent());
+                    jsonObject.put("userAddress", userAddress);
+                    jsonObject.put("lastSmsTime", message.getSend_time());
+                    jsonObject.put("hasUnread", MessageProxy.getUnReadCountByAddress(db, userAddress) != 0);
 
-            JSONObject jsonObject = new JSONObject();
-            try {
-                jsonObject.put("lastSmsContent", message.getContent());
-                jsonObject.put("userAddress", userAddress);
-                jsonObject.put("lastSmsTime", message.getSend_time());
-                jsonObject.put("hasUnread", unreadSmses.size() != 0);
-                System.out.println(jsonObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
-            } catch (JSONException e) {
-                e.printStackTrace();
+                smsList.put(jsonObject);
             }
 
-            smsList.put(jsonObject);
         }
 
-//        System.out.println("+++++smsList" + smsList);
         return smsList;
     }
 
     public JSONArray getSmsDetail(String userAddress, int countPerPage, String timeBefore) {
-        RealmResults<com.cetcme.xkterminal.RealmModels.Message> messages;
-        if (userAddress.equals(myNumber)) {
-            messages = realm.where(com.cetcme.xkterminal.RealmModels.Message.class)
-                    .equalTo("sender", userAddress)
-                    .equalTo("receiver", userAddress)
-                    .lessThan("send_time", new Date(timeBefore))
-                    .findAll();
-        } else {
-            RealmQuery query = realm.where(com.cetcme.xkterminal.RealmModels.Message.class);
-            query.beginGroup()
-                .equalTo("sender", userAddress)
-                .or().equalTo("receiver", userAddress)
-                .endGroup();
-            query.lessThan("send_time", new Date(timeBefore));
-            messages = query.findAll();
-        }
-
-        messages = messages.sort("send_time", Sort.ASCENDING);
+        List<MessageBean> messages = MessageProxy.getByAddressAndTime(db, userAddress, myNumber, countPerPage, timeBefore);
 
         JSONArray smsList = new JSONArray();
-        if (messages.size() < countPerPage) countPerPage = messages.size();
 
-
-        for (int i = messages.size() - countPerPage; i < messages.size(); i++) {
-            com.cetcme.xkterminal.RealmModels.Message message = messages.get(i);
+        for (int i = 0; i < messages.size(); i++) {
+            MessageBean message = messages.get(i);
             JSONObject jsonObject = message.toJson();
             smsList.put(jsonObject);
         }
         return smsList;
     }
 
-    private void testReceive(int i) {
-        switch (i) {
-            case 0:
-                // 测试接收短信
-                byte[] messageBytes = MessageFormat.format("123456", "我是第一条的短信。。。。", MessageFormat.MESSAGE_TYPE_NORMAL);
-                sendBytes(messageBytes);
-                messageBytes = MessageFormat.format("123456", "我是第二条的短信!!!!", MessageFormat.MESSAGE_TYPE_NORMAL);
-                sendBytes(messageBytes);
-                break;
-            case 1:
-                // 测试接收身份证信息
-                sendBytes(SignFormat.format());
-                break;
-            case 2:
-                // 测试接收报警
-                byte[] frameData = "$R5".getBytes();
-                frameData = ByteUtil.byteMerger(frameData, "12345678".getBytes());
-//                frameData = ByteUtil.byteMerger(frameData, new byte[]{(byte) 0x00});
-                frameData = ByteUtil.byteMerger(frameData, "OK".getBytes());
-                frameData = ByteUtil.byteMerger(frameData, "*h".getBytes());
-                frameData = ByteUtil.byteMerger(frameData, new byte[]{(byte) 0x0D, (byte) 0x0A});
-                sendBytes(frameData);
-                break;
-            default:
-                break;
-        }
-    }
-
     @Override
     public void onTerminate() {
         super.onTerminate();
-        realm.close();
     }
 
 
-    public SerialPortFinder mSerialPortFinder = new SerialPortFinder();
-    private SerialPort mSerialPort = null;
-
     public SerialPort getSerialPort() throws SecurityException, IOException, InvalidParameterException {
         if (mSerialPort == null) {
-			/* Read serial port parameters */
+            /* Read serial port parameters */
 //            SharedPreferences sp = getSharedPreferences("android_serialport_api.sample_preferences", MODE_PRIVATE);
 //            String path = sp.getString("DEVICE", "");
 //            path = "/dev/ttyS3";
 //            int baudrate = Integer.decode(sp.getString("BAUDRATE", "-1"));
-            String path = "/dev/ttyS3";
-            int baudrate = Constant.SERIAL_PORT_BAUD_RATE;
+            String path = Constant.SERIAL_DATA_PORT_PATH;
+            int baudrate = Constant.SERIAL_DATA_PORT_BAUD_RATE;
 
 			/* Check parameters */
-            if ( (path.length() == 0) || (baudrate == -1)) {
+            if ((path.length() == 0) || (baudrate == -1)) {
                 throw new InvalidParameterException();
             }
 
@@ -490,6 +505,39 @@ public class MyApplication extends Application {
             mSerialPort = new SerialPort(new File(path), baudrate, 0);
         }
         return mSerialPort;
+    }
+
+    //    public SerialPort getGpsSerialPort() throws SecurityException, IOException, InvalidParameterException {
+//        if (gpsSerialPort == null) {
+//			/* Read serial port parameters */
+//            String path = Constant.SERIAL_GPS_PORT_PATH;
+//            int baudrate = Constant.SERIAL_GPS_PORT_BAUD_RATE;
+//
+//			/* Check parameters */
+//            if ( (path.length() == 0) || (baudrate == -1)) {
+//                throw new InvalidParameterException();
+//            }
+//
+//			/* Open the serial port */
+//            gpsSerialPort = new SerialPort(new File(path), baudrate, 0);
+//        }
+//        return gpsSerialPort;
+//    }
+    public SerialPort getAisSerialPort() throws SecurityException, IOException, InvalidParameterException {
+        if (aisSerialPort == null) {
+                /* Read serial port parameters */
+            String path = Constant.SERIAL_AIS_PORT_PATH;
+            int baudrate = Constant.SERIAL_AIS_PORT_BAUD_RATE;
+
+                /* Check parameters */
+            if ((path.length() == 0) || (baudrate == -1)) {
+                throw new InvalidParameterException();
+            }
+
+                /* Open the serial port */
+            aisSerialPort = new SerialPort(new File(path), baudrate, 0);
+        }
+        return aisSerialPort;
     }
 
     public void closeSerialPort() {
@@ -500,6 +548,8 @@ public class MyApplication extends Application {
     }
 
     private void DisplayError(int resourceId) {
+        Log.e("MyApplication", "DisplayError: " + getString(resourceId), null);
+        /*
         AlertDialog.Builder b = new AlertDialog.Builder(this);
         b.setTitle("Error");
         b.setMessage(resourceId);
@@ -509,6 +559,7 @@ public class MyApplication extends Application {
             }
         });
         b.show();
+        */
     }
 
     private class ReadThread extends Thread {
@@ -516,7 +567,7 @@ public class MyApplication extends Application {
         @Override
         public void run() {
             super.run();
-            while(!isInterrupted()) {
+            while (!isInterrupted()) {
                 int size;
                 try {
                     Thread.sleep(10);
@@ -525,6 +576,56 @@ public class MyApplication extends Application {
                     size = mInputStream.read(buffer);
                     if (size > 0) {
                         onDataReceived(buffer, size);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return;
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+//    private class GpsReadThread extends Thread {
+//
+//        @Override
+//        public void run() {
+//            super.run();
+//            while(!isInterrupted()) {
+//                int size;
+//                try {
+//                    Thread.sleep(1000);
+//                    byte[] buffer = new byte[200];
+//                    if (gpsInputStream == null) return;
+//                    size = gpsInputStream.read(buffer);
+//                    if (size > 0) {
+//                        onGpsDataReceived(buffer, size);
+//                    }
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                    return;
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+//    }
+
+    private class AisReadThread extends Thread {
+
+        @Override
+        public void run() {
+            super.run();
+            while (!isInterrupted()) {
+                int size;
+                try {
+                    Thread.sleep(1000);
+                    byte[] buffer = new byte[1024];
+                    if (aisInputStream == null) return;
+                    size = aisInputStream.read(buffer);
+                    if (size > 0) {
+                        onAisDataReceived(buffer, size);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -545,7 +646,7 @@ public class MyApplication extends Application {
         serialCount++;
         if (serialCount == 3) {
             String head = Util.bytesGetHead(serialBuffer, 3);
-            if (head.equals("$04") || head.equals("$R4") || head.equals("$R1") || head.equals("$R5") || head.equals("$R0") || head.equals("$R6") || head.equals("$R7") || head.equals("$R8")) {
+            if (head.equals("$04") || head.equals("$R4") || head.equals("$R1") || head.equals("$R2") || head.equals("$R5") || head.equals("$R0") || head.equals("$R6") || head.equals("$R7") || head.equals("$R8")) {
                 hasHead = true;
             } else {
                 Util.bytesRemoveFirst(serialBuffer, serialCount);
@@ -567,7 +668,7 @@ public class MyApplication extends Application {
                 switch (Util.bytesGetHead(serialBuffer, 3)) {
                     case "$04":
                         // 接收短信
-                        message.what = SERIAL_PORT_RECEIVE_NEW_MESSAGE;
+                        message.what = DataHandler.SERIAL_PORT_RECEIVE_NEW_MESSAGE;
                         message.setData(bundle);
                         mHandler.sendMessage(message);
                         break;
@@ -591,45 +692,55 @@ public class MyApplication extends Application {
                         return;
                     case "$R4":
                         // 短信发送成功
-                        message.what = SERIAL_PORT_MESSAGE_SEND_SUCCESS;
+                        message.what = DataHandler.SERIAL_PORT_MESSAGE_SEND_SUCCESS;
                         message.setData(bundle);
                         mHandler.sendMessage(message);
                         break;
                     case "$R1":
                         // 接收时间
-                        message.what = SERIAL_PORT_TIME_NUMBER_AND_COMMUNICATION_FROM;
+                        if (serialCount == 25) {
+                            message.what = DataHandler.SERIAL_PORT_TIME_NUMBER_AND_COMMUNICATION_FROM;
+                        } else if (serialCount == 20) {
+                            message.what = DataHandler.SERIAL_PORT_TIME;
+                        }
+                        message.setData(bundle);
+                        mHandler.sendMessage(message);
+                        break;
+                    case "$R2":
+                        // 接收时间
+                        message.what = DataHandler.SERIAL_PORT_ID_EDIT_OK;
                         message.setData(bundle);
                         mHandler.sendMessage(message);
                         break;
                     case "$R5":
                         if (serialCount == 14) {
                             // 紧急报警成功
-                            message.what = SERIAL_PORT_ALERT_SEND_SUCCESS;
+                            message.what = DataHandler.SERIAL_PORT_ALERT_SEND_SUCCESS;
                         } else if (serialCount == 15) {
                             // 显示报警activity
-                            message.what = SERIAL_PORT_SHOW_ALERT_ACTIVITY;
+                            message.what = DataHandler.SERIAL_PORT_SHOW_ALERT_ACTIVITY;
                         } else if (serialCount == 16) {
                             // 增加报警记录，显示收到报警
-                            message.what = SERIAL_PORT_RECEIVE_NEW_ALERT;
+                            message.what = DataHandler.SERIAL_PORT_RECEIVE_NEW_ALERT;
                         }
                         message.setData(bundle);
                         mHandler.sendMessage(message);
                         break;
                     case "$R0":
                         // 接收身份证信息
-                        message.what = SERIAL_PORT_RECEIVE_NEW_SIGN;
+                        message.what = DataHandler.SERIAL_PORT_RECEIVE_NEW_SIGN;
                         message.setData(bundle);
                         mHandler.sendMessage(message);
                         break;
                     case "$R6":
                         // 调节背光
-                        message.what = SERIAL_PORT_MODIFY_SCREEN_BRIGHTNESS;
+                        message.what = DataHandler.SERIAL_PORT_MODIFY_SCREEN_BRIGHTNESS;
                         message.setData(bundle);
                         mHandler.sendMessage(message);
                         break;
                     case "$R7":
                         // 关机
-                        message.what = SERIAL_PORT_SHUT_DOWN;
+                        message.what = DataHandler.SERIAL_PORT_SHUT_DOWN;
                         message.setData(bundle);
                         mHandler.sendMessage(message);
                         break;
@@ -637,13 +748,13 @@ public class MyApplication extends Application {
                         if (serialBuffer[3] == 0x01) {
                             System.out.println("报警中");
                             // 报警中
-                            message.what = SERIAL_PORT_ALERT_START;
+                            message.what = DataHandler.SERIAL_PORT_ALERT_START;
                             message.setData(bundle);
                             mHandler.sendMessage(message);
                         } else if (serialBuffer[3] == 0x02) {
                             System.out.println("报警失败");
                             // 报警失败
-                            message.what = SERIAL_PORT_ALERT_FAIL;
+                            message.what = DataHandler.SERIAL_PORT_ALERT_FAIL;
                             message.setData(bundle);
                             mHandler.sendMessage(message);
                         }
@@ -663,6 +774,80 @@ public class MyApplication extends Application {
 
     }
 
+    String TAG = "GPS Serial Port";
+
+    protected void onGpsDataReceived(byte[] buffer, int size) {
+
+        Log.i(TAG, "onGpsDataReceived: ");
+        Log.i(TAG, "size: " + size);
+
+        String gpsDataStr = new String(ByteUtil.subBytes(buffer, 0, size));
+
+        // 过滤掉GPGAA
+        int loc = gpsDataStr.indexOf("$GNRMC");
+        if (loc == -1) return; // 不包含的话
+        String string = gpsDataStr.substring(loc);
+
+        Log.i(TAG, "onGpsDataReceived: " + string);
+        if (string.startsWith("$GNRMC") && string.endsWith("\r\n")) {
+            Log.i(TAG, "onGpsDataReceived: 完整");
+            string = string.replace("$GNRMC", "$GPRMC");
+            GpsInfo gpsInfo = GpsParse.parse(string);
+            if (gpsInfo != null) {
+                LocationBean locationBean = new LocationBean();
+                locationBean.setLatitude(gpsInfo.latititude);
+                locationBean.setLongitude(gpsInfo.longtitude);
+                locationBean.setSpeed(gpsInfo.speed);
+                locationBean.setHeading(gpsInfo.course);
+                locationBean.setAcqtime(gpsInfo.cal1.getTime());
+                currentLocation = locationBean;
+
+                EventBus.getDefault().post(locationBean);
+            }
+        }
+    }
+
+    protected void onAisDataReceived(byte[] buffer, int size) {
+
+        Log.i(TAG, "onAisDataReceived: ");
+        Log.i(TAG, "size: " + size);
+//        AisInfo a = YimaAisParse.mParseAISSentence("!AIVDM,1,1,,A,15MgK45P3@G?fl0E`JbR0OwT0@MS,0*4E");
+        String gpsDataStr = new String(ByteUtil.subBytes(buffer, 0, size));
+        Toast.makeText(this, "receiveInfo: " + gpsDataStr, Toast.LENGTH_SHORT).show();
+        if (gpsDataStr.startsWith("!AIVDM") || gpsDataStr.startsWith("!AIVDO")) {
+            AisInfo aisInfo = YimaAisParse.mParseAISSentence(gpsDataStr);
+            if (aisInfo != null) {
+                Log.i(TAG, aisInfo.MsgType + "");
+
+                if (14 == aisInfo.MsgType) {
+                    // 报警信息
+                    if (aisInfo.mmsi > 0) {
+                        String message = aisInfo.warnMsgInfo;
+                        if (TextUtils.isEmpty(message)) {
+                            message = "AIS报警";
+                        }
+                        sendBytes(WarnFormat.format("" + aisInfo.mmsi, message));
+                    }
+                } else {
+                    if (aisInfo.bOwnShip) {
+                        LocationBean locationBean = new LocationBean();
+                        locationBean.setLatitude(aisInfo.latititude);
+                        locationBean.setLongitude(aisInfo.longtitude);
+                        locationBean.setSpeed(aisInfo.SOG);
+                        locationBean.setHeading(aisInfo.COG);
+                        locationBean.setAcqtime(new Date());
+                        currentLocation = locationBean;
+
+                        EventBus.getDefault().post(locationBean);
+                    } else {
+                        // 判断是否存在mmsi
+                        EventBus.getDefault().post(aisInfo);
+                    }
+                }
+            }
+        }
+    }
+
     public void sendBytes(byte[] buffer) {
         new SendingThread(buffer).start();
         System.out.println("发送包：" + ConvertUtil.bytesToHexString(buffer));
@@ -675,6 +860,7 @@ public class MyApplication extends Application {
         SendingThread(byte[] buffer) {
             this.buffer = buffer;
         }
+
         @Override
         public void run() {
             try {
@@ -687,6 +873,20 @@ public class MyApplication extends Application {
         }
     }
 
+    public void sendLightOn(boolean on) {
+        System.out.println("控制灯：" + on);
+        byte[] bytes;
+        if (on) {
+            bytes = "$08".getBytes();
+        } else {
+            bytes = "$09".getBytes();
+        }
+        bytes = ByteUtil.byteMerger(bytes, new byte[]{0x01});
+        bytes = ByteUtil.byteMerger(bytes, "\r\n".getBytes());
+        sendBytes(bytes);
+    }
+
+    /*
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
         @Override public void handleMessage(Message msg) {//覆盖handleMessage方法
@@ -702,17 +902,24 @@ public class MyApplication extends Application {
                     String address = messageStrings[0];
                     String content = messageStrings[1];
                     String type    = messageStrings[2];
+                    int group      = Integer.parseInt(messageStrings[3]);
 
                     // 判断类型 普通短信 还是 救护短信
-                    if (type.equals(MessageFormat.MESSAGE_TYPE_RESCURE)) {
+                    if (type.equals(MessageFormat.MESSAGE_TYPE_RESCUE)) {
                         sendLightOn(true);
                         mainActivity.showRescueDialog(content);
                         mainActivity.addMessage(address, content, true);
                     } else {
-                        SoundPlay.playMessageSound(getApplicationContext());
-                        mainActivity.addMessage(address, content, false);
-                        mainActivity.modifyGpsBarMessageCount();
-                        Toast.makeText(getApplicationContext(), "您有新的短信", Toast.LENGTH_SHORT).show();
+
+                        // 判断分组 group -1为非分组短信，其他为组号，
+                        int ownGroup = PreferencesUtils.getInt(mainActivity, "group");
+                        if (group == -1 || group == ownGroup) { // 判断是分组短信
+                            SoundPlay.playMessageSound(getApplicationContext());
+                            mainActivity.addMessage(address, content, false);
+                            mainActivity.modifyGpsBarMessageCount();
+                            Toast.makeText(getApplicationContext(), "您有新的短信", Toast.LENGTH_SHORT).show();
+                        }
+
                     }
                     break;
                 case SERIAL_PORT_MESSAGE_SEND_SUCCESS:
@@ -741,6 +948,19 @@ public class MyApplication extends Application {
 
                     break;
                 case SERIAL_PORT_TIME_NUMBER_AND_COMMUNICATION_FROM:
+                    // 先处理后面部分，时间部分由下一个case处理，不加break
+                    int myNumber = Util.bytesToInt2(ByteUtil.subBytes(bytes, 17, 21), 0);
+                    PreferencesUtils.putString(getApplicationContext(), "myNumber", myNumber + "");
+                    MainActivity.myNumber = myNumber + "";
+                    System.out.println("myNumber: " + myNumber);
+
+                    String status = Util.byteToBit(ByteUtil.subBytes(bytes, 21, 22)[0]);
+                    boolean gpsStatus = status.charAt(7) == '1';
+                    mainActivity.gpsBar.setGPSStatus(gpsStatus);
+                    String communication_from = status.charAt(6) == '1' ? "北斗" : "GPRS";
+                    PreferencesUtils.putString(getApplicationContext(), "communication_from", communication_from);
+                    // 这里不加break
+                case SERIAL_PORT_TIME:
                     // 接收时间
                     int year = ByteUtil.subBytes(bytes, 11, 12)[0]  & 0xFF;
                     int month = ByteUtil.subBytes(bytes, 12, 13)[0]  & 0xFF;
@@ -764,17 +984,34 @@ public class MyApplication extends Application {
                         Constant.SYSTEM_DATE = rightDate;
                     }
                     System.out.println(rightDate);
+                    break;
+                case SERIAL_PORT_ID_EDIT_OK:
+                    // $R2 刷卡器id修改成功 获取 获取成功
+                    String deviceID = IDFormat.unFormat(bytes);
+                    System.out.println("deviceID: " + deviceID);
 
-                    int myNumber = Util.bytesToInt2(ByteUtil.subBytes(bytes, 17, 21), 0);
-                    PreferencesUtils.putString(getApplicationContext(), "myNumber", myNumber + "");
-                    MainActivity.myNumber = myNumber + "";
-                    System.out.println("myNumber: " + myNumber);
+                    JSONObject sendJSON = new JSONObject();
+                    try {
+                        sendJSON.put("apiType", "device_id");
+                        sendJSON.put("code", "0");
+                        sendJSON.put("msg", "获取成功");
+                        sendJSON.put("deviceID", deviceID);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    SocketServer.send(sendJSON);
+                    Toast.makeText(getApplicationContext(), "终端ID：" + deviceID, Toast.LENGTH_LONG).show();
 
-                    String status = Util.byteToBit(ByteUtil.subBytes(bytes, 21, 22)[0]);
-                    boolean gpsStatus = status.charAt(7) == '1';
-                    mainActivity.gpsBar.setGPSStatus(gpsStatus);
-                    String communication_from = status.charAt(6) == '1' ? "北斗" : "GPRS";
-                    PreferencesUtils.putString(getApplicationContext(), "communication_from", communication_from);
+//                    new QMUIDialog.MessageDialogBuilder(mainActivity)
+//                            .setTitle("终端ID")
+//                            .setMessage(deviceID)
+//                            .addAction("确定", new QMUIDialogAction.ActionListener() {
+//                                @Override
+//                                public void onClick(QMUIDialog dialog, int index) {
+//                                    dialog.dismiss();
+//                                }
+//                            })
+//                            .show();
                     break;
                 case SERIAL_PORT_ALERT_SEND_SUCCESS:
                     // 报警发送成功
@@ -859,16 +1096,5 @@ public class MyApplication extends Application {
         }
     };
 
-    public void sendLightOn(boolean on) {
-        System.out.println("控制灯：" + on);
-        byte[] bytes;
-        if (on) {
-            bytes ="$08".getBytes();
-        } else {
-            bytes ="$09".getBytes();
-        }
-        bytes = ByteUtil.byteMerger(bytes, new byte[] {0x01});
-        bytes = ByteUtil.byteMerger(bytes, "\r\n".getBytes());
-        sendBytes(bytes);
-    }
+    */
 }

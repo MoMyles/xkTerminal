@@ -1,0 +1,80 @@
+MAP NAME: User Defined Map
+MAP ORGINAL SCALE: 10000
+BEGIN
+<
+LAYER NAME: 综合图层
+ATTRIBUTES COUNT: 1
+ <
+  ATTR NAME: NAME
+  DATA TYPE: STRING
+ > 
+GEO TYPE: ANYTYPE
+GEO STYLE COUNT: 0 
+>
+//////////////////////////////////////////////////////////////////
+<
+LAYER NAME: NAVTEX电台
+ATTRIBUTES COUNT: 2
+ <
+  ATTR NAME: NAME
+  DATA TYPE: STRING
+ >
+ <
+  ATTR NAME: 电台类型
+  DATA TYPE: INT
+ >
+GEO TYPE: POINT
+GEO STYLE COUNT: 1
+ <
+ CONDITION: 
+ MINSCALE: 
+ MAXSCALE: 
+ SYMBOL STYLE: 1, 0 
+ TEXT STYLE: "@0","Arial", 400, 0, 500, NORMAL, RGB(0, 0, 0)
+ >
+>
+//////////////////////////////////////////////////////////////////
+<
+LAYER NAME: INMARSAT卫星覆盖范围
+ATTRIBUTES COUNT: 2
+ <
+  ATTR NAME: NAME
+  DATA TYPE: STRING
+ >
+ <
+  ATTR NAME: 覆盖半径
+  DATA TYPE: FLOAT
+ >
+GEO TYPE: LINE
+GEO STYLE COUNT: 1
+ <
+ CONDITION: 
+ MINSCALE: 
+ MAXSCALE: 
+ BASIC STYLE: SOLID, 50, RGB(37,121,106)
+ CYCLE SYMBOL STYLE: 2, 1000
+ TEXT STYLE: "@0","Arial", 400, 0, 500, NORMAL, RGB(0, 0, 0)
+ >
+>
+//////////////////////////////////////////////////////////////////
+<
+LAYER NAME: 自定义警戒区
+ATTRIBUTES COUNT: 1
+ <
+  ATTR NAME: 警戒区名
+  DATA TYPE: STRING
+ >
+GEO TYPE: REGION
+GEO STYLE COUNT: 1
+ <
+ CONDITION: 
+ MINSCALE: 
+ MAXSCALE: 
+ BASIC STYLE: RGB(0, 0, 0),20
+ PATTERN SYMBOL STYLE:  
+ BOUNDARY LINE STYLE: SOLID, 200, RGB(0,255,0)
+ TEXT STYLE:"@0","Arial", 1200, 0, 00, BOLD, RGB(255, 0, 0)
+ >
+>
+//////////////////////////////////////////////////////////////////
+END

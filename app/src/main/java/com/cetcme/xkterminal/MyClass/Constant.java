@@ -44,11 +44,11 @@ public class Constant {
     // 数据串口码率
     public static final int SERIAL_DATA_PORT_BAUD_RATE = 9600;
     // gps串口码率
-    public static final int SERIAL_GPS_PORT_BAUD_RATE = 9600;
+//    public static final int SERIAL_GPS_PORT_BAUD_RATE = 9600;
     public static final int SERIAL_AIS_PORT_BAUD_RATE = 38400;
     // GPS串口路径
-    public static final String SERIAL_GPS_PORT_PATH = "/dev/ttyS1";
-    public static final String SERIAL_AIS_PORT_PATH = "/dev/ttyS3";
+//    public static final String SERIAL_GPS_PORT_PATH = "/dev/ttyS1";
+    public static final String SERIAL_AIS_PORT_PATH = "/dev/ttyS1";
     // 数据串口路径
     public static final String SERIAL_DATA_PORT_PATH = "/dev/ttyS3";
 

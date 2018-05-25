@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -72,6 +73,7 @@ public class SkiaDrawView extends View {
     {
         fSkiaBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         String strTtfFilePath = Constant.YIMA_WORK_PATH + "/DroidSansFallback.ttf";
+        mYimaLib.SetDisplayCategory(1);
         mYimaLib.RefreshDrawer(fSkiaBitmap, strTtfFilePath);//刷新绘制器，需要传入字体文件地址，用户可以自己修改为别的字体
         mYimaLib.OverViewLibMap(0);//概览第一幅图
 //        mYimaLib.SetDisplayCategory(3);
@@ -360,7 +362,7 @@ public class SkiaDrawView extends View {
             mYimaLib.tmAppendObjectInLayer(curLayerPos2, 0);//在图层上添加一个点物标
             objCount = mYimaLib.tmGetLayerObjectCount(curLayerPos2);
             objLayerPos2.add(objCount);
-            layerAttrCount = mYimaLib.tmGetLayerObjectAttrCount(curLayerPos2);
+            //layerAttrCount = mYimaLib.tmGetLayerObjectAttrCount(curLayerPos2);
             //mYimaLib.tmSetObjectAttrValueString(curLayerPos2, objCount - 1, layerAttrCount - 1, sdf.format(list.get(iObj).getAcqtime()));//设置物标属性值字符串
             mYimaLib.tmSetPointObjectCoor(curLayerPos2, objCount - 1, arrGeoX[iObj], arrGeoY[iObj]);//设置物标坐标
             if (iObj == 0) {
@@ -401,6 +403,50 @@ public class SkiaDrawView extends View {
         postInvalidate();
     }
 
+
+    /**
+     * 绘制 禁渔区 禁入区 禁出区
+     */
+    public List<Integer> drawBanArea(int red, int green, int blue, int[] geoX, int[] geoY) {
+        List<Integer> list = new LinkedList<>();
+        mYimaLib.tmAppendLayer(3);//添加面图层
+        int curLayerPos = mYimaLib.tmGetLayerCount() - 1;
+        list.add(curLayerPos);
+        mYimaLib.tmSetLayerName(curLayerPos, "面图层图层");
+        mYimaLib.tmSetLayerDrawOrNot(curLayerPos, true);
+        mYimaLib.tmAddLayerAttribute(curLayerPos, 4, "物标名称");//添加图层属性：属性名称："物标名称",属性值类型：4（字符串）
+//        for (int iObj = 0; iObj < 20; iObj++) {
+        mYimaLib.tmAppendObjectInLayer(curLayerPos, 3);//在图层上添加一个面物标
+        int objCount = mYimaLib.tmGetLayerObjectCount(curLayerPos);
+        list.add(objCount);
+        //int layerAttrCount = mYimaLib.tmGetLayerObjectAttrCount(curLayerPos);
+        //mYimaLib.tmSetObjectAttrValueString(curLayerPos, objCount - 1, layerAttrCount - 1, "face obj");//设置物标属性值字符串
+        mYimaLib.tmSetFaceObjectCoors(curLayerPos, objCount - 1, geoX.length, geoX, geoY);//设置物标坐标
+        mYimaLib.tmSetFaceObjectStyle(curLayerPos, objCount - 1, true, red, green, blue
+                , 50, 1, 0, 0
+                , "face obj", "", 20, 0, 0
+                , 0, true, false, true, 0, 0);//设置物标样式
+//        }
+        postInvalidate();
+        return list;
+    }
+
+    /**
+     * 移除 禁渔区 禁入区 禁出区
+     * @param list
+     * @return
+     */
+    public boolean removeBanArea(List<Integer> list) {
+        try {
+            if (list == null || list.isEmpty()) return true;
+            if (list.size() < 2) return false;
+            mYimaLib.tmDeleteGeoObject(list.get(0), list.get(1));
+            mYimaLib.tmDeleteLayer(list.get(0));
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
 
 }
 

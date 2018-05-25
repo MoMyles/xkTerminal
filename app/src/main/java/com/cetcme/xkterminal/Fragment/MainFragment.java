@@ -84,13 +84,13 @@ public class MainFragment extends Fragment {
 
         tv_lon = view.findViewById(R.id.tv_lon);
         tv_lat = view.findViewById(R.id.tv_lat);
+
         tv_head = view.findViewById(R.id.tv_head);
         tv_speed = view.findViewById(R.id.tv_speed);
 
         mLvAisInfo = view.findViewById(R.id.ais_info_lv);
         aisInfoAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, datas);
         mLvAisInfo.setAdapter(aisInfoAdapter);
-
 
 
         alert_confirm_btn = view.findViewById(R.id.alert_confirm_btn);
@@ -332,6 +332,7 @@ public class MainFragment extends Fragment {
         skiaDrawView.mYimaLib.RotateMapByScrnCenter(rotateScreen ? 0 - heading : 0);
         skiaDrawView.mYimaLib.CenterMap(myLocation.x, myLocation.y);
         skiaDrawView.postInvalidate();
+
     }
 
     /**

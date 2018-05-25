@@ -77,6 +77,19 @@ public class AlertFormat {
     }
 
     public static void main(String[] args) {
+        String hStr = "21465449442C46542D313730332C304145362C303939422C453438332C354338392C2020343133323433312C33312C3436202840";
+        byte[] bytes = ConvertUtil.hexStr2Bytes(hStr);
+        String convertStr = new String(bytes);
+        System.out.println("ok: " + convertStr);
+
+
+        String hStr1 = "98009A420A02CA0A42323401025196302040800002020252AA9A6A00F0";
+        byte[] bytes1 = ConvertUtil.hexStr2Bytes(hStr1);
+        String convertStr1 = new String(bytes1);
+        System.out.println("fail:" + convertStr1);
+
+
+
 //        byte[] frameData = format((byte) 0x00, "00001110");
 //        String[] unFormatStrings = unFormat(frameData);
 //        String mode = unFormatStrings[0];
@@ -84,7 +97,7 @@ public class AlertFormat {
 //        System.out.println(mode);
 //        System.out.println(getStringType(type));
 
-        byte[] bytes = new byte[] {
+        /*byte[] bytes = new byte[] {
                 0x24,
                 0x52,
                 0x35,
@@ -108,7 +121,7 @@ public class AlertFormat {
         byte[] alertBytes = ByteUtil.subBytes(bytes, 11, 13);
         if (alertBytes[0] == 0x02 && alertBytes[1] == 0x00) {
             System.out.println("123123123123123");
-        }
+        }*/
 
     }
 

@@ -16,4 +16,8 @@
 
     <color name="navigation_status_normal">#EEFFFFFF</color>
     <color name="navigation_status_danger">#edec3333</color>
+
+    <color name="bar_divider">#D4D6D8</color>
+    <color name="tab_panel_bg">#ffffff</color>
+    <color name="tab_panel_divider">@color/bar_divider</color>
 </resources>

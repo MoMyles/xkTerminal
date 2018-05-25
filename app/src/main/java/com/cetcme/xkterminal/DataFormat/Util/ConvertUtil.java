@@ -81,7 +81,6 @@ public class ConvertUtil {
 	public static byte[] hexStr2Bytes(String src) {
 		int m = 0, n = 0;
 		int l = src.length() / 2;
-		System.out.println(l);
 		byte[] ret = new byte[l];
 		for (int i = 0; i < l; i++) {
 			m = i * 2 + 1;

@@ -112,7 +112,10 @@ public class MainActivity extends AppCompatActivity {
         ((MyApplication) getApplication()).mainActivity = this;
 
         bindView();
-        initMainFragment();
+
+        //TODO test 测试
+//        initMainFragment();
+        initSettingFragment();
         initHud();
 
         myNumber = PreferencesUtils.getString(this, "myNumber");

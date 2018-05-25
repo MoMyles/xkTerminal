@@ -77,10 +77,8 @@ public class AlertFormat {
     }
 
     public static void main(String[] args) {
-        String getByteStr = "21465449442C46542D313730332C304145362C303939422C453438332C354338392C2020343133323433312C33312C343620284098009A420A02CA0A42323401025196302040800002020252AA9A6A00F0";
-        byte[] bytes = ConvertUtil.hexStr2Bytes(getByteStr);
-        String s = new String(bytes);
-        System.out.println(s);
+
+
     }
 
 }

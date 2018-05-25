@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+              android:orientation="vertical"
+             tools:context=".Fragment.setting.SeriveStatusFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    style="@style/setting_tv_title"
+                    android:layout_marginLeft="150dp"
+                    android:layout_marginStart="150dp"
+                    android:text="紧急报警："/>
+
+                <TextView
+                    android:id="@+id/address_textView"
+                    style="@style/setting_tv_title"
+                    android:gravity="center"
+                    android:text="允许"/>
+
+                <android.support.v4.widget.Space
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"/>
+
+                <TextView
+                    style="@style/setting_tv_title"
+                    android:text="中心报警："/>
+
+                <TextView
+                    android:id="@+id/communication_from_textView"
+                    style="@style/setting_tv_title"
+                    android:gravity="center"
+                    android:layout_marginRight="150dp"
+                    android:layout_marginEnd="150dp"
+                    android:text="允许"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_alignParentBottom="true"
+                android:background="#b7b7b7" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    style="@style/setting_tv_title"
+                    android:layout_marginLeft="150dp"
+                    android:layout_marginStart="150dp"
+                    android:text="开关机报告："/>
+
+                <TextView
+                    style="@style/setting_tv_title"
+                    android:gravity="center"
+                    android:text="允许"/>
+
+                <android.support.v4.widget.Space
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"/>
+
+                <TextView
+                    style="@style/setting_tv_title"
+                    android:text="进出港报告："/>
+
+                <TextView
+                    style="@style/setting_tv_title"
+                    android:gravity="center"
+                    android:layout_marginRight="150dp"
+                    android:layout_marginEnd="150dp"
+                    android:text="允许"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_alignParentBottom="true"
+                android:background="#b7b7b7" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    style="@style/setting_tv_title"
+                    android:layout_marginLeft="150dp"
+                    android:layout_marginStart="150dp"
+                    android:text="AIS报警："/>
+
+                <TextView
+                    style="@style/setting_tv_title"
+                    android:gravity="center"
+                    android:text="允许"/>
+
+                <android.support.v4.widget.Space
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"/>
+
+                <TextView
+                    style="@style/setting_tv_title"
+                    android:text="AIS位置报告："/>
+
+                <TextView
+                    style="@style/setting_tv_title"
+                    android:gravity="center"
+                    android:layout_marginRight="150dp"
+                    android:layout_marginEnd="150dp"
+                    android:text="允许"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_alignParentBottom="true"
+                android:background="#b7b7b7" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    style="@style/setting_tv_title"
+                    android:layout_marginLeft="150dp"
+                    android:layout_marginStart="150dp"
+                    android:text="自付费短信："/>
+
+                <TextView
+                    style="@style/setting_tv_title"
+                    android:gravity="center"
+                    android:text="允许"/>
+
+                <android.support.v4.widget.Space
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"/>
+
+                <TextView
+                    style="@style/setting_tv_title"
+                    android:text="对方付费短信："/>
+
+                <TextView
+                    style="@style/setting_tv_title"
+                    android:gravity="center"
+                    android:layout_marginRight="150dp"
+                    android:layout_marginEnd="150dp"
+                    android:text="允许"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_alignParentBottom="true"
+                android:background="#b7b7b7"
+                android:visibility="gone"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:visibility="gone">
+
+                <TextView
+                    style="@style/setting_tv_title"
+                    android:layout_marginLeft="150dp"
+                    android:layout_marginStart="150dp"
+                    android:text="定位区分门限："/>
+
+                <TextView
+                    style="@style/setting_tv_title"
+                    android:gravity="center"
+                    android:text="允许"/>
+
+                <android.support.v4.widget.Space
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"/>
+
+                <TextView
+                    style="@style/setting_tv_title"
+                    android:text="组通播应答门限："/>
+
+                <TextView
+                    style="@style/setting_tv_title"
+                    android:gravity="center"
+                    android:layout_marginRight="150dp"
+                    android:layout_marginEnd="150dp"
+                    android:text="允许"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

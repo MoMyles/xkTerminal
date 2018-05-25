@@ -176,7 +176,7 @@ public class GPSBar extends RelativeLayout {
             }
         });
 
-        /*
+
         // for test串口调试界面 看是否通
         textView_location_status.setOnClickListener(new OnClickListener() {
             @Override
@@ -185,7 +185,7 @@ public class GPSBar extends RelativeLayout {
                 mainActivity.startActivity(new Intent(mainActivity, SerialPortActivity.class));
             }
         });
-
+/*
         // for test 测试收到新的短信息
         findViewById(R.id.sms_btn).setOnClickListener(new OnClickListener() {
             @Override

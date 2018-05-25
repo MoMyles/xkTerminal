@@ -11,6 +11,8 @@ import com.cetcme.xkterminal.widget.Satellite;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * 卫星天体位置
@@ -36,17 +38,7 @@ public class SatelliteActivity extends AppCompatActivity {
 
         mView = findViewById(R.id.LinearLayout);
 
-        Random random = new Random();
-        for (int i=0;i<10;i++) {
-            Satellite satellite1 = new Satellite();
-            int j = random.nextInt(10);
-            satellite1.setNum(30 + j);
-            int k = random.nextInt(359);
-            satellite1.setAzimuth(k+"");
-            int l = random.nextInt(90);
-            satellite1.setElevationAngle(l+"");
-            mSatelliteList.add(satellite1);
-        }
+        refreshSatellite();
 
         //初始化
         int mWidth = getResources().getDisplayMetrics().widthPixels / 2 - 35;
@@ -61,5 +53,30 @@ public class SatelliteActivity extends AppCompatActivity {
         satelliteView = new DrawSatellite(this, w / 2, w / 2, mSatelliteList);
         satelliteView.invalidate();
         mView.addView(satelliteView);
+
+        // 开启定时器 5分钟更新一次
+        final Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                refreshSatellite();
+            }
+        }, 5 * 60 * 1000);
+    }
+
+    private void refreshSatellite() {
+        mSatelliteList.clear();
+        Random random = new Random();
+        for (int i=0;i<10;i++) {
+            Satellite satellite1 = new Satellite();
+            int j = random.nextInt(10);
+            satellite1.setNum(30 + j);
+            int k = random.nextInt(359);
+            satellite1.setAzimuth(k+"");
+            int l = random.nextInt(90);
+            satellite1.setElevationAngle(l+"");
+            mSatelliteList.add(satellite1);
+        }
+        satelliteView.postInvalidate();
     }
 }

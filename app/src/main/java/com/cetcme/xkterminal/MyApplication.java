@@ -53,6 +53,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.InvalidParameterException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import android_serialport_api.SerialPort;
@@ -123,7 +124,6 @@ public class MyApplication extends Application {
         EventBus.getDefault().register(this);
 
 
-
         try {
             mSerialPort = getSerialPort();
             mOutputStream = mSerialPort.getOutputStream();
@@ -153,7 +153,7 @@ public class MyApplication extends Application {
             DisplayError(R.string.error_configuration);
         }
 
-//        显示所有path
+        //显示所有path
 //        String[] paths =  mSerialPortFinder.getAllDevicesPath();
 //        for (String path : paths) {
 //            Log.i("qh_port", "onCreate: " + path);
@@ -620,8 +620,8 @@ public class MyApplication extends Application {
             while (!isInterrupted()) {
                 int size;
                 try {
-                    Thread.sleep(1000);
-                    byte[] buffer = new byte[1024];
+                    Thread.sleep(10);
+                    byte[] buffer = new byte[1];
                     if (aisInputStream == null) return;
                     size = aisInputStream.read(buffer);
                     if (size > 0) {
@@ -807,45 +807,97 @@ public class MyApplication extends Application {
         }
     }
 
+    private final List<Byte> aisByts = new LinkedList<>();
+
     protected void onAisDataReceived(byte[] buffer, int size) {
-
-        Log.i(TAG, "onAisDataReceived: ");
-        Log.i(TAG, "size: " + size);
+        //Log.i(TAG, "16进制：" + ConvertUtil.bytesToHexString(ByteUtil.subBytes(buffer, 0, size)));
 //        AisInfo a = YimaAisParse.mParseAISSentence("!AIVDM,1,1,,A,15MgK45P3@G?fl0E`JbR0OwT0@MS,0*4E");
-        String gpsDataStr = new String(ByteUtil.subBytes(buffer, 0, size));
-        Toast.makeText(this, "receiveInfo: " + gpsDataStr, Toast.LENGTH_SHORT).show();
-        if (gpsDataStr.startsWith("!AIVDM") || gpsDataStr.startsWith("!AIVDO")) {
-            AisInfo aisInfo = YimaAisParse.mParseAISSentence(gpsDataStr);
-            if (aisInfo != null) {
-                Log.i(TAG, aisInfo.MsgType + "");
-
-                if (14 == aisInfo.MsgType) {
-                    // 报警信息
-                    if (aisInfo.mmsi > 0) {
-                        String message = aisInfo.warnMsgInfo;
-                        if (TextUtils.isEmpty(message)) {
-                            message = "AIS报警";
-                        }
-                        sendBytes(WarnFormat.format("" + aisInfo.mmsi, message));
+        if (buffer[0] == 33) {
+            // ! 号头
+            if (aisByts.size() > 2) {
+                int len = aisByts.size();
+                if (aisByts.get(len - 2) == 13 && aisByts.get(len - 1) == 10) {
+                    // \r\n 结尾
+                    Byte[] byts = aisByts.toArray(new Byte[len]);
+                    byte[] tmpByts = new byte[len];
+                    for (int i = 0; i < len; i++) {
+                        tmpByts[i] = byts[i];
                     }
-                } else {
-                    if (aisInfo.bOwnShip) {
-                        LocationBean locationBean = new LocationBean();
-                        locationBean.setLatitude(aisInfo.latititude);
-                        locationBean.setLongitude(aisInfo.longtitude);
-                        locationBean.setSpeed(aisInfo.SOG);
-                        locationBean.setHeading(aisInfo.COG);
-                        locationBean.setAcqtime(new Date());
-                        currentLocation = locationBean;
+                    String gpsDataStr = new String(tmpByts);
+                    Log.i(TAG, "16进制：" + ConvertUtil.bytesToHexString(tmpByts));
+                    Log.i(TAG, "onAisDataReceived: " + gpsDataStr);
+                    AisInfo aisInfo = YimaAisParse.mParseAISSentence(gpsDataStr);
+                    if (aisInfo != null) {
+                        Log.i(TAG, aisInfo.MsgType + "");
 
-                        EventBus.getDefault().post(locationBean);
-                    } else {
-                        // 判断是否存在mmsi
-                        EventBus.getDefault().post(aisInfo);
+                        if (14 == aisInfo.MsgType) {
+                            // 报警信息
+                            if (aisInfo.mmsi > 0) {
+                                String message = aisInfo.warnMsgInfo;
+                                if (TextUtils.isEmpty(message)) {
+                                    message = "AIS报警";
+                                }
+                                sendBytes(WarnFormat.format("" + aisInfo.mmsi, message));
+                            }
+                        } else {
+                            if (aisInfo.bOwnShip) {
+                                LocationBean locationBean = new LocationBean();
+                                locationBean.setLatitude(aisInfo.latititude);
+                                locationBean.setLongitude(aisInfo.longtitude);
+                                locationBean.setSpeed(aisInfo.SOG);
+                                locationBean.setHeading(aisInfo.COG);
+                                locationBean.setAcqtime(new Date());
+                                currentLocation = locationBean;
+
+                                EventBus.getDefault().post(locationBean);
+                            } else {
+                                // 判断是否存在mmsi
+                                EventBus.getDefault().post(aisInfo);
+                            }
+                        }
                     }
                 }
             }
+            aisByts.clear();
+            aisByts.add(buffer[0]);
+        } else {
+            aisByts.add(buffer[0]);
         }
+//        String gpsDataStr = new String(ByteUtil.subBytes(buffer, 0, size));
+//        Log.i(TAG, "onAisDataReceived: " + gpsDataStr);
+//        if (gpsDataStr.startsWith("!AIVDM") || gpsDataStr.startsWith("!AIVDO")) {
+//            gpsDataStr.split("\r\n");
+//            AisInfo aisInfo = YimaAisParse.mParseAISSentence(gpsDataStr);
+//            if (aisInfo != null) {
+//                Log.i(TAG, aisInfo.MsgType + "");
+//
+//                if (14 == aisInfo.MsgType) {
+//                    // 报警信息
+//                    if (aisInfo.mmsi > 0) {
+//                        String message = aisInfo.warnMsgInfo;
+//                        if (TextUtils.isEmpty(message)) {
+//                            message = "AIS报警";
+//                        }
+//                        sendBytes(WarnFormat.format("" + aisInfo.mmsi, message));
+//                    }
+//                } else {
+//                    if (aisInfo.bOwnShip) {
+//                        LocationBean locationBean = new LocationBean();
+//                        locationBean.setLatitude(aisInfo.latititude);
+//                        locationBean.setLongitude(aisInfo.longtitude);
+//                        locationBean.setSpeed(aisInfo.SOG);
+//                        locationBean.setHeading(aisInfo.COG);
+//                        locationBean.setAcqtime(new Date());
+//                        currentLocation = locationBean;
+//
+//                        EventBus.getDefault().post(locationBean);
+//                    } else {
+//                        // 判断是否存在mmsi
+//                        EventBus.getDefault().post(aisInfo);
+//                    }
+//                }
+//            }
+//        }
     }
 
     public void sendBytes(byte[] buffer) {

@@ -538,7 +538,7 @@ public class SystemSettingFragment extends Fragment {
                 for (int i = 0; i < indexes.length; i++) {
                     GroupProxy.deleteById(db, groups.get(i).getId());
                 }
-                Toast.makeText(getActivity(), "好友删除成功", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "分组删除成功", Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             }
         });

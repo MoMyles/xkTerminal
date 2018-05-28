@@ -6,8 +6,14 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.R;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -15,16 +21,28 @@ import com.cetcme.xkterminal.R;
 public class DBSettingFragment extends Fragment {
 
 
-    public DBSettingFragment() {
-        // Required empty public constructor
-    }
+    @BindView(R.id.address_textView)
+    TextView address_textView;
+    Unbinder unbinder;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_setting_db, container, false);
+        View view = inflater.inflate(R.layout.fragment_setting_db, container, false);
+        unbinder = ButterKnife.bind(this, view);
+        initData(view);
+        return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
+
+    private void initData(View view) {
+        address_textView.setText(PreferencesUtils.getString(getActivity(), "myNumber"));
     }
 
 }

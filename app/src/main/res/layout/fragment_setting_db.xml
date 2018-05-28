@@ -43,7 +43,6 @@
                     android:text="入站频率："/>
 
                 <TextView
-                    android:id="@+id/communication_from_textView"
                     style="@style/setting_tv_title"
                     android:gravity="center"
                     android:layout_marginRight="150dp"

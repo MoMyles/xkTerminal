@@ -190,7 +190,7 @@ public class MyApplication extends Application {
         };
         new SocketManager(handler, getApplicationContext());
 
-        mHandler = new DataHandler(mainActivity, this);
+        mHandler = new DataHandler(this);
 
 
         initDb();

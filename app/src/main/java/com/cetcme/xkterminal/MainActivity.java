@@ -37,7 +37,6 @@ import com.cetcme.xkterminal.MyClass.DensityUtil;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.MyClass.SoundPlay;
 import com.cetcme.xkterminal.Socket.SocketServer;
-import com.cetcme.xkterminal.Sqlite.Bean.GroupBean;
 import com.cetcme.xkterminal.Sqlite.Bean.MessageBean;
 import com.cetcme.xkterminal.Sqlite.Proxy.AlertProxy;
 import com.cetcme.xkterminal.Sqlite.Proxy.FriendProxy;
@@ -52,7 +51,6 @@ import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.xutils.DbManager;
-import org.xutils.ex.DbException;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
@@ -137,6 +135,16 @@ public class MainActivity extends AppCompatActivity {
         MessageProxy.getAddress(db);
 
         checkoutShutDown();
+
+        // TODO: test
+        /*
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                showMessageDialog("测试短信", MessageDialogActivity.TYPE_CALL_ROLL);
+            }
+        }, 2000);
+        */
     }
 
     private void initHud() {
@@ -238,9 +246,11 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void showRescueDialog(String content) {
-        Intent intent = new Intent(MainActivity.this, RescueMessageActivity.class);
+    public void showMessageDialog(String content, int type) {
+        // type 0: 救护, 1: 报警提醒, 2: 夜间点名
+        Intent intent = new Intent(MainActivity.this, MessageDialogActivity.class);
         intent.putExtra("content", content);
+        intent.putExtra("type", type);
         startActivity(intent);
     }
 

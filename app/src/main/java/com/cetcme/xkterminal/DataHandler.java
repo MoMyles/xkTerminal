@@ -75,8 +75,9 @@ public class DataHandler extends Handler {
                         break;
                     // 救护短信
                     case MessageFormat.MESSAGE_TYPE_RESCUE:
+                        SoundPlay.playMessageSound(myApplication.mainActivity);
                         myApplication.sendLightOn(true);
-                        myApplication.mainActivity.showRescueDialog(content);
+                        myApplication.mainActivity.showMessageDialog(content, MessageDialogActivity.TYPE_RESCUE);
                         myApplication.mainActivity.addMessage(address, content, true);
                         break;
                     // 开启关闭短信功能
@@ -85,7 +86,9 @@ public class DataHandler extends Handler {
                         break;
                     // 报警提醒
                     case MessageFormat.MESSAGE_TYPE_ALERT_REMIND:
-                        // TODO:
+                        SoundPlay.playMessageSound(myApplication.mainActivity);
+                        myApplication.mainActivity.showMessageDialog(content, MessageDialogActivity.TYPE_ALERT);
+                        myApplication.mainActivity.addMessage(address, content, true);
                         break;
                     // 摇毙功能
                     case MessageFormat.MESSAGE_TYPE_SHUT_DOWN:
@@ -94,7 +97,8 @@ public class DataHandler extends Handler {
                         break;
                     // 夜间点名
                     case MessageFormat.MESSAGE_TYPE_CALL_THE_ROLL:
-                        // TODO:
+                        SoundPlay.playMessageSound(myApplication.mainActivity);
+                        myApplication.mainActivity.showMessageDialog(content, MessageDialogActivity.TYPE_CALL_ROLL);
                         break;
                     default:
                         // 判断分组 group -1为非分组短信，其他为组号，

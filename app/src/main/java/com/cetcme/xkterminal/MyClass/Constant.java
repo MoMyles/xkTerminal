@@ -21,7 +21,7 @@ public class Constant {
     public static int TIME_ZONE = 20; // +8   0 ~ 24
 
     // 短信内容最大长度，0为不限
-    public static final int MESSAGE_CONTENT_MAX_LENGTH = 54;
+    public static final int MESSAGE_CONTENT_MAX_LENGTH = 64; // 54; TODO: fake
 
     // 短信发送失败等待时间
     public static final int MESSAGE_FAIL_TIME = 2000;

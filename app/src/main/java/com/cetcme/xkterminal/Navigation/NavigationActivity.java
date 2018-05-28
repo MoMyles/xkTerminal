@@ -1,11 +1,10 @@
 package com.cetcme.xkterminal.Navigation;
 
 import android.annotation.SuppressLint;
-import android.content.Loader;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -16,6 +15,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.MyApplication;
+import com.cetcme.xkterminal.R;
+import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -32,19 +33,23 @@ import butterknife.ButterKnife;
 import yimamapapi.skia.M_POINT;
 import yimamapapi.skia.ShipOffRoute;
 
-import com.cetcme.xkterminal.R;
-import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
+public class NavigationActivity extends AppCompatActivity implements SkiaDrawView.OnMapClickListener {
 
-public class NavigationActivity extends AppCompatActivity implements SkiaDrawView.OnMapClickListener{
+    @BindView(R.id.skiaView)
+    SkiaDrawView fMainView;
+    @BindView(R.id.btn_navigation)
+    Button btn_navigation;
+    @BindView(R.id.ly_status)
+    LinearLayout ly_status;
 
-    @BindView(R.id.skiaView) SkiaDrawView fMainView;
-    @BindView(R.id.btn_navigation) Button btn_navigation;
-    @BindView(R.id.ly_status) LinearLayout ly_status;
-
-    @BindView(R.id.tv_lon) TextView tv_lon;
-    @BindView(R.id.tv_lat) TextView tv_lat;
-    @BindView(R.id.tv_head) TextView tv_head;
-    @BindView(R.id.tv_speed) TextView tv_speed;
+    @BindView(R.id.tv_lon)
+    TextView tv_lon;
+    @BindView(R.id.tv_lat)
+    TextView tv_lat;
+    @BindView(R.id.tv_head)
+    TextView tv_head;
+    @BindView(R.id.tv_speed)
+    TextView tv_speed;
 
     private int startWp = -1;
     private int endWp = -1;
@@ -148,10 +153,10 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                         endDistToRead = fMainView.mYimaLib.GetDistBetwTwoPoint(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
                         double bearing = Math.abs(fMainView.mYimaLib.GetBearingBetwTwoPoint(startPoint.x, startPoint.y, endPoint.x, endPoint.y) - myLocation.getHeading());
                         String bearingStr = String.format("%.2f", bearing);
-                        NavigationMainActivity.play("开始导航,总里程" + (int)endDistToRead + "海里,夹角" + bearingStr + "度");
+                        NavigationMainActivity.play("开始导航,总里程" + (int) endDistToRead + "海里,夹角" + bearingStr + "度");
                     } else {
                         // 航线
-                        NavigationMainActivity.play("开始导航,航线总里程" + (int)endDistToRead + "海里");
+                        NavigationMainActivity.play("开始导航,航线总里程" + (int) endDistToRead + "海里");
                     }
                     lastReportTime = new Date().getTime();
 
@@ -167,6 +172,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
 
     float addOne = 0.003f;
     Timer timer;
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -186,7 +192,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                     public void run() {
                         LocationBean locationBean = new LocationBean();
                         locationBean.setLongitude((int) ((121.12 + addOne) * 10000000));
-                        locationBean.setLatitude((int) ((31.12+ addOne) * 10000000));
+                        locationBean.setLatitude((int) ((31.12 + addOne) * 10000000));
                         locationBean.setHeading(45f);
                         locationBean.setSpeed(12.3f);
                         EventBus.getDefault().post(locationBean);
@@ -259,6 +265,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
 
     /**
      * 放大地图
+     *
      * @param view
      */
     public void ZoomInClick_Event(View view) {
@@ -268,6 +275,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
 
     /**
      * 缩小地图
+     *
      * @param view
      */
     public void ZoomOutClick_Event(View view) {
@@ -277,9 +285,10 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
 
     /**
      * 定位本船位置
+     *
      * @param view
      */
-    public void OwnCenterClick_Event(View view){
+    public void OwnCenterClick_Event(View view) {
         if (myLocation.getLongitude() == 0.0 && myLocation.getLatitude() == 0.0) return;
         fMainView.mYimaLib.CenterMap(myLocation.getLongitude(), myLocation.getLatitude());
         fMainView.postInvalidate();//刷新fMainView
@@ -287,9 +296,10 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
 
     /**
      * 返回
+     *
      * @param view
      */
-    public void Back_Event(View view){
+    public void Back_Event(View view) {
         finish();
     }
 
@@ -309,6 +319,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
 
     /**
      * 航行监控，获取位置后调用此方法，无信息则返回null
+     *
      * @param locationBean
      * @param heading
      * @param routeID
@@ -340,6 +351,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
 
     boolean isBackWrite = true;
     boolean isDanger = false;
+
     private void flashStatusBackColor() {
         new Thread(new Runnable() {
             @Override
@@ -363,7 +375,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
         // 处理子线程给我们发送的消息。
         @Override
         public void handleMessage(Message msg) {
-            if (msg.what == MESSAGE_TYPE_FLASH_BACK_COLOR){
+            if (msg.what == MESSAGE_TYPE_FLASH_BACK_COLOR) {
                 setStatusDander(isBackWrite);
                 isBackWrite = !isBackWrite;
 
@@ -393,79 +405,77 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
     private long lastReportTime = -1;
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onLocationEvent(Object obj) {
-        if (obj instanceof LocationBean) {
-            LocationBean lb = (LocationBean) obj;
-            Log.i("TAG", "onLocationEvent: 收到自身位置");
-            Log.i("TAG", "onLocationEvent: 纬度lat:" + lb.getLatitude());
-            Log.i("TAG", "onLocationEvent: 经度lon:" + lb.getLongitude());
-            if (myLocation == null) {
-                myLocation = lb;
-                fMainView.mYimaLib.CenterMap(myLocation.getLongitude(), myLocation.getLatitude());
-            } else {
-                myLocation = lb;
+    public void onLocationEvent(LocationBean lb) {
+        Log.i("TAG", "onLocationEvent: 收到自身位置");
+        Log.i("TAG", "onLocationEvent: 纬度lat:" + lb.getLatitude());
+        Log.i("TAG", "onLocationEvent: 经度lon:" + lb.getLongitude());
+        if (myLocation == null) {
+            myLocation = lb;
+            fMainView.mYimaLib.CenterMap(myLocation.getLongitude(), myLocation.getLatitude());
+        } else {
+            myLocation = lb;
+        }
+
+        // 更新路径起点
+        if (!inNavigating)
+            fMainView.mYimaLib.SetWayPointCoor(startWp, myLocation.getLongitude(), myLocation.getLatitude());
+
+        // 根据每次gps信息更新位置
+        setOwnShip(myLocation, lb.getHeading(), inNavigating);
+
+        // 更新框
+        updateShipInfo(lb);
+
+        if (inNavigating) {
+            try {
+                db.saveBindingId(lb);
+            } catch (DbException e) {
+                e.printStackTrace();
             }
 
-            // 更新路径起点
-            if (!inNavigating) fMainView.mYimaLib.SetWayPointCoor(startWp, myLocation.getLongitude(), myLocation.getLatitude());
-
-            // 根据每次gps信息更新位置
-            setOwnShip(myLocation, lb.getHeading(), inNavigating);
-
-            // 更新框
-            updateShipInfo(lb);
-
-            if (inNavigating) {
-                try {
-                    db.saveBindingId(lb);
-                } catch (DbException e) {
-                    e.printStackTrace();
+            // 判断是否有危险
+            String msg = safetyControl(myLocation, lb.getHeading(), routeID);
+            if (msg != null) {
+                // 如果有危险
+                if (!isDanger) {
+                    isDanger = true;
+                    flashStatusBackColor();
                 }
 
-                // 判断是否有危险
-                String msg = safetyControl(myLocation, lb.getHeading(), routeID);
-                if (msg != null) {
-                    // 如果有危险
-                    if (!isDanger) {
-                        isDanger = true;
-                        flashStatusBackColor();
-                    }
-
-                    // 记录上次报警时间，如果没有则赋值
-                    if (lastReportTime == -1) {
-                        lastReportTime = new Date().getTime();
+                // 记录上次报警时间，如果没有则赋值
+                if (lastReportTime == -1) {
+                    lastReportTime = new Date().getTime();
+                    toast.setText(msg);
+                    toast.show();
+                    NavigationMainActivity.play(msg);
+                } else {
+                    // 判断上次报警时间是否是10秒之前
+                    if (new Date().getTime() - lastReportTime > 10 * 1000) {
                         toast.setText(msg);
                         toast.show();
                         NavigationMainActivity.play(msg);
-                    } else {
-                        // 判断上次报警时间是否是10秒之前
-                        if (new Date().getTime() - lastReportTime > 10 * 1000) {
-                            toast.setText(msg);
-                            toast.show();
-                            NavigationMainActivity.play(msg);
-                            lastReportTime = new Date().getTime();
-                        }
+                        lastReportTime = new Date().getTime();
                     }
-                } else {
-                    isDanger = false;
                 }
+            } else {
+                isDanger = false;
+            }
 
-                // 计算终点距离，判断是否结束导航
-                if (getNavigationEndDistance(myLocation, endWp) < Constant.NAVIGATION_END_DIST) {
-                    toast.setText("已到达目的地附近，导航结束");
-                    toast.show();
-                    NavigationMainActivity.play("已到达目的地附近，导航结束");
-                    btn_navigation.setText("开始导航");
-                    inNavigating = false;
-                    isBackWrite = true;
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            setStatusDander(false);
-                            finish();
-                        }
-                    }, 500);
-                }
+            // 计算终点距离，判断是否结束导航
+            if (getNavigationEndDistance(myLocation, endWp) < Constant.NAVIGATION_END_DIST) {
+                toast.setText("已到达目的地附近，导航结束");
+                toast.show();
+                NavigationMainActivity.play("已到达目的地附近，导航结束");
+                btn_navigation.setText("开始导航");
+                inNavigating = false;
+                isBackWrite = true;
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        setStatusDander(false);
+                        finish();
+                    }
+                }, 500);
             }
         }
     }
@@ -479,6 +489,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
 
     /**
      * 更新GPS状态框
+     *
      * @param locationBean
      */
     private void updateShipInfo(LocationBean locationBean) {

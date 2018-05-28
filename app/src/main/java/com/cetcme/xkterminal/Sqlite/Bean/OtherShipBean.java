@@ -35,4 +35,13 @@ public class OtherShipBean {
     public void setShip_id(int ship_id) {
         this.ship_id = ship_id;
     }
+
+    @Override
+    public String toString() {
+        return "OtherShipBean{" +
+                "id=" + id +
+                ", mmsi=" + mmsi +
+                ", ship_id=" + ship_id +
+                '}';
+    }
 }

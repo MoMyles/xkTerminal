@@ -9,11 +9,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.cetcme.xkterminal.DataFormat.AlertFormat;
 import com.cetcme.xkterminal.Event.SmsEvent;
@@ -38,10 +36,6 @@ import org.json.JSONObject;
 import org.xutils.DbManager;
 import org.xutils.ex.DbException;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
 import yimamapapi.skia.AisInfo;
 import yimamapapi.skia.M_POINT;
 
@@ -54,6 +48,8 @@ public class MainFragment extends Fragment {
     private SkiaDrawView skiaDrawView;
     //    private LinearLayout main_layout;
     private LinearLayout alert_layout;
+
+    private Button zoomOut, zoomIn;
 
 
     private TextView tv_lon;
@@ -69,9 +65,9 @@ public class MainFragment extends Fragment {
 
     private DbManager db;
 
-    private ArrayAdapter<String> aisInfoAdapter;
-    private ListView mLvAisInfo;
-    private final List<String> datas = new LinkedList<>();
+//    private ArrayAdapter<String> aisInfoAdapter;
+//    private ListView mLvAisInfo;
+//    private final List<String> datas = new LinkedList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -88,9 +84,9 @@ public class MainFragment extends Fragment {
         tv_head = view.findViewById(R.id.tv_head);
         tv_speed = view.findViewById(R.id.tv_speed);
 
-        mLvAisInfo = view.findViewById(R.id.ais_info_lv);
-        aisInfoAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, datas);
-        mLvAisInfo.setAdapter(aisInfoAdapter);
+//        mLvAisInfo = view.findViewById(R.id.ais_info_lv);
+//        aisInfoAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, datas);
+//        mLvAisInfo.setAdapter(aisInfoAdapter);
 
 
         alert_confirm_btn = view.findViewById(R.id.alert_confirm_btn);
@@ -110,6 +106,25 @@ public class MainFragment extends Fragment {
         });
 
         alert_tv = view.findViewById(R.id.alert_tv);
+
+        zoomIn = view.findViewById(R.id.btn_zoom_in);
+        zoomOut = view.findViewById(R.id.btn_zoom_out);
+        zoomIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                System.out.println("放大");
+                skiaDrawView.mYimaLib.SetCurrentScale(skiaDrawView.mYimaLib.GetCurrentScale() / 2);
+                skiaDrawView.postInvalidate();//刷新fMainView
+            }
+        });
+        zoomOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                System.out.println("缩小");
+                skiaDrawView.mYimaLib.SetCurrentScale(skiaDrawView.mYimaLib.GetCurrentScale() * 2);
+                skiaDrawView.postInvalidate();//刷新fMainView
+            }
+        });
 
         view.findViewById(R.id.app_name_tv).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -134,6 +149,7 @@ public class MainFragment extends Fragment {
         }
         return view;
     }
+
 
     public void showMainLayout() {
         alert_need_flash = false;
@@ -267,58 +283,61 @@ public class MainFragment extends Fragment {
     private M_POINT myLocation;
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onLocationEvent(Object locationBean) {
-        if (locationBean instanceof LocationBean) {
-            LocationBean lb = (LocationBean) locationBean;
-            Log.i("TAG", "onLocationEvent: 收到自身位置");
-            Log.i("TAG", "onLocationEvent: 纬度lat:" + lb.getLatitude());
-            Log.i("TAG", "onLocationEvent: 经度lon:" + lb.getLongitude());
-            if (myLocation == null) {
-                myLocation = new M_POINT();
-                myLocation.x = lb.getLongitude();
-                myLocation.y = lb.getLatitude();
-                skiaDrawView.mYimaLib.CenterMap(myLocation.x, myLocation.y);
+    public void onLocationEvent(LocationBean locationBean) {
+        LocationBean lb = (LocationBean) locationBean;
+        Log.i("TAG", "onLocationEvent: 收到自身位置");
+        Log.i("TAG", "onLocationEvent: 纬度lat:" + lb.getLatitude());
+        Log.i("TAG", "onLocationEvent: 经度lon:" + lb.getLongitude());
+        if (myLocation == null) {
+            myLocation = new M_POINT();
+            myLocation.x = lb.getLongitude();
+            myLocation.y = lb.getLatitude();
+            skiaDrawView.mYimaLib.CenterMap(myLocation.x, myLocation.y);
+        } else {
+            myLocation.x = lb.getLongitude();
+            myLocation.y = lb.getLatitude();
+        }
+
+        // 根据每次gps信息更新位置
+        setOwnShip(myLocation, lb.getHeading(), false);
+
+        // 更新框
+        updateShipInfo(lb);
+    }
+
+    @Subscribe
+    public void onAisEvent(AisInfo aisInfo) {
+        if (aisInfo == null) return;
+        int mmsi = aisInfo.mmsi;
+        try {
+            OtherShipBean osb = db.selector(OtherShipBean.class).where("mmsi", "=", mmsi).findFirst();
+            int ship_id = 0;
+            if (osb == null) {
+                // 不存在， 新增
+                osb = new OtherShipBean();
+                osb.setMmsi(mmsi);
+                ship_id = skiaDrawView.mYimaLib.AddOtherVessel(true
+                        , aisInfo.longtitude, aisInfo.latititude, aisInfo.COG, aisInfo.COG
+                        , 0, aisInfo.SOG, 0);
+                osb.setShip_id(ship_id);
+                db.save(osb);
             } else {
-                myLocation.x = lb.getLongitude();
-                myLocation.y = lb.getLatitude();
+                // 存在， 更新信息
+                int versselId = skiaDrawView.mYimaLib.GetOtherVesselPosOfID(osb.getShip_id());
+                skiaDrawView.mYimaLib.SetOtherVesselCurrentInfo(versselId
+                        , aisInfo.longtitude, aisInfo.latititude, aisInfo.COG, aisInfo.COG
+                        , 0, aisInfo.SOG, 0);
             }
-
-            // 根据每次gps信息更新位置
-            setOwnShip(myLocation, lb.getHeading(), false);
-
-            // 更新框
-            updateShipInfo(lb);
-        } else if (locationBean instanceof AisInfo) {
-            Toast.makeText(getActivity(), "收到AIS信息", Toast.LENGTH_SHORT).show();
-            AisInfo aisInfo = (AisInfo) locationBean;
-            int mmsi = aisInfo.mmsi;
-            try {
-                OtherShipBean osb = db.selector(OtherShipBean.class).where("mmsi", "=", mmsi).findFirst();
-                if (osb == null) {
-                    // 不存在， 新增
-                    osb = new OtherShipBean();
-                    osb.setMmsi(mmsi);
-                    int ship_id = skiaDrawView.mYimaLib.AddOtherVessel(true
-                            , aisInfo.longtitude, aisInfo.latititude,aisInfo.COG,aisInfo.COG
-                            ,0,aisInfo.SOG, 0);
-                    osb.setId(ship_id);
-                } else {
-                    // 存在， 更新信息
-                    int versselId = skiaDrawView.mYimaLib.GetOtherVesselPosOfID(osb.getShip_id());
-                    skiaDrawView.mYimaLib.SetOtherVesselCurrentInfo(versselId
-                            , aisInfo.longtitude, aisInfo.latititude,aisInfo.COG,aisInfo.COG
-                            ,0,aisInfo.SOG, 0);
-                }
-                // 显示所有船
-                skiaDrawView.mYimaLib.SetAllOtherVesselDrawOrNot(true);
-
-                String str = String.format("mmsi:{0},msgType:{1},shipName:{2},cog:{3},sog:{4}", aisInfo.mmsi, aisInfo.MsgType,aisInfo.shipName, aisInfo.COG
-                , aisInfo.SOG);
-                datas.add(str);
-                aisInfoAdapter.notifyDataSetChanged();
-            } catch (DbException e) {
-                e.printStackTrace();
-            }
+            // 显示所有船
+            skiaDrawView.mYimaLib.SetAllOtherVesselDrawOrNot(true);
+            skiaDrawView.postInvalidate();
+            Log.e("TAG", aisInfo.mmsi + ", " + aisInfo.longtitude + ", " + aisInfo.latititude);
+//                String str = String.format("mmsi:{0},msgType:{1},shipName:{2},cog:{3},sog:{4}", aisInfo.mmsi, aisInfo.MsgType,aisInfo.shipName, aisInfo.COG
+//                , aisInfo.SOG);
+//                datas.add(str);
+//                aisInfoAdapter.notifyDataSetChanged();
+        } catch (DbException e) {
+            e.printStackTrace();
         }
     }
 

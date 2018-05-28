@@ -30,18 +30,18 @@ public class DrawEarth extends View {
         p.setColor(Color.BLACK);
         p.setTextSize(25);
 
-        canvas.drawCircle(mSatelliteX, mSateLliteY, mSatelliteX * 1 / 3, p);
-        canvas.drawCircle(mSatelliteX, mSateLliteY, mSatelliteX * 2 / 3, p);
-        canvas.drawCircle(mSatelliteX, mSateLliteY, mSatelliteX, p);
+        canvas.drawCircle(mSatelliteX, mSateLliteY, mSateLliteY * 1 / 3, p);
+        canvas.drawCircle(mSatelliteX, mSateLliteY, mSateLliteY * 2 / 3, p);
+        canvas.drawCircle(mSatelliteX, mSateLliteY, mSateLliteY, p);
 
-        canvas.drawLine(0, mSateLliteY, mSatelliteX * 2, mSateLliteY, p);//X
+        canvas.drawLine(mSatelliteX - mSateLliteY, mSateLliteY, mSatelliteX - mSateLliteY + mSateLliteY * 2, mSateLliteY, p);//X
         canvas.drawLine(mSatelliteX, 0, mSatelliteX, mSateLliteY * 2, p);//Y
 
         p.setStyle(Paint.Style.FILL);
         canvas.drawText("北", mSatelliteX - 15, 0 + 25, p);
         canvas.drawText("南", mSatelliteX - 15, mSateLliteY * 2, p);
-        canvas.drawText("西", 0, mSateLliteY + 10, p);
-        canvas.drawText("东", mSatelliteX * 2 - 25, mSateLliteY + 10, p);
+        canvas.drawText("西", mSatelliteX - mSateLliteY, mSateLliteY + 10, p);
+        canvas.drawText("东", mSatelliteX - mSateLliteY + mSateLliteY * 2 - 25, mSateLliteY + 10, p);
 
     }
 

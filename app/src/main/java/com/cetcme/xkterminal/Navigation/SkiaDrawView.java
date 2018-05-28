@@ -64,6 +64,7 @@ public class SkiaDrawView extends View {
         mYimaLib = new YimaLib();
         mYimaLib.Create();
         mYimaLib.Init(Constant.YIMA_WORK_PATH);//初始化，传入WorkDir初始化目录地址
+        mYimaLib.SetDrawOwnShipSpecialOptions(false,true,true,255,0,0);
         mContext = ctx;
         bNormalDragMapMode = false;
     }

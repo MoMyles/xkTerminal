@@ -56,6 +56,4 @@ public class Constant {
     public static final boolean SHOW_NUMBER_MESSAGE_LIST = true;
     public static final boolean SHOW_NUMBER_MSG_TEMP_LIST = true;
     public static final boolean SHOW_NUMBER_FRIEND_LIST = true;
-
-
 }

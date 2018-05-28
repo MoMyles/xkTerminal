@@ -16,10 +16,12 @@ import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.MyClass.ScreenBrightness;
 import com.cetcme.xkterminal.MyClass.SoundPlay;
 import com.cetcme.xkterminal.Socket.SocketServer;
+import com.cetcme.xkterminal.Sqlite.Proxy.GroupProxy;
 
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.xutils.DbManager;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -44,6 +46,8 @@ public class DataHandler extends Handler {
     private MainActivity mainActivity;
     private MyApplication myApplication;
 
+    private DbManager db = MyApplication.getInstance().getDb();
+
     public DataHandler(MainActivity mainActivity, MyApplication myApplication) {
         this.myApplication = myApplication;
         this.mainActivity = mainActivity;
@@ -62,22 +66,47 @@ public class DataHandler extends Handler {
                 String type    = messageStrings[2];
                 int group      = Integer.parseInt(messageStrings[3]);
 
-                // 判断类型 普通短信 还是 救护短信
-                if (type.equals(MessageFormat.MESSAGE_TYPE_RESCUE)) {
-                    myApplication.sendLightOn(true);
-                    mainActivity.showRescueDialog(content);
-                    mainActivity.addMessage(address, content, true);
-                } else {
 
-                    // 判断分组 group -1为非分组短信，其他为组号，
-                    int ownGroup = PreferencesUtils.getInt(mainActivity, "group");
-                    if (group == -1 || group == ownGroup) { // 判断是分组短信
+                switch (type) {
+                    // 普通短信
+                    case MessageFormat.MESSAGE_TYPE_NORMAL:
                         SoundPlay.playMessageSound(mainActivity);
                         mainActivity.addMessage(address, content, false);
                         mainActivity.modifyGpsBarMessageCount();
                         Toast.makeText(mainActivity, "您有新的短信", Toast.LENGTH_SHORT).show();
-                    }
-
+                        break;
+                    // 救护短信
+                    case MessageFormat.MESSAGE_TYPE_RESCUE:
+                        myApplication.sendLightOn(true);
+                        mainActivity.showRescueDialog(content);
+                        mainActivity.addMessage(address, content, true);
+                        break;
+                    // 开启关闭短信功能
+                    case MessageFormat.MESSAGE_TYPE_SMS_OPEN:
+                        PreferencesUtils.putBoolean(mainActivity, "canSendSms", content.equals("1"));
+                        break;
+                    // 报警提醒
+                    case MessageFormat.MESSAGE_TYPE_ALERT_REMIND:
+                        // TODO:
+                        break;
+                    // 摇毙功能
+                    case MessageFormat.MESSAGE_TYPE_SHUT_DOWN:
+                        PreferencesUtils.putBoolean(mainActivity, "shutdown", true);
+                        System.exit(0);
+                        break;
+                    // 夜间点名
+                    case MessageFormat.MESSAGE_TYPE_CALL_THE_ROLL:
+                        // TODO:
+                        break;
+                    default:
+                        // 判断分组 group -1为非分组短信，其他为组号，
+                        if (group == -1 || GroupProxy.hasGroup(db, group)) {
+                            SoundPlay.playMessageSound(mainActivity);
+                            mainActivity.addMessage(address, content, false);
+                            mainActivity.modifyGpsBarMessageCount();
+                            Toast.makeText(mainActivity, "您有新的短信", Toast.LENGTH_SHORT).show();
+                        }
+                        break;
                 }
                 break;
             case SERIAL_PORT_MESSAGE_SEND_SUCCESS:

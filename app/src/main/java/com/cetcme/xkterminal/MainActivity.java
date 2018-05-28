@@ -37,9 +37,11 @@ import com.cetcme.xkterminal.MyClass.DensityUtil;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.MyClass.SoundPlay;
 import com.cetcme.xkterminal.Socket.SocketServer;
+import com.cetcme.xkterminal.Sqlite.Bean.GroupBean;
 import com.cetcme.xkterminal.Sqlite.Bean.MessageBean;
 import com.cetcme.xkterminal.Sqlite.Proxy.AlertProxy;
 import com.cetcme.xkterminal.Sqlite.Proxy.FriendProxy;
+import com.cetcme.xkterminal.Sqlite.Proxy.GroupProxy;
 import com.cetcme.xkterminal.Sqlite.Proxy.MessageProxy;
 import com.cetcme.xkterminal.Sqlite.Proxy.SignProxy;
 import com.kaopiz.kprogresshud.KProgressHUD;
@@ -50,6 +52,7 @@ import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.xutils.DbManager;
+import org.xutils.ex.DbException;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
@@ -113,9 +116,8 @@ public class MainActivity extends AppCompatActivity {
 
         bindView();
 
-        //TODO test 测试
-//        initMainFragment();
-        initSettingFragment();
+        initMainFragment();
+//        initSettingFragment();
         initHud();
 
         myNumber = PreferencesUtils.getString(this, "myNumber");
@@ -133,6 +135,8 @@ public class MainActivity extends AppCompatActivity {
         sendBootData();
 
         MessageProxy.getAddress(db);
+
+        checkoutShutDown();
     }
 
     private void initHud() {
@@ -198,6 +202,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void addFriend(String name, String number) {
         FriendProxy.insert(db, name, number);
+    }
+
+    public void addGroup(String name, String number) {
+        GroupProxy.insert(db, name, Integer.parseInt(number));
     }
 
     public void showIDCardDialog(String id, String name, String nation, String address) {
@@ -670,5 +678,21 @@ public class MainActivity extends AppCompatActivity {
                 }
             })
             .show();
+    }
+
+    private void checkoutShutDown() {
+        boolean shutdown = PreferencesUtils.getBoolean(MainActivity.this, "shutdown");
+        if (shutdown) {
+            new QMUIDialog.MessageDialogBuilder(MainActivity.this)
+                    .setTitle("提示")
+                    .setMessage("遥毙功能已启动, app不可再使用!")
+                    .addAction("确定", new QMUIDialogAction.ActionListener() {
+                        @Override
+                        public void onClick(QMUIDialog dialog, int index) {
+                            System.exit(0);
+                        }
+                    })
+                    .show();
+        }
     }
 }

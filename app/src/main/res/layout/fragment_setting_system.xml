@@ -480,14 +480,24 @@
                     android:text="用户分组："/>
 
                 <TextView
-                    android:id="@+id/group_textView"
-                    android:layout_width="250dp"
-                    android:layout_weight="1"
+                    android:id="@+id/group_add_textView"
+                    android:layout_width="125dp"
+                    android:layout_weight="0.5"
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:textColor="#000000"
                     android:textSize="18sp"
-                    android:text="---"/>
+                    android:text="增加"/>
+
+                <TextView
+                    android:id="@+id/group_delete_textView"
+                    android:layout_width="125dp"
+                    android:layout_weight="0.5"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:textColor="#000000"
+                    android:textSize="18sp"
+                    android:text="删除"/>
 
                 <android.support.v4.widget.Space
                     android:layout_width="50dp"
@@ -592,18 +602,6 @@
                     android:layout_marginRight="150dp"
                     android:layout_marginEnd="150dp"
                     android:text="删除"/>
-
-                <!--<TextView-->
-                <!--android:id="@+id/sun_voltage_textView1"-->
-                <!--android:layout_width="250dp"-->
-                <!--android:layout_weight="1"-->
-                <!--android:layout_height="match_parent"-->
-                <!--android:gravity="center"-->
-                <!--android:textColor="#000000"-->
-                <!--android:layout_marginRight="150dp"-->
-                <!--android:layout_marginEnd="150dp"-->
-                <!--android:textSize="18sp"-->
-                <!--android:text=""/>-->
             </LinearLayout>
 
             <TextView

@@ -47,6 +47,7 @@ import com.qiuhong.qhlibrary.Dialog.QHDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.xutils.DbManager;
@@ -669,5 +670,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             })
             .show();
+    }
+
+    public void openOtherShips() {
+        EventBus.getDefault().post("openShip");
     }
 }

@@ -821,7 +821,8 @@ public class MyApplication extends Application {
                 }
                 String gpsDataStr = new String(tmpByts);
 //                Log.i(TAG, "len: " + aisByts.size() + ", onAisDataReceived: " + gpsDataStr);
-                if (gpsDataStr.startsWith("!AIVDM")) {
+                if (gpsDataStr.startsWith("!AIVDM")
+                        || gpsDataStr.startsWith("!AIVDO")) {
                     AisInfo aisInfo = YimaAisParse.mParseAISSentence(gpsDataStr);
                     if (aisInfo != null) {
                         Log.i(TAG, aisInfo.MsgType + "");

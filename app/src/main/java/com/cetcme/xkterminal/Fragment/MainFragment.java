@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +18,7 @@ import android.widget.TextView;
 
 import com.cetcme.xkterminal.DataFormat.AlertFormat;
 import com.cetcme.xkterminal.Event.SmsEvent;
+import com.cetcme.xkterminal.Fragment.adapter.RvShipAdapter;
 import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.GPSFormatUtils;
@@ -24,6 +28,7 @@ import com.cetcme.xkterminal.Navigation.SkiaDrawView;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 import com.cetcme.xkterminal.Sqlite.Bean.OtherShipBean;
+import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton;
@@ -36,18 +41,24 @@ import org.json.JSONObject;
 import org.xutils.DbManager;
 import org.xutils.ex.DbException;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import yimamapapi.skia.AisInfo;
 import yimamapapi.skia.M_POINT;
+import yimamapapi.skia.OtherVesselCurrentInfo;
 
 /**
  * Created by qiuhong on 10/01/2018.
  */
 
-public class MainFragment extends Fragment {
+public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickListener {
 
     private SkiaDrawView skiaDrawView;
     //    private LinearLayout main_layout;
     private LinearLayout alert_layout;
+    private LinearLayout ll_ship_list;
+    private RecyclerView rv_ships;
 
     private Button zoomOut, zoomIn;
 
@@ -65,9 +76,11 @@ public class MainFragment extends Fragment {
 
     private DbManager db;
 
-//    private ArrayAdapter<String> aisInfoAdapter;
+    //    private ArrayAdapter<String> aisInfoAdapter;
 //    private ListView mLvAisInfo;
 //    private final List<String> datas = new LinkedList<>();
+    private RvShipAdapter rvShipAdapter;
+    private final List<OtherShipBean> datas = new LinkedList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -76,7 +89,18 @@ public class MainFragment extends Fragment {
 
 //        main_layout = view.findViewById(R.id.main_layout);
         skiaDrawView = view.findViewById(R.id.skiaView);
+        skiaDrawView.setOnMapClickListener(this);
         alert_layout = view.findViewById(R.id.alert_layout);
+        ll_ship_list = view.findViewById(R.id.ll_ship_list);
+        ViewGroup.LayoutParams lp = ll_ship_list.getLayoutParams();
+        lp.width = QMUIDisplayHelper.getScreenWidth(getActivity()) * 4 / 10;
+        rv_ships = view.findViewById(R.id.rv_ships);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+        rv_ships.setLayoutManager(linearLayoutManager);
+        rv_ships.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
+        datas.clear();
+        rvShipAdapter = new RvShipAdapter(getActivity(), datas, skiaDrawView);
+        rv_ships.setAdapter(rvShipAdapter);
 
         tv_lon = view.findViewById(R.id.tv_lon);
         tv_lat = view.findViewById(R.id.tv_lat);
@@ -320,6 +344,7 @@ public class MainFragment extends Fragment {
                         , aisInfo.longtitude, aisInfo.latititude, aisInfo.COG, aisInfo.COG
                         , 0, aisInfo.SOG, 0);
                 osb.setShip_id(ship_id);
+                osb.setShip_name(aisInfo.shipName);
                 db.save(osb);
             } else {
                 // 存在， 更新信息
@@ -339,6 +364,39 @@ public class MainFragment extends Fragment {
         } catch (DbException e) {
             e.printStackTrace();
         }
+    }
+
+    @Subscribe
+    public void onOpenEvent(String action) {
+        if ("openShip".equals(action)) {
+
+            try {
+                datas.clear();
+                List<OtherShipBean> list = db.selector(OtherShipBean.class).findAll();
+                if (list != null && !list.isEmpty()) {
+                    datas.addAll(list);
+                }
+                rvShipAdapter.notifyDataSetChanged();
+            } catch (DbException e) {
+                e.printStackTrace();
+            }
+
+            if (ll_ship_list.getVisibility() == View.GONE) {
+                ll_ship_list.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    @Override
+    public void onMapClicked(M_POINT m_point) {
+        if (ll_ship_list.getVisibility() == View.VISIBLE) {
+            ll_ship_list.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void onMapTouched(int action) {
+
     }
 
     /**
@@ -366,4 +424,41 @@ public class MainFragment extends Fragment {
         tv_speed.setText(String.format("%.1f", locationBean.getSpeed()) + "kn");
     }
 
+    /**
+     * 是否需要距离报警
+     *
+     * @return
+     */
+    private boolean isDangerOfDistance() {
+        if (PreferencesUtils.getBoolean(getActivity(), "warn_switch", false)) {
+            LocationBean myself = MyApplication.getInstance().getCurrentLocation();
+            int distance = PreferencesUtils.getInt(getActivity(), "warn_distance", 200);
+            double haili = distance * 1.0 / 1852;// 海里
+            M_POINT start = skiaDrawView.mYimaLib.getDesPointOfCrsAndDist(myself.getLongitude()
+                    , myself.getLatitude(), haili, myself.getHeading());// 本船报警距离目标点
+            try {
+                List<OtherShipBean> list = db.selector(OtherShipBean.class).findAll();
+                if (list != null && !list.isEmpty()) {
+                    for (OtherShipBean osb : list) {
+                        int vessel_id = skiaDrawView.mYimaLib.GetOtherVesselPosOfID(osb.getShip_id());
+                        OtherVesselCurrentInfo ovci = skiaDrawView.mYimaLib.getOtherVesselCurrentInfo(vessel_id);
+                        M_POINT end = skiaDrawView.mYimaLib.getDesPointOfCrsAndDist(ovci.currentPoint.x
+                            , ovci.currentPoint.y, haili, ovci.fCourseOverGround);
+                        int x_ = myself.getLongitude() - ovci.currentPoint.x;
+                        int y_ = myself.getLatitude() - ovci.currentPoint.y;
+
+                        int x_2 = start.x - end.x;
+                        int y_2 = start.y - end.y;
+
+                        if (x_2 < x_ && y_2 < y_) {
+
+                        }
+                    }
+                }
+            } catch (DbException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
 }

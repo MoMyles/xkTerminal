@@ -32,6 +32,7 @@ public class BottomBar extends RelativeLayout implements View.OnClickListener {
     private Button button_navigate;
     private Button button_post;
     private Button button_about;
+    private Button button_other_ship;
 
     private ArrayList<Button> buttons = new ArrayList<>();
 
@@ -55,6 +56,7 @@ public class BottomBar extends RelativeLayout implements View.OnClickListener {
         button_navigate = view.findViewById(R.id.button_navigate);
         button_post     = view.findViewById(R.id.button_post);
         button_about    = view.findViewById(R.id.button_about);
+        button_other_ship = view.findViewById(R.id.button_other_ship);
 
         buttons.add(button_receive);
         buttons.add(button_send);
@@ -64,6 +66,7 @@ public class BottomBar extends RelativeLayout implements View.OnClickListener {
         buttons.add(button_navigate);
         buttons.add(button_post);
         buttons.add(button_about);
+        buttons.add(button_other_ship);
 
         for (Button button: buttons) {
             button.setTextColor(0xFF000000);
@@ -99,6 +102,9 @@ public class BottomBar extends RelativeLayout implements View.OnClickListener {
                 break;
             case R.id.button_about:
                 mainActivity.initAboutFragment();
+                break;
+            case R.id.button_other_ship:
+                mainActivity.openOtherShips();
                 break;
             default:
                 break;

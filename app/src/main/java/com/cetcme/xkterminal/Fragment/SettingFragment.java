@@ -15,6 +15,7 @@ import com.cetcme.xkterminal.Fragment.setting.SatelliteFragment;
 import com.cetcme.xkterminal.Fragment.setting.SeriveStatusFragment;
 import com.cetcme.xkterminal.Fragment.setting.SystemSettingFragment;
 import com.cetcme.xkterminal.Fragment.setting.DBSettingFragment;
+import com.cetcme.xkterminal.Fragment.setting.WarningSettingFragment;
 import com.cetcme.xkterminal.R;
 import com.qmuiteam.qmui.widget.QMUITabSegment;
 
@@ -49,7 +50,7 @@ public class SettingFragment extends Fragment {
         List<Fragment> fragments=new ArrayList<>();
         fragments.add(new DBSettingFragment());
         fragments.add(new SatelliteFragment());
-        fragments.add(new BlankFragment());
+        fragments.add(new WarningSettingFragment());
         fragments.add(new SeriveStatusFragment());
         fragments.add(new SystemSettingFragment());
         FragAdapter adapter = new FragAdapter(getActivity().getSupportFragmentManager(), fragments);

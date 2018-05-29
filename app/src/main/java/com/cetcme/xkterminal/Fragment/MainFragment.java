@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -55,7 +56,7 @@ import yimamapapi.skia.OtherVesselCurrentInfo;
 public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickListener {
 
     private SkiaDrawView skiaDrawView;
-    //    private LinearLayout main_layout;
+    private ConstraintLayout main_layout;
     private LinearLayout alert_layout;
     private LinearLayout ll_ship_list;
     private RecyclerView rv_ships;
@@ -87,9 +88,13 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_main, container, false);
         EventBus.getDefault().register(this);
 
+<<<<<<< HEAD
 //        main_layout = view.findViewById(R.id.main_layout);
         skiaDrawView = view.findViewById(R.id.skiaView);
         skiaDrawView.setOnMapClickListener(this);
+=======
+        main_layout = view.findViewById(R.id.main_layout);
+>>>>>>> master
         alert_layout = view.findViewById(R.id.alert_layout);
         ll_ship_list = view.findViewById(R.id.ll_ship_list);
         ViewGroup.LayoutParams lp = ll_ship_list.getLayoutParams();
@@ -178,15 +183,12 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
     public void showMainLayout() {
         alert_need_flash = false;
         SoundPlay.stopAlertSound();
-
-//        main_layout.setVisibility(View.VISIBLE);
-        skiaDrawView.setVisibility(View.VISIBLE);
+        main_layout.setVisibility(View.VISIBLE);
         alert_layout.setVisibility(View.GONE);
     }
 
     private void showAlertLayout() {
-//        main_layout.setVisibility(View.GONE);
-        skiaDrawView.setVisibility(View.GONE);
+        main_layout.setVisibility(View.GONE);
         alert_layout.setVisibility(View.VISIBLE);
         alert_need_flash = true;
         if (Constant.ALERT_FLASH_TIME != 0) {

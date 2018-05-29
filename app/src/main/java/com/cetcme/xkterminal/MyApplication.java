@@ -190,7 +190,7 @@ public class MyApplication extends Application {
         };
         new SocketManager(handler, getApplicationContext());
 
-        mHandler = new DataHandler(mainActivity, this);
+        mHandler = new DataHandler(this);
 
 
         initDb();
@@ -920,7 +920,7 @@ public class MyApplication extends Application {
                     // 判断类型 普通短信 还是 救护短信
                     if (type.equals(MessageFormat.MESSAGE_TYPE_RESCUE)) {
                         sendLightOn(true);
-                        mainActivity.showRescueDialog(content);
+                        mainActivity.showMessageDialog(content);
                         mainActivity.addMessage(address, content, true);
                     } else {
 

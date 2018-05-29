@@ -3,6 +3,7 @@ package com.cetcme.xkterminal.Fragment.setting;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.text.InputType;
 import android.view.LayoutInflater;
@@ -19,9 +20,12 @@ import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.Sqlite.Bean.FriendBean;
+import com.cetcme.xkterminal.Sqlite.Bean.GroupBean;
 import com.cetcme.xkterminal.Sqlite.Proxy.FriendProxy;
+import com.cetcme.xkterminal.Sqlite.Proxy.GroupProxy;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
+import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,6 +36,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -54,17 +62,22 @@ public class SystemSettingFragment extends Fragment {
 
     private TextView wifi_ssid_textView;
 
-    private TextView group_textView;
-
     private TextView time_zone_textView;
     private Button time_zone_minus_btn;
     private Button time_zone_add_btn;
 
+    @BindView(R.id.tv_rdss) TextView tv_rdss;
+
+    // 用于添加好友内容缓存
     private String[] friend = {"", ""};
+
+    // 用于添加分组内容缓存
+    private String[] group = {"", ""};
 
     private MainActivity mainActivity;
     private DbManager db = MyApplication.getInstance().getDb();
 
+    Unbinder unbinder;
 
     public SystemSettingFragment() {
         // Required empty public constructor
@@ -74,30 +87,35 @@ public class SystemSettingFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_setting_system,container,false);
+        unbinder = ButterKnife.bind(this, view);
         initView(view);
         getData();
         mainActivity = (MainActivity) getActivity();
         return view;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
+
     private void initView(View view) {
         address_textView            = view.findViewById(R.id.address_textView);
-        signal_textView             = view.findViewById(R.id.signal_textView);
-        location_freq_textView      = view.findViewById(R.id.location_freq_textView);
-        gps_freq_textView           = view.findViewById(R.id.gps_freq_textView);
-        central_number_textView     = view.findViewById(R.id.central_number_textView);
+//        signal_textView             = view.findViewById(R.id.signal_textView);
+//        location_freq_textView      = view.findViewById(R.id.location_freq_textView);
+//        gps_freq_textView           = view.findViewById(R.id.gps_freq_textView);
+//        central_number_textView     = view.findViewById(R.id.central_number_textView);
 
-        location_from_textView      = view.findViewById(R.id.location_from_textView);
-        communication_from_textView = view.findViewById(R.id.communication_from_textView);
-        signal_power_textView       = view.findViewById(R.id.signal_power_textView);
-        satellite_count_textView    = view.findViewById(R.id.satellite_count_textView);
-        broad_temp_textView         = view.findViewById(R.id.broad_temp_textView);
-        li_voltage_textView         = view.findViewById(R.id.li_voltage_textView);
-        sun_voltage_textView        = view.findViewById(R.id.sun_voltage_textView);
+//        location_from_textView      = view.findViewById(R.id.location_from_textView);
+//        communication_from_textView = view.findViewById(R.id.communication_from_textView);
+//        signal_power_textView       = view.findViewById(R.id.signal_power_textView);
+//        satellite_count_textView    = view.findViewById(R.id.satellite_count_textView);
+//        broad_temp_textView         = view.findViewById(R.id.broad_temp_textView);
+//        li_voltage_textView         = view.findViewById(R.id.li_voltage_textView);
+//        sun_voltage_textView        = view.findViewById(R.id.sun_voltage_textView);
 
         wifi_ssid_textView          = view.findViewById(R.id.wifi_ssid_textView);
-
-        group_textView              = view.findViewById(R.id.group_textView);
 
         wifi_ssid_textView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -187,16 +205,60 @@ public class SystemSettingFragment extends Fragment {
             }
         });
 
-        // 分组
-        group_textView.setOnClickListener(new View.OnClickListener() {
+        // 用户分组
+        view.findViewById(R.id.group_add_textView).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                editGroup();
+                groupAdd();
             }
         });
+
+        view.findViewById(R.id.group_delete_textView).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                groupDelete();
+            }
+        });
+
+        tv_rdss.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final boolean rdssOpen = PreferencesUtils.getBoolean(getActivity(), "rdss", false);
+
+                final QMUITipDialog tipDialog;
+                tipDialog = new QMUITipDialog.Builder(getContext())
+                        .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
+                        .setTipWord(rdssOpen ? "关闭中" : "开启中")
+                        .create();
+                tipDialog.show();
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        PreferencesUtils.putBoolean(getActivity(), "rdss", !rdssOpen);
+                        tv_rdss.setText(!rdssOpen ? "关闭" : "开启");
+                        tipDialog.dismiss();
+                    }
+                }, 3000);
+
+            }
+        });
+
     }
 
     private void getData() {
+
+        String ssid = PreferencesUtils.getString(getActivity(), "wifiSSID");
+        if (ssid != null ) {
+            wifi_ssid_textView.setText(ssid);
+        } else {
+            wifi_ssid_textView.setText(getString(R.string.wifi_ssid));
+        }
+
+        boolean rdssOpen = PreferencesUtils.getBoolean(getActivity(), "rdss", false);
+        tv_rdss.setText(rdssOpen ? "关闭" : "开启");
+
+        /*
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("address", "168857");
@@ -208,15 +270,7 @@ public class SystemSettingFragment extends Fragment {
             address_textView        .setText(PreferencesUtils.getString(getActivity(), "myNumber"));
             communication_from_textView.setText(PreferencesUtils.getString(getActivity(), "communication_from"));
 
-            String ssid = PreferencesUtils.getString(getActivity(), "wifiSSID");
-            if (ssid != null ) {
-                wifi_ssid_textView.setText(ssid);
-            } else {
-                wifi_ssid_textView.setText(getString(R.string.wifi_ssid));
-            }
 
-            int group = PreferencesUtils.getInt(getActivity(), "group");
-            group_textView.setText(group == -1 ? "无" : group + "");
 
             signal_textView         .setText(jsonObject.getString("signal"));
             location_freq_textView  .setText(jsonObject.getString("location_per"));
@@ -233,6 +287,7 @@ public class SystemSettingFragment extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        */
 
     }
 
@@ -401,7 +456,7 @@ public class SystemSettingFragment extends Fragment {
     private void friendDelete() {
 
         final List<FriendBean> friends = FriendProxy.getAll(db);
-        if (friends.size() == 0) {
+        if (friends == null || friends.size() == 0) {
             Toast.makeText(getActivity(), "好友列表为空", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -431,6 +486,108 @@ public class SystemSettingFragment extends Fragment {
                     FriendProxy.deleteById(db, friends.get(i).getId());
                 }
                 Toast.makeText(getActivity(), "好友删除成功", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            }
+        });
+        builder.show();
+    }
+
+    private void groupAdd() {
+
+        final QMUIDialog.EditTextDialogBuilder numberBuilder = new QMUIDialog.EditTextDialogBuilder(getActivity());
+        numberBuilder.setTitle("添加用户分组")
+                .setPlaceholder("在此输入分组编号(1到255)")
+                .setInputType(InputType.TYPE_CLASS_NUMBER)
+                .addAction("取消", new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
+                        dialog.dismiss();
+                    }
+                })
+                .addAction("确认", new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
+                        CharSequence text = numberBuilder.getEditText().getText();
+                        if (text != null && text.length() > 0 && text.length() <= 3 && isNumer(text.toString())) {
+                            int number = Integer.parseInt(text.toString());
+                            if (number < 1 || number > 255) {
+                                Toast.makeText(getActivity(), "分组编号超出氛围(1到255)", Toast.LENGTH_SHORT).show();
+                            } else {
+                                group[1] = text.toString();
+                                mainActivity.addGroup(group[0], group[1]);
+                                group[0] = "";
+                                group[1] = "";
+                                dialog.dismiss();
+                                Toast.makeText(getActivity(), "分组添加成功", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(getActivity(), "请填入号码", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
+        final QMUIDialog.EditTextDialogBuilder nameBuilder = new QMUIDialog.EditTextDialogBuilder(getActivity());
+        nameBuilder.setTitle("添加分组")
+                .setPlaceholder("在此输入自定义分组名称")
+                .setInputType(InputType.TYPE_CLASS_TEXT)
+                .addAction("取消", new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
+                        dialog.dismiss();
+                    }
+                })
+                .addAction("确认", new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
+                        CharSequence text = nameBuilder.getEditText().getText();
+                        if (text != null && text.length() > 0) {
+
+                            group[0] = text.toString();
+                            numberBuilder.show();
+                            dialog.dismiss();
+
+                        } else {
+                            Toast.makeText(getActivity(), "请填入自定义分组名称", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                })
+                .show();
+
+    }
+
+    private void groupDelete() {
+
+        final List<GroupBean> groups = GroupProxy.getAll(db);
+        if (groups == null || groups.size() == 0) {
+            Toast.makeText(getActivity(), "分组列表为空", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        final String[] items = new String[groups.size()];
+        for (int i = 0; i < groups.size(); i++) {
+            items[i] = (i + 1) + ". " + groups.get(i).getName() + "(" + groups.get(i).getNumber() + ")";
+        }
+        final QMUIDialog.MultiCheckableDialogBuilder builder = new QMUIDialog.MultiCheckableDialogBuilder(getActivity())
+                .addItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+        builder.addAction("取消", new QMUIDialogAction.ActionListener() {
+            @Override
+            public void onClick(QMUIDialog dialog, int index) {
+                dialog.dismiss();
+            }
+        });
+        builder.addAction("删除", new QMUIDialogAction.ActionListener() {
+            @Override
+            public void onClick(QMUIDialog dialog, int index) {
+                int[] indexes = builder.getCheckedItemIndexes();
+                for (int i = 0; i < indexes.length; i++) {
+                    GroupProxy.deleteById(db, groups.get(i).getId());
+                }
+                Toast.makeText(getActivity(), "分组删除成功", Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             }
         });

@@ -26,6 +26,7 @@ import com.cetcme.xkterminal.DataFormat.Util.ByteUtil;
 import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
 import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
 import com.cetcme.xkterminal.DataFormat.Util.Util;
+import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.Fragment.AboutFragment;
 import com.cetcme.xkterminal.Fragment.LogFragment;
 import com.cetcme.xkterminal.Fragment.MainFragment;
@@ -40,6 +41,7 @@ import com.cetcme.xkterminal.Socket.SocketServer;
 import com.cetcme.xkterminal.Sqlite.Bean.MessageBean;
 import com.cetcme.xkterminal.Sqlite.Proxy.AlertProxy;
 import com.cetcme.xkterminal.Sqlite.Proxy.FriendProxy;
+import com.cetcme.xkterminal.Sqlite.Proxy.GroupProxy;
 import com.cetcme.xkterminal.Sqlite.Proxy.MessageProxy;
 import com.cetcme.xkterminal.Sqlite.Proxy.SignProxy;
 import com.kaopiz.kprogresshud.KProgressHUD;
@@ -55,6 +57,8 @@ import org.xutils.DbManager;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -115,7 +119,6 @@ public class MainActivity extends AppCompatActivity {
         bindView();
 
         initMainFragment();
-        //initSettingFragment();
         initHud();
 
         myNumber = PreferencesUtils.getString(this, "myNumber");
@@ -133,6 +136,37 @@ public class MainActivity extends AppCompatActivity {
         sendBootData();
 
         MessageProxy.getAddress(db);
+
+        checkoutShutDown();
+
+        // TODO: test
+        /*
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                showMessageDialog("测试短信", MessageDialogActivity.TYPE_CALL_ROLL);
+            }
+        }, 2000);
+        */
+
+        // TODO: fake
+        volTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (voltage < 3.2) return;
+                voltage -= 0.02;
+                try {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("apiType", "voltage");
+                    jsonObject.put("voltage", voltage);
+                    SmsEvent smsEvent = new SmsEvent(jsonObject);
+                    EventBus.getDefault().post(smsEvent);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }, 0, 60 * 1000);
     }
 
     private void initHud() {
@@ -200,6 +234,10 @@ public class MainActivity extends AppCompatActivity {
         FriendProxy.insert(db, name, number);
     }
 
+    public void addGroup(String name, String number) {
+        GroupProxy.insert(db, name, Integer.parseInt(number));
+    }
+
     public void showIDCardDialog(String id, String name, String nation, String address) {
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
@@ -230,9 +268,11 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void showRescueDialog(String content) {
-        Intent intent = new Intent(MainActivity.this, RescueMessageActivity.class);
+    public void showMessageDialog(String content, int type) {
+        // type 0: 救护, 1: 报警提醒, 2: 夜间点名
+        Intent intent = new Intent(MainActivity.this, MessageDialogActivity.class);
         intent.putExtra("content", content);
+        intent.putExtra("type", type);
         startActivity(intent);
     }
 
@@ -672,7 +712,31 @@ public class MainActivity extends AppCompatActivity {
             .show();
     }
 
+
     public void openOtherShips() {
         EventBus.getDefault().post("openShip");
     }
+
+    private void checkoutShutDown() {
+        boolean shutdown = PreferencesUtils.getBoolean(MainActivity.this, "shutdown");
+        if (shutdown) {
+            new QMUIDialog.MessageDialogBuilder(MainActivity.this)
+                    .setTitle("提示")
+                    .setMessage("遥毙功能已启动, app不可再使用!")
+                    .addAction("确定", new QMUIDialogAction.ActionListener() {
+                        @Override
+                        public void onClick(QMUIDialog dialog, int index) {
+                            System.exit(0);
+                        }
+                    })
+                    .show();
+        }
+    }
+
+
+    //TODO: fake
+    public double voltage = 4.20;
+    public Timer volTimer = new Timer();
+
+
 }

@@ -29,7 +29,7 @@
                     android:text="用户地址："/>
 
                 <TextView
-                    android:id="@+id/address_textView"
+                    android:id="@+id/tv_address"
                     style="@style/setting_tv_title"
                     android:gravity="center"
                     android:text="---"/>
@@ -43,7 +43,6 @@
                     android:text="入站频率："/>
 
                 <TextView
-                    android:id="@+id/communication_from_textView"
                     style="@style/setting_tv_title"
                     android:gravity="center"
                     android:layout_marginRight="150dp"
@@ -209,6 +208,47 @@
                     android:layout_marginRight="150dp"
                     android:layout_marginEnd="150dp"
                     android:text="---"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_alignParentBottom="true"
+                android:background="#b7b7b7" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    style="@style/setting_tv_title"
+                    android:layout_marginLeft="150dp"
+                    android:layout_marginStart="150dp"
+                    android:text="供电电压："/>
+
+                <TextView
+                    android:id="@+id/tv_voltage"
+                    style="@style/setting_tv_title"
+                    android:gravity="center"
+                    android:text="---"/>
+
+                <android.support.v4.widget.Space
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"/>
+
+                <TextView
+                    style="@style/setting_tv_title"
+                    android:text=""/>
+
+                <TextView
+                    style="@style/setting_tv_title"
+                    android:gravity="center"
+                    android:layout_marginRight="150dp"
+                    android:layout_marginEnd="150dp"
+                    android:text=""/>
 
             </LinearLayout>
 

@@ -16,10 +16,12 @@ import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.MyClass.ScreenBrightness;
 import com.cetcme.xkterminal.MyClass.SoundPlay;
 import com.cetcme.xkterminal.Socket.SocketServer;
+import com.cetcme.xkterminal.Sqlite.Proxy.GroupProxy;
 
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.xutils.DbManager;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -41,12 +43,12 @@ public class DataHandler extends Handler {
     public static final int SERIAL_PORT_ALERT_FAIL = 0x11;
     public static final int SERIAL_PORT_ID_EDIT_OK = 0x12;
 
-    private MainActivity mainActivity;
     private MyApplication myApplication;
 
-    public DataHandler(MainActivity mainActivity, MyApplication myApplication) {
+    private DbManager db = MyApplication.getInstance().getDb();
+
+    public DataHandler(MyApplication myApplication) {
         this.myApplication = myApplication;
-        this.mainActivity = mainActivity;
     }
 
     @Override
@@ -62,33 +64,61 @@ public class DataHandler extends Handler {
                 String type    = messageStrings[2];
                 int group      = Integer.parseInt(messageStrings[3]);
 
-                // 判断类型 普通短信 还是 救护短信
-                if (type.equals(MessageFormat.MESSAGE_TYPE_RESCUE)) {
-                    myApplication.sendLightOn(true);
-                    mainActivity.showRescueDialog(content);
-                    mainActivity.addMessage(address, content, true);
-                } else {
-
-                    // 判断分组 group -1为非分组短信，其他为组号，
-                    int ownGroup = PreferencesUtils.getInt(mainActivity, "group");
-                    if (group == -1 || group == ownGroup) { // 判断是分组短信
-                        SoundPlay.playMessageSound(mainActivity);
-                        mainActivity.addMessage(address, content, false);
-                        mainActivity.modifyGpsBarMessageCount();
-                        Toast.makeText(mainActivity, "您有新的短信", Toast.LENGTH_SHORT).show();
-                    }
-
+                switch (type) {
+                    // 普通短信
+                    case MessageFormat.MESSAGE_TYPE_NORMAL:
+                        SoundPlay.playMessageSound(myApplication.mainActivity);
+                        myApplication.mainActivity.addMessage(address, content, false);
+                        myApplication.mainActivity.modifyGpsBarMessageCount();
+                        Toast.makeText(myApplication.mainActivity, "您有新的短信", Toast.LENGTH_SHORT).show();
+                        break;
+                    // 救护短信
+                    case MessageFormat.MESSAGE_TYPE_RESCUE:
+                        SoundPlay.playMessageSound(myApplication.mainActivity);
+                        myApplication.sendLightOn(true);
+                        myApplication.mainActivity.showMessageDialog(content, MessageDialogActivity.TYPE_RESCUE);
+                        myApplication.mainActivity.addMessage(address, content, true);
+                        break;
+                    // 开启关闭短信功能
+                    case MessageFormat.MESSAGE_TYPE_SMS_OPEN:
+                        PreferencesUtils.putBoolean(myApplication.mainActivity, "canSendSms", content.equals("1"));
+                        break;
+                    // 报警提醒
+                    case MessageFormat.MESSAGE_TYPE_ALERT_REMIND:
+                        SoundPlay.playMessageSound(myApplication.mainActivity);
+                        myApplication.mainActivity.showMessageDialog(content, MessageDialogActivity.TYPE_ALERT);
+                        myApplication.mainActivity.addMessage(address, content, true);
+                        break;
+                    // 摇毙功能
+                    case MessageFormat.MESSAGE_TYPE_SHUT_DOWN:
+                        PreferencesUtils.putBoolean(myApplication.mainActivity, "shutdown", true);
+                        System.exit(0);
+                        break;
+                    // 夜间点名
+                    case MessageFormat.MESSAGE_TYPE_CALL_THE_ROLL:
+                        SoundPlay.playMessageSound(myApplication.mainActivity);
+                        myApplication.mainActivity.showMessageDialog(content, MessageDialogActivity.TYPE_CALL_ROLL);
+                        break;
+                    default:
+                        // 判断分组 group -1为非分组短信，其他为组号，
+                        if (group == -1 || GroupProxy.hasGroup(db, group)) {
+                            SoundPlay.playMessageSound(myApplication.mainActivity);
+                            myApplication.mainActivity.addMessage(address, content, false);
+                            myApplication.mainActivity.modifyGpsBarMessageCount();
+                            Toast.makeText(myApplication.mainActivity, "您有新的短信", Toast.LENGTH_SHORT).show();
+                        }
+                        break;
                 }
                 break;
             case SERIAL_PORT_MESSAGE_SEND_SUCCESS:
                 // 短信发送成功
-                Toast.makeText(mainActivity, "短信发送成功", Toast.LENGTH_SHORT).show();
+                Toast.makeText(myApplication.mainActivity, "短信发送成功", Toast.LENGTH_SHORT).show();
 
-                String lastSendTimeSave = PreferencesUtils.getString(mainActivity, "lastSendTimeSave");
-                PreferencesUtils.putString(mainActivity, "lastSendTime", lastSendTimeSave);
+                String lastSendTimeSave = PreferencesUtils.getString(myApplication.mainActivity, "lastSendTimeSave");
+                PreferencesUtils.putString(myApplication.mainActivity, "lastSendTime", lastSendTimeSave);
 
                 // 用于去掉2秒后显示发送失败提示
-                mainActivity.messageSendFailed = false;
+                myApplication.mainActivity.messageSendFailed = false;
                 myApplication.messageSendFailed = false;
 
                 // 返回成功socket
@@ -107,15 +137,15 @@ public class DataHandler extends Handler {
             case SERIAL_PORT_TIME_NUMBER_AND_COMMUNICATION_FROM:
                 // 先处理后面部分，时间部分由下一个case处理，不加break
                 int myNumber = Util.bytesToInt2(ByteUtil.subBytes(bytes, 17, 21), 0);
-                PreferencesUtils.putString(mainActivity, "myNumber", myNumber + "");
+                PreferencesUtils.putString(myApplication.mainActivity, "myNumber", myNumber + "");
                 MainActivity.myNumber = myNumber + "";
                 System.out.println("myNumber: " + myNumber);
 
                 String status = Util.byteToBit(ByteUtil.subBytes(bytes, 21, 22)[0]);
                 boolean gpsStatus = status.charAt(7) == '1';
-                mainActivity.gpsBar.setGPSStatus(gpsStatus);
+                myApplication.mainActivity.gpsBar.setGPSStatus(gpsStatus);
                 String communication_from = status.charAt(6) == '1' ? "北斗" : "GPRS";
-                PreferencesUtils.putString(mainActivity, "communication_from", communication_from);
+                PreferencesUtils.putString(myApplication.mainActivity, "communication_from", communication_from);
                 // 这里不加break
             case SERIAL_PORT_TIME:
                 // 接收时间
@@ -129,7 +159,7 @@ public class DataHandler extends Handler {
                 Date date = DateUtil.parseStringToDate(dateStr);
                 // 加8小时
 
-                int originalTimeZone = PreferencesUtils.getInt(mainActivity, "time_zone");
+                int originalTimeZone = PreferencesUtils.getInt(myApplication.mainActivity, "time_zone");
                 if (originalTimeZone == -1) originalTimeZone = Constant.TIME_ZONE;
 
                 long rightTime = date.getTime() + (originalTimeZone - 12) * 3600 * 1000;
@@ -157,32 +187,21 @@ public class DataHandler extends Handler {
                     e.printStackTrace();
                 }
                 SocketServer.send(sendJSON);
-                Toast.makeText(mainActivity, "终端ID：" + deviceID, Toast.LENGTH_LONG).show();
-
-//                    new QMUIDialog.MessageDialogBuilder(mainActivity)
-//                            .setTitle("终端ID")
-//                            .setMessage(deviceID)
-//                            .addAction("确定", new QMUIDialogAction.ActionListener() {
-//                                @Override
-//                                public void onClick(QMUIDialog dialog, int index) {
-//                                    dialog.dismiss();
-//                                }
-//                            })
-//                            .show();
+                Toast.makeText(myApplication.mainActivity, "终端ID：" + deviceID, Toast.LENGTH_LONG).show();
                 break;
             case SERIAL_PORT_ALERT_SEND_SUCCESS:
                 // 报警发送成功
-                mainActivity.gpsBar.showAlerting(false);
-                Toast.makeText(mainActivity, "遇险报警发送成功", Toast.LENGTH_SHORT).show();
+                myApplication.mainActivity.gpsBar.showAlerting(false);
+                Toast.makeText(myApplication.mainActivity, "遇险报警发送成功", Toast.LENGTH_SHORT).show();
                 break;
             case SERIAL_PORT_SHOW_ALERT_ACTIVITY:
                 // 显示报警activity
-                mainActivity.gpsBar.showAlerting(false);
-                mainActivity.showDangerDialog();
+                myApplication.mainActivity.gpsBar.showAlerting(false);
+                myApplication.mainActivity.showDangerDialog();
                 break;
             case SERIAL_PORT_RECEIVE_NEW_ALERT:
                 // 增加报警记录，显示收到报警
-                mainActivity.gpsBar.showAlerting(false);
+                myApplication.mainActivity.gpsBar.showAlerting(false);
                 try {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("apiType", "showAlertInHomePage");
@@ -191,24 +210,22 @@ public class DataHandler extends Handler {
                     e.printStackTrace();
                 }
 
-                PreferencesUtils.putBoolean(mainActivity, "homePageAlertView", true);
-                SoundPlay.startAlertSound(mainActivity);
+                PreferencesUtils.putBoolean(myApplication.mainActivity, "homePageAlertView", true);
+                SoundPlay.startAlertSound(myApplication.mainActivity);
 
                 byte[] alertBytes = ByteUtil.subBytes(bytes, 11, 13);
                 if (alertBytes[0] == 0x02 && alertBytes[1] == 0x00) {
                     // 落水报警
-                    Toast.makeText(mainActivity, "收到落水报警", Toast.LENGTH_SHORT).show();
-                    mainActivity.addAlertLog("落水");
+                    Toast.makeText(myApplication.mainActivity, "收到落水报警", Toast.LENGTH_SHORT).show();
+                    myApplication.mainActivity.addAlertLog("落水");
                 } else if (alertBytes[0] == 0x10 && alertBytes[1] == 0x00){
                     // 解除报警
-                    PreferencesUtils.putBoolean(mainActivity, "homePageAlertView", false);
-                    if (mainActivity.mainFragment != null) {
-                        mainActivity.mainFragment.showMainLayout();
+                    PreferencesUtils.putBoolean(myApplication.mainActivity, "homePageAlertView", false);
+                    if (myApplication.mainActivity.mainFragment != null) {
+                        myApplication.mainActivity.mainFragment.showMainLayout();
                     }
-                    mainActivity.gpsBar.cancelAlert();
+                    myApplication.mainActivity.gpsBar.cancelAlert();
                     SoundPlay.stopAlertSound();
-//                        Toast.makeText(getApplicationContext(), "收到遇险报警", Toast.LENGTH_SHORT).show();
-//                        mainActivity.addAlertLog("");
                 }
 
                 break;
@@ -219,15 +236,15 @@ public class DataHandler extends Handler {
                 String name = idStrings[1];
                 String nation = "--";
                 String idAddress = "xx市xx区xx小区xx幢xx室";
-                mainActivity.showIDCardDialog(id, name, nation, idAddress);
+                myApplication.mainActivity.showIDCardDialog(id, name, nation, idAddress);
                 break;
             case SERIAL_PORT_MODIFY_SCREEN_BRIGHTNESS:
                 // 调节背光
-                ScreenBrightness.modifyBrightness(mainActivity);
+                ScreenBrightness.modifyBrightness(myApplication.mainActivity);
                 break;
             case SERIAL_PORT_SHUT_DOWN:
                 // 显示关机hud
-                mainActivity.showShutDownHud();
+                myApplication.mainActivity.showShutDownHud();
 
                 // 发送关机包
                 byte[] sendBytes = "$07".getBytes();
@@ -240,11 +257,11 @@ public class DataHandler extends Handler {
                 myApplication.sendBytes(sendBytes);
                 break;
             case SERIAL_PORT_ALERT_START:
-                mainActivity.gpsBar.showAlerting(true);
+                myApplication.mainActivity.gpsBar.showAlerting(true);
                 break;
             case SERIAL_PORT_ALERT_FAIL:
-                mainActivity.gpsBar.showAlerting(false);
-                mainActivity.showAlertFailDialog();
+                myApplication.mainActivity.gpsBar.showAlerting(false);
+                myApplication.mainActivity.showAlertFailDialog();
                 break;
             default:
                 super.handleMessage(msg);//这里最好对不需要或者不关心的消息抛给父类，避免丢失消息

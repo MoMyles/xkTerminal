@@ -79,27 +79,33 @@ public class SystemSettingFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_setting_system,container,false);
         initView(view);
-        getData();
+        //getData();
         mainActivity = (MainActivity) getActivity();
         return view;
     }
 
     private void initView(View view) {
         address_textView            = view.findViewById(R.id.address_textView);
-        signal_textView             = view.findViewById(R.id.signal_textView);
-        location_freq_textView      = view.findViewById(R.id.location_freq_textView);
-        gps_freq_textView           = view.findViewById(R.id.gps_freq_textView);
-        central_number_textView     = view.findViewById(R.id.central_number_textView);
+//        signal_textView             = view.findViewById(R.id.signal_textView);
+//        location_freq_textView      = view.findViewById(R.id.location_freq_textView);
+//        gps_freq_textView           = view.findViewById(R.id.gps_freq_textView);
+//        central_number_textView     = view.findViewById(R.id.central_number_textView);
 
-        location_from_textView      = view.findViewById(R.id.location_from_textView);
-        communication_from_textView = view.findViewById(R.id.communication_from_textView);
-        signal_power_textView       = view.findViewById(R.id.signal_power_textView);
-        satellite_count_textView    = view.findViewById(R.id.satellite_count_textView);
-        broad_temp_textView         = view.findViewById(R.id.broad_temp_textView);
-        li_voltage_textView         = view.findViewById(R.id.li_voltage_textView);
-        sun_voltage_textView        = view.findViewById(R.id.sun_voltage_textView);
+//        location_from_textView      = view.findViewById(R.id.location_from_textView);
+//        communication_from_textView = view.findViewById(R.id.communication_from_textView);
+//        signal_power_textView       = view.findViewById(R.id.signal_power_textView);
+//        satellite_count_textView    = view.findViewById(R.id.satellite_count_textView);
+//        broad_temp_textView         = view.findViewById(R.id.broad_temp_textView);
+//        li_voltage_textView         = view.findViewById(R.id.li_voltage_textView);
+//        sun_voltage_textView        = view.findViewById(R.id.sun_voltage_textView);
 
         wifi_ssid_textView          = view.findViewById(R.id.wifi_ssid_textView);
+        String ssid = PreferencesUtils.getString(getActivity(), "wifiSSID");
+        if (ssid != null ) {
+            wifi_ssid_textView.setText(ssid);
+        } else {
+            wifi_ssid_textView.setText(getString(R.string.wifi_ssid));
+        }
 
         wifi_ssid_textView.setOnClickListener(new View.OnClickListener() {
             @Override

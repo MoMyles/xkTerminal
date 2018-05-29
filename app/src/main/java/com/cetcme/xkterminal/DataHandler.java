@@ -64,7 +64,6 @@ public class DataHandler extends Handler {
                 String type    = messageStrings[2];
                 int group      = Integer.parseInt(messageStrings[3]);
 
-
                 switch (type) {
                     // 普通短信
                     case MessageFormat.MESSAGE_TYPE_NORMAL:
@@ -189,17 +188,6 @@ public class DataHandler extends Handler {
                 }
                 SocketServer.send(sendJSON);
                 Toast.makeText(myApplication.mainActivity, "终端ID：" + deviceID, Toast.LENGTH_LONG).show();
-
-//                    new QMUIDialog.MessageDialogBuilder(mainActivity)
-//                            .setTitle("终端ID")
-//                            .setMessage(deviceID)
-//                            .addAction("确定", new QMUIDialogAction.ActionListener() {
-//                                @Override
-//                                public void onClick(QMUIDialog dialog, int index) {
-//                                    dialog.dismiss();
-//                                }
-//                            })
-//                            .show();
                 break;
             case SERIAL_PORT_ALERT_SEND_SUCCESS:
                 // 报警发送成功
@@ -238,8 +226,6 @@ public class DataHandler extends Handler {
                     }
                     myApplication.mainActivity.gpsBar.cancelAlert();
                     SoundPlay.stopAlertSound();
-//                        Toast.makeText(getApplicationContext(), "收到遇险报警", Toast.LENGTH_SHORT).show();
-//                        myApplication.mainActivity.addAlertLog("");
                 }
 
                 break;

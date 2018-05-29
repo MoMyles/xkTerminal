@@ -3,6 +3,7 @@ package com.cetcme.xkterminal.Fragment.setting;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.text.InputType;
 import android.view.LayoutInflater;
@@ -24,6 +25,7 @@ import com.cetcme.xkterminal.Sqlite.Proxy.FriendProxy;
 import com.cetcme.xkterminal.Sqlite.Proxy.GroupProxy;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
+import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,6 +36,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -60,6 +66,8 @@ public class SystemSettingFragment extends Fragment {
     private Button time_zone_minus_btn;
     private Button time_zone_add_btn;
 
+    @BindView(R.id.tv_rdss) TextView tv_rdss;
+
     // 用于添加好友内容缓存
     private String[] friend = {"", ""};
 
@@ -69,6 +77,7 @@ public class SystemSettingFragment extends Fragment {
     private MainActivity mainActivity;
     private DbManager db = MyApplication.getInstance().getDb();
 
+    Unbinder unbinder;
 
     public SystemSettingFragment() {
         // Required empty public constructor
@@ -78,10 +87,17 @@ public class SystemSettingFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_setting_system,container,false);
+        unbinder = ButterKnife.bind(this, view);
         initView(view);
-        //getData();
+        getData();
         mainActivity = (MainActivity) getActivity();
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     private void initView(View view) {
@@ -100,12 +116,6 @@ public class SystemSettingFragment extends Fragment {
 //        sun_voltage_textView        = view.findViewById(R.id.sun_voltage_textView);
 
         wifi_ssid_textView          = view.findViewById(R.id.wifi_ssid_textView);
-        String ssid = PreferencesUtils.getString(getActivity(), "wifiSSID");
-        if (ssid != null ) {
-            wifi_ssid_textView.setText(ssid);
-        } else {
-            wifi_ssid_textView.setText(getString(R.string.wifi_ssid));
-        }
 
         wifi_ssid_textView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -209,9 +219,46 @@ public class SystemSettingFragment extends Fragment {
                 groupDelete();
             }
         });
+
+        tv_rdss.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final boolean rdssOpen = PreferencesUtils.getBoolean(getActivity(), "rdss", false);
+
+                final QMUITipDialog tipDialog;
+                tipDialog = new QMUITipDialog.Builder(getContext())
+                        .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
+                        .setTipWord(rdssOpen ? "关闭中" : "开启中")
+                        .create();
+                tipDialog.show();
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        PreferencesUtils.putBoolean(getActivity(), "rdss", !rdssOpen);
+                        tv_rdss.setText(!rdssOpen ? "关闭" : "开启");
+                        tipDialog.dismiss();
+                    }
+                }, 3000);
+
+            }
+        });
+
     }
 
     private void getData() {
+
+        String ssid = PreferencesUtils.getString(getActivity(), "wifiSSID");
+        if (ssid != null ) {
+            wifi_ssid_textView.setText(ssid);
+        } else {
+            wifi_ssid_textView.setText(getString(R.string.wifi_ssid));
+        }
+
+        boolean rdssOpen = PreferencesUtils.getBoolean(getActivity(), "rdss", false);
+        tv_rdss.setText(rdssOpen ? "关闭" : "开启");
+
+        /*
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("address", "168857");
@@ -223,12 +270,7 @@ public class SystemSettingFragment extends Fragment {
             address_textView        .setText(PreferencesUtils.getString(getActivity(), "myNumber"));
             communication_from_textView.setText(PreferencesUtils.getString(getActivity(), "communication_from"));
 
-            String ssid = PreferencesUtils.getString(getActivity(), "wifiSSID");
-            if (ssid != null ) {
-                wifi_ssid_textView.setText(ssid);
-            } else {
-                wifi_ssid_textView.setText(getString(R.string.wifi_ssid));
-            }
+
 
             signal_textView         .setText(jsonObject.getString("signal"));
             location_freq_textView  .setText(jsonObject.getString("location_per"));
@@ -245,6 +287,7 @@ public class SystemSettingFragment extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        */
 
     }
 

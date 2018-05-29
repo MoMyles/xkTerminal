@@ -53,10 +53,10 @@
                     android:gravity="center_vertical"
                     android:textColor="#000000"
                     android:textSize="18sp"
-                    android:text=""/>
+                    android:text="RDSS定位："/>
 
                 <TextView
-                    android:id="@+id/beiyong_textView"
+                    android:id="@+id/tv_rdss"
                     android:layout_width="250dp"
                     android:layout_weight="1"
                     android:layout_height="match_parent"
@@ -65,7 +65,7 @@
                     android:layout_marginRight="150dp"
                     android:layout_marginEnd="150dp"
                     android:textSize="18sp"
-                    android:text=""/>
+                    android:text="开启"/>
 
             </LinearLayout>
 

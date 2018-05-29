@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -52,7 +53,7 @@ import yimamapapi.skia.M_POINT;
 public class MainFragment extends Fragment {
 
     private SkiaDrawView skiaDrawView;
-    //    private LinearLayout main_layout;
+    private ConstraintLayout main_layout;
     private LinearLayout alert_layout;
 
 
@@ -78,8 +79,7 @@ public class MainFragment extends Fragment {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_main, container, false);
         EventBus.getDefault().register(this);
 
-//        main_layout = view.findViewById(R.id.main_layout);
-        skiaDrawView = view.findViewById(R.id.skiaView);
+        main_layout = view.findViewById(R.id.main_layout);
         alert_layout = view.findViewById(R.id.alert_layout);
 
         tv_lon = view.findViewById(R.id.tv_lon);
@@ -138,15 +138,12 @@ public class MainFragment extends Fragment {
     public void showMainLayout() {
         alert_need_flash = false;
         SoundPlay.stopAlertSound();
-
-//        main_layout.setVisibility(View.VISIBLE);
-        skiaDrawView.setVisibility(View.VISIBLE);
+        main_layout.setVisibility(View.VISIBLE);
         alert_layout.setVisibility(View.GONE);
     }
 
     private void showAlertLayout() {
-//        main_layout.setVisibility(View.GONE);
-        skiaDrawView.setVisibility(View.GONE);
+        main_layout.setVisibility(View.GONE);
         alert_layout.setVisibility(View.VISIBLE);
         alert_need_flash = true;
         if (Constant.ALERT_FLASH_TIME != 0) {

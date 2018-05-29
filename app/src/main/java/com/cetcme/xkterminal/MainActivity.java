@@ -26,6 +26,7 @@ import com.cetcme.xkterminal.DataFormat.Util.ByteUtil;
 import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
 import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
 import com.cetcme.xkterminal.DataFormat.Util.Util;
+import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.Fragment.AboutFragment;
 import com.cetcme.xkterminal.Fragment.LogFragment;
 import com.cetcme.xkterminal.Fragment.MainFragment;
@@ -48,6 +49,7 @@ import com.qiuhong.qhlibrary.Dialog.QHDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.xutils.DbManager;
@@ -55,6 +57,8 @@ import org.xutils.DbManager;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -145,6 +149,25 @@ public class MainActivity extends AppCompatActivity {
             }
         }, 2000);
         */
+
+        // TODO: fake
+        volTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (voltage < 3.2) return;
+                voltage -= 0.02;
+                try {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("apiType", "voltage");
+                    jsonObject.put("voltage", voltage);
+                    SmsEvent smsEvent = new SmsEvent(jsonObject);
+                    EventBus.getDefault().post(smsEvent);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }, 0, 60 * 1000);
     }
 
     private void initHud() {
@@ -705,4 +728,10 @@ public class MainActivity extends AppCompatActivity {
                     .show();
         }
     }
+
+
+    //TODO: fake
+    public double voltage = 4.20;
+    public Timer volTimer = new Timer();
+
 }

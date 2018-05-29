@@ -11,7 +11,6 @@ import static com.cetcme.xkterminal.MyClass.GPSFormatUtils.formatGps;
 
 public class WarnFormat {
 
-    public static final String MESSAGE_TYPE_INOUT = "04";
     private static final String messageHead = "$04";
 
     private static final String MESSAGE_END_SYMBOL = "\r\n";
@@ -29,7 +28,7 @@ public class WarnFormat {
         }
         byte[] msgBytes = warnInfo.getBytes();
         byte[] messageBytes;
-        messageBytes = ByteUtil.byteMerger(MESSAGE_TYPE_INOUT.getBytes(), msgBytes);
+        messageBytes = ByteUtil.byteMerger(MessageFormat.MESSAGE_TYPE_AIS.getBytes(), msgBytes);
 
         int messageLength = messageBytes.length;
         byte[] lengthBytes = new byte[]{(byte) messageLength};

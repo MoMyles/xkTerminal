@@ -1,6 +1,8 @@
 package com.cetcme.xkterminal;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -8,7 +10,10 @@ import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.DataFormat.InoutFormat;
+import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
 import com.cetcme.xkterminal.Event.SmsEvent;
+import com.cetcme.xkterminal.MyClass.Constant;
+import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.Sqlite.Bean.InoutBean;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 import com.qiuhong.qhlibrary.QHTitleView.QHTitleView;
@@ -80,6 +85,18 @@ public class NewInoutActivity extends Activity {
             return;
         }
 
+        SharedPreferences sharedPreferences = getSharedPreferences("xkTerminal", Context.MODE_PRIVATE); //私有数据
+        String lastSendTime = sharedPreferences.getString("lastSendTime", "");
+        if (!lastSendTime.isEmpty()) {
+            Long sendDate = DateUtil.parseStringToDate(lastSendTime, DateUtil.DatePattern.YYYYMMDDHHMMSS).getTime();
+            Long now = Constant.SYSTEM_DATE.getTime();
+            if (now - sendDate <= Constant.MESSAGE_SEND_LIMIT_TIME && now - sendDate > 0) {
+                long remainSecond = (Constant.MESSAGE_SEND_LIMIT_TIME - (now - sendDate)) / 1000;
+                Toast.makeText(this, "发送时间间隔不到1分钟，请等待" + remainSecond + "秒", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
         int type = 0;
         if (rb_in.isChecked()) {
             type = 1;
@@ -117,8 +134,6 @@ public class NewInoutActivity extends Activity {
             e.printStackTrace();
         }
 
-        // TODO：发送编码 北斗号要确认下
-
         MyApplication.getInstance().sendBytes(
                 InoutFormat.format(MainActivity.myNumber, type, count, lon, lat, now)
         );
@@ -133,6 +148,9 @@ public class NewInoutActivity extends Activity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        PreferencesUtils.putString(NewInoutActivity.this, "lastSendTime", DateUtil.parseDateToString(Constant.SYSTEM_DATE, DateUtil.DatePattern.YYYYMMDDHHMMSS));
+
         finish();
 
     }

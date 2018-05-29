@@ -10,6 +10,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.MainActivity;
+import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.NewInoutActivity;
 import com.cetcme.xkterminal.R;
 
@@ -80,7 +81,12 @@ public class MessageBar extends RelativeLayout implements View.OnClickListener {
                 if (isInout) {
                     mainActivity.startActivity(new Intent(mainActivity, NewInoutActivity.class));
                 } else {
-                    mainActivity.initNewFragment("new");
+                    boolean canSendSms = PreferencesUtils.getBoolean(mainActivity, "canSendSms", true);
+                    if (canSendSms) {
+                        mainActivity.initNewFragment("new");
+                    } else {
+                        Toast.makeText(mainActivity, "短信发送功能已关闭", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 break;
             case R.id.button_detail:

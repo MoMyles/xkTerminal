@@ -71,7 +71,7 @@
             android:theme="@style/myDialogActivityStyle" />
         <activity android:name=".SerialTest.SerialPortActivity" />
         <activity
-            android:name=".RescueMessageActivity"
+            android:name=".MessageDialogActivity"
             android:theme="@style/myDialogActivityStyle"></activity>
         <activity
             android:name=".NewInoutActivity"

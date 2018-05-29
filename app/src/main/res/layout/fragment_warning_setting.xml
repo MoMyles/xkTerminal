@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".Fragment.setting.SeriveStatusFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/setting_tv_title"
+                    android:layout_marginLeft="150dp"
+                    android:layout_marginStart="150dp"
+                    android:text="距离报警：" />
+
+                <Switch
+                    android:id="@+id/switch_warn"
+                    style="@style/setting_tv_title"
+                    android:textOff="关"
+                    android:textOn="开" />
+
+                <android.support.v4.widget.Space
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent" />
+
+                <TextView
+                    style="@style/setting_tv_title"
+                    android:text="报警距离(米)：" />
+
+                <EditText
+                    android:id="@+id/et_warn_distance"
+                    style="@style/setting_tv_title"
+                    android:layout_marginEnd="150dp"
+                    android:layout_marginRight="150dp"
+                    android:gravity="center"
+                    android:inputType="number"
+                    android:text="200" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_alignParentBottom="true"
+                android:background="#b7b7b7" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

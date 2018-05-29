@@ -11,6 +11,14 @@ public class OtherShipBean {
     private int mmsi;
     @Column(name="ship_id")
     private int ship_id;
+    @Column(name="ship_name")
+    private String ship_name;
+    @Column(name="longitude")
+    private int longitude;
+    @Column(name="latitude")
+    private int latitude;
+
+    private boolean show = false;
 
     public int getId() {
         return id;
@@ -34,5 +42,47 @@ public class OtherShipBean {
 
     public void setShip_id(int ship_id) {
         this.ship_id = ship_id;
+    }
+
+    public String getShip_name() {
+        return ship_name;
+    }
+
+    public void setShip_name(String ship_name) {
+        this.ship_name = ship_name;
+    }
+
+    public boolean isShow() {
+        return show;
+    }
+
+    public void setShow(boolean show) {
+        this.show = show;
+    }
+
+    public int getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(int longitude) {
+        this.longitude = longitude;
+    }
+
+    public int getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(int latitude) {
+        this.latitude = latitude;
+    }
+
+    @Override
+    public String toString() {
+        return "OtherShipBean{" +
+                "id=" + id +
+                ", mmsi=" + mmsi +
+                ", ship_id=" + ship_id +
+                ", ship_name='" + ship_name + '\'' +
+                '}';
     }
 }

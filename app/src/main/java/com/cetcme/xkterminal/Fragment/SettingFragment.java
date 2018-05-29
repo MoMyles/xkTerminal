@@ -11,9 +11,11 @@ import android.view.ViewGroup;
 
 import com.cetcme.xkterminal.ActionBar.TitleBar;
 import com.cetcme.xkterminal.Fragment.setting.BlankFragment;
+import com.cetcme.xkterminal.Fragment.setting.SatelliteFragment;
 import com.cetcme.xkterminal.Fragment.setting.SeriveStatusFragment;
 import com.cetcme.xkterminal.Fragment.setting.SystemSettingFragment;
 import com.cetcme.xkterminal.Fragment.setting.DBSettingFragment;
+import com.cetcme.xkterminal.Fragment.setting.WarningSettingFragment;
 import com.cetcme.xkterminal.R;
 import com.qmuiteam.qmui.widget.QMUITabSegment;
 
@@ -47,8 +49,8 @@ public class SettingFragment extends Fragment {
         //构造适配器
         List<Fragment> fragments=new ArrayList<>();
         fragments.add(new DBSettingFragment());
-        fragments.add(new BlankFragment());
-        fragments.add(new BlankFragment());
+        fragments.add(new SatelliteFragment());
+        fragments.add(new WarningSettingFragment());
         fragments.add(new SeriveStatusFragment());
         fragments.add(new SystemSettingFragment());
         FragAdapter adapter = new FragAdapter(getActivity().getSupportFragmentManager(), fragments);

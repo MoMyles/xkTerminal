@@ -620,7 +620,6 @@ public class MyApplication extends Application {
             while (!isInterrupted()) {
                 int size;
                 try {
-                    Thread.sleep(10);
                     byte[] buffer = new byte[1];
                     if (aisInputStream == null) return;
                     size = aisInputStream.read(buffer);
@@ -630,8 +629,6 @@ public class MyApplication extends Application {
                 } catch (IOException e) {
                     e.printStackTrace();
                     return;
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
                 }
             }
         }
@@ -810,26 +807,25 @@ public class MyApplication extends Application {
     private final List<Byte> aisByts = new LinkedList<>();
 
     protected void onAisDataReceived(byte[] buffer, int size) {
-        //Log.i(TAG, "16进制：" + ConvertUtil.bytesToHexString(ByteUtil.subBytes(buffer, 0, size)));
+//        Log.i(TAG, "16进制：" + ConvertUtil.bytesToHexString(ByteUtil.subBytes(buffer, 0, size)));
 //        AisInfo a = YimaAisParse.mParseAISSentence("!AIVDM,1,1,,A,15MgK45P3@G?fl0E`JbR0OwT0@MS,0*4E");
         if (buffer[0] == 33) {
             // ! 号头
-            if (aisByts.size() > 2) {
+            if (aisByts.size() > 0) {
                 int len = aisByts.size();
-                if (aisByts.get(len - 2) == 13 && aisByts.get(len - 1) == 10) {
-                    // \r\n 结尾
-                    Byte[] byts = aisByts.toArray(new Byte[len]);
-                    byte[] tmpByts = new byte[len];
-                    for (int i = 0; i < len; i++) {
-                        tmpByts[i] = byts[i];
-                    }
-                    String gpsDataStr = new String(tmpByts);
-                    Log.i(TAG, "16进制：" + ConvertUtil.bytesToHexString(tmpByts));
-                    Log.i(TAG, "onAisDataReceived: " + gpsDataStr);
+                // \r\n 结尾
+                Byte[] byts = aisByts.toArray(new Byte[len]);
+                byte[] tmpByts = new byte[len];
+                for (int i = 0; i < len; i++) {
+                    tmpByts[i] = byts[i];
+                }
+                String gpsDataStr = new String(tmpByts);
+//                Log.i(TAG, "len: " + aisByts.size() + ", onAisDataReceived: " + gpsDataStr);
+                if (gpsDataStr.startsWith("!AIVDM")
+                        || gpsDataStr.startsWith("!AIVDO")) {
                     AisInfo aisInfo = YimaAisParse.mParseAISSentence(gpsDataStr);
                     if (aisInfo != null) {
                         Log.i(TAG, aisInfo.MsgType + "");
-
                         if (14 == aisInfo.MsgType) {
                             // 报警信息
                             if (aisInfo.mmsi > 0) {
@@ -863,41 +859,6 @@ public class MyApplication extends Application {
         } else {
             aisByts.add(buffer[0]);
         }
-//        String gpsDataStr = new String(ByteUtil.subBytes(buffer, 0, size));
-//        Log.i(TAG, "onAisDataReceived: " + gpsDataStr);
-//        if (gpsDataStr.startsWith("!AIVDM") || gpsDataStr.startsWith("!AIVDO")) {
-//            gpsDataStr.split("\r\n");
-//            AisInfo aisInfo = YimaAisParse.mParseAISSentence(gpsDataStr);
-//            if (aisInfo != null) {
-//                Log.i(TAG, aisInfo.MsgType + "");
-//
-//                if (14 == aisInfo.MsgType) {
-//                    // 报警信息
-//                    if (aisInfo.mmsi > 0) {
-//                        String message = aisInfo.warnMsgInfo;
-//                        if (TextUtils.isEmpty(message)) {
-//                            message = "AIS报警";
-//                        }
-//                        sendBytes(WarnFormat.format("" + aisInfo.mmsi, message));
-//                    }
-//                } else {
-//                    if (aisInfo.bOwnShip) {
-//                        LocationBean locationBean = new LocationBean();
-//                        locationBean.setLatitude(aisInfo.latititude);
-//                        locationBean.setLongitude(aisInfo.longtitude);
-//                        locationBean.setSpeed(aisInfo.SOG);
-//                        locationBean.setHeading(aisInfo.COG);
-//                        locationBean.setAcqtime(new Date());
-//                        currentLocation = locationBean;
-//
-//                        EventBus.getDefault().post(locationBean);
-//                    } else {
-//                        // 判断是否存在mmsi
-//                        EventBus.getDefault().post(aisInfo);
-//                    }
-//                }
-//            }
-//        }
     }
 
     public void sendBytes(byte[] buffer) {

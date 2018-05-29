@@ -119,7 +119,6 @@ public class MainActivity extends AppCompatActivity {
         bindView();
 
         initMainFragment();
-//        initSettingFragment();
         initHud();
 
         myNumber = PreferencesUtils.getString(this, "myNumber");
@@ -713,6 +712,11 @@ public class MainActivity extends AppCompatActivity {
             .show();
     }
 
+
+    public void openOtherShips() {
+        EventBus.getDefault().post("openShip");
+    }
+
     private void checkoutShutDown() {
         boolean shutdown = PreferencesUtils.getBoolean(MainActivity.this, "shutdown");
         if (shutdown) {
@@ -733,5 +737,6 @@ public class MainActivity extends AppCompatActivity {
     //TODO: fake
     public double voltage = 4.20;
     public Timer volTimer = new Timer();
+
 
 }

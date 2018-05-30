@@ -908,7 +908,12 @@ public class MyApplication extends Application {
                             }
                         } else {
 //                            Log.e("TAG", "是否本船：" + aisInfo.bOwnShip);
-                            if (Integer.valueOf(sp.getString("shipNo", "0")).intValue()  == aisInfo.mmsi/*aisInfo.bOwnShip*/) {
+                            int mmsi = -99;
+                            try {
+                                mmsi = Integer.valueOf(sp.getString("shipNo", "0")).intValue();
+                            } catch (Exception e) {
+                            }
+                            if (mmsi == aisInfo.mmsi) {
                                 LocationBean locationBean = new LocationBean();
                                 locationBean.setLatitude(aisInfo.latititude);
                                 locationBean.setLongitude(aisInfo.longtitude);
@@ -930,6 +935,10 @@ public class MyApplication extends Application {
             aisByts.add(buffer[0]);
         } else {
             aisByts.add(buffer[0]);
+        }
+        if (aisByts.size() > 1024
+                || (aisByts.size() > 1 && aisByts.get(0) != 33)) {
+            aisByts.clear();
         }
     }
 

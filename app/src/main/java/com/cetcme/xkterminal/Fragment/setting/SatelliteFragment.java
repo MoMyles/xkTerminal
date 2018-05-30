@@ -20,7 +20,9 @@ import com.cetcme.xkterminal.widget.DrawSatellite;
 import com.cetcme.xkterminal.widget.Satellite;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -46,6 +48,9 @@ public class SatelliteFragment extends Fragment {
     private TextView mTime;
     private TextView mDate;
     private TextView mDouble;
+
+    private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
 
 
     public SatelliteFragment() {
@@ -129,8 +134,10 @@ public class SatelliteFragment extends Fragment {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mLongitude.setText(lb.getLongitude() + "");
-                    mLatitude.setText(lb.getLatitude() + "");
+                    mLongitude.setText(lb.getLongitude() * 1.0 / 1e7 + "");
+                    mLatitude.setText(lb.getLatitude() * 1.0 / 1e7 + "");
+                    mTime.setText(timeFormat.format(new Date()));
+                    mDate.setText(dateFormat.format(new Date()));
                 }
             });
         }

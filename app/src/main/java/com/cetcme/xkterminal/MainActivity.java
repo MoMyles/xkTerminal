@@ -379,13 +379,14 @@ public class MainActivity extends AppCompatActivity {
         if (mainFragment == null) {
             mainFragment = new MainFragment();
         }
-        if (!mainFragment.isAdded()) {
-            transaction.add(R.id.main_frame_layout, mainFragment);
-        } else {
-            if (mainFragment.isHidden()) {
-                transaction.show(mainFragment);
-            }
-        }
+//        if (!mainFragment.isAdded()) {
+//            transaction.add(R.id.main_frame_layout, mainFragment);
+//        } else {
+//            if (mainFragment.isHidden()) {
+//                transaction.show(mainFragment);
+//            }
+//        }
+        transaction.replace(R.id.main_frame_layout, mainFragment);
         transaction.commit();
         showMainBar();
         fragmentName = "main";

@@ -44,6 +44,7 @@ import com.joanzapata.iconify.widget.IconTextView;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 
 import org.xutils.DbManager;
+import org.xutils.ex.DbException;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -416,6 +417,12 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
                                     } else {
                                         fMainView.AddLineLayerAndObject(list);
                                         mClearTrack.setVisibility(View.VISIBLE);
+                                        //保存文件
+                                        String data = "";
+                                        for (LocationBean lb : list) {
+                                            data += lb.toString();
+                                        }
+                                        FileUtil.saveHangjiFile(startTime.replace("/", "-").replace(":", "-") + ".txt", data);
                                     }
                                 } catch (Exception e) {
                                     e.printStackTrace();
@@ -644,5 +651,25 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
 
     public void Back_Event(View view) {
         finish();
+    }
+
+
+    // TODO: test 添加测试 自身位置
+    private void addLocation() {
+        int lon = 1210000000;
+        int lat = 310000000;
+        for (int i = 0; i < 20; i++) {
+            LocationBean locationBean = new LocationBean();
+            locationBean.setLongitude(lon + 1000000 * i);
+            locationBean.setLatitude(lat + 100000 * i);
+            locationBean.setHeading(45.1f);
+            locationBean.setAcqtime(new Date());
+            try {
+                db.saveBindingId(locationBean);
+            } catch (DbException e) {
+                e.printStackTrace();
+            }
+        }
+//        Log.e(TAG, "addLocation: ok");
     }
 }

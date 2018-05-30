@@ -88,13 +88,10 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_main, container, false);
         EventBus.getDefault().register(this);
 
-<<<<<<< HEAD
-//        main_layout = view.findViewById(R.id.main_layout);
+
+        main_layout = view.findViewById(R.id.main_layout);
         skiaDrawView = view.findViewById(R.id.skiaView);
         skiaDrawView.setOnMapClickListener(this);
-=======
-        main_layout = view.findViewById(R.id.main_layout);
->>>>>>> master
         alert_layout = view.findViewById(R.id.alert_layout);
         ll_ship_list = view.findViewById(R.id.ll_ship_list);
         ViewGroup.LayoutParams lp = ll_ship_list.getLayoutParams();

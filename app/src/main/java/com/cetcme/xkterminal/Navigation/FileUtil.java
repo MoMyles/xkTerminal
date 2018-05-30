@@ -29,7 +29,7 @@ public class FileUtil {
 
 
 
-    public static String FILE_PATH = Environment.getExternalStorageDirectory() + "/0yima_routes";
+    public static String FILE_PATH = Environment.getExternalStorageDirectory() + "/0yima_routes/";
 
     public static void saveFile(String name, String data) {
 
@@ -39,7 +39,24 @@ public class FileUtil {
         }
 
         try {
-            FileOutputStream outStream = new FileOutputStream(new File(FILE_PATH  + name));
+            FileOutputStream outStream = new FileOutputStream(new File(FILE_PATH + "/" + name));
+            OutputStreamWriter writer = new OutputStreamWriter(outStream, "UTF-8");
+            writer.write(data);
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void saveHangjiFile(String name, String data) {
+
+        File filePath = new File(Constant.HANG_JI_FILE_PATH);
+        if(!filePath.exists()) {
+            filePath.mkdir();
+        }
+
+        try {
+            FileOutputStream outStream = new FileOutputStream(new File(Constant.HANG_JI_FILE_PATH + '/' + name));
             OutputStreamWriter writer = new OutputStreamWriter(outStream, "UTF-8");
             writer.write(data);
             writer.close();

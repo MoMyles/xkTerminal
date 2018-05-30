@@ -8,12 +8,14 @@ import android.os.Environment;
 
 public class Constant {
 
-    //
+    // yima sdk 文件
     public static final String YIMA_WORK_PATH = "/data/data/com.cetcme.xkterminal/files/WorkDir";
 
-    //
+    // 航线文件
     public static final String ROUTE_FILE_PATH = Environment.getExternalStorageDirectory() + "/0yima_routes";
 
+    // 航迹文件
+    public static final String HANG_JI_FILE_PATH = Environment.getExternalStorageDirectory() + "/0航迹";
 
     // 危险区园面 判断半径
     public static final float NAVIGATION_TO_DANGER_DIST_LIMIT = 50f;

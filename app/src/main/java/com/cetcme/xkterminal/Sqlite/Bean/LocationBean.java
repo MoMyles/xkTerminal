@@ -77,4 +77,17 @@ public class LocationBean {
     public void setNavtime(Date navtime) {
         this.navtime = navtime;
     }
+
+    @Override
+    public String toString() {
+        return "LocationBean{" +
+                "id=" + id +
+                ", longitude=" + longitude +
+                ", latitude=" + latitude +
+                ", speed=" + speed +
+                ", heading=" + heading +
+                ", acqtime=" + acqtime +
+                ", navtime=" + navtime +
+                '}';
+    }
 }

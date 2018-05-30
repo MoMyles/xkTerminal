@@ -243,9 +243,16 @@ public class SystemSettingFragment extends Fragment {
                         .setPositiveButton("保存", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
+                                String shipNo = mEt2.getText().toString().trim();
+                                Pattern pattern = Pattern.compile("^\\d+$");
+                                Matcher matcher = pattern.matcher(shipNo);
+                                if (!matcher.find()) {
+                                    Toast.makeText(getActivity(), "MMSI必须为数字编号", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
                                 boolean success = sp.edit()
                                         .putString("shipName", mEt1.getText().toString().trim())
-                                        .putString("shipNo", mEt2.getText().toString().trim())
+                                        .putString("shipNo", shipNo)
                                         .putString("shipLength", mEt3.getText().toString().trim())
                                         .putString("shipDeep", mEt4.getText().toString().trim())
                                         .commit();

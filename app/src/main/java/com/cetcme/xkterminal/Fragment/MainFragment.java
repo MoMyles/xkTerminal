@@ -11,6 +11,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -181,7 +182,14 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
         }
 
         loadOwnShipInfo();
-
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                //121.768783,28.696902
+                skiaDrawView.mYimaLib.CenterMap((int)(121.768783 * 1e7), (int)(28.696902 * 1e7));
+                skiaDrawView.mYimaLib.SetCurrentScale(8878176.0f);
+            }
+        }, 200);
         return view;
     }
 
@@ -388,7 +396,8 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
 
             try {
                 datas.clear();
-                List<OtherShipBean> list = db.selector(OtherShipBean.class).findAll();
+                final SharedPreferences sp = getActivity().getSharedPreferences("xkTerminal", MODE_PRIVATE);
+                List<OtherShipBean> list = db.selector(OtherShipBean.class).where("mmsi", "<>", sp.getString("shipNo","")).findAll();
                 if (list != null && !list.isEmpty()) {
                     datas.addAll(list);
                 }
@@ -419,7 +428,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
      * 设置本船
      */
     public void setOwnShip(M_POINT m_point, float heading, boolean rotateScreen) {
-        skiaDrawView.mYimaLib.SetOwnShipBasicInfo("本船", "123456789", 100, 50);
+//        skiaDrawView.mYimaLib.SetOwnShipBasicInfo("本船", "123456789", 100, 50);
         skiaDrawView.mYimaLib.SetOwnShipCurrentInfo(m_point.x, m_point.y, heading, 50, 50, 0, 0);
         skiaDrawView.mYimaLib.SetOwnShipShowSymbol(false, 4, true, 16, 5000000);
         skiaDrawView.mYimaLib.RotateMapByScrnCenter(rotateScreen ? 0 - heading : 0);

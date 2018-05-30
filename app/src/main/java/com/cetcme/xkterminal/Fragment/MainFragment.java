@@ -1,6 +1,7 @@
 package com.cetcme.xkterminal.Fragment;
 
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import com.cetcme.xkterminal.DataFormat.AlertFormat;
 import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.Fragment.adapter.RvShipAdapter;
+import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.GPSFormatUtils;
@@ -44,10 +46,13 @@ import org.xutils.ex.DbException;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Timer;
 
 import yimamapapi.skia.AisInfo;
 import yimamapapi.skia.M_POINT;
 import yimamapapi.skia.OtherVesselCurrentInfo;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by qiuhong on 10/01/2018.
@@ -88,13 +93,10 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_main, container, false);
         EventBus.getDefault().register(this);
 
-<<<<<<< HEAD
-//        main_layout = view.findViewById(R.id.main_layout);
+        main_layout = view.findViewById(R.id.main_layout);
         skiaDrawView = view.findViewById(R.id.skiaView);
         skiaDrawView.setOnMapClickListener(this);
-=======
-        main_layout = view.findViewById(R.id.main_layout);
->>>>>>> master
+
         alert_layout = view.findViewById(R.id.alert_layout);
         ll_ship_list = view.findViewById(R.id.ll_ship_list);
         ViewGroup.LayoutParams lp = ll_ship_list.getLayoutParams();
@@ -176,7 +178,18 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
         } else {
             showMainLayout();
         }
+
+        loadOwnShipInfo();
+
         return view;
+    }
+
+    private void loadOwnShipInfo() {
+        final SharedPreferences sp = getActivity().getSharedPreferences("xkTerminal", MODE_PRIVATE);
+        skiaDrawView.mYimaLib.SetOwnShipBasicInfo(sp.getString("shipName", "")
+                ,sp.getString("shipNo", "")
+                ,Float.valueOf(sp.getString("shipLength", "0"))
+                ,Float.valueOf(sp.getString("shipDeep", "0")));
     }
 
 
@@ -426,41 +439,6 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
         tv_speed.setText(String.format("%.1f", locationBean.getSpeed()) + "kn");
     }
 
-    /**
-     * 是否需要距离报警
-     *
-     * @return
-     */
-    private boolean isDangerOfDistance() {
-        if (PreferencesUtils.getBoolean(getActivity(), "warn_switch", false)) {
-            LocationBean myself = MyApplication.getInstance().getCurrentLocation();
-            int distance = PreferencesUtils.getInt(getActivity(), "warn_distance", 200);
-            double haili = distance * 1.0 / 1852;// 海里
-            M_POINT start = skiaDrawView.mYimaLib.getDesPointOfCrsAndDist(myself.getLongitude()
-                    , myself.getLatitude(), haili, myself.getHeading());// 本船报警距离目标点
-            try {
-                List<OtherShipBean> list = db.selector(OtherShipBean.class).findAll();
-                if (list != null && !list.isEmpty()) {
-                    for (OtherShipBean osb : list) {
-                        int vessel_id = skiaDrawView.mYimaLib.GetOtherVesselPosOfID(osb.getShip_id());
-                        OtherVesselCurrentInfo ovci = skiaDrawView.mYimaLib.getOtherVesselCurrentInfo(vessel_id);
-                        M_POINT end = skiaDrawView.mYimaLib.getDesPointOfCrsAndDist(ovci.currentPoint.x
-                            , ovci.currentPoint.y, haili, ovci.fCourseOverGround);
-                        int x_ = myself.getLongitude() - ovci.currentPoint.x;
-                        int y_ = myself.getLatitude() - ovci.currentPoint.y;
 
-                        int x_2 = start.x - end.x;
-                        int y_2 = start.y - end.y;
 
-                        if (x_2 < x_ && y_2 < y_) {
-
-                        }
-                    }
-                }
-            } catch (DbException e) {
-                e.printStackTrace();
-            }
-        }
-        return false;
-    }
 }

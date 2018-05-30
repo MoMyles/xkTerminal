@@ -2,14 +2,17 @@ package com.cetcme.xkterminal.Fragment.setting;
 
 
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,8 +30,6 @@ import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.xutils.DbManager;
 
 import java.io.UnsupportedEncodingException;
@@ -40,6 +41,8 @@ import java.util.regex.Pattern;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -66,7 +69,8 @@ public class SystemSettingFragment extends Fragment {
     private Button time_zone_minus_btn;
     private Button time_zone_add_btn;
 
-    @BindView(R.id.tv_rdss) TextView tv_rdss;
+    @BindView(R.id.tv_rdss)
+    TextView tv_rdss;
 
     // 用于添加好友内容缓存
     private String[] friend = {"", ""};
@@ -86,7 +90,7 @@ public class SystemSettingFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_setting_system,container,false);
+        View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_setting_system, container, false);
         unbinder = ButterKnife.bind(this, view);
         initView(view);
         getData();
@@ -101,7 +105,7 @@ public class SystemSettingFragment extends Fragment {
     }
 
     private void initView(View view) {
-        address_textView            = view.findViewById(R.id.address_textView);
+        address_textView = view.findViewById(R.id.address_textView);
 //        signal_textView             = view.findViewById(R.id.signal_textView);
 //        location_freq_textView      = view.findViewById(R.id.location_freq_textView);
 //        gps_freq_textView           = view.findViewById(R.id.gps_freq_textView);
@@ -115,7 +119,7 @@ public class SystemSettingFragment extends Fragment {
 //        li_voltage_textView         = view.findViewById(R.id.li_voltage_textView);
 //        sun_voltage_textView        = view.findViewById(R.id.sun_voltage_textView);
 
-        wifi_ssid_textView          = view.findViewById(R.id.wifi_ssid_textView);
+        wifi_ssid_textView = view.findViewById(R.id.wifi_ssid_textView);
 
         wifi_ssid_textView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -160,7 +164,7 @@ public class SystemSettingFragment extends Fragment {
 
         modifyTimeZoneBtn(originalTimeZone);
         int timeZone = originalTimeZone - 12;
-        time_zone_textView.setText( timeZone > 0 ? " + " + timeZone : timeZone + "");
+        time_zone_textView.setText(timeZone > 0 ? " + " + timeZone : timeZone + "");
 
         time_zone_minus_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -219,6 +223,44 @@ public class SystemSettingFragment extends Fragment {
                 groupDelete();
             }
         });
+        //本船信息
+        view.findViewById(R.id.own_ship_textView).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final SharedPreferences sp = getActivity().getSharedPreferences("xkTerminal", MODE_PRIVATE);
+                final View contentView = getLayoutInflater().inflate(R.layout.dialog_own_ship_info, null);
+                final EditText mEt1 = contentView.findViewById(R.id.et_ship_name);
+                final EditText mEt2 = contentView.findViewById(R.id.et_ship_no);
+                final EditText mEt3 = contentView.findViewById(R.id.et_ship_length);
+                final EditText mEt4 = contentView.findViewById(R.id.et_ship_deep);
+                mEt1.setText(sp.getString("shipName", ""));
+                mEt2.setText(sp.getString("shipNo", ""));
+                mEt3.setText(sp.getString("shipLength", ""));
+                mEt4.setText(sp.getString("shipDeep", ""));
+                new AlertDialog.Builder(getActivity())
+                        .setView(contentView)
+                        .setCancelable(false)
+                        .setPositiveButton("保存", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                boolean success = sp.edit()
+                                        .putString("shipName", mEt1.getText().toString().trim())
+                                        .putString("shipNo", mEt2.getText().toString().trim())
+                                        .putString("shipLength", mEt3.getText().toString().trim())
+                                        .putString("shipDeep", mEt4.getText().toString().trim())
+                                        .commit();
+                                if (success) {
+                                    Toast.makeText(getActivity(), "保存成功", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(getActivity(), "保存失败", Toast.LENGTH_SHORT).show();
+                                }
+                                dialogInterface.dismiss();
+                            }
+                        })
+                        .setNegativeButton("取消", null)
+                        .show();
+            }
+        });
 
         tv_rdss.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -249,7 +291,7 @@ public class SystemSettingFragment extends Fragment {
     private void getData() {
 
         String ssid = PreferencesUtils.getString(getActivity(), "wifiSSID");
-        if (ssid != null ) {
+        if (ssid != null) {
             wifi_ssid_textView.setText(ssid);
         } else {
             wifi_ssid_textView.setText(getString(R.string.wifi_ssid));

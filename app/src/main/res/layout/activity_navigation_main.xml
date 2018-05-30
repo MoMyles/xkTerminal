@@ -45,7 +45,7 @@
         android:textColor="#000"
         android:textSize="14sp"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/id_menu"
         app:layout_constraintRight_toRightOf="parent" />
 
     <LinearLayout

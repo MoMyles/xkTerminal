@@ -5,6 +5,7 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -14,16 +15,16 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="船名:"
-            android:textSize="14sp" />
+            android:text="MMSI:"
+            android:textSize="18sp" />
 
         <EditText
-            android:id="@+id/et_ship_name"
+            android:id="@+id/et_ship_no"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:inputType="text"
-            android:textSize="14sp" />
+            android:textSize="18sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -35,16 +36,16 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="船号:"
-            android:textSize="14sp" />
+            android:text="船名:"
+            android:textSize="18sp" />
 
         <EditText
-            android:id="@+id/et_ship_no"
+            android:id="@+id/et_ship_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:inputType="text"
-            android:textSize="14sp" />
+            android:textSize="18sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -57,7 +58,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="船长:"
-            android:textSize="14sp" />
+            android:textSize="18sp" />
 
         <EditText
             android:id="@+id/et_ship_length"
@@ -65,7 +66,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:inputType="numberDecimal"
-            android:textSize="14sp" />
+            android:textSize="18sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -77,8 +78,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="船深:"
-            android:textSize="14sp" />
+            android:text="船宽:"
+            android:textSize="18sp" />
 
         <EditText
             android:id="@+id/et_ship_deep"
@@ -86,6 +87,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:inputType="numberDecimal"
-            android:textSize="14sp" />
+            android:textSize="18sp" />
     </LinearLayout>
 </LinearLayout>

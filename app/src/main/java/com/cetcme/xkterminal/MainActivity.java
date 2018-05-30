@@ -5,10 +5,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
         //设置当前窗体为全屏显示
         Window window = getWindow();
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        int flag= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+        int flag = WindowManager.LayoutParams.FLAG_FULLSCREEN;
         window.setFlags(flag, flag);
 
         setContentView(R.layout.activity_main);
@@ -184,11 +184,11 @@ public class MainActivity extends AppCompatActivity {
                 .setCancellable(false);
         ImageView imageView = new ImageView(this);
         imageView.setBackgroundResource(R.drawable.checkmark);
-        okHUD  =  KProgressHUD.create(this)
+        okHUD = KProgressHUD.create(this)
                 .setCustomView(imageView)
                 .setLabel("加载成功")
                 .setCancellable(false)
-                .setSize(hudWidth,hudWidth)
+                .setSize(hudWidth, hudWidth)
                 .setDimAmount(0.3f);
     }
 
@@ -253,12 +253,13 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
             idCardDialogOpen = true;
         } else {
-            ((MyApplication)getApplication()).idCardActivity.setData(bundle);
+            ((MyApplication) getApplication()).idCardActivity.setData(bundle);
         }
 
         addSignLog(id, name);
 
     }
+
     public static boolean idCardDialogOpen = false;
 
     public void showDangerDialog() {
@@ -308,7 +309,7 @@ public class MainActivity extends AppCompatActivity {
                 public void run() {
                     hasPressedBackOnce = false;
                 }
-            },2500);
+            }, 2500);
         } else {
             backToast.cancel();
             super.onBackPressed();
@@ -373,14 +374,19 @@ public class MainActivity extends AppCompatActivity {
         sendBar.setVisibility(View.VISIBLE);
     }
 
-    public void initMainFragment(){
+    public void initMainFragment() {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if (mainFragment == null){
+        if (mainFragment == null) {
             mainFragment = new MainFragment();
         }
-        transaction.replace(R.id.main_frame_layout, mainFragment);
+        if (!mainFragment.isAdded()) {
+            transaction.add(R.id.main_frame_layout, mainFragment);
+        } else {
+            if (mainFragment.isHidden()) {
+                transaction.show(mainFragment);
+            }
+        }
         transaction.commit();
-
         showMainBar();
         fragmentName = "main";
 
@@ -391,10 +397,10 @@ public class MainActivity extends AppCompatActivity {
         messageIndex = -1;
     }
 
-    public void initMessageFragment(String tg){
+    public void initMessageFragment(String tg) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 //        if (messageFragment == null){
-            messageFragment = new MessageFragment(tg);
+        messageFragment = new MessageFragment(tg);
 //        }
         transaction.replace(R.id.main_frame_layout, messageFragment);
         transaction.commit();
@@ -405,10 +411,10 @@ public class MainActivity extends AppCompatActivity {
         messageListStatus = tg;
     }
 
-    public void initLogFragment(String tg){
+    public void initLogFragment(String tg) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 //        if (logFragment == null){
-            logFragment = new LogFragment(tg);
+        logFragment = new LogFragment(tg);
 //        }
         transaction.replace(R.id.main_frame_layout, logFragment);
         transaction.commit();
@@ -422,9 +428,9 @@ public class MainActivity extends AppCompatActivity {
         fragmentName = "log";
     }
 
-    public void initSettingFragment(){
+    public void initSettingFragment() {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if (settingFragment == null){
+        if (settingFragment == null) {
             settingFragment = new SettingFragment();
         }
         transaction.replace(R.id.main_frame_layout, settingFragment);
@@ -434,9 +440,9 @@ public class MainActivity extends AppCompatActivity {
         fragmentName = "setting";
     }
 
-    public void initAboutFragment(){
+    public void initAboutFragment() {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if (aboutFragment == null){
+        if (aboutFragment == null) {
             aboutFragment = new AboutFragment();
         }
         transaction.replace(R.id.main_frame_layout, aboutFragment);
@@ -452,7 +458,7 @@ public class MainActivity extends AppCompatActivity {
     public String messageId = "";
     public int messageIndex = -1;
 
-    public void initNewFragment(String tg){
+    public void initNewFragment(String tg) {
         if (!tg.equals("new") && (messageContent.isEmpty() || messageReceiver.isEmpty())) {
             Toast.makeText(this, "请选择一条短信", Toast.LENGTH_SHORT).show();
             return;
@@ -531,14 +537,14 @@ public class MainActivity extends AppCompatActivity {
         final String content = messageNewFragment.getContent();
 
         if (receiver.isEmpty()) {
-            QHDialog qhDialog = new QHDialog(this,"提示", "收件人为空！");
+            QHDialog qhDialog = new QHDialog(this, "提示", "收件人为空！");
             qhDialog.setOnlyOneButtonText("好的");
             qhDialog.show();
             return;
         }
 
         if (content.isEmpty()) {
-            QHDialog qhDialog = new QHDialog(this,"提示", "短信内容为空！");
+            QHDialog qhDialog = new QHDialog(this, "提示", "短信内容为空！");
             qhDialog.setOnlyOneButtonText("好的");
             qhDialog.show();
             return;
@@ -552,7 +558,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (Constant.MESSAGE_CONTENT_MAX_LENGTH != 0 && length > Constant.MESSAGE_CONTENT_MAX_LENGTH) {
-            QHDialog qhDialog = new QHDialog(this,"提示", "短信内容长度超出最大值（" + Constant.MESSAGE_CONTENT_MAX_LENGTH + "）！");
+            QHDialog qhDialog = new QHDialog(this, "提示", "短信内容长度超出最大值（" + Constant.MESSAGE_CONTENT_MAX_LENGTH + "）！");
             qhDialog.setOnlyOneButtonText("好的");
             qhDialog.show();
             return;
@@ -630,7 +636,7 @@ public class MainActivity extends AppCompatActivity {
         WifiConfiguration config = new WifiConfiguration();
 
         String ssid = PreferencesUtils.getString(MainActivity.this, "wifiSSID");
-        if (ssid == null ) {
+        if (ssid == null) {
             ssid = getString(R.string.wifi_ssid);
         }
 
@@ -682,8 +688,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void sendBootData() {
         byte[] bytes = "$01".getBytes();
-        bytes = ByteUtil.byteMerger(bytes, new byte[] {0x01, 0x00});
-        bytes = ByteUtil.byteMerger(bytes, new byte[] {0x2A, 0x01});
+        bytes = ByteUtil.byteMerger(bytes, new byte[]{0x01, 0x00});
+        bytes = ByteUtil.byteMerger(bytes, new byte[]{0x2A, 0x01});
         bytes = ByteUtil.byteMerger(bytes, "\r\n".getBytes());
         ((MyApplication) getApplication()).sendBytes(bytes);
     }
@@ -701,15 +707,15 @@ public class MainActivity extends AppCompatActivity {
 
     public void showAlertFailDialog() {
         new QMUIDialog.MessageDialogBuilder(MainActivity.this)
-            .setTitle("提示")
-            .setMessage("报警失败!")
-            .addAction("确认", new QMUIDialogAction.ActionListener() {
-                @Override
-                public void onClick(QMUIDialog dialog, int index) {
-                    dialog.dismiss();
-                }
-            })
-            .show();
+                .setTitle("提示")
+                .setMessage("报警失败!")
+                .addAction("确认", new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
+                        dialog.dismiss();
+                    }
+                })
+                .show();
     }
 
 

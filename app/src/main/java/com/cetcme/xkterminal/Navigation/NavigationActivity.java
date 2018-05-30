@@ -340,7 +340,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
             if (meter < 1852) {
                 msg = "已偏航" + meter + "米";
             } else {
-                msg = String.format("已偏航%2.f海里", offRoute.offDistByMeter / 1852);
+                msg = String.format("已偏航%.2f海里", offRoute.offDistByMeter / 1852);
             }
 
         }

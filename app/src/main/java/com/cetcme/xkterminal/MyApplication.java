@@ -226,6 +226,15 @@ public class MyApplication extends Application {
                 isDangerOfDistance();
             }
         }, 10000, 5 * 60 * 1000);
+
+        //TODO: fake
+        currentLocation = new LocationBean();
+        currentLocation.setLongitude(0);
+        currentLocation.setLatitude(0);
+        currentLocation.setAcqtime(new Date());
+        currentLocation.setHeading(0.0f);
+        currentLocation.setSpeed(0.0f);
+
     }
 
     /**

@@ -138,8 +138,10 @@ public class DataHandler extends Handler {
                 // 先处理后面部分，时间部分由下一个case处理，不加break
                 int myNumber = Util.bytesToInt2(ByteUtil.subBytes(bytes, 17, 21), 0);
                 PreferencesUtils.putString(myApplication.mainActivity, "myNumber", myNumber + "");
-                MainActivity.myNumber = myNumber + "";
-                System.out.println("myNumber: " + myNumber);
+                if (myNumber != 0) {
+                    MainActivity.myNumber = myNumber + "";
+                    System.out.println("myNumber: " + myNumber);
+                }
 
                 String status = Util.byteToBit(ByteUtil.subBytes(bytes, 21, 22)[0]);
                 boolean gpsStatus = status.charAt(7) == '1';

@@ -172,9 +172,10 @@ public class MessageNewFragment extends Fragment{
                 final String[] builtInFriendNumbers = mainActivity.getResources().getStringArray(R.array.friendNumber);
 
                 final List<FriendBean> friends = FriendProxy.getAll(db);
-
+                int size = 0;
+                if (friends != null) size = friends.size();
                 // 显示序号
-                final String[] showItems = new String[builtInFriendNames.length + friends.size()];
+                final String[] showItems = new String[builtInFriendNames.length + size];
                 for (int i = 0; i < showItems.length; i++) {
                     if (i < friends.size()) {
                         showItems[i] = (i + 1) + ". " + friends.get(i).getName() + "(" + friends.get(i).getNumber() + ")";

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -85,9 +86,8 @@ public class NewInoutActivity extends Activity {
             return;
         }
 
-        SharedPreferences sharedPreferences = getSharedPreferences("xkTerminal", Context.MODE_PRIVATE); //私有数据
-        String lastSendTime = sharedPreferences.getString("lastSendTime", "");
-        if (!lastSendTime.isEmpty()) {
+        String lastSendTime = PreferencesUtils.getString(NewInoutActivity.this, "lastSendTime");
+        if (lastSendTime != null && !lastSendTime.isEmpty()) {
             Long sendDate = DateUtil.parseStringToDate(lastSendTime, DateUtil.DatePattern.YYYYMMDDHHMMSS).getTime();
             Long now = Constant.SYSTEM_DATE.getTime();
             if (now - sendDate <= Constant.MESSAGE_SEND_LIMIT_TIME && now - sendDate > 0) {
@@ -149,7 +149,8 @@ public class NewInoutActivity extends Activity {
             e.printStackTrace();
         }
 
-        PreferencesUtils.putString(NewInoutActivity.this, "lastSendTime", DateUtil.parseDateToString(Constant.SYSTEM_DATE, DateUtil.DatePattern.YYYYMMDDHHMMSS));
+        String str = DateUtil.parseDateToString(Constant.SYSTEM_DATE, DateUtil.DatePattern.YYYYMMDDHHMMSS);
+        Log.e("TAG", "postInout: " + PreferencesUtils.putString(NewInoutActivity.this, "lastSendTime", str));
 
         finish();
 

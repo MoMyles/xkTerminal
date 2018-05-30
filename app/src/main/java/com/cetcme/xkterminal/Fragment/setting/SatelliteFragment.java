@@ -124,10 +124,15 @@ public class SatelliteFragment extends Fragment {
         }
         satelliteView.postInvalidate();
 
-        LocationBean lb = MyApplication.getInstance().getCurrentLocation();
+        final LocationBean lb = MyApplication.getInstance().getCurrentLocation();
         if (lb != null) {
-            mLongitude.setText(lb.getLongitude());
-            mLatitude.setText(lb.getLatitude());
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mLongitude.setText(lb.getLongitude() + "");
+                    mLatitude.setText(lb.getLatitude() + "");
+                }
+            });
         }
     }
 

@@ -21,8 +21,10 @@ import com.cetcme.xkterminal.DataFormat.WarnFormat;
 import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
+import com.cetcme.xkterminal.MyClass.SoundPlay;
 import com.cetcme.xkterminal.Navigation.GpsInfo;
 import com.cetcme.xkterminal.Navigation.GpsParse;
+import com.cetcme.xkterminal.Navigation.SkiaDrawView;
 import com.cetcme.xkterminal.Socket.SocketManager;
 import com.cetcme.xkterminal.Socket.SocketServer;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
@@ -55,10 +57,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android_serialport_api.SerialPort;
 import android_serialport_api.SerialPortFinder;
 import yimamapapi.skia.AisInfo;
+import yimamapapi.skia.M_POINT;
+import yimamapapi.skia.OtherVesselCurrentInfo;
 import yimamapapi.skia.YimaAisParse;
 import yimamapapi.skia.YimaLib;
 
@@ -72,6 +78,8 @@ public class MyApplication extends Application {
 
     public MainActivity mainActivity;
     public IDCardActivity idCardActivity;
+
+    private SharedPreferences sp = null;
 
     private static MyApplication mContext;
     private static LocationBean currentLocation;
@@ -112,7 +120,7 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         mContext = this;
-
+        sp =  getSharedPreferences("xkTerminal", MODE_PRIVATE);
         if (!PreferencesUtils.getBoolean(this, "copiedYimaFile")) {
             copyYimaFile();
             PreferencesUtils.putBoolean(this, "copiedYimaFile", true);
@@ -210,7 +218,58 @@ public class MyApplication extends Application {
         } catch (DbException e) {
             e.printStackTrace();
         }
+        // 距离报警
+        warnTimer = new Timer();
+        warnTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                isDangerOfDistance();
+            }
+        }, 10000, 5 * 60 * 1000);
     }
+
+    /**
+     * 是否需要距离报警
+     *
+     * @return
+     */
+    private void isDangerOfDistance() {
+        if (SkiaDrawView.mYimaLib == null) return;
+        if (PreferencesUtils.getBoolean(this, "warn_switch", false)) {
+            LocationBean myself = MyApplication.getInstance().getCurrentLocation();
+            if (myself == null) return;
+            int distance = PreferencesUtils.getInt(this, "warn_distance", 200);
+            double haili = distance * 1.0 / 1852;// 海里
+            M_POINT start = SkiaDrawView.mYimaLib.getDesPointOfCrsAndDist(myself.getLongitude()
+                    , myself.getLatitude(), haili, myself.getHeading());// 本船报警距离目标点
+            try {
+                List<OtherShipBean> list = db.selector(OtherShipBean.class).findAll();
+                if (list != null && !list.isEmpty()) {
+                    for (OtherShipBean osb : list) {
+                        int vessel_id = SkiaDrawView.mYimaLib.GetOtherVesselPosOfID(osb.getShip_id());
+                        OtherVesselCurrentInfo ovci = SkiaDrawView.mYimaLib.getOtherVesselCurrentInfo(vessel_id);
+                        M_POINT end = SkiaDrawView.mYimaLib.getDesPointOfCrsAndDist(ovci.currentPoint.x
+                                , ovci.currentPoint.y, haili, ovci.fCourseOverGround);
+                        int x_ = myself.getLongitude() - ovci.currentPoint.x;
+                        int y_ = myself.getLatitude() - ovci.currentPoint.y;
+
+                        int x_2 = start.x - end.x;
+                        int y_2 = start.y - end.y;
+
+                        double curHaili = SkiaDrawView.mYimaLib.GetDistBetwTwoPoint(start.x,start.y,end.x,end.y);
+                        if (x_2 < x_ && y_2 < y_ && curHaili <= haili) {
+                            mainActivity.showMessageDialog("您即将撞船", 1);
+                            SoundPlay.startAlertSound(mainActivity);
+                        }
+                    }
+                }
+            } catch (DbException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private Timer warnTimer;
 
 
     public static MyApplication getInstance() {
@@ -483,6 +542,9 @@ public class MyApplication extends Application {
     @Override
     public void onTerminate() {
         super.onTerminate();
+        if (warnTimer != null) {
+            warnTimer.cancel();
+        }
     }
 
 
@@ -836,7 +898,8 @@ public class MyApplication extends Application {
                                 sendBytes(WarnFormat.format("" + aisInfo.mmsi, message));
                             }
                         } else {
-                            if (aisInfo.bOwnShip) {
+//                            Log.e("TAG", "是否本船：" + aisInfo.bOwnShip);
+                            if (Integer.valueOf(sp.getString("shipNo", "0")).intValue()  == aisInfo.mmsi/*aisInfo.bOwnShip*/) {
                                 LocationBean locationBean = new LocationBean();
                                 locationBean.setLatitude(aisInfo.latititude);
                                 locationBean.setLongitude(aisInfo.longtitude);
@@ -844,7 +907,7 @@ public class MyApplication extends Application {
                                 locationBean.setHeading(aisInfo.COG);
                                 locationBean.setAcqtime(new Date());
                                 currentLocation = locationBean;
-
+                                Log.e("TAG", "本船: " + aisInfo.mmsi);
                                 EventBus.getDefault().post(locationBean);
                             } else {
                                 // 判断是否存在mmsi

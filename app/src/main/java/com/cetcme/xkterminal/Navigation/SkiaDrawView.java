@@ -38,7 +38,7 @@ public class SkiaDrawView extends View {
     private static final String LINE_BLUE2 = "111.288387523593,17.3697313541462;110.917015168613,15.5573409075002;112.788388559325,15.8697329241532;112.84418031168,16;113,16.7772151091301;112.610929327575,17.0872682465386;111.288387523593,17.3697313541462";
 
 
-    public YimaLib mYimaLib;
+    public static YimaLib mYimaLib;
     public Bitmap fSkiaBitmap;
     private int mLastX, mLastY;
     private int mCurrX, mCurrY;
@@ -77,6 +77,7 @@ public class SkiaDrawView extends View {
 //        mYimaLib.SetDisplayCategory(3);
         mYimaLib.RefreshDrawer(fSkiaBitmap, strTtfFilePath);//刷新绘制器，需要传入字体文件地址，用户可以自己修改为别的字体
         mYimaLib.OverViewLibMap(0);//概览第一幅图
+        mYimaLib.SetOwnShipBasicInfo("基站-2431", "4132431", 100, 20);
 //        mYimaLib.SetDisplayCategory(3);
 //        mYimaLib.SetIfShowSoundingAndMinMaxSound(true, 0, 20);
     }

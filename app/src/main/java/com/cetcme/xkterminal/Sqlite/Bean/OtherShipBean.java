@@ -13,10 +13,6 @@ public class OtherShipBean {
     private int ship_id;
     @Column(name="ship_name")
     private String ship_name;
-    @Column(name="longitude")
-    private int longitude;
-    @Column(name="latitude")
-    private int latitude;
 
     private boolean show = false;
 
@@ -58,22 +54,6 @@ public class OtherShipBean {
 
     public void setShow(boolean show) {
         this.show = show;
-    }
-
-    public int getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(int longitude) {
-        this.longitude = longitude;
-    }
-
-    public int getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(int latitude) {
-        this.latitude = latitude;
     }
 
     @Override

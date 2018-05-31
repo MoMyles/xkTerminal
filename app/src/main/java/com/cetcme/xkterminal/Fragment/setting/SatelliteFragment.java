@@ -2,6 +2,8 @@ package com.cetcme.xkterminal.Fragment.setting;
 
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -52,6 +54,8 @@ public class SatelliteFragment extends Fragment {
     private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
 
+    private Handler handler ;
+
 
     public SatelliteFragment() {
         // Required empty public constructor
@@ -64,6 +68,20 @@ public class SatelliteFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_satellite, container, false);
         init(view);
+        handler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case 1:
+                        LocationBean lb = (LocationBean) msg.obj;
+                        mLongitude.setText(lb.getLongitude() * 1.0 / 1e7 + "");
+                        mLatitude.setText(lb.getLatitude() * 1.0 / 1e7 + "");
+                        mTime.setText(timeFormat.format(new Date()));
+                        mDate.setText(dateFormat.format(new Date()));
+                        break;
+                }
+            }
+        };
         return view;
     }
 
@@ -131,15 +149,10 @@ public class SatelliteFragment extends Fragment {
 
         final LocationBean lb = MyApplication.getInstance().getCurrentLocation();
         if (lb != null) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mLongitude.setText(lb.getLongitude() * 1.0 / 1e7 + "");
-                    mLatitude.setText(lb.getLatitude() * 1.0 / 1e7 + "");
-                    mTime.setText(timeFormat.format(new Date()));
-                    mDate.setText(dateFormat.format(new Date()));
-                }
-            });
+            Message msg = Message.obtain();
+            msg.obj = lb;
+            msg.what = 1;
+            handler.sendMessage(msg);
         }
     }
 

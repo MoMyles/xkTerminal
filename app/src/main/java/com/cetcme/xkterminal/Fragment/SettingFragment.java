@@ -53,9 +53,9 @@ public class SettingFragment extends Fragment {
         fragments.add(new SatelliteFragment());
         fragments.add(new WarningSettingFragment());
         fragments.add(new SeriveStatusFragment());
-        fragments.add(new SystemSettingFragment());
         fragments.add(new WeatherInfoFragment());
-        FragAdapter adapter = new FragAdapter(getActivity().getSupportFragmentManager(), fragments);
+        fragments.add(new SystemSettingFragment());
+        FragAdapter adapter = new FragAdapter(getChildFragmentManager(), fragments);
 
         mContentViewPager.setAdapter(adapter);
 
@@ -64,8 +64,9 @@ public class SettingFragment extends Fragment {
         mTabSegment.addTab(new QMUITabSegment.Tab("卫星分布"));
         mTabSegment.addTab(new QMUITabSegment.Tab("报警设置"));
         mTabSegment.addTab(new QMUITabSegment.Tab("服务状态"));
-        mTabSegment.addTab(new QMUITabSegment.Tab("系统设置"));
         mTabSegment.addTab(new QMUITabSegment.Tab("当前海域气象信息"));
+        mTabSegment.addTab(new QMUITabSegment.Tab("系统设置"));
+
 
         mTabSegment.setupWithViewPager(mContentViewPager, false);
         mTabSegment.setMode(QMUITabSegment.MODE_FIXED);

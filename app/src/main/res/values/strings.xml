@@ -31,6 +31,13 @@
 
     <string name="wifi_ssid">船载北斗显控终端_WIFI</string>
 
+    <string name="setting_tab_1">北斗参数</string>
+    <string name="setting_tab_2">卫星分布</string>
+    <string name="setting_tab_3">报警设置</string>
+    <string name="setting_tab_4">服务状态</string>
+    <string name="setting_tab_5">气象信息</string>
+    <string name="setting_tab_6">系统设置</string>
+
     <string-array name="smsTemplate">
         <item>固定短信模版1</item>
         <item>固定短信模版2</item>

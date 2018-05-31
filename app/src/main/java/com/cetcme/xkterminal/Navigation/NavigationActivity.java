@@ -14,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
@@ -108,14 +109,14 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                 if (myLocation == null) {
                     toast.setText("未获取自身定位");
                     toast.show();
-                    NavigationMainActivity.play("未获取自身定位");
+                    MainActivity.play("未获取自身定位");
                     return;
                 }
 
                 if (inNavigating) {
                     toast.setText("导航结束");
                     toast.show();
-                    NavigationMainActivity.play("导航结束");
+                    MainActivity.play("导航结束");
                     btn_navigation.setText("开始导航");
                     isDanger = false;
                     needCenterOwnShip = false;
@@ -131,14 +132,14 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                     if (myLocation.getLongitude() == 0 && myLocation.getLatitude() == 0) {
                         toast.setText("未获取自身定位");
                         toast.show();
-                        NavigationMainActivity.play("未获取自身定位");
+                        MainActivity.play("未获取自身定位");
                         return;
                     }
 
                     if (routeID == -1) {
                         toast.setText("请设置导航终点");
                         toast.show();
-                        NavigationMainActivity.play("请设置导航终点");
+                        MainActivity.play("请设置导航终点");
                         return;
                     }
 
@@ -153,10 +154,10 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                         endDistToRead = fMainView.mYimaLib.GetDistBetwTwoPoint(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
                         double bearing = Math.abs(fMainView.mYimaLib.GetBearingBetwTwoPoint(startPoint.x, startPoint.y, endPoint.x, endPoint.y) - myLocation.getHeading());
                         String bearingStr = String.format("%.2f", bearing);
-                        NavigationMainActivity.play("开始导航,总里程" + (int) endDistToRead + "海里,夹角" + bearingStr + "度");
+                        MainActivity.play("开始导航,总里程" + (int) endDistToRead + "海里,夹角" + bearingStr + "度");
                     } else {
                         // 航线
-                        NavigationMainActivity.play("开始导航,航线总里程" + (int) endDistToRead + "海里");
+                        MainActivity.play("开始导航,航线总里程" + (int) endDistToRead + "海里");
                     }
                     lastReportTime = new Date().getTime();
 
@@ -222,7 +223,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                 if (myLocation == null) {
                     toast.setText("未获取自身定位");
                     toast.show();
-                    NavigationMainActivity.play("未获取自身定位");
+                    MainActivity.play("未获取自身定位");
                     return;
                 }
 
@@ -447,13 +448,13 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                     lastReportTime = new Date().getTime();
                     toast.setText(msg);
                     toast.show();
-                    NavigationMainActivity.play(msg);
+                    MainActivity.play(msg);
                 } else {
                     // 判断上次报警时间是否是10秒之前
                     if (new Date().getTime() - lastReportTime > 10 * 1000) {
                         toast.setText(msg);
                         toast.show();
-                        NavigationMainActivity.play(msg);
+                        MainActivity.play(msg);
                         lastReportTime = new Date().getTime();
                     }
                 }
@@ -465,7 +466,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
             if (getNavigationEndDistance(myLocation, endWp) < Constant.NAVIGATION_END_DIST) {
                 toast.setText("已到达目的地附近，导航结束");
                 toast.show();
-                NavigationMainActivity.play("已到达目的地附近，导航结束");
+                MainActivity.play("已到达目的地附近，导航结束");
                 btn_navigation.setText("开始导航");
                 inNavigating = false;
                 isBackWrite = true;

@@ -22,7 +22,10 @@ public class MessageFormat {
     public static final String MESSAGE_TYPE_SMS_OPEN = "05"; // 是否开通短信发送功能
     public static final String MESSAGE_TYPE_ALERT_REMIND = "06"; // 报警提醒页面
     public static final String MESSAGE_TYPE_SHUT_DOWN = "07"; // 摇毙功能
-    public static final String MESSAGE_TYPE_CALL_THE_ROLL = "08"; // 夜间点名
+    public static final String MESSAGE_TYPE_UPDATE_LOCATION = "08"; // 更新位置信息
+
+//    public static final String MESSAGE_TYPE_CALL_THE_ROLL = ""; // 夜间点名
+
 
     private static final String messageHead = "$04";
 
@@ -133,11 +136,22 @@ public class MessageFormat {
 
 //        System.out.println(ConvertUtil.bytesToHexString("01".getBytes()));
 
-        byte[] bytes = ConvertUtil.hexStringToByte("24303400000012345607D08F9A8F0C3030C7D7C6DDC8A5C8A5C8A52A1F0D0A");
-        String[] msg = unFormat(bytes);
-        System.out.println("targetAddress: " + msg[0]);
-        System.out.println("messageContent: " + msg[1]);
-        System.out.println("type: " + msg[2]);
+//        byte[] bytes = ConvertUtil.hexStringToByte("24303400000012345607D08F9A8F0C3030C7D7C6DDC8A5C8A5C8A52A1F0D0A");
+//        String[] msg = unFormat(bytes);
+//        System.out.println("targetAddress: " + msg[0]);
+//        System.out.println("messageContent: " + msg[1]);
+//        System.out.println("type: " + msg[2]);
+
+        String content = "121.2a14,31.1234";
+        String[] strings = content.split(",");
+        try {
+            int lon = (int) (Float.parseFloat(strings[0]) * 10000000);
+            int lat = (int) (Float.parseFloat(strings[1]) * 10000000);
+            System.out.println(lon);
+            System.out.println(lat);
+        } catch (NumberFormatException e) {
+            e.getStackTrace();
+        }
     }
 
     private static byte getDataLengthByte (String message, int frameCountInt) {

@@ -35,6 +35,7 @@ import com.cetcme.xkterminal.Fragment.MainFragment;
 import com.cetcme.xkterminal.Fragment.MessageFragment;
 import com.cetcme.xkterminal.Fragment.MessageNewFragment;
 import com.cetcme.xkterminal.Fragment.SettingFragment;
+import com.cetcme.xkterminal.Fragment.SettingTabFragment;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.DensityUtil;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
@@ -86,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
     public MainFragment mainFragment;
     public MessageFragment messageFragment;
     private LogFragment logFragment;
-    private SettingFragment settingFragment;
+    private SettingTabFragment settingFragment;
     private AboutFragment aboutFragment;
     private MessageNewFragment messageNewFragment;
 
@@ -597,9 +598,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void initSettingFragment() {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if (settingFragment == null) {
-            settingFragment = new SettingFragment();
-        }
+//        if (settingFragment == null) {
+            settingFragment = new SettingTabFragment();
+//        }
         transaction.replace(R.id.main_frame_layout, settingFragment);
         transaction.commit();
 

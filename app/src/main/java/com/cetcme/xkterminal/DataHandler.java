@@ -94,11 +94,25 @@ public class DataHandler extends Handler {
                         PreferencesUtils.putBoolean(myApplication.mainActivity, "shutdown", true);
                         System.exit(0);
                         break;
+                    // 更新位置
+                    case MessageFormat.MESSAGE_TYPE_UPDATE_LOCATION:
+                        String[] strings = content.split(",");
+                        try {
+                            int lon = (int) (Float.parseFloat(strings[0]) * 10000000);
+                            int lat = (int) (Float.parseFloat(strings[1]) * 10000000);
+                            myApplication.getCurrentLocation().setLongitude(lon);
+                            myApplication.getCurrentLocation().setLongitude(lat);
+                        } catch (NumberFormatException e) {
+                            e.getStackTrace();
+                        }
+                        break;
                     // 夜间点名
+                    /*
                     case MessageFormat.MESSAGE_TYPE_CALL_THE_ROLL:
                         SoundPlay.playMessageSound(myApplication.mainActivity);
                         myApplication.mainActivity.showMessageDialog(content, MessageDialogActivity.TYPE_CALL_ROLL);
                         break;
+                    */
                     default:
                         // 判断分组 group -1为非分组短信，其他为组号，
                         if (group == -1 || GroupProxy.hasGroup(db, group)) {

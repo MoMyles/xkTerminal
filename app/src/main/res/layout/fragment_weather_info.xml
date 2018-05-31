@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+              android:orientation="vertical"
+             tools:context=".Fragment.setting.WeatherInfoFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    style="@style/setting_tv_title"
+                    android:layout_marginLeft="150dp"
+                    android:layout_marginStart="150dp"
+                    android:text="风速："/>
+
+                <TextView
+                    android:id="@+id/tv_wind_speed"
+                    style="@style/setting_tv_title"
+                    android:gravity="center"
+                    android:text="---"/>
+
+                <android.support.v4.widget.Space
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"/>
+
+                <TextView
+                    style="@style/setting_tv_title"
+                    android:text="风向："/>
+
+                <TextView
+                    android:id="@+id/tv_wind_head"
+                    style="@style/setting_tv_title"
+                    android:gravity="center"
+                    android:layout_marginRight="150dp"
+                    android:layout_marginEnd="150dp"
+                    android:text="---"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_alignParentBottom="true"
+                android:background="#b7b7b7" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    style="@style/setting_tv_title"
+                    android:layout_marginLeft="150dp"
+                    android:layout_marginStart="150dp"
+                    android:text="风级："/>
+
+                <TextView
+                    android:id="@+id/tv_wind_level"
+                    style="@style/setting_tv_title"
+                    android:gravity="center"
+                    android:text="---"/>
+
+                <android.support.v4.widget.Space
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"/>
+
+                <TextView
+                    style="@style/setting_tv_title"
+                    android:text="气压："/>
+
+                <TextView
+                    android:id="@+id/tv_air_pressure"
+                    style="@style/setting_tv_title"
+                    android:gravity="center"
+                    android:layout_marginRight="150dp"
+                    android:layout_marginEnd="150dp"
+                    android:text="---"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_alignParentBottom="true"
+                android:background="#b7b7b7" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    style="@style/setting_tv_title"
+                    android:layout_marginLeft="150dp"
+                    android:layout_marginStart="150dp"
+                    android:text="浪高："/>
+
+                <TextView
+                    android:id="@+id/tv_wave_height"
+                    style="@style/setting_tv_title"
+                    android:gravity="center"
+                    android:text="---"/>
+
+                <android.support.v4.widget.Space
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"/>
+
+                <TextView
+                    style="@style/setting_tv_title"
+                    android:text="温度："/>
+
+                <TextView
+                    android:id="@+id/tv_air_temp"
+                    style="@style/setting_tv_title"
+                    android:gravity="center"
+                    android:layout_marginRight="150dp"
+                    android:layout_marginEnd="150dp"
+                    android:text="---"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+</LinearLayout>

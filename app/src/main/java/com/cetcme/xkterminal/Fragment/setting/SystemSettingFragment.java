@@ -49,20 +49,6 @@ import static android.content.Context.MODE_PRIVATE;
  */
 public class SystemSettingFragment extends Fragment {
 
-    private TextView address_textView;
-    private TextView signal_textView;
-    private TextView location_freq_textView;
-    private TextView gps_freq_textView;
-    private TextView central_number_textView;
-
-    private TextView location_from_textView;
-    private TextView communication_from_textView;
-    private TextView signal_power_textView;
-    private TextView satellite_count_textView;
-    private TextView broad_temp_textView;
-    private TextView li_voltage_textView;
-    private TextView sun_voltage_textView;
-
     private TextView wifi_ssid_textView;
 
     private TextView time_zone_textView;
@@ -105,19 +91,6 @@ public class SystemSettingFragment extends Fragment {
     }
 
     private void initView(View view) {
-        address_textView = view.findViewById(R.id.address_textView);
-//        signal_textView             = view.findViewById(R.id.signal_textView);
-//        location_freq_textView      = view.findViewById(R.id.location_freq_textView);
-//        gps_freq_textView           = view.findViewById(R.id.gps_freq_textView);
-//        central_number_textView     = view.findViewById(R.id.central_number_textView);
-
-//        location_from_textView      = view.findViewById(R.id.location_from_textView);
-//        communication_from_textView = view.findViewById(R.id.communication_from_textView);
-//        signal_power_textView       = view.findViewById(R.id.signal_power_textView);
-//        satellite_count_textView    = view.findViewById(R.id.satellite_count_textView);
-//        broad_temp_textView         = view.findViewById(R.id.broad_temp_textView);
-//        li_voltage_textView         = view.findViewById(R.id.li_voltage_textView);
-//        sun_voltage_textView        = view.findViewById(R.id.sun_voltage_textView);
 
         wifi_ssid_textView = view.findViewById(R.id.wifi_ssid_textView);
 
@@ -306,37 +279,6 @@ public class SystemSettingFragment extends Fragment {
 
         boolean rdssOpen = PreferencesUtils.getBoolean(getActivity(), "rdss", false);
         tv_rdss.setText(rdssOpen ? "关闭" : "开启");
-
-        /*
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("address", "168857");
-            jsonObject.put("signal", "78");
-            jsonObject.put("location_per", "5min");
-            jsonObject.put("gps_per", "1s");
-            jsonObject.put("central_number", "378378");
-
-            address_textView        .setText(PreferencesUtils.getString(getActivity(), "myNumber"));
-            communication_from_textView.setText(PreferencesUtils.getString(getActivity(), "communication_from"));
-
-
-
-            signal_textView         .setText(jsonObject.getString("signal"));
-            location_freq_textView  .setText(jsonObject.getString("location_per"));
-            gps_freq_textView       .setText(jsonObject.getString("gps_per"));
-            central_number_textView .setText(jsonObject.getString("central_number"));
-
-            location_from_textView.setText("GPS/BD");
-            communication_from_textView.setText("GPRS");
-            signal_power_textView.setText("30");
-            satellite_count_textView.setText("8");
-            broad_temp_textView.setText("-7℃");
-            li_voltage_textView.setText("4.16(96%)V");
-            sun_voltage_textView.setText("3.12V");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        */
 
     }
 
@@ -686,44 +628,6 @@ public class SystemSettingFragment extends Fragment {
         Pattern p = Pattern.compile("[0-9]*");
         Matcher m = p.matcher(txt);
         return m.matches();
-    }
-
-    private void editGroup() {
-        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
-        builder.setTitle("用户分组")
-                .setPlaceholder("在此输入您的分组编号（1 - 255）")
-                .setInputType(InputType.TYPE_CLASS_NUMBER)
-                .addAction("取消", new QMUIDialogAction.ActionListener() {
-                    @Override
-                    public void onClick(QMUIDialog dialog, int index) {
-                        dialog.dismiss();
-                    }
-                })
-                .addAction("确定", new QMUIDialogAction.ActionListener() {
-                    @Override
-                    public void onClick(QMUIDialog dialog, int index) {
-                        CharSequence text = builder.getEditText().getText();
-                        if (text != null && text.length() > 0) {
-
-                            if (!isNumer(text.toString())) {
-                                Toast.makeText(getActivity(), "请输入正确的分组编号", Toast.LENGTH_SHORT).show();
-                                return;
-                            }
-
-                            int group = Integer.parseInt(text.toString());
-                            if (group < 1 || group > 255) {
-                                Toast.makeText(getActivity(), "请输入正确的分组编号(1 - 255)", Toast.LENGTH_SHORT).show();
-                                return;
-                            }
-                            PreferencesUtils.putInt(getActivity(), "group", group);
-                            Toast.makeText(getActivity(), "分组编号设置成功：" + group, Toast.LENGTH_SHORT).show();
-
-                        } else {
-                            Toast.makeText(getActivity(), "输入您的分组编号（1 - 255）", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                })
-                .show();
     }
 
 }

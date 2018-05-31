@@ -431,9 +431,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void initSettingFragment() {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if (settingFragment == null) {
+//        if (settingFragment == null) {
             settingFragment = new SettingFragment();
-        }
+//        }
         transaction.replace(R.id.main_frame_layout, settingFragment);
         transaction.commit();
 

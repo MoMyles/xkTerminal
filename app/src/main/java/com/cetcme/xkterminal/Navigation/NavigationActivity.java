@@ -398,6 +398,13 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
     protected void onDestroy() {
         isDanger = false;
         if (timer != null) timer.cancel();
+        if (routeID != -1) {
+            fMainView.mYimaLib.DeleteRoute(routeID);
+            int[] ids = fMainView.mYimaLib.GetRouteWayPointsID(routeID);
+            for (int id : ids) {
+                fMainView.mYimaLib.DeleteWayPoint(id);
+            }
+        }
         super.onDestroy();
     }
 

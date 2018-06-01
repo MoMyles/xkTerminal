@@ -14,15 +14,16 @@ import java.io.UnsupportedEncodingException;
 
 public class MessageFormat {
 
-    public static final String MESSAGE_TYPE_NORMAL = "00"; // 普通短信
-    public static final String MESSAGE_TYPE_RESCUE = "01"; // 救护短信
-    public static final String MESSAGE_TYPE_CELLPHONE = "02"; // 手机短信
-    public static final String MESSAGE_TYPE_INOUT = "03"; // 进出港申报
-    public static final String MESSAGE_TYPE_AIS = "04"; // AIS报警
-    public static final String MESSAGE_TYPE_SMS_OPEN = "05"; // 是否开通短信发送功能
-    public static final String MESSAGE_TYPE_ALERT_REMIND = "06"; // 报警提醒页面
-    public static final String MESSAGE_TYPE_SHUT_DOWN = "07"; // 摇毙功能
-    public static final String MESSAGE_TYPE_UPDATE_LOCATION = "08"; // 更新位置信息
+    public static final String MESSAGE_TYPE_NORMAL              = "00"; // 普通短信
+    public static final String MESSAGE_TYPE_RESCUE              = "01"; // 救护短信
+    public static final String MESSAGE_TYPE_CELLPHONE           = "02"; // 手机短信
+    public static final String MESSAGE_TYPE_INOUT               = "03"; // 进出港申报
+    public static final String MESSAGE_TYPE_AIS                 = "04"; // AIS报警
+    public static final String MESSAGE_TYPE_SMS_OPEN            = "05"; // 是否开通短信发送功能
+    public static final String MESSAGE_TYPE_ALERT_REMIND        = "06"; // 报警提醒页面
+    public static final String MESSAGE_TYPE_SHUT_DOWN           = "07"; // 摇毙功能
+    public static final String MESSAGE_TYPE_UPDATE_LOCATION     = "08"; // 更新位置信息
+    public static final String MESSAGE_TYPE_REPORT_ALARM        = "09"; // 告警信息，语音播报
 
 //    public static final String MESSAGE_TYPE_CALL_THE_ROLL = ""; // 夜间点名
 

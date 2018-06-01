@@ -17,6 +17,7 @@ public class MessageDialogActivity extends Activity {
     public static final int TYPE_RESCUE = 0;
     public static final int TYPE_ALERT = 1;
     public static final int TYPE_CALL_ROLL = 2;
+    public static final int TYPE_ALARM = 3;
 
     @BindView(R.id.rescue_content_tv) TextView rescue_content_tv;
     @BindView(R.id.confirm_button) Button confirm_bt;
@@ -30,7 +31,7 @@ public class MessageDialogActivity extends Activity {
         setContentView(R.layout.activity_message_dialog);
         ButterKnife.bind(this);
 
-        // type 0: 救护, 1: 报警提醒, 2: 夜间点名
+        // type 0: 救护, 1: 报警提醒, 2: 夜间点名, 3: 告警信息
         type = getIntent().getIntExtra("type", -1);
         switch (type) {
             case TYPE_RESCUE:
@@ -42,6 +43,9 @@ public class MessageDialogActivity extends Activity {
                 break;
             case TYPE_CALL_ROLL:
                 tv_title.setText("夜间点名");
+                break;
+            case TYPE_ALARM:
+                tv_title.setText("告警信息");
                 break;
         }
 
@@ -66,7 +70,7 @@ public class MessageDialogActivity extends Activity {
                 //
                 break;
             case TYPE_CALL_ROLL:
-                // TODO:
+                //
                 break;
         }
     }

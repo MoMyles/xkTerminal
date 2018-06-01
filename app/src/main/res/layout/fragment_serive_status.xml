@@ -148,9 +148,10 @@
                     style="@style/setting_tv_title"
                     android:layout_marginLeft="150dp"
                     android:layout_marginStart="150dp"
-                    android:text="自付费短信："/>
+                    android:text="短信发送："/>
 
                 <TextView
+                    android:id="@+id/tv_sms_send"
                     style="@style/setting_tv_title"
                     android:gravity="center"
                     android:text="允许"/>
@@ -161,14 +162,14 @@
 
                 <TextView
                     style="@style/setting_tv_title"
-                    android:text="对方付费短信："/>
+                    android:text=""/>
 
                 <TextView
                     style="@style/setting_tv_title"
                     android:gravity="center"
                     android:layout_marginRight="150dp"
                     android:layout_marginEnd="150dp"
-                    android:text="允许"/>
+                    android:text=""/>
 
             </LinearLayout>
 

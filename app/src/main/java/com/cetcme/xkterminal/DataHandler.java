@@ -2,6 +2,7 @@ package com.cetcme.xkterminal;
 
 import android.os.Handler;
 import android.os.Message;
+import android.util.EventLog;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.DataFormat.IDFormat;
@@ -97,13 +98,21 @@ public class DataHandler extends Handler {
                     // 更新位置
                     case MessageFormat.MESSAGE_TYPE_UPDATE_LOCATION:
                         String[] strings = content.split(",");
-                        try {
-                            int lon = (int) (Float.parseFloat(strings[0]) * 10000000);
-                            int lat = (int) (Float.parseFloat(strings[1]) * 10000000);
-                            myApplication.getCurrentLocation().setLongitude(lon);
-                            myApplication.getCurrentLocation().setLongitude(lat);
-                        } catch (NumberFormatException e) {
-                            e.getStackTrace();
+                        if (strings.length == 4) {
+                            try {
+                                int lon = (int) (Float.parseFloat(strings[0]) * 10000000);
+                                int lat = (int) (Float.parseFloat(strings[1]) * 10000000);
+                                float speed = Float.parseFloat(strings[2]);
+                                float head = Float.parseFloat(strings[3]);
+                                myApplication.getCurrentLocation().setLongitude(lon);
+                                myApplication.getCurrentLocation().setLatitude(lat);
+                                myApplication.getCurrentLocation().setSpeed(speed);
+                                myApplication.getCurrentLocation().setHeading(head);
+                                myApplication.getCurrentLocation().setAcqtime(new Date());
+                                EventBus.getDefault().post(myApplication.getCurrentLocation());
+                            } catch (NumberFormatException e) {
+                                e.getStackTrace();
+                            }
                         }
                         break;
                     // 夜间点名
@@ -113,6 +122,11 @@ public class DataHandler extends Handler {
                         myApplication.mainActivity.showMessageDialog(content, MessageDialogActivity.TYPE_CALL_ROLL);
                         break;
                     */
+                    // 告警信息，语音播报
+                    case MessageFormat.MESSAGE_TYPE_REPORT_ALARM:
+                        myApplication.mainActivity.showMessageDialog(content, MessageDialogActivity.TYPE_ALARM);
+                        MainActivity.play("告警信息: " + content);
+                        break;
                     default:
                         // 判断分组 group -1为非分组短信，其他为组号，
                         if (group == -1 || GroupProxy.hasGroup(db, group)) {

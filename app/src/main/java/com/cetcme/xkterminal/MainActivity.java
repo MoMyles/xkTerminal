@@ -147,8 +147,6 @@ public class MainActivity extends AppCompatActivity {
         // 发送启动$01，要求对方发时间
         sendBootData();
 
-        MessageProxy.getAddress(db);
-
         checkoutShutDown();
 
         // TODO: test

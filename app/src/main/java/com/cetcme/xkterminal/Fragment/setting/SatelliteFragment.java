@@ -141,16 +141,16 @@ public class SatelliteFragment extends Fragment {
     private void refreshSatellite() {
         mSatelliteList.clear();
         Random random = new Random();
-//        for (int i = 0; i < 10; i++) {
-//            Satellite satellite1 = new Satellite();
-//            int j = random.nextInt(90);
-//            satellite1.setNum(j);
-//            int k = random.nextInt(359);
-//            satellite1.setAzimuth(k);
-//            int l = random.nextInt(90);
-//            sate llite1.setElevationAngle(l);
-//            mSatelliteList.add(satellite1);
-//        }
+        for (int i = 0; i < 7; i++) {
+            Satellite satellite1 = new Satellite();
+            int j = random.nextInt(50);
+            satellite1.setNum(j);
+            int k = random.nextInt(359);
+            satellite1.setAzimuth(k);
+            int l = random.nextInt(90);
+            satellite1.setElevationAngle(l);
+            mSatelliteList.add(satellite1);
+        }
         DbManager db = MyApplication.getInstance().getDb();
         try {
             List<GPSBean> list = db.selector(GPSBean.class).findAll();

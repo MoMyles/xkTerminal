@@ -34,6 +34,7 @@ public class Constant {
 
     // 未定位闪烁间隔，0为不闪烁，ms
     public static final int NO_GPS_FLASH_TIME = 700;
+    public static final int NO_AIS_FLASH_TIME = 700;
 
     // 短信发送间隔
     public static final int MESSAGE_SEND_LIMIT_TIME = 60000;

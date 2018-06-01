@@ -109,6 +109,12 @@ public class MyApplication extends Application {
 
     private int failedMessageId = 0;
 
+    public long oldAisReceiveTime = System.currentTimeMillis();
+
+    public boolean isAisFirst = true;
+
+    private Timer timer;
+
     /**
      * 加载库文件（只需调用一次）
      */
@@ -132,6 +138,26 @@ public class MyApplication extends Application {
 
         EventBus.getDefault().register(this);
 
+        handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case 0:
+                        SimpleDateFormat format = new SimpleDateFormat("hh:mm:ss");
+                        String str = "[" + format.format(Constant.SYSTEM_DATE) + "]" + msg.obj.toString();
+                        tipToast.setText(str);
+                        tipToast.show();
+                        System.out.println(str);
+                        break;
+                    case 1:
+                        System.out.println("本机IP：" + " 监听端口:" + msg.obj.toString());
+                        break;
+                    case 2:
+                        Toast.makeText(getApplicationContext(), msg.obj.toString(), Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+        };
 
         try {
             mSerialPort = getSerialPort();
@@ -154,6 +180,8 @@ public class MyApplication extends Application {
 //            gpsReadThread.start();
             AisReadThread aisReadThread = new AisReadThread();
             aisReadThread.start();
+
+
         } catch (SecurityException e) {
             DisplayError(R.string.error_security);
         } catch (IOException e) {
@@ -177,26 +205,6 @@ public class MyApplication extends Application {
 
         tipToast = Toast.makeText(getApplicationContext(), "", Toast.LENGTH_SHORT);
 
-        handler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                switch (msg.what) {
-                    case 0:
-                        SimpleDateFormat format = new SimpleDateFormat("hh:mm:ss");
-                        String str = "[" + format.format(Constant.SYSTEM_DATE) + "]" + msg.obj.toString();
-                        tipToast.setText(str);
-                        tipToast.show();
-                        System.out.println(str);
-                        break;
-                    case 1:
-                        System.out.println("本机IP：" + " 监听端口:" + msg.obj.toString());
-                        break;
-                    case 2:
-                        Toast.makeText(getApplicationContext(), msg.obj.toString(), Toast.LENGTH_SHORT).show();
-                        break;
-                }
-            }
-        };
         new SocketManager(handler, getApplicationContext());
 
         mHandler = new DataHandler(this);
@@ -883,6 +891,7 @@ public class MyApplication extends Application {
     protected void onAisDataReceived(byte[] buffer, int size) {
 //        Log.i(TAG, "16进制：" + ConvertUtil.bytesToHexString(ByteUtil.subBytes(buffer, 0, size)));
 //        AisInfo a = YimaAisParse.mParseAISSentence("!AIVDM,1,1,,A,15MgK45P3@G?fl0E`JbR0OwT0@MS,0*4E");
+
         if (buffer[0] == 33 || buffer[0] == 36) {
             // ! 号头
             if (aisByts.size() > 0) {
@@ -899,6 +908,7 @@ public class MyApplication extends Application {
                 if (gpsDataStr.startsWith("!AIVDM")
                         || gpsDataStr.startsWith("!AIVDO")) {
                     Log.e("TAG", "receive: " + gpsDataStr);
+                    oldAisReceiveTime = System.currentTimeMillis();
                     AisInfo aisInfo = YimaAisParse.mParseAISSentence(gpsDataStr);
                     if (aisInfo != null) {
                         Log.i(TAG, aisInfo.MsgType + "");

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="60dp">
 
@@ -8,13 +7,24 @@
         android:id="@+id/textView_time"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:layout_marginLeft="20dp"
         android:layout_marginStart="20dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
         android:gravity="center_vertical"
         android:text="00:00:00"
+        android:textSize="22sp" />
+
+    <TextView
+        android:id="@+id/textView_ais_status"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="20dp"
+        android:layout_toRightOf="@+id/textView_time"
+        android:gravity="center_vertical"
+        android:text="AIS未连接"
         android:textSize="22sp" />
 
     <!--经纬度航速航向 -->
@@ -30,9 +40,9 @@
             android:layout_height="match_parent"
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
+            android:gravity="center_vertical"
             android:text="---"
-            android:textSize="22sp"
-            android:gravity="center_vertical" />
+            android:textSize="22sp" />
 
         <TextView
             android:id="@+id/textView_longitude"
@@ -87,7 +97,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
             android:text="打卡"
-            android:textSize="16sp"/>
+            android:textSize="16sp" />
 
         <Button
             android:id="@+id/alert_btn"
@@ -96,7 +106,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginStart="20dp"
             android:text="报警"
-            android:textSize="16sp"/>
+            android:textSize="16sp" />
 
         <Button
             android:id="@+id/screen_btn"
@@ -105,7 +115,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginStart="20dp"
             android:text="截图"
-            android:textSize="16sp"/>
+            android:textSize="16sp" />
 
         <Button
             android:id="@+id/sms_btn"
@@ -114,7 +124,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginStart="20dp"
             android:text="收短信"
-            android:textSize="16sp"/>
+            android:textSize="16sp" />
 
         <Button
             android:id="@+id/bright_btn"
@@ -123,7 +133,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginStart="20dp"
             android:text="亮度"
-            android:textSize="16sp"/>
+            android:textSize="16sp" />
 
     </LinearLayout>
 
@@ -132,8 +142,8 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:layout_marginRight="20dp"
         android:layout_marginEnd="20dp"
+        android:layout_marginRight="20dp"
         android:layout_toLeftOf="@+id/textView_alert"
         android:layout_toStartOf="@+id/textView_alert"
         android:gravity="center_vertical"
@@ -146,8 +156,8 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:layout_marginRight="20dp"
         android:layout_marginEnd="20dp"
+        android:layout_marginRight="20dp"
         android:layout_toLeftOf="@+id/textView_location_status"
         android:layout_toStartOf="@+id/textView_location_status"
         android:gravity="center_vertical"
@@ -160,8 +170,8 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:layout_marginRight="20dp"
         android:layout_marginEnd="20dp"
+        android:layout_marginRight="20dp"
         android:layout_toLeftOf="@+id/textView_message"
         android:layout_toStartOf="@+id/textView_message"
         android:gravity="center_vertical"
@@ -178,22 +188,22 @@
         android:layout_toStartOf="@+id/textView_message_number"
         android:gravity="center_vertical|end"
         android:text="无短信"
-        android:textSize="22sp"/>
+        android:textSize="22sp" />
 
     <TextView
         android:id="@+id/textView_message_number"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:layout_alignParentTop="true"
-        android:layout_marginRight="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="10dp"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/message_num_bg"
         android:gravity="center"
         android:text="-"
         android:textColor="#FFFFFF"
-        android:background="@drawable/message_num_bg"
         android:textSize="14sp" />
 
     <android.support.v4.widget.Space
@@ -201,8 +211,7 @@
         android:layout_width="20dp"
         android:layout_height="match_parent"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        />
+        android:layout_alignParentRight="true" />
 
 
     <TextView

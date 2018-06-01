@@ -177,6 +177,42 @@ public class MainActivity extends AppCompatActivity {
 
             }
         }, 0, 60 * 1000);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                while (true) {
+                    if (MyApplication.getInstance().isAisFirst) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (gpsBar != null) {
+                                    gpsBar.setAisStatus(true);
+                                }
+                            }
+                        });
+                        MyApplication.getInstance().isAisFirst = false;
+                    } else {
+                        if (System.currentTimeMillis() - MyApplication.getInstance().oldAisReceiveTime > 60 * 1000) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (gpsBar != null) {
+                                        gpsBar.setAisStatus(false);
+                                    }
+                                }
+                            });
+                        }
+                    }
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
     }
 
     /**

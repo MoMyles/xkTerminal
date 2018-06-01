@@ -27,6 +27,7 @@ import com.cetcme.xkterminal.Navigation.GpsParse;
 import com.cetcme.xkterminal.Navigation.SkiaDrawView;
 import com.cetcme.xkterminal.Socket.SocketManager;
 import com.cetcme.xkterminal.Socket.SocketServer;
+import com.cetcme.xkterminal.Sqlite.Bean.GPSBean;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 import com.cetcme.xkterminal.Sqlite.Bean.MessageBean;
 import com.cetcme.xkterminal.Sqlite.Bean.OtherShipBean;
@@ -880,17 +881,21 @@ public class MyApplication extends Application {
     protected void onAisDataReceived(byte[] buffer, int size) {
 //        Log.i(TAG, "16进制：" + ConvertUtil.bytesToHexString(ByteUtil.subBytes(buffer, 0, size)));
 //        AisInfo a = YimaAisParse.mParseAISSentence("!AIVDM,1,1,,A,15MgK45P3@G?fl0E`JbR0OwT0@MS,0*4E");
-        if (buffer[0] == 33) {
+        if (buffer[0] == 33 || buffer[0] == 36) {
             // ! 号头
             if (aisByts.size() > 0) {
                 int len = aisByts.size();
                 // \r\n 结尾
                 Byte[] byts = aisByts.toArray(new Byte[len]);
                 byte[] tmpByts = new byte[len];
+                StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < len; i++) {
                     tmpByts[i] = byts[i];
                 }
+                    sb.append(ConvertUtil.bytesToHexString(tmpByts));
+                Log.e("TAG", "receive_16: " + sb.toString());
                 String gpsDataStr = new String(tmpByts);
+                Log.e("TAG", "receive: " + gpsDataStr);
 //                Log.i(TAG, "len: " + aisByts.size() + ", onAisDataReceived: " + gpsDataStr);
                 if (gpsDataStr.startsWith("!AIVDM")
                         || gpsDataStr.startsWith("!AIVDO")) {
@@ -907,13 +912,12 @@ public class MyApplication extends Application {
                                 sendBytes(WarnFormat.format("" + aisInfo.mmsi, message));
                             }
                         } else {
-//                            Log.e("TAG", "是否本船：" + aisInfo.bOwnShip);
                             int mmsi = -99;
                             try {
                                 mmsi = Integer.valueOf(sp.getString("shipNo", "0")).intValue();
                             } catch (Exception e) {
                             }
-                            if (mmsi == aisInfo.mmsi) {
+                            if (aisInfo.bOwnShip) {
                                 LocationBean locationBean = new LocationBean();
                                 locationBean.setLatitude(aisInfo.latititude);
                                 locationBean.setLongitude(aisInfo.longtitude);
@@ -921,12 +925,50 @@ public class MyApplication extends Application {
                                 locationBean.setHeading(aisInfo.COG);
                                 locationBean.setAcqtime(new Date());
                                 currentLocation = locationBean;
-                                Log.e("TAG", "本船: " + aisInfo.mmsi);
                                 EventBus.getDefault().post(locationBean);
                             } else {
-                                // 判断是否存在mmsi
-                                EventBus.getDefault().post(aisInfo);
+                                if (mmsi == aisInfo.mmsi) {
+                                    LocationBean locationBean = new LocationBean();
+                                    locationBean.setLatitude(aisInfo.latititude);
+                                    locationBean.setLongitude(aisInfo.longtitude);
+                                    locationBean.setSpeed(aisInfo.SOG);
+                                    locationBean.setHeading(aisInfo.COG);
+                                    locationBean.setAcqtime(new Date());
+                                    currentLocation = locationBean;
+                                    EventBus.getDefault().post(locationBean);
+                                } else {
+                                    EventBus.getDefault().post(aisInfo);
+                                }
                             }
+                        }
+                    }
+                } else if (gpsDataStr.startsWith("$GPGSV")) {
+                    String newStr = gpsDataStr.substring(gpsDataStr.indexOf(",")+1, gpsDataStr.lastIndexOf("*"));
+                    String[] arr = newStr.split(",");
+                    for (int i=3;i<arr.length;i+=4){
+                        int no = Integer.valueOf(arr[i]);
+                        int yangjiao = Integer.valueOf(arr[i+1]);
+                        int fangwei = Integer.valueOf(arr[i+2]);
+                        int xinhao = Integer.valueOf(arr[i+3]);
+                        try {
+                            GPSBean bean = db.selector(GPSBean.class).where("no", "=", no).findFirst();
+                            if (bean == null) {
+                                // 不存在
+                                bean = new GPSBean();
+                                bean.setNo(no);
+                                bean.setYangjiao(yangjiao);
+                                bean.setFangwei(fangwei);
+                                bean.setXinhao(xinhao);
+                                db.saveBindingId(bean);
+                            } else {
+                                // 存在
+                                bean.setYangjiao(yangjiao);
+                                bean.setFangwei(fangwei);
+                                bean.setXinhao(xinhao);
+                                db.update(bean, "yangjiao", "fangwei", "xinhao");
+                            }
+                        } catch (DbException e) {
+                            e.printStackTrace();
                         }
                     }
                 }

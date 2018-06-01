@@ -14,8 +14,8 @@ import android.widget.Toast;
 
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -64,14 +64,13 @@ public class SkiaDrawView extends View {
         mYimaLib = new YimaLib();
         mYimaLib.Create();
         mYimaLib.Init(Constant.YIMA_WORK_PATH);//初始化，传入WorkDir初始化目录地址
-        mYimaLib.SetDrawOwnShipSpecialOptions(false,true,true,255,0,0);
+        mYimaLib.SetDrawOwnShipSpecialOptions(false, true, true, 255, 0, 0);
         mContext = ctx;
         bNormalDragMapMode = false;
     }
 
     @Override
-    public void onSizeChanged(int w, int h, int oldw, int oldh)
-    {
+    public void onSizeChanged(int w, int h, int oldw, int oldh) {
         fSkiaBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         String strTtfFilePath = Constant.YIMA_WORK_PATH + "/DroidSansFallback.ttf";
 //        mYimaLib.SetDisplayCategory(3);
@@ -83,8 +82,7 @@ public class SkiaDrawView extends View {
     }
 
     @Override
-    public void onDraw(Canvas canvas)
-    {
+    public void onDraw(Canvas canvas) {
         mYimaLib.ViewDraw(fSkiaBitmap, null, null);
         //YimaLib.ViewDraw(fSkiaBitmap, "com/example/viewdraw/viewdrawinndkskiausestaticlib/SkiaDrawView", "AfterDraw");//绘制海图到fSkiaBitmap
         canvas.drawBitmap(fSkiaBitmap, 0, 0, null);//
@@ -128,6 +126,7 @@ public class SkiaDrawView extends View {
     private String tag = "SkiaDrawView";
 
     private boolean dragingMap = false;
+
     @Override
     //手势滑动
     public boolean onTouchEvent(MotionEvent event) {
@@ -146,7 +145,7 @@ public class SkiaDrawView extends View {
                 if (mFirstX == 0) mFirstX = mLastX;
                 if (mFirstY == 0) mFirstY = mLastY;
 
-                if(bNormalDragMapMode) {
+                if (bNormalDragMapMode) {
                     bDragingMap = true;//拽动起始
                     dragStartPointX = mLastX;
                     dragStartPointY = mLastY;
@@ -164,40 +163,39 @@ public class SkiaDrawView extends View {
                 }
                 dragingMap = true;
 
-                mLastX =  (int) event.getX();
-                mLastY =  (int) event.getY();
+                mLastX = (int) event.getX();
+                mLastY = (int) event.getY();
                 int pointCount = event.getPointerCount();
 
-                if(pointCount >= 2)//pinch-->随手指放大缩小
+                if (pointCount >= 2)//pinch-->随手指放大缩小
                 {
                     Log.i("Pinch", "into");
-                    if(bNormalDragMapMode) {
+                    if (bNormalDragMapMode) {
                         bDragingMap = false;
                         dragMapOffsetPointX = dragMapOffsetPointY = 0;
                     }
                     int painterIndex0 = event.findPointerIndex(0);
                     int painterIndex1 = event.findPointerIndex(1);
-                    if(painterIndex0 == -1 || painterIndex1 == -1){//三个手指缩放时，painterIndex1有时会获取到-1，导致崩溃
+                    if (painterIndex0 == -1 || painterIndex1 == -1) {//三个手指缩放时，painterIndex1有时会获取到-1，导致崩溃
                         break;
                     }
                     Log.i("Pinch", "painterIndex0:" + String.valueOf(painterIndex0) + ",painterIndex1:" + String.valueOf(painterIndex1));
-                    if((mLastX0 == 0) || (mLastY0 == 0) || ( mLastX1 == 0) || (  mLastY1 == 0) )
-                    {
-                        mLastX0 = (int)event.getX(painterIndex0);
-                        mLastY0 = (int)event.getY(painterIndex0);
-                        mLastX1 = (int)event.getX(painterIndex1);
-                        mLastY1 = (int)event.getY(painterIndex1);
+                    if ((mLastX0 == 0) || (mLastY0 == 0) || (mLastX1 == 0) || (mLastY1 == 0)) {
+                        mLastX0 = (int) event.getX(painterIndex0);
+                        mLastY0 = (int) event.getY(painterIndex0);
+                        mLastX1 = (int) event.getX(painterIndex1);
+                        mLastY1 = (int) event.getY(painterIndex1);
                         invalidate();
                         break;
                     }
-                    mCurrX0 = (int)event.getX(painterIndex0);
-                    mCurrY0 = (int)event.getY(painterIndex0);
-                    mCurrX1 = (int)event.getX(painterIndex1);
-                    mCurrY1 = (int)event.getY(painterIndex1);
+                    mCurrX0 = (int) event.getX(painterIndex0);
+                    mCurrY0 = (int) event.getY(painterIndex0);
+                    mCurrX1 = (int) event.getX(painterIndex1);
+                    mCurrY1 = (int) event.getY(painterIndex1);
                     double d1 = Math.sqrt(Math.pow(mLastX0 - mLastX1, 2) + Math.pow(mLastY0 - mLastY1, 2));
                     double d2 = Math.sqrt(Math.pow(mCurrX0 - mCurrX1, 2) + Math.pow(mCurrY0 - mCurrY1, 2));
                     double currentScaleFactor = d2 / d1;
-                    if(currentScaleFactor == 1.0)
+                    if (currentScaleFactor == 1.0)
                         break;
 //                    Log.i("Pinch", "currentScaleFactor:" + String.valueOf(currentScaleFactor) +
 //                            "; Curr:(" + String.valueOf(mCurrX0) + "," + String.valueOf(mCurrY0)  +"),("+  String.valueOf(mCurrX1) + "," + String.valueOf(mCurrY1)  + ").");
@@ -208,7 +206,7 @@ public class SkiaDrawView extends View {
 //                    yimamapapi.skia.yimaclass.M_POINT  mouseGeoPo = new yimamapapi.skia.yimaclass.M_POINT();
 //                    mouseGeoPo = yimamapapi.skia.YimaLib.getGeoPoFromScrnPo(mouseScrnPo.x, mouseScrnPo.y);
 //                    Point newCenterGeoPo = new Point((int)(mouseGeoPo.x - (mouseGeoPo.x - centerGeoPo.x) / currentScaleFactor), (int)(mouseGeoPo.y - (mouseGeoPo.y - centerGeoPo.y) / currentScaleFactor));               i
-                    if(bNormalDragMapMode) {
+                    if (bNormalDragMapMode) {
                         pasteWidth = (int) (pasteWidth * currentScaleFactor);
                         pasteHeight = (int) (pasteHeight * currentScaleFactor);
                         pinchScaleFactor = pinchScaleFactor * currentScaleFactor;
@@ -216,14 +214,13 @@ public class SkiaDrawView extends View {
                         int dstOffsetY = (fSkiaBitmap.getHeight() - pasteHeight) / 2;
                         Log.i("Pinch", "pasteWidth:" + String.valueOf(pasteWidth) + ",pasteHeight:" + String.valueOf(pasteHeight) + ",dstOffsetX:" + String.valueOf(dstOffsetX) + ",dstOffsetY:" + String.valueOf(dstOffsetY));
                         mYimaLib.DrawScaledMap(dstOffsetX, dstOffsetY, pasteWidth, pasteHeight);
-                    }
-                    else {
+                    } else {
                         mYimaLib.SetCurrentScale(mYimaLib.GetCurrentScale() / (float) currentScaleFactor);//设置比例尺
                     }
-                    mLastX0 = (int)event.getX(painterIndex0);
-                    mLastY0 = (int)event.getY(painterIndex0);
-                    mLastX1 = (int)event.getX(painterIndex1);
-                    mLastY1 = (int)event.getY(painterIndex1);
+                    mLastX0 = (int) event.getX(painterIndex0);
+                    mLastY0 = (int) event.getY(painterIndex0);
+                    mLastX1 = (int) event.getX(painterIndex1);
+                    mLastY1 = (int) event.getY(painterIndex1);
                     invalidate();
                     break;
                 }
@@ -242,7 +239,7 @@ public class SkiaDrawView extends View {
                     dragMapOffsetPointX = iDragX;//mLastX - dragStartPointX;
                     dragMapOffsetPointY = iDragY;//mLastY - dragStartPointY;//curMouseScrnPo - dragStartPoint;
                     mYimaLib.PasteToScrn(dragMapOffsetPointX, dragMapOffsetPointY);
-                } else  mYimaLib.SetMapMoreOffset(iDragX, iDragY);//移动设置偏移
+                } else mYimaLib.SetMapMoreOffset(iDragX, iDragY);//移动设置偏移
 
                 invalidate();
                 break;
@@ -261,12 +258,12 @@ public class SkiaDrawView extends View {
                 }
                 dragingMap = false;
 
-                if(bNormalDragMapMode){//留白模式
+                if (bNormalDragMapMode) {//留白模式
                     if (bDragingMap)//留白拖动结束
-                        mYimaLib.SetMapMoreOffset((int)event.getX() - dragStartPointX, (int)event.getY() - dragStartPointY);
-                    else{//pinch拖动结束
+                        mYimaLib.SetMapMoreOffset((int) event.getX() - dragStartPointX, (int) event.getY() - dragStartPointY);
+                    else {//pinch拖动结束
                         mYimaLib.CenterMap(scrnCenterPointGeo.x, scrnCenterPointGeo.y);
-                        mYimaLib.SetCurrentScale( mYimaLib.GetCurrentScale() / (float) pinchScaleFactor);
+                        mYimaLib.SetCurrentScale(mYimaLib.GetCurrentScale() / (float) pinchScaleFactor);
                     }
                     bDragingMap = false;//拽动结束
                 }
@@ -280,31 +277,33 @@ public class SkiaDrawView extends View {
     }
 
     //显示本船信息
-    public void ShowShipInfo(int scrnX, int scrnY, int scale){
-        if(mYimaLib.GetCurrentScale() > scale) return;
+    public void ShowShipInfo(int scrnX, int scrnY, int scale) {
+        if (mYimaLib.GetCurrentScale() > scale) return;
         int retOtherVesselId = mYimaLib.SelectOtherVesselByScrnPoint(scrnX, scrnY);
-        if(retOtherVesselId != -1) {
+        if (retOtherVesselId != -1) {
             int shipPos = mYimaLib.GetOtherVesselPosOfID(retOtherVesselId);
             OtherShipBaicInfo otherShipBaicInfo = mYimaLib.getOtherVesselBasicInfo(shipPos);
             OtherVesselCurrentInfo otherVesselCurrentInfo = mYimaLib.getOtherVesselCurrentInfo(shipPos);
             String strInfo = new String();
-            strInfo = "船名:"+otherShipBaicInfo.strShipName + "\n" + "MMSI:"+ otherShipBaicInfo.itrMmsi + "\n"
-                    + "经度："+ String.valueOf(otherVesselCurrentInfo.currentPoint.x) + "\n"  + "纬度："+ String.valueOf(otherVesselCurrentInfo.currentPoint.y) + "\n"
-                    + "航速："+ otherVesselCurrentInfo.fSpeedOverGround + "\n"  + "航向："+ otherVesselCurrentInfo.fCourseOverGround +"\n";
+            strInfo = "船名:" + otherShipBaicInfo.strShipName + "\n" + "MMSI:" + otherShipBaicInfo.itrMmsi + "\n"
+                    + "经度：" + String.valueOf(otherVesselCurrentInfo.currentPoint.x) + "\n" + "纬度：" + String.valueOf(otherVesselCurrentInfo.currentPoint.y) + "\n"
+                    + "航速：" + otherVesselCurrentInfo.fSpeedOverGround + "\n" + "航向：" + otherVesselCurrentInfo.fCourseOverGround + "\n";
             new AlertDialog.Builder(mContext)
                     .setTitle("船舶")
                     .setMessage(strInfo)
                     .show();
         }
     }
+
     public OnMapClickListener onMapClickListener;
 
-    public void setOnMapClickListener(OnMapClickListener onMapClickListener){
+    public void setOnMapClickListener(OnMapClickListener onMapClickListener) {
         this.onMapClickListener = onMapClickListener;
     }
 
     public interface OnMapClickListener {
         void onMapClicked(M_POINT m_point);
+
         void onMapTouched(int action);
     }
 
@@ -409,32 +408,58 @@ public class SkiaDrawView extends View {
     /**
      * 绘制 禁渔区 禁入区 禁出区
      */
-    public List<Integer> drawBanArea(int red, int green, int blue, int[] geoX, int[] geoY) {
-        List<Integer> list = new LinkedList<>();
+    public int drawBanArea(List<WarnArea> areas) {
         mYimaLib.tmAppendLayer(3);//添加面图层
         int curLayerPos = mYimaLib.tmGetLayerCount() - 1;
-        list.add(curLayerPos);
         mYimaLib.tmSetLayerName(curLayerPos, "面图层图层");
         mYimaLib.tmSetLayerDrawOrNot(curLayerPos, true);
         mYimaLib.tmAddLayerAttribute(curLayerPos, 4, "物标名称");//添加图层属性：属性名称："物标名称",属性值类型：4（字符串）
-//        for (int iObj = 0; iObj < 20; iObj++) {
-        mYimaLib.tmAppendObjectInLayer(curLayerPos, 3);//在图层上添加一个面物标
-        int objCount = mYimaLib.tmGetLayerObjectCount(curLayerPos);
-        list.add(objCount);
-        //int layerAttrCount = mYimaLib.tmGetLayerObjectAttrCount(curLayerPos);
-        //mYimaLib.tmSetObjectAttrValueString(curLayerPos, objCount - 1, layerAttrCount - 1, "face obj");//设置物标属性值字符串
-        mYimaLib.tmSetFaceObjectCoors(curLayerPos, objCount - 1, geoX.length, geoX, geoY);//设置物标坐标
-        mYimaLib.tmSetFaceObjectStyle(curLayerPos, objCount - 1, true, red, green, blue
-                , 50, 1, 0, 0
-                , "face obj", "", 20, 0, 0
-                , 0, true, false, true, 0, 0);//设置物标样式
-//        }
+        for (int i = 0; i < areas.size(); i++) {
+            WarnArea area = areas.get(i);
+            mYimaLib.tmAppendObjectInLayer(curLayerPos, 3);//在图层上添加一个面物标
+            int objCount = mYimaLib.tmGetLayerObjectCount(curLayerPos);
+            area.setCurLayerPos(curLayerPos);
+            area.setObjCount(objCount);
+            String typeStr = "";
+            switch (area.getType()) {
+                case 0:
+                    typeStr = "禁渔区";
+                    break;
+                case 1:
+                    typeStr = "禁入区";
+                    break;
+                case 2:
+                    typeStr = "禁出区";
+                    break;
+            }
+
+            //int layerAttrCount = mYimaLib.tmGetLayerObjectAttrCount(curLayerPos);
+            //mYimaLib.tmSetObjectAttrValueString(curLayerPos, objCount - 1, layerAttrCount - 1, "face obj");//设置物标属性值字符串
+            List<Integer> listX = area.getGeoX();
+            List<Integer> listY = area.getGeoY();
+            int[] geoX = new int[listX.size()];
+            int[] geoY = new int[listY.size()];
+            for (int j = 0; j < listX.size(); j++) {
+                geoX[j] = listX.get(j);
+                geoY[j] = listY.get(j);
+            }
+            mYimaLib.tmSetFaceObjectCoors(curLayerPos, objCount - 1, geoX.length, geoX, geoY);//设置物标坐标
+            try {
+                mYimaLib.tmSetFaceObjectStyle(curLayerPos, objCount - 1, true, area.getRed(), area.getGreen(), area.getBlue()
+                        , 50, 1, 0, 0
+                        , new String(typeStr.getBytes("GBK"), "GBK"), "宋体", 20, 0, 0
+                        , 0, true, false, true, 0, 0);//设置物标样式
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
         postInvalidate();
-        return list;
+        return curLayerPos;
     }
 
     /**
      * 移除 禁渔区 禁入区 禁出区
+     *
      * @param list
      * @return
      */

@@ -69,12 +69,12 @@ public class SatelliteActivity extends AppCompatActivity {
         Random random = new Random();
         for (int i=0;i<10;i++) {
             Satellite satellite1 = new Satellite();
-            int j = random.nextInt(10);
-            satellite1.setNum(30 + j);
+            int j = random.nextInt(90);
+            satellite1.setNum(j);
             int k = random.nextInt(359);
-            satellite1.setAzimuth(k+"");
+            satellite1.setAzimuth(k);
             int l = random.nextInt(90);
-            satellite1.setElevationAngle(l+"");
+            satellite1.setElevationAngle(l);
             mSatelliteList.add(satellite1);
         }
         satelliteView.postInvalidate();

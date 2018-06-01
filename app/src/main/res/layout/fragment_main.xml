@@ -179,6 +179,30 @@
 
         </LinearLayout>
 
+        <Switch
+            android:id="@+id/switch_yuqu"
+            android:layout_width="wrap_content"
+            android:layout_height="56dp"
+            android:layout_marginRight="10dp"
+            android:switchMinWidth="24dp"
+            android:text="渔区"
+            android:textOff="关"
+            android:textOn="开"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ly_status" />
+
+        <Switch
+            android:id="@+id/switch_warn_area"
+            android:layout_width="wrap_content"
+            android:layout_height="56dp"
+            android:layout_marginRight="10dp"
+            android:switchMinWidth="24dp"
+            android:text="区域报警"
+            android:textOff="关"
+            android:textOn="开"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/switch_yuqu" />
+
         <LinearLayout
             android:id="@+id/ll_zoom"
             android:layout_width="wrap_content"

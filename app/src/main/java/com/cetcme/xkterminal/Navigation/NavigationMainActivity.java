@@ -75,10 +75,6 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
     private Button btnNaviGo;
     private String routeFileName;
 
-    private final int[] JIN_YU_AREA_COLOR = new int[]{10, 255, 20};
-    private final int[] JIN_RU_AREA_COLOR = new int[]{150, 255, 20};
-    private final int[] JIN_CHU_AREA_COLOR = new int[]{100, 255, 20};
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,10 +102,6 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
         btnNaviGo = findViewById(R.id.navi_go);
         btnNaviCancel.setOnClickListener(this);
         btnNaviGo.setOnClickListener(this);
-
-        fMainView.drawBanArea(JIN_YU_AREA_COLOR[0], JIN_YU_AREA_COLOR[1], JIN_YU_AREA_COLOR[2]
-                , new int[]{1211590000, 1211740000, 1211790000, 1211680000, 1211590000}
-                , new int[]{278000000,278030000, 277940000, 277910000, 277920000 });
     }
 
     /**

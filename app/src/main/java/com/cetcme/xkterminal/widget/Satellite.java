@@ -6,8 +6,8 @@ package com.cetcme.xkterminal.widget;
 
 public class Satellite {
     private int num;// 信号强度
-    private String elevationAngle;// 仰角 0 - 90
-    private String azimuth;// 方位角 0 - 359
+    private int elevationAngle;// 仰角 0 - 90
+    private int azimuth;// 方位角 0 - 359
     private int snr = 0;
     private String satelliteType;// 卫星类型
 
@@ -22,19 +22,19 @@ public class Satellite {
         this.num = num;
     }
 
-    public String getElevationAngle() {
-        return this.elevationAngle;
+    public int getElevationAngle() {
+        return elevationAngle;
     }
 
-    public void setElevationAngle(String elevationAngle) {
+    public void setElevationAngle(int elevationAngle) {
         this.elevationAngle = elevationAngle;
     }
 
-    public String getAzimuth() {
-        return this.azimuth;
+    public int getAzimuth() {
+        return azimuth;
     }
 
-    public void setAzimuth(String azimuth) {
+    public void setAzimuth(int azimuth) {
         this.azimuth = azimuth;
     }
 

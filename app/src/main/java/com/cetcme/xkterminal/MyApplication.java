@@ -513,24 +513,26 @@ public class MyApplication extends Application {
         List<String> userAddresses = MessageProxy.getAddress(db);
 
         JSONArray smsList = new JSONArray();
-        for (String userAddress : userAddresses) {
+        if (userAddresses != null) {
+            for (String userAddress : userAddresses) {
 
-            MessageBean message = MessageProxy.getLast(db, userAddress, myNumber);
-            if (message != null) {
-                JSONObject jsonObject = new JSONObject();
-                try {
-                    jsonObject.put("lastSmsContent", message.getContent());
-                    jsonObject.put("userAddress", userAddress);
-                    jsonObject.put("lastSmsTime", message.getSend_time());
-                    jsonObject.put("hasUnread", MessageProxy.getUnReadCountByAddress(db, userAddress) != 0);
+                MessageBean message = MessageProxy.getLast(db, userAddress, myNumber);
+                if (message != null) {
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("lastSmsContent", message.getContent());
+                        jsonObject.put("userAddress", userAddress);
+                        jsonObject.put("lastSmsTime", message.getSend_time());
+                        jsonObject.put("hasUnread", MessageProxy.getUnReadCountByAddress(db, userAddress) != 0);
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    smsList.put(jsonObject);
                 }
 
-                smsList.put(jsonObject);
             }
-
         }
 
         return smsList;
@@ -538,13 +540,13 @@ public class MyApplication extends Application {
 
     public JSONArray getSmsDetail(String userAddress, int countPerPage, String timeBefore) {
         List<MessageBean> messages = MessageProxy.getByAddressAndTime(db, userAddress, myNumber, countPerPage, timeBefore);
-
         JSONArray smsList = new JSONArray();
-
-        for (int i = 0; i < messages.size(); i++) {
-            MessageBean message = messages.get(i);
-            JSONObject jsonObject = message.toJson();
-            smsList.put(jsonObject);
+        if (messages != null) {
+            for (int i = 0; i < messages.size(); i++) {
+                MessageBean message = messages.get(i);
+                JSONObject jsonObject = message.toJson();
+                smsList.put(jsonObject);
+            }
         }
         return smsList;
     }

@@ -16,15 +16,20 @@ import android.widget.TextView;
 import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.ScreenUtil;
 import com.cetcme.xkterminal.R;
+import com.cetcme.xkterminal.Sqlite.Bean.GPSBean;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 import com.cetcme.xkterminal.widget.DrawEarth;
 import com.cetcme.xkterminal.widget.DrawSatellite;
 import com.cetcme.xkterminal.widget.Satellite;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 
+import org.xutils.DbManager;
+import org.xutils.ex.DbException;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -78,6 +83,7 @@ public class SatelliteFragment extends Fragment {
                         mLatitude.setText(lb.getLatitude() * 1.0 / 1e7 + "");
                         mTime.setText(timeFormat.format(new Date()));
                         mDate.setText(dateFormat.format(new Date()));
+                        mSatellite.setText(mSatelliteList.size() + "");
                         break;
                 }
             }
@@ -135,15 +141,28 @@ public class SatelliteFragment extends Fragment {
     private void refreshSatellite() {
         mSatelliteList.clear();
         Random random = new Random();
-        for (int i = 0; i < 10; i++) {
-            Satellite satellite1 = new Satellite();
-            int j = random.nextInt(90);
-            satellite1.setNum(j);
-            int k = random.nextInt(359);
-            satellite1.setAzimuth(k);
-            int l = random.nextInt(90);
-            satellite1.setElevationAngle(l);
-            mSatelliteList.add(satellite1);
+//        for (int i = 0; i < 10; i++) {
+//            Satellite satellite1 = new Satellite();
+//            int j = random.nextInt(90);
+//            satellite1.setNum(j);
+//            int k = random.nextInt(359);
+//            satellite1.setAzimuth(k);
+//            int l = random.nextInt(90);
+//            sate llite1.setElevationAngle(l);
+//            mSatelliteList.add(satellite1);
+//        }
+        DbManager db = MyApplication.getInstance().getDb();
+        try {
+            List<GPSBean> list = db.selector(GPSBean.class).findAll();
+            for (GPSBean g : list) {
+                Satellite satellite = new Satellite();
+                satellite.setNum(g.getNo());
+                satellite.setAzimuth(g.getFangwei());
+                satellite.setElevationAngle(g.getYangjiao());
+                mSatelliteList.add(satellite);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         satelliteView.postInvalidate();
 

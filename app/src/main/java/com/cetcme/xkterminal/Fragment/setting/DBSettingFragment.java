@@ -81,6 +81,7 @@ public class DBSettingFragment extends Fragment {
                                     Toast.makeText(getActivity(), "北斗卡号修改成功: " + text, Toast.LENGTH_SHORT).show();
                                     ((MainActivity) getActivity()).myNumber = text.toString();
                                     PreferencesUtils.putString(getActivity(), "myNumber", text.toString());
+                                    tv_address.setText(text.toString());
                                     dialog.dismiss();
                                 } else {
                                     Toast.makeText(getActivity(), "请填入正确北斗卡号", Toast.LENGTH_SHORT).show();

@@ -52,6 +52,7 @@ import java.util.List;
 
 import yimamapapi.skia.AisInfo;
 import yimamapapi.skia.M_POINT;
+import yimamapapi.skia.YimaAisParse;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -450,14 +451,24 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                         arrX, arrY, size);
                 switch (area.getType()) {
                     case 0:// 禁渔
+                        if (exists) {
+                            // 报警
+                            MyApplication.getInstance().mainActivity.showMessageDialog("禁渔区域报警", 1);
+                            SoundPlay.startAlertSound(MyApplication.getInstance().mainActivity);
+                        }
+                        break;
                     case 1:// 禁入
                         if (exists) {
                             // 报警
+                            MyApplication.getInstance().mainActivity.showMessageDialog("禁入区域报警", 1);
+                            SoundPlay.startAlertSound(MyApplication.getInstance().mainActivity);
                         }
                         break;
                     case 2:// 禁出
                         if (!exists) {
                             // 报警
+                            MyApplication.getInstance().mainActivity.showMessageDialog("进出区域报警", 1);
+                            SoundPlay.startAlertSound(MyApplication.getInstance().mainActivity);
                         }
                         break;
                     default:

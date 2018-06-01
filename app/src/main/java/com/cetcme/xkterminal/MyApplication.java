@@ -121,7 +121,7 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         mContext = this;
-        sp =  getSharedPreferences("xkTerminal", MODE_PRIVATE);
+        sp = getSharedPreferences("xkTerminal", MODE_PRIVATE);
         if (!PreferencesUtils.getBoolean(this, "copiedYimaFile")) {
             copyYimaFile();
             PreferencesUtils.putBoolean(this, "copiedYimaFile", true);
@@ -266,7 +266,7 @@ public class MyApplication extends Application {
                         int x_2 = start.x - end.x;
                         int y_2 = start.y - end.y;
 
-                        double curHaili = SkiaDrawView.mYimaLib.GetDistBetwTwoPoint(start.x,start.y,end.x,end.y);
+                        double curHaili = SkiaDrawView.mYimaLib.GetDistBetwTwoPoint(start.x, start.y, end.x, end.y);
                         if (x_2 < x_ && y_2 < y_ && curHaili <= haili) {
                             mainActivity.showMessageDialog("您即将撞船", 1);
                             SoundPlay.startAlertSound(mainActivity);
@@ -892,13 +892,11 @@ public class MyApplication extends Application {
                 for (int i = 0; i < len; i++) {
                     tmpByts[i] = byts[i];
                 }
-                    sb.append(ConvertUtil.bytesToHexString(tmpByts));
-                Log.e("TAG", "receive_16: " + sb.toString());
+                sb.append(ConvertUtil.bytesToHexString(tmpByts));
                 String gpsDataStr = new String(tmpByts);
-                Log.e("TAG", "receive: " + gpsDataStr);
-//                Log.i(TAG, "len: " + aisByts.size() + ", onAisDataReceived: " + gpsDataStr);
                 if (gpsDataStr.startsWith("!AIVDM")
                         || gpsDataStr.startsWith("!AIVDO")) {
+                    Log.e("TAG", "receive: " + gpsDataStr);
                     AisInfo aisInfo = YimaAisParse.mParseAISSentence(gpsDataStr);
                     if (aisInfo != null) {
                         Log.i(TAG, aisInfo.MsgType + "");
@@ -918,6 +916,7 @@ public class MyApplication extends Application {
                             } catch (Exception e) {
                             }
                             if (aisInfo.bOwnShip) {
+                                Log.e("TAG", "本船:" + aisInfo.mmsi);
                                 LocationBean locationBean = new LocationBean();
                                 locationBean.setLatitude(aisInfo.latititude);
                                 locationBean.setLongitude(aisInfo.longtitude);
@@ -928,6 +927,7 @@ public class MyApplication extends Application {
                                 EventBus.getDefault().post(locationBean);
                             } else {
                                 if (mmsi == aisInfo.mmsi) {
+                                    Log.e("TAG", "本船:" + aisInfo.mmsi);
                                     LocationBean locationBean = new LocationBean();
                                     locationBean.setLatitude(aisInfo.latititude);
                                     locationBean.setLongitude(aisInfo.longtitude);
@@ -943,14 +943,16 @@ public class MyApplication extends Application {
                         }
                     }
                 } else if (gpsDataStr.startsWith("$GPGSV")) {
-                    String newStr = gpsDataStr.substring(gpsDataStr.indexOf(",")+1, gpsDataStr.lastIndexOf("*"));
-                    String[] arr = newStr.split(",");
-                    for (int i=3;i<arr.length;i+=4){
-                        int no = Integer.valueOf(arr[i]);
-                        int yangjiao = Integer.valueOf(arr[i+1]);
-                        int fangwei = Integer.valueOf(arr[i+2]);
-                        int xinhao = Integer.valueOf(arr[i+3]);
-                        try {
+                    Log.e("TAG", "receive: " + gpsDataStr);
+                    try {
+                        String newStr = gpsDataStr.substring(gpsDataStr.indexOf(",") + 1, gpsDataStr.lastIndexOf("*"));
+                        String[] arr = newStr.split(",");
+                        for (int i = 3; i < arr.length; i += 4) {
+                            int no = Integer.valueOf(arr[i]);
+                            int yangjiao = Integer.valueOf(arr[i + 1]);
+                            int fangwei = Integer.valueOf(arr[i + 2]);
+                            int xinhao = 0;
+                            xinhao = Integer.valueOf(arr[i + 3]);
                             GPSBean bean = db.selector(GPSBean.class).where("no", "=", no).findFirst();
                             if (bean == null) {
                                 // 不存在
@@ -965,11 +967,11 @@ public class MyApplication extends Application {
                                 bean.setYangjiao(yangjiao);
                                 bean.setFangwei(fangwei);
                                 bean.setXinhao(xinhao);
-                                db.update(bean, "yangjiao", "fangwei", "xinhao");
+                                db.saveOrUpdate(bean);
                             }
-                        } catch (DbException e) {
-                            e.printStackTrace();
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
             }
@@ -978,8 +980,7 @@ public class MyApplication extends Application {
         } else {
             aisByts.add(buffer[0]);
         }
-        if (aisByts.size() > 1024
-                || (aisByts.size() > 1 && aisByts.get(0) != 33)) {
+        if (aisByts.size() > 1024) {
             aisByts.clear();
         }
     }

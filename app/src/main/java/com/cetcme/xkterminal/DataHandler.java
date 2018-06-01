@@ -165,8 +165,8 @@ public class DataHandler extends Handler {
             case SERIAL_PORT_TIME_NUMBER_AND_COMMUNICATION_FROM:
                 // 先处理后面部分，时间部分由下一个case处理，不加break
                 int myNumber = Util.bytesToInt2(ByteUtil.subBytes(bytes, 17, 21), 0);
-                PreferencesUtils.putString(myApplication.mainActivity, "myNumber", myNumber + "");
                 if (myNumber != 0) {
+                    PreferencesUtils.putString(myApplication.mainActivity, "myNumber", myNumber + "");
                     MainActivity.myNumber = myNumber + "";
                     System.out.println("myNumber: " + myNumber);
                 }

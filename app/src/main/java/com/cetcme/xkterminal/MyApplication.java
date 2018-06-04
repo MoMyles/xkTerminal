@@ -739,9 +739,10 @@ public class MyApplication extends Application {
         }
 
         if (hasHead) {
-            if (serialCount == 76) {
+            if (serialCount >= 81) {
                 serialBuffer = new byte[100];
                 serialCount = 0;
+                hasHead = false;
                 return;
             }
             if (serialBuffer[serialCount - 2] == (byte) 0x0D && serialBuffer[serialCount - 1] == (byte) 0x0A) {

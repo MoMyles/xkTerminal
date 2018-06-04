@@ -72,7 +72,7 @@ public class MessageDialogActivity extends Activity {
                 //
                 break;
             case TYPE_CALL_ROLL:
-                byte[] bytes = MessageFormat.format(Constant.SERVER_BD_NUMBER, "1", MessageFormat.MESSAGE_TYPE_CALL_THE_ROLL);
+                byte[] bytes = MessageFormat.format(Constant.SERVER_BD_NUMBER, "1", MessageFormat.MESSAGE_TYPE_CALL_THE_ROLL, 0);
                 MyApplication.getInstance().sendBytes(bytes);
                 break;
         }

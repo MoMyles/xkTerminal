@@ -242,6 +242,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
 
 
         // 作假200艘船
+        /*
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -274,6 +275,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                 }
             }
         }).start();
+        */
         return view;
     }
 

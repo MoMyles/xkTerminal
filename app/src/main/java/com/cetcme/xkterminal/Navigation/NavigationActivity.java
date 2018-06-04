@@ -18,7 +18,6 @@ import android.widget.Toast;
 import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
 import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.MyApplication;
-import com.cetcme.xkterminal.MyClass.DateUtil;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 

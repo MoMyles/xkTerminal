@@ -65,17 +65,18 @@ public class MessageFormat {
         return new String[]{targetAddress, messageContent, typeString, groupId + "", frameCount + ""};
     }
 
-    public static byte[] format(String targetAddress, String message, String type) {
+    public static byte[] format(String targetAddress, String message, String type, int frameCount, String unique) {
+        message = shortcutMessage(message); // 裁剪内容到限制54字节内
+
         message = type + message;
         targetAddress = Util.stringAddZero(targetAddress, 12);
         System.out.println(targetAddress);
         byte[] bytes = messageHead.getBytes();
-        String unique = ConvertUtil.rc4ToHex();
+        if (unique == null) ConvertUtil.rc4ToHex();
         byte[] addressBytes = ByteUtil.byteMerger(ConvertUtil.str2Bcd(targetAddress), ConvertUtil.str2Bcd(unique));
-        byte[] lengthBytes = new byte[]{getDataLengthByte(message, 0)};
+        byte[] lengthBytes = new byte[]{getDataLengthByte(message, frameCount)};
         byte[] messageBytes = new byte[0];
         try {
-            message = shortcutMessage(message); // 裁剪内容到限制54字节内
             messageBytes = message.getBytes("GB2312");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -90,6 +91,37 @@ public class MessageFormat {
 
         bytes = ByteUtil.byteMerger(bytes, toCheckBytes);
         bytes = ByteUtil.byteMerger(bytes, checkSumBytes);
+        log(bytes);
+        return bytes;
+    }
+
+    public static byte[] format(String targetAddress, String message, String type, int frameCount) {
+        message = shortcutMessage(message); // 裁剪内容到限制54字节内
+
+        message = type + message;
+        targetAddress = Util.stringAddZero(targetAddress, 12);
+        System.out.println(targetAddress);
+        byte[] bytes = messageHead.getBytes();
+        String unique = ConvertUtil.rc4ToHex();
+        byte[] addressBytes = ByteUtil.byteMerger(ConvertUtil.str2Bcd(targetAddress), ConvertUtil.str2Bcd(unique));
+        byte[] lengthBytes = new byte[]{getDataLengthByte(message, frameCount)};
+        byte[] messageBytes = new byte[0];
+        try {
+            messageBytes = message.getBytes("GB2312");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        byte[] toCheckBytes = ByteUtil.byteMerger(addressBytes, lengthBytes);
+        toCheckBytes = ByteUtil.byteMerger(toCheckBytes, messageBytes);
+
+        int checkSum = Util.computeCheckSum(toCheckBytes, 0, toCheckBytes.length);
+        byte[] checkSumBytes = ByteUtil.byteMerger("*".getBytes(), new byte[]{(byte) checkSum});
+        checkSumBytes = ByteUtil.byteMerger(checkSumBytes, MESSAGE_END_SYMBOL.getBytes());
+
+        bytes = ByteUtil.byteMerger(bytes, toCheckBytes);
+        bytes = ByteUtil.byteMerger(bytes, checkSumBytes);
+        log(bytes);
         return bytes;
     }
     public static void main(String[] args) {
@@ -157,7 +189,13 @@ public class MessageFormat {
         }
         */
 
-        System.out.println(shortcutMessage("一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十一12二"));
+        String message = "一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十";
+        System.out.println(message);
+        String first = shortcutMessage(message);
+        System.out.println(first);
+        System.out.println(message.replace(first, ""));
+
+        format("344408", "一二三四五六七八九十一二三四五六七八九十一二三四五六七", "00", 0);
     }
 
     private static byte getDataLengthByte (String message, int frameCountInt) {
@@ -184,5 +222,14 @@ public class MessageFormat {
             e.printStackTrace();
             return "";
         }
+    }
+
+    private static void log(byte[] buff) {
+        StringBuilder sb = new StringBuilder();
+        for(byte b:buff){
+            sb.append(b);
+            sb.append(" ");
+        }
+        System.out.println(sb.toString());
     }
 }

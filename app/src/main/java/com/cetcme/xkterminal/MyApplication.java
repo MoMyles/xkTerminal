@@ -163,7 +163,7 @@ public class MyApplication extends Application {
         };
 
         //TODO: test for phone
-        /*
+
         try {
             mSerialPort = getSerialPort();
             mOutputStream = mSerialPort.getOutputStream();
@@ -187,7 +187,7 @@ public class MyApplication extends Application {
         } catch (InvalidParameterException e) {
             DisplayError(R.string.error_configuration);
         }
-        */
+
 
         //显示所有path
 //        String[] paths =  mSerialPortFinder.getAllDevicesPath();
@@ -450,7 +450,7 @@ public class MyApplication extends Application {
                     MessageProxy.insert(db, message);
                     failedMessageId = message.getId();
 
-                    byte[] messageBytes = MessageFormat.format(message.getReceiver(), message.getContent(), message.getReceiver().length() == 11 ? MessageFormat.MESSAGE_TYPE_CELLPHONE : MessageFormat.MESSAGE_TYPE_NORMAL);
+                    byte[] messageBytes = MessageFormat.format(message.getReceiver(), message.getContent(), message.getReceiver().length() == 11 ? MessageFormat.MESSAGE_TYPE_CELLPHONE : MessageFormat.MESSAGE_TYPE_NORMAL, 0);
                     sendBytes(messageBytes);
                     System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
 

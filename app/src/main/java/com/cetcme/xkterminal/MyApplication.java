@@ -109,6 +109,12 @@ public class MyApplication extends Application {
 
     private int failedMessageId = 0;
 
+    public long oldAisReceiveTime = System.currentTimeMillis();
+
+    public boolean isAisFirst = true;
+
+    private Timer timer;
+
     /**
      * 加载库文件（只需调用一次）
      */
@@ -132,6 +138,26 @@ public class MyApplication extends Application {
 
         EventBus.getDefault().register(this);
 
+        handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case 0:
+                        SimpleDateFormat format = new SimpleDateFormat("hh:mm:ss");
+                        String str = "[" + format.format(Constant.SYSTEM_DATE) + "]" + msg.obj.toString();
+                        tipToast.setText(str);
+                        tipToast.show();
+                        System.out.println(str);
+                        break;
+                    case 1:
+                        System.out.println("本机IP：" + " 监听端口:" + msg.obj.toString());
+                        break;
+                    case 2:
+                        Toast.makeText(getApplicationContext(), msg.obj.toString(), Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+        };
 
         try {
             mSerialPort = getSerialPort();
@@ -154,6 +180,8 @@ public class MyApplication extends Application {
 //            gpsReadThread.start();
             AisReadThread aisReadThread = new AisReadThread();
             aisReadThread.start();
+
+
         } catch (SecurityException e) {
             DisplayError(R.string.error_security);
         } catch (IOException e) {
@@ -177,26 +205,6 @@ public class MyApplication extends Application {
 
         tipToast = Toast.makeText(getApplicationContext(), "", Toast.LENGTH_SHORT);
 
-        handler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                switch (msg.what) {
-                    case 0:
-                        SimpleDateFormat format = new SimpleDateFormat("hh:mm:ss");
-                        String str = "[" + format.format(Constant.SYSTEM_DATE) + "]" + msg.obj.toString();
-                        tipToast.setText(str);
-                        tipToast.show();
-                        System.out.println(str);
-                        break;
-                    case 1:
-                        System.out.println("本机IP：" + " 监听端口:" + msg.obj.toString());
-                        break;
-                    case 2:
-                        Toast.makeText(getApplicationContext(), msg.obj.toString(), Toast.LENGTH_SHORT).show();
-                        break;
-                }
-            }
-        };
         new SocketManager(handler, getApplicationContext());
 
         mHandler = new DataHandler(this);
@@ -235,6 +243,8 @@ public class MyApplication extends Application {
         currentLocation.setAcqtime(new Date());
         currentLocation.setHeading(0.0f);
         currentLocation.setSpeed(0.0f);
+
+        Log.e("TAG_CESHI", new String(createAisWarnInfoMessage("测试警告信息")));
 
     }
 
@@ -883,6 +893,7 @@ public class MyApplication extends Application {
     protected void onAisDataReceived(byte[] buffer, int size) {
 //        Log.i(TAG, "16进制：" + ConvertUtil.bytesToHexString(ByteUtil.subBytes(buffer, 0, size)));
 //        AisInfo a = YimaAisParse.mParseAISSentence("!AIVDM,1,1,,A,15MgK45P3@G?fl0E`JbR0OwT0@MS,0*4E");
+
         if (buffer[0] == 33 || buffer[0] == 36) {
             // ! 号头
             if (aisByts.size() > 0) {
@@ -898,11 +909,16 @@ public class MyApplication extends Application {
                 String gpsDataStr = new String(tmpByts);
                 if (gpsDataStr.startsWith("!AIVDM")
                         || gpsDataStr.startsWith("!AIVDO")) {
-                    Log.e("TAG", "receive: " + gpsDataStr);
+//                    Log.e("TAG", "receive: " + gpsDataStr);
+                    oldAisReceiveTime = System.currentTimeMillis();
+                    if (mainActivity != null) {
+                        mainActivity.gpsBar.setAisStatus(true);
+                    }
                     AisInfo aisInfo = YimaAisParse.mParseAISSentence(gpsDataStr);
                     if (aisInfo != null) {
                         Log.i(TAG, aisInfo.MsgType + "");
                         if (14 == aisInfo.MsgType) {
+                            Log.e("TAG", ConvertUtil.bytesToHexString(tmpByts));
                             // 报警信息
                             if (aisInfo.mmsi > 0) {
                                 String message = aisInfo.warnMsgInfo;
@@ -1236,4 +1252,95 @@ public class MyApplication extends Application {
     };
 
     */
+
+    public byte[] createAisWarnInfoMessage(String message) {
+        String headStr = "!AIVDM,1,1,0,A,";
+        byte[] headByts = headStr.getBytes();
+        StringBuffer sb = new StringBuffer("00111000");
+        // 消息ID
+        String mmsi = "";
+        if (sp != null) {
+            mmsi = sp.getString("shipNo", "");
+        }
+        // MMSI
+        byte[] mmsiArr = mmsi.getBytes();
+        StringBuffer mmsiStr = new StringBuffer();
+        for (int i = 0; i < mmsiArr.length; i++) {
+            mmsiStr.append(bu0(Long.toString(mmsiArr[i], 2)));
+        }
+        int bu = 30 - 8 * mmsiArr.length;//30位补0
+        if (bu > 0) {
+            for (int i = 0; i < bu; i++) {
+                sb.append("0");
+            }
+        }
+        sb.append(mmsiStr);
+        //备用
+        sb.append("00");
+        //安全文本内容
+        byte[] byts = message.getBytes();
+        for (int i = 0; i < byts.length; i++) {
+            String tmp = Long.toString(byts[i] & 0x3f, 2);
+            Log.e("TAG", "content: " + bu0_6(tmp));
+            sb.append(bu0_6(tmp));
+        }
+        int len = byts.length * 6;
+        int v = 8 - len % 8;
+        if (len % 8 != 0) {
+            for (int i = 0; i < v; i++) {
+                sb.append("0");
+            }
+        }
+        //比特总数
+        sb.append(bu0(Integer.toString(sb.toString().length(), 2)));
+        //
+        String finalStr = sb.toString();
+        len = finalStr.length();
+        Log.e("TAG", "len: " + len);
+        byte[] newByts = new byte[len / 8];
+        int index = 0;
+        for (int i = 0; i < len; i += 8) {
+            String ss = "";
+            for (int j = i; j < i + 8; j++) {
+                ss += finalStr.charAt(j);
+            }
+            byte b = Long.valueOf(ss, 2).byteValue();
+            newByts[index++] = b;
+        }
+        //校验和
+        String last = "," + v;
+        byte[] ll = last.getBytes();
+        newByts = ByteUtil.byteMerger(headByts, newByts);
+        newByts = ByteUtil.byteMerger(newByts, ll);
+        last = "*" + Util.computeCheckSum(newByts, 0, newByts.length);
+        return ByteUtil.byteMerger(newByts, last.getBytes());
+    }
+
+    private String bu0(String numberStr) {
+        if (TextUtils.isEmpty(numberStr)) return "";
+        int len = numberStr.length();
+        if (len < 8) {
+            StringBuffer sb = new StringBuffer();
+            for (int i = 0; i < 8 - len; i++) {
+                sb.append("0");
+            }
+            sb.append(numberStr);
+            return sb.toString();
+        }
+        return numberStr;
+    }
+
+    private String bu0_6(String numberStr) {
+        if (TextUtils.isEmpty(numberStr)) return "";
+        int len = numberStr.length();
+        if (len < 6) {
+            StringBuffer sb = new StringBuffer();
+            for (int i = 0; i < 6 - len; i++) {
+                sb.append("0");
+            }
+            sb.append(numberStr);
+            return sb.toString();
+        }
+        return numberStr;
+    }
 }

@@ -2,7 +2,6 @@ package com.cetcme.xkterminal.ActionBar;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Environment;
 import android.os.Handler;
@@ -23,10 +22,7 @@ import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.DateUtil;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
-import com.cetcme.xkterminal.MyClass.ScreenBrightness;
-import com.cetcme.xkterminal.MyClass.SoundPlay;
 import com.cetcme.xkterminal.R;
-import com.cetcme.xkterminal.SerialTest.SerialPortActivity;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 
@@ -53,6 +49,7 @@ public class GPSBar extends RelativeLayout {
     private TextView textView_speed;
     private TextView textView_heading;
     private TextView textView_location_status;
+    private TextView textView_ais_status;
     private TextView textView_message;
     private TextView textView_time;
 
@@ -63,8 +60,11 @@ public class GPSBar extends RelativeLayout {
     private LinearLayout debug_btn_layout;
 
     private boolean noGps = true;
+    private boolean noAisConnected = true;
 
     private boolean flashTextViewVisible = true;
+
+    private boolean flashAisTextViewVisible = true;
 
     // 用于关闭app
     private int clickTime = 0;
@@ -92,19 +92,20 @@ public class GPSBar extends RelativeLayout {
 
     private void bindView(View view) {
 
-        debug_btn_layout            = view.findViewById(R.id.debug_btn_layout);
+        debug_btn_layout = view.findViewById(R.id.debug_btn_layout);
 
-        textView_latitude           = view.findViewById(R.id.textView_latitude);
-        textView_longitude          = view.findViewById(R.id.textView_longitude);
-        textView_speed              = view.findViewById(R.id.textView_speed);
-        textView_heading            = view.findViewById(R.id.textView_heading);
-        textView_location_status    = view.findViewById(R.id.textView_location_status);
-        textView_message            = view.findViewById(R.id.textView_message);
-        textView_time               = view.findViewById(R.id.textView_time);
+        textView_latitude = view.findViewById(R.id.textView_latitude);
+        textView_longitude = view.findViewById(R.id.textView_longitude);
+        textView_speed = view.findViewById(R.id.textView_speed);
+        textView_heading = view.findViewById(R.id.textView_heading);
+        textView_location_status = view.findViewById(R.id.textView_location_status);
+        textView_ais_status = view.findViewById(R.id.textView_ais_status);
+        textView_message = view.findViewById(R.id.textView_message);
+        textView_time = view.findViewById(R.id.textView_time);
 
-        textView_message_number     = view.findViewById(R.id.textView_message_number);
+        textView_message_number = view.findViewById(R.id.textView_message_number);
 
-        textView_alert              = view.findViewById(R.id.textView_alert);
+        textView_alert = view.findViewById(R.id.textView_alert);
         textView_alert.setVisibility(GONE);
         textView_alert.setOnClickListener(new OnClickListener() {
             @Override
@@ -141,14 +142,16 @@ public class GPSBar extends RelativeLayout {
         textView_message.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!mainActivity.fragmentName.equals("message")) mainActivity.initMessageFragment("receive");
+                if (!mainActivity.fragmentName.equals("message"))
+                    mainActivity.initMessageFragment("receive");
             }
         });
 
         textView_message_number.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!mainActivity.fragmentName.equals("message")) mainActivity.initMessageFragment("receive");
+                if (!mainActivity.fragmentName.equals("message"))
+                    mainActivity.initMessageFragment("receive");
             }
         });
 
@@ -178,13 +181,13 @@ public class GPSBar extends RelativeLayout {
 
 
         // for test串口调试界面 看是否通
-        textView_location_status.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //显示串口测试activity
-                mainActivity.startActivity(new Intent(mainActivity, SerialPortActivity.class));
-            }
-        });
+//        textView_location_status.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                //显示串口测试activity
+//                mainActivity.startActivity(new Intent(mainActivity, SerialPortActivity.class));
+//            }
+//        });
 /*
         // for test 测试收到新的短信息
         findViewById(R.id.sms_btn).setOnClickListener(new OnClickListener() {
@@ -243,7 +246,7 @@ public class GPSBar extends RelativeLayout {
         textViews.add(textView_message);
         textViews.add(textView_time);
 
-        for (TextView textview: textViews) {
+        for (TextView textview : textViews) {
             textview.getPaint().setFakeBoldText(true);
             textview.setTextColor(0xFF000000);
         }
@@ -253,7 +256,7 @@ public class GPSBar extends RelativeLayout {
 
         String IMAGE_DIR = Environment.getExternalStorageDirectory() + File.separator + "Android截屏";
         System.out.println(IMAGE_DIR);
-        final String SCREEN_SHOT ="screenshot.png";
+        final String SCREEN_SHOT = "screenshot.png";
 
         // 获取屏幕
         View dView = mainActivity.getWindow().getDecorView();
@@ -343,7 +346,14 @@ public class GPSBar extends RelativeLayout {
         noGps = !gpsStatus;
     }
 
-    class TimeHandler extends Thread{
+    public void setAisStatus(boolean aisStatus) {
+        textView_ais_status.setTextColor(aisStatus ? 0xFF2657EC : 0xFFD0021B);
+        textView_ais_status.setText(aisStatus ? "AIS已连接" : "AIS未连接");
+        if (aisStatus) textView_ais_status.setVisibility(VISIBLE);
+        noAisConnected = !aisStatus;
+    }
+
+    class TimeHandler extends Thread {
         @Override
         public void run() {
             super.run();
@@ -351,8 +361,7 @@ public class GPSBar extends RelativeLayout {
             do {
                 try {
                     Thread.sleep(100);
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
 
                 }
 
@@ -379,13 +388,24 @@ public class GPSBar extends RelativeLayout {
                     if (i == 10 * noGpsFlashTime) i = 0;
                 }
 
+                if (Constant.NO_AIS_FLASH_TIME != 0) {
+                    int noGpsFlashTime = Constant.NO_GPS_FLASH_TIME / 100;
+                    if (i % noGpsFlashTime == 0) {
+                        flashAisTextViewVisible = !flashAisTextViewVisible;
+                        Message message = new Message();
+                        message.what = 4;
+                        handler.sendMessage(message);
+                    }
+                    if (i == 10 * noGpsFlashTime) i = 0;
+                }
+
                 i++;
             } while (true);
         }
     }
 
     @SuppressLint("HandlerLeak")
-    private Handler handler = new Handler(){
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -396,11 +416,17 @@ public class GPSBar extends RelativeLayout {
                 case 3:
 
                     if (noGps) {
-                        textView_location_status.setVisibility(flashTextViewVisible ? VISIBLE: INVISIBLE);
+                        textView_location_status.setVisibility(flashTextViewVisible ? VISIBLE : INVISIBLE);
                     }
 
                     if (PreferencesUtils.getBoolean(mainActivity, "flashAlert", false)) {
-                        textView_alert.setVisibility(flashTextViewVisible ? VISIBLE: INVISIBLE);
+                        textView_alert.setVisibility(flashTextViewVisible ? VISIBLE : INVISIBLE);
+                    }
+                    break;
+
+                case 4:
+                    if (noAisConnected) {
+                        textView_ais_status.setVisibility(flashAisTextViewVisible ? VISIBLE : INVISIBLE);
                     }
                     break;
                 default:

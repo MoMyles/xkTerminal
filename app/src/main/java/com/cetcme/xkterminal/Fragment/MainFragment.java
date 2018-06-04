@@ -467,7 +467,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                     case 2:// 禁出
                         if (!exists) {
                             // 报警
-                            MyApplication.getInstance().mainActivity.showMessageDialog("进出区域报警", 1);
+                            MyApplication.getInstance().mainActivity.showMessageDialog("禁出区域报警", 1);
                             SoundPlay.startAlertSound(MyApplication.getInstance().mainActivity);
                         }
                         break;

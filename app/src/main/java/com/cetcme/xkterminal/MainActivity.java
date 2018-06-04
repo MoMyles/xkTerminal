@@ -34,7 +34,6 @@ import com.cetcme.xkterminal.Fragment.LogFragment;
 import com.cetcme.xkterminal.Fragment.MainFragment;
 import com.cetcme.xkterminal.Fragment.MessageFragment;
 import com.cetcme.xkterminal.Fragment.MessageNewFragment;
-import com.cetcme.xkterminal.Fragment.SettingFragment;
 import com.cetcme.xkterminal.Fragment.SettingTabFragment;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.DensityUtil;
@@ -177,6 +176,30 @@ public class MainActivity extends AppCompatActivity {
 
             }
         }, 0, 60 * 1000);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                while (true) {
+                    if (System.currentTimeMillis() - MyApplication.getInstance().oldAisReceiveTime > 60 * 1000) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (gpsBar != null) {
+                                    gpsBar.setAisStatus(false);
+                                }
+                            }
+                        });
+                    }
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
     }
 
     /**
@@ -597,7 +620,7 @@ public class MainActivity extends AppCompatActivity {
     public void initSettingFragment() {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 //        if (settingFragment == null) {
-            settingFragment = new SettingTabFragment();
+        settingFragment = new SettingTabFragment();
 //        }
         transaction.replace(R.id.main_frame_layout, settingFragment);
         transaction.commit();

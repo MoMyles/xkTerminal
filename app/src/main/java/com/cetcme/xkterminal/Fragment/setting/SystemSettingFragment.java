@@ -250,7 +250,7 @@ public class SystemSettingFragment extends Fragment {
                 final QMUITipDialog tipDialog;
                 tipDialog = new QMUITipDialog.Builder(getContext())
                         .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
-                        .setTipWord(rdssOpen ? "关闭中" : "开启中")
+                        .setTipWord("发送中")
                         .create();
                 tipDialog.show();
 
@@ -258,7 +258,7 @@ public class SystemSettingFragment extends Fragment {
                     @Override
                     public void run() {
                         PreferencesUtils.putBoolean(getActivity(), "rdss", !rdssOpen);
-                        tv_rdss.setText(!rdssOpen ? "关闭" : "开启");
+                        tv_rdss.setText("点击发送");
                         tipDialog.dismiss();
                     }
                 }, 3000);
@@ -277,8 +277,8 @@ public class SystemSettingFragment extends Fragment {
             wifi_ssid_textView.setText(getString(R.string.wifi_ssid));
         }
 
-        boolean rdssOpen = PreferencesUtils.getBoolean(getActivity(), "rdss", false);
-        tv_rdss.setText(rdssOpen ? "关闭" : "开启");
+//        boolean rdssOpen = PreferencesUtils.getBoolean(getActivity(), "rdss", false);
+//        tv_rdss.setText(rdssOpen ? "关闭" : "开启");
 
     }
 

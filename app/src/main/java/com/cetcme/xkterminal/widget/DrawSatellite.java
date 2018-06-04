@@ -98,7 +98,7 @@ public class DrawSatellite extends View {
 //        int signLevel=snrToSignalLevel(snr);  //暂时不用
 //      String info = String.format("#%s_%s", satellite.getNum(), snr);
         String info = String.valueOf(satellite.getNum());
-        canvas.drawText(info, (float) (x)-15, (float) (y)+5, p);
+        canvas.drawText(info, (float) (x)-5, (float) (y)+5, p);
 
     }
 

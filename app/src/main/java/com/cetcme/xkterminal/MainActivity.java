@@ -707,8 +707,125 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // 发送短信
+    // 分包发送短信
     public void sendMessage() {
+
+        SharedPreferences sharedPreferences = getSharedPreferences("xkTerminal", Context.MODE_PRIVATE); //私有数据
+        String lastSendTime = sharedPreferences.getString("lastSendTime", "");
+        if (!lastSendTime.isEmpty()) {
+            Long sendDate = DateUtil.parseStringToDate(lastSendTime, DateUtil.DatePattern.YYYYMMDDHHMMSS).getTime();
+            Long now = Constant.SYSTEM_DATE.getTime();
+            if (now - sendDate <= Constant.MESSAGE_SEND_LIMIT_TIME && now - sendDate > 0) {
+                long remainSecond = (Constant.MESSAGE_SEND_LIMIT_TIME - (now - sendDate)) / 1000;
+                Toast.makeText(this, "发送时间间隔不到1分钟，请等待" + remainSecond + "秒", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
+        final String receiver = messageNewFragment.getReceiver();
+        final String content = messageNewFragment.getContent();
+
+        if (receiver.isEmpty()) {
+            QHDialog qhDialog = new QHDialog(this, "提示", "收件人为空！");
+            qhDialog.setOnlyOneButtonText("好的");
+            qhDialog.show();
+            return;
+        }
+
+        if (content.isEmpty()) {
+            QHDialog qhDialog = new QHDialog(this, "提示", "短信内容为空！");
+            qhDialog.setOnlyOneButtonText("好的");
+            qhDialog.show();
+            return;
+        }
+
+        int length = 0;
+        try {
+            length = content.getBytes("GBK").length;
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        if (Constant.MESSAGE_CONTENT_MAX_LENGTH != 0 && length > Constant.MESSAGE_CONTENT_MAX_LENGTH) {
+            QHDialog qhDialog = new QHDialog(this, "提示", "短信内容长度超出最大值（" + Constant.MESSAGE_CONTENT_MAX_LENGTH + "）！");
+            qhDialog.setOnlyOneButtonText("好的");
+            qhDialog.show();
+            return;
+        }
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();//获取编辑器
+        editor.putString("lastSendTimeSave", DateUtil.parseDateToString(Constant.SYSTEM_DATE, DateUtil.DatePattern.YYYYMMDDHHMMSS));
+        editor.apply(); //提交修改
+
+        final MessageBean newMessage = new MessageBean();
+        newMessage.setSender(myNumber);
+        newMessage.setReceiver(receiver);
+        newMessage.setContent(content);
+        newMessage.setDeleted(false);
+        newMessage.setSend_time(Constant.SYSTEM_DATE);
+        newMessage.setRead(true);
+        newMessage.setSend(true);
+        newMessage.setSendOK(true);
+
+        MessageProxy.insert(db, newMessage);
+        failedMessageId = newMessage.getId();
+
+        if (length > 54) {
+            String firstContent = MessageFormat.shortcutMessage(content);
+            final String secondContent = content.replace(firstContent, "");
+            byte[] messageBytes = MessageFormat.format(receiver, firstContent, receiver.length() == 11 ? MessageFormat.MESSAGE_TYPE_CELLPHONE : MessageFormat.MESSAGE_TYPE_NORMAL);
+            ((MyApplication) getApplication()).sendBytes(messageBytes);
+            System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    byte[] messageBytes = MessageFormat.format(receiver, secondContent, receiver.length() == 11 ? MessageFormat.MESSAGE_TYPE_CELLPHONE : MessageFormat.MESSAGE_TYPE_NORMAL);
+                    ((MyApplication) getApplication()).sendBytes(messageBytes);
+                    System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
+                    backToMessageFragment();
+                }
+            }, 2000);
+
+        } else {
+            byte[] messageBytes = MessageFormat.format(receiver, content, receiver.length() == 11 ? MessageFormat.MESSAGE_TYPE_CELLPHONE : MessageFormat.MESSAGE_TYPE_NORMAL);
+            ((MyApplication) getApplication()).sendBytes(messageBytes);
+            System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
+            backToMessageFragment();
+        }
+
+        // 显示短信发送失败
+        messageSendFailed = true;
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (messageSendFailed) {
+                    Toast.makeText(MainActivity.this, "发送失败", Toast.LENGTH_SHORT).show();
+                    if (failedMessageId != 0) {
+                        MessageProxy.setMessageFailed(db, failedMessageId);
+                        if (fragmentName.equals("message") && messageFragment.tg.equals("send")) {
+                            messageFragment.reloadDate();
+                        }
+                        failedMessageId = 0;
+                    }
+                }
+            }
+        }, Constant.MESSAGE_FAIL_TIME);
+
+        // 短信推送
+        JSONObject sendJson = new JSONObject();
+        try {
+            sendJson.put("apiType", "sms_push");
+            sendJson.put("userAddress", "sms_push");
+            sendJson.put("data", newMessage.toJson());
+
+            SocketServer.send(sendJson);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 发送短信
+    public void sendMessageOld() {
 
         SharedPreferences sharedPreferences = getSharedPreferences("xkTerminal", Context.MODE_PRIVATE); //私有数据
         String lastSendTime = sharedPreferences.getString("lastSendTime", "");

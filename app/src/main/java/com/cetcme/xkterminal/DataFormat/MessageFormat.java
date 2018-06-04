@@ -25,8 +25,7 @@ public class MessageFormat {
     public static final String MESSAGE_TYPE_SHUT_DOWN           = "07"; // 摇毙功能
     public static final String MESSAGE_TYPE_UPDATE_LOCATION     = "08"; // 更新位置信息
     public static final String MESSAGE_TYPE_REPORT_ALARM        = "09"; // 告警信息，语音播报
-
-//    public static final String MESSAGE_TYPE_CALL_THE_ROLL = ""; // 夜间点名
+    public static final String MESSAGE_TYPE_CALL_THE_ROLL       = "10"; // 夜间点名
 
 
     private static final String messageHead = "$04";
@@ -63,7 +62,7 @@ public class MessageFormat {
             e.printStackTrace();
         }
 
-        return new String[]{targetAddress, messageContent, typeString, groupId + ""};
+        return new String[]{targetAddress, messageContent, typeString, groupId + "", frameCount + ""};
     }
 
     public static byte[] format(String targetAddress, String message, String type) {
@@ -174,8 +173,7 @@ public class MessageFormat {
         return Util.BitToByte(frameCount + messageLengthBitStr);
     }
 
-
-    private static String shortcutMessage(String message) {
+    public static String shortcutMessage(String message) {
         try {
             if (message.getBytes("GB2312").length > 54) {
                 return shortcutMessage(message.substring(0, message.length() - 1));

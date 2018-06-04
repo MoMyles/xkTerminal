@@ -1,6 +1,7 @@
 package com.cetcme.xkterminal.Fragment.setting;
 
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -25,7 +26,6 @@ import com.cetcme.xkterminal.widget.Satellite;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 
 import org.xutils.DbManager;
-import org.xutils.ex.DbException;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,6 +34,14 @@ import java.util.List;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import lecho.lib.hellocharts.model.Axis;
+import lecho.lib.hellocharts.model.AxisValue;
+import lecho.lib.hellocharts.model.Column;
+import lecho.lib.hellocharts.model.ColumnChartData;
+import lecho.lib.hellocharts.model.SubcolumnValue;
+import lecho.lib.hellocharts.util.ChartUtils;
+import lecho.lib.hellocharts.view.ColumnChartView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -56,11 +64,12 @@ public class SatelliteFragment extends Fragment {
     private TextView mTime;
     private TextView mDate;
     private TextView mDouble;
+    private ColumnChartView gpsBar;
 
     private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
 
-    private Handler handler ;
+    private Handler handler;
 
 
     public SatelliteFragment() {
@@ -74,7 +83,7 @@ public class SatelliteFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_satellite, container, false);
         init(view);
-        handler = new Handler(){
+        handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 switch (msg.what) {
@@ -85,6 +94,10 @@ public class SatelliteFragment extends Fragment {
                         mTime.setText(timeFormat.format(Constant.SYSTEM_DATE));
                         mDate.setText(dateFormat.format(Constant.SYSTEM_DATE));
                         mSatellite.setText(mSatelliteList.size() + "");
+                        Random random = new Random();
+                        int f = random.nextInt(5) + 1;
+                        float ff = random.nextFloat();
+                        mElevation.setText(f + ff + " 米");
                         break;
                 }
             }
@@ -103,11 +116,12 @@ public class SatelliteFragment extends Fragment {
         mTime = view.findViewById(R.id.time_tv);
         mDate = view.findViewById(R.id.date_tv);
         mDouble = view.findViewById(R.id.bestPosa_accuracy_tv);
+        gpsBar = view.findViewById(R.id.bar_gps);
 
         //初始化
         int realWidth = QMUIDisplayHelper.dp2px(getActivity()
-                ,(ScreenUtil.getScreenHigh(getActivity()) - 34 - 40 - 40 - 30 - 50 - 50) / 2);
-                // gps 34 bottom 40 title 30 head 30;
+                , (ScreenUtil.getScreenHigh(getActivity()) - 34 - 40 - 40 - 30 - 50 - 50) / 2);
+        // gps 34 bottom 40 title 30 head 30;
         int mWidth = getResources().getDisplayMetrics().widthPixels / 4;
         DrawEarth earthView = new DrawEarth(getActivity(), mWidth, realWidth);
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
@@ -137,12 +151,13 @@ public class SatelliteFragment extends Fragment {
                 refreshSatellite();
             }
         }, 0, 5 * 60 * 1000);
+
     }
 
     private void refreshSatellite() {
         mSatelliteList.clear();
         Random random = new Random();
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 4; i++) {
             Satellite satellite1 = new Satellite();
             int j = random.nextInt(50);
             satellite1.setNum(j);
@@ -150,6 +165,7 @@ public class SatelliteFragment extends Fragment {
             satellite1.setAzimuth(k);
             int l = random.nextInt(90);
             satellite1.setElevationAngle(l);
+            satellite1.setNo(random.nextInt(90));
             mSatelliteList.add(satellite1);
         }
         DbManager db = MyApplication.getInstance().getDb();
@@ -157,11 +173,13 @@ public class SatelliteFragment extends Fragment {
             List<GPSBean> list = db.selector(GPSBean.class).findAll();
             for (GPSBean g : list) {
                 Satellite satellite = new Satellite();
+                satellite.setNo(g.getXinhao());
                 satellite.setNum(g.getNo());
                 satellite.setAzimuth(g.getFangwei());
                 satellite.setElevationAngle(g.getYangjiao());
                 mSatelliteList.add(satellite);
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -174,6 +192,38 @@ public class SatelliteFragment extends Fragment {
             msg.what = 1;
             handler.sendMessage(msg);
         }
+
+        //定义有多少个柱子
+        int numColumns = 5;
+        //定义表格实现类
+        ColumnChartData columnChartData;
+        //Column 是下图中柱子的实现类
+        List<Column> columns = new ArrayList<>();
+        //SubcolumnValue 是下图中柱子中的小柱子的实现类，下面会解释我说的是什么
+        List<SubcolumnValue> values = null;
+        List<AxisValue> axisValues = new ArrayList<>();
+
+        Axis axis = new Axis();
+        //循环初始化每根柱子，
+        for (int i = 0; i < numColumns; i++) {
+            axisValues.add(new AxisValue(i).setLabel(mSatelliteList.get(random.nextInt(mSatelliteList.size())).getNum()+""));
+            values = new ArrayList<>();
+            //每一根柱子中只有一根小柱子
+            values.add(new SubcolumnValue(mSatelliteList.get(random.nextInt(mSatelliteList.size())).getNo() * 1.0f, ChartUtils.pickColor()));
+            //初始化Column
+            Column column = new Column(values);
+            column.setHasLabels(true);
+            columns.add(column);
+
+        }
+        axis.setValues(axisValues);
+        axis.setName("信号强度");
+        axis.setTextColor(Color.BLACK);
+        //给表格添加写好数据的柱子
+        columnChartData = new ColumnChartData(columns);
+        columnChartData.setAxisXBottom(axis);
+        //给画表格的View添加要画的表格
+        gpsBar.setColumnChartData(columnChartData);
     }
 
 }

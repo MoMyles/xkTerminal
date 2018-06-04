@@ -188,6 +188,7 @@ public class MainActivity extends AppCompatActivity {
                             public void run() {
                                 if (gpsBar != null) {
                                     gpsBar.setAisStatus(false);
+                                    MyApplication.getInstance().isAisConnected = false;
                                 }
                             }
                         });
@@ -200,6 +201,11 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }).start();
+
+        if (gpsBar != null) {
+            gpsBar.setAisStatus(true);
+            gpsBar.setGPSStatus(true);
+        }
     }
 
     /**

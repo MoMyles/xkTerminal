@@ -63,7 +63,7 @@ public class RouteListActivity extends Activity {
     }
 
     private void initTitleView() {
-        qhTitleView.setTitle("航迹列表");
+        qhTitleView.setTitle("航线列表");
         qhTitleView.setBackView(R.mipmap.title_icon_back_2x);
         qhTitleView.setRightView(R.mipmap.title_icon_add_2x);
         qhTitleView.setBackgroundResource(R.drawable.top_select);

@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
 import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.CommonUtil;
@@ -58,6 +59,9 @@ public class SystemSettingFragment extends Fragment {
     @BindView(R.id.tv_rdss)
     TextView tv_rdss;
 
+    @BindView(R.id.tv_self_test)
+    TextView tv_self_test;
+
     // 用于添加好友内容缓存
     private String[] friend = {"", ""};
 
@@ -66,8 +70,10 @@ public class SystemSettingFragment extends Fragment {
 
     private MainActivity mainActivity;
     private DbManager db = MyApplication.getInstance().getDb();
+    private QMUITipDialog tipDialog;
 
     Unbinder unbinder;
+
 
     public SystemSettingFragment() {
         // Required empty public constructor
@@ -136,7 +142,7 @@ public class SystemSettingFragment extends Fragment {
         if (originalTimeZone == -1) originalTimeZone = Constant.TIME_ZONE;
 
         modifyTimeZoneBtn(originalTimeZone);
-        int timeZone = originalTimeZone - 12;
+        final int timeZone = originalTimeZone - 12;
         time_zone_textView.setText(timeZone > 0 ? " + " + timeZone : timeZone + "");
 
         time_zone_minus_btn.setOnClickListener(new View.OnClickListener() {
@@ -247,7 +253,6 @@ public class SystemSettingFragment extends Fragment {
             public void onClick(View view) {
                 final boolean rdssOpen = PreferencesUtils.getBoolean(getActivity(), "rdss", false);
 
-                final QMUITipDialog tipDialog;
                 tipDialog = new QMUITipDialog.Builder(getContext())
                         .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
                         .setTipWord("发送中")
@@ -266,7 +271,40 @@ public class SystemSettingFragment extends Fragment {
             }
         });
 
+        tv_self_test.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                PreferencesUtils.putString(getActivity(), "lastSendTime", DateUtil.parseDateToString(Constant.SYSTEM_DATE, DateUtil.DatePattern.YYYYMMDDHHMMSS));
+                tipDialog = new QMUITipDialog.Builder(getContext())
+                        .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
+                        .setTipWord("自检中")
+                        .create();
+                tipDialog.show();
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        tipDialog.dismiss();
+                        tipDialog = new QMUITipDialog.Builder(getContext())
+                                .setIconType(QMUITipDialog.Builder.ICON_TYPE_SUCCESS)
+                                .setTipWord("自检成功")
+                                .create();
+                        tipDialog.show();
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                tipDialog.dismiss();
+                            }
+                        }, 1500);
+                    }
+                }, 15000);
+
+            }
+        });
+
     }
+
 
     private void getData() {
 

@@ -1,5 +1,6 @@
 package com.cetcme.xkterminal;
 
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 import android.util.EventLog;
@@ -52,6 +53,8 @@ public class DataHandler extends Handler {
         this.myApplication = myApplication;
     }
 
+    String content = "";
+
     @Override
     public void handleMessage(Message msg) {
         byte[] bytes = msg.getData().getByteArray("bytes");
@@ -64,14 +67,19 @@ public class DataHandler extends Handler {
                 String content = messageStrings[1];
                 String type    = messageStrings[2];
                 int group      = Integer.parseInt(messageStrings[3]);
+                int frameCount = Integer.parseInt(messageStrings[4]);
 
                 switch (type) {
                     // 普通短信
                     case MessageFormat.MESSAGE_TYPE_NORMAL:
-                        SoundPlay.playMessageSound(myApplication.mainActivity);
-                        myApplication.mainActivity.addMessage(address, content, false);
-                        myApplication.mainActivity.modifyGpsBarMessageCount();
-                        Toast.makeText(myApplication.mainActivity, "您有新的短信", Toast.LENGTH_SHORT).show();
+                        this.content += content;
+                        if (frameCount == 0) {
+                            SoundPlay.playMessageSound(myApplication.mainActivity);
+                            myApplication.mainActivity.addMessage(address, this.content, false);
+                            myApplication.mainActivity.modifyGpsBarMessageCount();
+                            Toast.makeText(myApplication.mainActivity, "您有新的短信", Toast.LENGTH_SHORT).show();
+                            this.content = "";
+                        }
                         break;
                     // 救护短信
                     case MessageFormat.MESSAGE_TYPE_RESCUE:
@@ -108,7 +116,7 @@ public class DataHandler extends Handler {
                                 myApplication.getCurrentLocation().setLatitude(lat);
                                 myApplication.getCurrentLocation().setSpeed(speed);
                                 myApplication.getCurrentLocation().setHeading(head);
-                                myApplication.getCurrentLocation().setAcqtime(new Date());
+                                myApplication.getCurrentLocation().setAcqtime(Constant.SYSTEM_DATE);
                                 EventBus.getDefault().post(myApplication.getCurrentLocation());
                             } catch (NumberFormatException e) {
                                 e.getStackTrace();
@@ -116,12 +124,10 @@ public class DataHandler extends Handler {
                         }
                         break;
                     // 夜间点名
-                    /*
                     case MessageFormat.MESSAGE_TYPE_CALL_THE_ROLL:
                         SoundPlay.playMessageSound(myApplication.mainActivity);
                         myApplication.mainActivity.showMessageDialog(content, MessageDialogActivity.TYPE_CALL_ROLL);
                         break;
-                    */
                     // 告警信息，语音播报
                     case MessageFormat.MESSAGE_TYPE_REPORT_ALARM:
                         myApplication.mainActivity.showMessageDialog(content, MessageDialogActivity.TYPE_ALARM);
@@ -172,8 +178,11 @@ public class DataHandler extends Handler {
                 }
 
                 String status = Util.byteToBit(ByteUtil.subBytes(bytes, 21, 22)[0]);
+                // 取消 来自数据串口的是否定位信息
+                /*
                 boolean gpsStatus = status.charAt(7) == '1';
                 myApplication.mainActivity.gpsBar.setGPSStatus(gpsStatus);
+                */
                 String communication_from = status.charAt(6) == '1' ? "北斗" : "GPRS";
                 PreferencesUtils.putString(myApplication.mainActivity, "communication_from", communication_from);
                 // 这里不加break

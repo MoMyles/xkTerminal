@@ -137,6 +137,12 @@
             android:text="清空" />
 
         <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="AddRouteWp_Event"
+            android:text="添加路径点" />
+
+        <Button
             android:id="@+id/btn_save"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

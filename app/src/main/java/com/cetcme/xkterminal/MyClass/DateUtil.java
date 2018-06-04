@@ -47,7 +47,7 @@ public class DateUtil {
 
     public static String modifyDate(String dateStr) {
         Date date = new Date(dateStr);
-        Date now = new Date();
+        Date now = Constant.SYSTEM_DATE;
         SimpleDateFormat sdf = new SimpleDateFormat("MM-dd HH:mm");
         if (now.getYear() != date.getYear()) {
             sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");

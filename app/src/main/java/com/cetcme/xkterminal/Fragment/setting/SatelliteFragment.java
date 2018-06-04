@@ -15,6 +15,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.cetcme.xkterminal.MyApplication;
+import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.ScreenUtil;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.Sqlite.Bean.GPSBean;
@@ -90,8 +91,8 @@ public class SatelliteFragment extends Fragment {
                         LocationBean lb = (LocationBean) msg.obj;
                         mLongitude.setText(lb.getLongitude() * 1.0 / 1e7 + "");
                         mLatitude.setText(lb.getLatitude() * 1.0 / 1e7 + "");
-                        mTime.setText(timeFormat.format(new Date()));
-                        mDate.setText(dateFormat.format(new Date()));
+                        mTime.setText(timeFormat.format(Constant.SYSTEM_DATE));
+                        mDate.setText(dateFormat.format(Constant.SYSTEM_DATE));
                         mSatellite.setText(mSatelliteList.size() + "");
                         Random random = new Random();
                         int f = random.nextInt(5) + 1;

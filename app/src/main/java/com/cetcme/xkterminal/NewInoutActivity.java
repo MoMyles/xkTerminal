@@ -126,7 +126,7 @@ public class NewInoutActivity extends Activity {
         int lat = currentLocation.getLatitude();
         inoutBean.setLon(lon);
         inoutBean.setLat(lat);
-        Date now = new Date();
+        Date now = Constant.SYSTEM_DATE;
         inoutBean.setTime(now);
         try {
             MyApplication.getInstance().getDb().saveBindingId(inoutBean);

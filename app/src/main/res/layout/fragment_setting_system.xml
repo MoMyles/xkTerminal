@@ -292,32 +292,21 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center_vertical"
-                    android:text="通讯录："
+                    android:text="设备自检："
                     android:textColor="#000000"
-                    android:textSize="18sp"
-                    android:visibility="invisible" />
+                    android:textSize="18sp"/>
 
                 <TextView
-                    android:layout_width="125dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.5"
-                    android:gravity="center"
-                    android:text="增加"
-                    android:textColor="#000000"
-                    android:textSize="18sp"
-                    android:visibility="invisible" />
-
-                <TextView
-                    android:layout_width="125dp"
+                    android:id="@+id/tv_self_test"
+                    android:layout_width="250dp"
                     android:layout_height="match_parent"
                     android:layout_marginEnd="150dp"
                     android:layout_marginRight="150dp"
-                    android:layout_weight="0.5"
+                    android:layout_weight="1"
                     android:gravity="center"
-                    android:text=""
+                    android:text="开始自检"
                     android:textColor="#000000"
-                    android:textSize="18sp"
-                    android:visibility="invisible" />
+                    android:textSize="18sp"/>
             </LinearLayout>
 
         </LinearLayout>

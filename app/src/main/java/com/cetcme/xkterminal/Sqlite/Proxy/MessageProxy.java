@@ -281,7 +281,7 @@ public class MessageProxy {
             if (cursor.moveToFirst()) {
                 //遍历游标
                 for(int i = 0; i < cursor.getCount(); i++){
-                    cursor.move(i);
+                    cursor.moveToPosition(i);
                     //获得ID
                     String sender = cursor.getString(0);
                     //输出用户信息
@@ -294,13 +294,14 @@ public class MessageProxy {
             if (cursor.moveToFirst()) {
                 //遍历游标
                 for(int i = 0; i < cursor.getCount(); i++){
-                    cursor.move(i);
+                    cursor.moveToPosition(i);
                     //获得ID
                     String receiver = cursor.getString(0);
                     //输出用户信息
                     if (!list.contains(receiver)) list.add(receiver);
                 }
             }
+            cursor.close();
         } catch (DbException e) {
             e.printStackTrace();
         }

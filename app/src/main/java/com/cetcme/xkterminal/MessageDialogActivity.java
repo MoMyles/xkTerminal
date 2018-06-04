@@ -7,6 +7,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.cetcme.xkterminal.DataFormat.AlertFormat;
+import com.cetcme.xkterminal.DataFormat.MessageFormat;
+import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.SoundPlay;
 
 import butterknife.BindView;
@@ -70,7 +72,8 @@ public class MessageDialogActivity extends Activity {
                 //
                 break;
             case TYPE_CALL_ROLL:
-                //
+                byte[] bytes = MessageFormat.format(Constant.SERVER_BD_NUMBER, "1", MessageFormat.MESSAGE_TYPE_CALL_THE_ROLL);
+                MyApplication.getInstance().sendBytes(bytes);
                 break;
         }
     }

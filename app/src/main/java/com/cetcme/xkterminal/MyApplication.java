@@ -162,14 +162,12 @@ public class MyApplication extends Application {
             }
         };
 
+        //TODO: test for phone
+        /*
         try {
             mSerialPort = getSerialPort();
             mOutputStream = mSerialPort.getOutputStream();
             mInputStream = mSerialPort.getInputStream();
-
-//            gpsSerialPort = getGpsSerialPort();
-//            gpsOutputStream = gpsSerialPort.getOutputStream();
-//            gpsInputStream = gpsSerialPort.getInputStream();
 
             aisSerialPort = getAisSerialPort();
             aisOutputStream = aisSerialPort.getOutputStream();
@@ -178,12 +176,9 @@ public class MyApplication extends Application {
             // Create a receiving thread
             ReadThread mReadThread = new ReadThread();
             mReadThread.start();
-//
-//            GpsReadThread gpsReadThread = new GpsReadThread();
-//            gpsReadThread.start();
+
             AisReadThread aisReadThread = new AisReadThread();
             aisReadThread.start();
-
 
         } catch (SecurityException e) {
             DisplayError(R.string.error_security);
@@ -192,6 +187,7 @@ public class MyApplication extends Application {
         } catch (InvalidParameterException e) {
             DisplayError(R.string.error_configuration);
         }
+        */
 
         //显示所有path
 //        String[] paths =  mSerialPortFinder.getAllDevicesPath();
@@ -243,8 +239,8 @@ public class MyApplication extends Application {
         currentLocation = new LocationBean();
         currentLocation.setLongitude(0);
         currentLocation.setLatitude(0);
-        currentLocation.setAcqtime(new Date());
         currentLocation.setHeading(0.0f);
+        currentLocation.setAcqtime(new Date(Constant.SYSTEM_DATE.getTime() - 10 * 60 * 1000));
         currentLocation.setSpeed(0.0f);
 
         Log.e("TAG_CESHI", new String(createAisWarnInfoMessage("测试警告信息")));
@@ -404,7 +400,7 @@ public class MyApplication extends Application {
                     String lastSendTime = sharedPreferences.getString("lastSendTime", "");
                     if (!lastSendTime.isEmpty()) {
                         Long sendDate = DateUtil.parseStringToDate(lastSendTime, DateUtil.DatePattern.YYYYMMDDHHMMSS).getTime();
-                        Long now = new Date().getTime();
+                        Long now = Constant.SYSTEM_DATE.getTime();
                         if (now - sendDate <= Constant.MESSAGE_SEND_LIMIT_TIME) {
                             long remainSecond = (Constant.MESSAGE_SEND_LIMIT_TIME - (now - sendDate)) / 1000;
                             // 返回不成功socket
@@ -952,7 +948,7 @@ public class MyApplication extends Application {
                                 locationBean.setLongitude(aisInfo.longtitude);
                                 locationBean.setSpeed(aisInfo.SOG);
                                 locationBean.setHeading(aisInfo.COG);
-                                locationBean.setAcqtime(new Date());
+                                locationBean.setAcqtime(Constant.SYSTEM_DATE);
                                 currentLocation = locationBean;
                                 EventBus.getDefault().post(locationBean);
                             } else {
@@ -963,7 +959,7 @@ public class MyApplication extends Application {
                                     locationBean.setLongitude(aisInfo.longtitude);
                                     locationBean.setSpeed(aisInfo.SOG);
                                     locationBean.setHeading(aisInfo.COG);
-                                    locationBean.setAcqtime(new Date());
+                                    locationBean.setAcqtime(Constant.SYSTEM_DATE);
                                     currentLocation = locationBean;
                                     EventBus.getDefault().post(locationBean);
                                 } else {

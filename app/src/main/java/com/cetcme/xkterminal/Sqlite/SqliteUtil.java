@@ -64,6 +64,8 @@ public class SqliteUtil {
                 System.out.println(id + ":" + sender + ":" + receiver + ":" + send_time + ":" + read);
             }
         }
+
+        cursor.close();
     }
 
 }

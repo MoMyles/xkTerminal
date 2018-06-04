@@ -4,12 +4,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatEditText;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -31,6 +33,7 @@ import com.bigkoo.pickerview.listener.OnTimeSelectListener;
 import com.bigkoo.pickerview.view.TimePickerView;
 
 import com.cetcme.xkterminal.MyApplication;
+import com.cetcme.xkterminal.MyClass.DateUtil;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 import com.iflytek.cloud.ErrorCode;
@@ -42,12 +45,15 @@ import com.iflytek.cloud.SynthesizerListener;
 import com.iflytek.cloud.util.ResourceUtil;
 import com.joanzapata.iconify.widget.IconTextView;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 
 import org.xutils.DbManager;
 import org.xutils.ex.DbException;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -75,6 +81,8 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
     private Button btnNaviGo;
     private String routeFileName;
 
+    private static final int REQUSET_CODE_HANGXIAN = 0;
+    private static final int REQUSET_CODE_HANGJI = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,7 +172,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
             filePath.mkdir();
         }
 
-        long timestamp = new Date().getTime();
+        long timestamp = com.cetcme.xkterminal.MyClass.Constant.SYSTEM_DATE.getTime();
         boolean saveOk = fMainView.mYimaLib.SaveRoutesToFile(Constant.ROUTE_FILE_PATH + "/" + timestamp);
 
         if (saveOk) {
@@ -172,7 +180,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
             toast.show();
             mLlBottom.setVisibility(View.GONE);
             clearRoute();
-            startActivityForResult(new Intent(this, RouteListActivity.class), 0);
+            startActivityForResult(new Intent(this, RouteListActivity.class), REQUSET_CODE_HANGXIAN);
         }
     }
 
@@ -204,6 +212,83 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
         clearRoute();
     }
 
+
+    private M_POINT point = new M_POINT();
+    /**
+     * 添加路径点
+     *
+     * @param view
+     */
+    public void AddRouteWp_Event(View view) {
+
+        final QMUIDialog.EditTextDialogBuilder latBuilder = new QMUIDialog.EditTextDialogBuilder(NavigationMainActivity.this);
+        latBuilder.setTitle("添加路径点")
+                .setPlaceholder("在此输入路径点纬度")
+                .setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL)
+                .addAction("取消", new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
+                        dialog.dismiss();
+                    }
+                })
+                .addAction("确定", new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
+                        CharSequence text = latBuilder.getEditText().getText();
+                        if (text != null && text.length() > 0) {
+                            try {
+                                point.y = (int) (Float.parseFloat(text.toString()) * 10000000);
+                                if (point.y > 90 * 10000000 || point.y < -90 * 10000000) {
+                                    Toast.makeText(NavigationMainActivity.this, "请填入正确路径点纬度", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                                dialog.dismiss();
+                                addPointOnMap(point);
+                            } catch (NumberFormatException e) {
+                                e.getStackTrace();
+                                Toast.makeText(NavigationMainActivity.this, "请填入正确路径点纬度", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(NavigationMainActivity.this, "请填入路径点纬度", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
+        final QMUIDialog.EditTextDialogBuilder lonBuilder = new QMUIDialog.EditTextDialogBuilder(NavigationMainActivity.this);
+        lonBuilder.setTitle("添加路径点")
+                .setPlaceholder("在此输入路径点经度")
+                .setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL)
+                .addAction("取消", new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
+                        dialog.dismiss();
+                    }
+                })
+                .addAction("确定", new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
+                        CharSequence text = lonBuilder.getEditText().getText();
+                        if (text != null && text.length() > 0) {
+                            try {
+                                dialog.dismiss();
+                                point.x = (int) (Float.parseFloat(text.toString()) * 10000000);
+                                if (point.x > 180 * 10000000 || point.x < -180 * 10000000) {
+                                    Toast.makeText(NavigationMainActivity.this, "请填入正确路径点经度", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                                latBuilder.show();
+                            } catch (NumberFormatException e) {
+                                e.getStackTrace();
+                                Toast.makeText(NavigationMainActivity.this, "请填入正确路径点经度", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(NavigationMainActivity.this, "请填入路径点经度", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                })
+                .show();
+    }
+
     /**
      * 将物理坐标变成整形
      *
@@ -222,20 +307,24 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
     @Override
     public void onMapClicked(M_POINT m_point) {
         if (type == 1) {
-            double x = m_point.x / 10000000f;
-            double y = m_point.y / 10000000f;
-
-            toast.setText(String.format("x: %.3f, y: %.3f", x, y));
-            toast.show();
-
-            if (routeID == -1) {
-                routeID = fMainView.mYimaLib.AddRoute("航线", new int[]{}, 0, true);
-                fMainView.mYimaLib.SetPointSelectJudgeDist(30, 15);
-            }
-            int wp = fMainView.mYimaLib.AddWayPoint(m_point.x, m_point.y, "1", 20, "1");
-            int wpCount = fMainView.mYimaLib.GetRouteWayPointsCount(routeID);
-            fMainView.mYimaLib.AddRouteWayPoint(routeID, wpCount, new int[]{wp}, 1);
+            addPointOnMap(m_point);
         }
+    }
+
+    private void addPointOnMap(M_POINT m_point) {
+        double x = m_point.x / 10000000f;
+        double y = m_point.y / 10000000f;
+
+        toast.setText(String.format("x: %.3f, y: %.3f", x, y));
+        toast.show();
+        if (routeID == -1) {
+            routeID = fMainView.mYimaLib.AddRoute("航线", new int[]{}, 0, true);
+            fMainView.mYimaLib.SetPointSelectJudgeDist(30, 15);
+        }
+        int wp = fMainView.mYimaLib.AddWayPoint(m_point.x, m_point.y, "1", 20, "1");
+        int wpCount = fMainView.mYimaLib.GetRouteWayPointsCount(routeID);
+        fMainView.mYimaLib.AddRouteWayPoint(routeID, wpCount, new int[]{wp}, 1);
+        fMainView.postInvalidate();
     }
 
     @Override
@@ -254,35 +343,59 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode != 0) {
-            return;
-        }
-        switch (resultCode) {
-            case RouteListActivity.ACTIVITY_RESULT_ROUTE_SHOW:
-                type = 0;
-                llNavigator.setVisibility(View.VISIBLE);
-                clearRoute();
-                routeFileName = data.getStringExtra("fileName");
-                Log.i(TAG, "load file: start");
+        switch (requestCode) {
+            case 0: // 航线
+                switch (resultCode) {
+                    case RouteListActivity.ACTIVITY_RESULT_ROUTE_SHOW:
+                        type = 0;
+                        llNavigator.setVisibility(View.VISIBLE);
+                        clearRoute();
+                        routeFileName = data.getStringExtra("fileName");
+                        Log.i(TAG, "load file: start");
 
-                fMainView.mYimaLib.AddRoutesFromFile(Constant.ROUTE_FILE_PATH + "/" + routeFileName);
-                int routeCount = fMainView.mYimaLib.GetRoutesCount();
-                routeID = fMainView.mYimaLib.GetRouteIDFromPos(routeCount - 1);
+                        fMainView.mYimaLib.AddRoutesFromFile(Constant.ROUTE_FILE_PATH + "/" + routeFileName);
+                        int routeCount = fMainView.mYimaLib.GetRoutesCount();
+                        routeID = fMainView.mYimaLib.GetRouteIDFromPos(routeCount - 1);
 
-                Log.i(TAG, "GetRoutesCount: " + fMainView.mYimaLib.GetRoutesCount());
-                Log.i(TAG, "routeID: " + routeID);
-                Log.i(TAG, "load file: end");
-                Log.i(TAG, "==========================");
+                        Log.i(TAG, "GetRoutesCount: " + fMainView.mYimaLib.GetRoutesCount());
+                        Log.i(TAG, "routeID: " + routeID);
+                        Log.i(TAG, "load file: end");
+                        Log.i(TAG, "==========================");
+                        break;
+                    case RouteListActivity.ACTIVITY_RESULT_ROUTE_ADD:
+                        type = 1;
+                        clearRoute();
+                        mLlBottom.setVisibility(View.VISIBLE);
+                        break;
+                    case RouteListActivity.ACTIVITY_RESULT_ROUTE_NOTHING:
+                        type = 0;
+                        break;
+                }
                 break;
-            case RouteListActivity.ACTIVITY_RESULT_ROUTE_ADD:
-                type = 1;
-                clearRoute();
-                mLlBottom.setVisibility(View.VISIBLE);
-                break;
-            case RouteListActivity.ACTIVITY_RESULT_ROUTE_NOTHING:
-                type = 0;
+            case 1: // 航迹
+                switch (resultCode) {
+                    case RouteListActivity.ACTIVITY_RESULT_ROUTE_SHOW:
+                        String navtime = data.getStringExtra("navtime");
+                        try {
+                            List<LocationBean> list = db.selector(LocationBean.class)
+                                    .where("navtime", "=", navtime)
+                                    .orderBy("acqtime")
+                                    .findAll();
+                            if (list == null || list.isEmpty()) {
+                                Toast.makeText(NavigationMainActivity.this, "未查询到相关轨迹信息", Toast.LENGTH_SHORT).show();
+                            } else {
+                                fMainView.AddLineLayerAndObject(list);
+                                mClearTrack.setVisibility(View.VISIBLE);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Toast.makeText(NavigationMainActivity.this, "未查询到相关轨迹信息", Toast.LENGTH_SHORT).show();
+                        }
+                        break;
+                }
                 break;
         }
+
     }
 
     private String TAG = "debug-qh";
@@ -348,6 +461,12 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
                 menu.dismiss();
                 break;
             case R.id.tv_ship_track:// 航迹查看
+
+                Intent hangjiIntent = new Intent(NavigationMainActivity.this, RouteListActivity.class);
+                hangjiIntent.putExtra("tag", "航迹");
+                startActivityForResult(hangjiIntent, REQUSET_CODE_HANGJI);
+
+                /*
                 final View trackView = getLayoutInflater().inflate(R.layout.dialog_ship_track, null);
                 final AppCompatEditText start = trackView.findViewById(R.id.acet_start);
                 final AppCompatEditText end = trackView.findViewById(R.id.acet_end);
@@ -425,6 +544,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
                         .setNegativeButton("取消", null)
                         .show();
                 menu.dismiss();
+                */
                 break;
             case R.id.clearTrack:
                 fMainView.clearTrack();
@@ -432,7 +552,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
                 break;
             case R.id.tv_route:
                 type = 1;
-                startActivityForResult(new Intent(this, RouteListActivity.class), 0);
+                startActivityForResult(new Intent(this, RouteListActivity.class), REQUSET_CODE_HANGXIAN);
                 menu.dismiss();
                 break;
             case R.id.tv_navigator:
@@ -442,7 +562,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
             case R.id.navi_cancel:
                 llNavigator.setVisibility(View.GONE);
                 clearRoute();
-                startActivityForResult(new Intent(this, RouteListActivity.class), 0);
+                startActivityForResult(new Intent(this, RouteListActivity.class), REQUSET_CODE_HANGXIAN);
                 break;
             case R.id.navi_go:
                 Intent intent = new Intent( this, NavigationActivity.class);
@@ -452,7 +572,6 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
             default:
         }
     }
-
 
     private PopupWindow menu;
 
@@ -510,7 +629,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
             locationBean.setLongitude(lon + 1000000 * i);
             locationBean.setLatitude(lat + 100000 * i);
             locationBean.setHeading(45.1f);
-            locationBean.setAcqtime(new Date());
+            locationBean.setAcqtime(com.cetcme.xkterminal.MyClass.Constant.SYSTEM_DATE);
             try {
                 db.saveBindingId(locationBean);
             } catch (DbException e) {

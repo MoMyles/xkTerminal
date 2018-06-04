@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.cetcme.xkterminal.DataFormat.AlertFormat;
 import com.cetcme.xkterminal.MainActivity;
+import com.cetcme.xkterminal.MessageDialogActivity;
 import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.DateUtil;
@@ -35,6 +36,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by qiuhong on 10/01/2018.
@@ -65,6 +67,12 @@ public class GPSBar extends RelativeLayout {
     private boolean flashTextViewVisible = true;
 
     private boolean flashAisTextViewVisible = true;
+
+    private static final int UPDATE_TIME = 1;
+    private static final int FLASH_NO_GPS = 2;
+    private static final int FLASH_NO_AIS = 3;
+    private static final int UPDATE_GPS_STATUS = 4;
+
 
     // 用于关闭app
     private int clickTime = 0;
@@ -339,10 +347,18 @@ public class GPSBar extends RelativeLayout {
 
     }
 
+    private long lastNoGpsReportTime = 0;
+    private long noGpsReportPeriod = 1000 * 60 * 10;
+
     public void setGPSStatus(boolean gpsStatus) {
         textView_location_status.setTextColor(gpsStatus ? 0xFF2657EC : 0xFFD0021B);
         textView_location_status.setText(gpsStatus ? "已定位" : "未定位");
         if (gpsStatus) textView_location_status.setVisibility(VISIBLE);
+        if (!gpsStatus && (Constant.SYSTEM_DATE.getTime() - lastNoGpsReportTime) >= noGpsReportPeriod) {
+            if (mainActivity != null) mainActivity.showMessageDialog("未获取定位", MessageDialogActivity.TYPE_ALERT);
+            MainActivity.play("您有新的短消息，请注意查收");
+            lastNoGpsReportTime = Constant.SYSTEM_DATE.getTime();
+        }
         noGps = !gpsStatus;
     }
 
@@ -365,40 +381,52 @@ public class GPSBar extends RelativeLayout {
 
                 }
 
-                if (i % 10 == 0) {
 
+                if (i % 10 == 0) {
+                    // 更新时间
                     Calendar c = Calendar.getInstance();
                     c.setTime(Constant.SYSTEM_DATE);
                     c.add(Calendar.SECOND, 1);
                     Constant.SYSTEM_DATE = c.getTime();
 
                     Message message = new Message();
-                    message.what = 1;
+                    message.what = UPDATE_TIME;
                     handler.sendMessage(message);
+
+                    // 判断是否为定位超过10分钟
+                    Date date = MyApplication.getInstance().getCurrentLocation().getAcqtime();
+                    if (date != null) {
+                        long locationTime = date.getTime();
+                        Message message1 = new Message();
+                        message1.what = UPDATE_GPS_STATUS;
+                        message1.obj = (Constant.SYSTEM_DATE.getTime() - locationTime) <= noGpsReportPeriod;
+                        handler.sendMessage(message1);
+                    }
                 }
 
+                // 未定位闪烁
                 if (Constant.NO_GPS_FLASH_TIME != 0) {
                     int noGpsFlashTime = Constant.NO_GPS_FLASH_TIME / 100;
                     if (i % noGpsFlashTime == 0) {
                         flashTextViewVisible = !flashTextViewVisible;
                         Message message = new Message();
-                        message.what = 3;
+                        message.what = FLASH_NO_GPS;
                         handler.sendMessage(message);
                     }
-                    if (i == 10 * noGpsFlashTime) i = 0;
                 }
 
+                // 无AIS闪烁
                 if (Constant.NO_AIS_FLASH_TIME != 0) {
                     int noGpsFlashTime = Constant.NO_GPS_FLASH_TIME / 100;
                     if (i % noGpsFlashTime == 0) {
                         flashAisTextViewVisible = !flashAisTextViewVisible;
                         Message message = new Message();
-                        message.what = 4;
+                        message.what = FLASH_NO_AIS;
                         handler.sendMessage(message);
                     }
-                    if (i == 10 * noGpsFlashTime) i = 0;
                 }
 
+                if (i == 10000) i = 0;
                 i++;
             } while (true);
         }
@@ -410,24 +438,25 @@ public class GPSBar extends RelativeLayout {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
-                case 1:
+                case UPDATE_TIME:
                     textView_time.setText(DateUtil.Date2String(Constant.SYSTEM_DATE, "yyyy年MM月dd日 HH:mm:ss"));
                     break;
-                case 3:
-
+                case FLASH_NO_GPS:
                     if (noGps) {
                         textView_location_status.setVisibility(flashTextViewVisible ? VISIBLE : INVISIBLE);
                     }
-
                     if (PreferencesUtils.getBoolean(mainActivity, "flashAlert", false)) {
                         textView_alert.setVisibility(flashTextViewVisible ? VISIBLE : INVISIBLE);
                     }
                     break;
-
-                case 4:
+                case FLASH_NO_AIS:
                     if (noAisConnected) {
                         textView_ais_status.setVisibility(flashAisTextViewVisible ? VISIBLE : INVISIBLE);
                     }
+                    break;
+                case UPDATE_GPS_STATUS:
+                    boolean b = (boolean) msg.obj;
+                    setGPSStatus(b);
                     break;
                 default:
                     break;
@@ -457,7 +486,6 @@ public class GPSBar extends RelativeLayout {
     public void showAlerting(boolean show) {
         textView_alerting.setVisibility(show ? VISIBLE : GONE);
     }
-
 
     public void setDebugButtonLayoutShow(boolean show) {
         System.out.println((show ? "打开" : "关闭") + "DEBUG按钮组");

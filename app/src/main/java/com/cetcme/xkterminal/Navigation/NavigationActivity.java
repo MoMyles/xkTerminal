@@ -1,6 +1,7 @@
 package com.cetcme.xkterminal.Navigation;
 
 import android.annotation.SuppressLint;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -16,6 +17,7 @@ import android.widget.Toast;
 
 import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.MyApplication;
+import com.cetcme.xkterminal.MyClass.DateUtil;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 
@@ -25,7 +27,9 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.xutils.DbManager;
 import org.xutils.ex.DbException;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -118,6 +122,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                     toast.show();
                     MainActivity.play("导航结束");
                     btn_navigation.setText("开始导航");
+                    navtime = null;
                     isDanger = false;
                     needCenterOwnShip = false;
                     isBackWrite = true;
@@ -159,7 +164,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                         // 航线
                         MainActivity.play("开始导航,航线总里程" + (int) endDistToRead + "海里");
                     }
-                    lastReportTime = new Date().getTime();
+                    lastReportTime = com.cetcme.xkterminal.MyClass.Constant.SYSTEM_DATE.getTime();
 
 
                     btn_navigation.setText("结束导航");
@@ -196,6 +201,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                         locationBean.setLatitude((int) ((31.12 + addOne) * 10000000));
                         locationBean.setHeading(45f);
                         locationBean.setSpeed(12.3f);
+                        locationBean.setAcqtime(com.cetcme.xkterminal.MyClass.Constant.SYSTEM_DATE);
                         EventBus.getDefault().post(locationBean);
                         addOne += 0.003f;
                     }
@@ -412,6 +418,8 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
 
     private long lastReportTime = -1;
 
+    private Date navtime = null;
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onLocationEvent(LocationBean lb) {
         Log.i("TAG", "onLocationEvent: 收到自身位置");
@@ -435,6 +443,8 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
         updateShipInfo(lb);
 
         if (inNavigating) {
+            if (navtime == null) navtime = com.cetcme.xkterminal.MyClass.Constant.SYSTEM_DATE;
+            myLocation.setNavtime(navtime);
             try {
                 db.saveBindingId(lb);
             } catch (DbException e) {
@@ -452,17 +462,17 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
 
                 // 记录上次报警时间，如果没有则赋值
                 if (lastReportTime == -1) {
-                    lastReportTime = new Date().getTime();
+                    lastReportTime = com.cetcme.xkterminal.MyClass.Constant.SYSTEM_DATE.getTime();
                     toast.setText(msg);
                     toast.show();
                     MainActivity.play(msg);
                 } else {
                     // 判断上次报警时间是否是10秒之前
-                    if (new Date().getTime() - lastReportTime > 10 * 1000) {
+                    if (com.cetcme.xkterminal.MyClass.Constant.SYSTEM_DATE.getTime() - lastReportTime > 10 * 1000) {
                         toast.setText(msg);
                         toast.show();
                         MainActivity.play(msg);
-                        lastReportTime = new Date().getTime();
+                        lastReportTime = com.cetcme.xkterminal.MyClass.Constant.SYSTEM_DATE.getTime();
                     }
                 }
             } else {
@@ -477,6 +487,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                 btn_navigation.setText("开始导航");
                 inNavigating = false;
                 isBackWrite = true;
+                navtime = null;
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {

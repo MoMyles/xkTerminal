@@ -3,6 +3,7 @@ package com.cetcme.xkterminal.Navigation;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,15 +13,21 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cetcme.xkterminal.MyApplication;
+import com.cetcme.xkterminal.MyClass.DateUtil;
 import com.cetcme.xkterminal.R;
 import com.qiuhong.qhlibrary.QHTitleView.QHTitleView;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
+
+import org.xutils.DbManager;
+import org.xutils.ex.DbException;
 
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +54,10 @@ public class RouteListActivity extends Activity {
     public static final int ACTIVITY_RESULT_ROUTE_NOTHING = 0x00;
     private Context context;
 
+    private DbManager db = MyApplication.getInstance().getDb();
+
+    private String tag = "航线";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,16 +67,26 @@ public class RouteListActivity extends Activity {
 
         // PermissionUtil.verifyStoragePermissions(this);
 
+
+        String intentTag = getIntent().getStringExtra("tag");
+        if (intentTag != null && intentTag.equals("航迹")) {
+            tag = "航迹";
+        }
+
         initTitleView();
         initListView();
+        if (tag.equals("航线")) {
+            getFilesData();
+        } else {
+            getRouteData();
+        }
 
-        getFilesData();
     }
 
     private void initTitleView() {
-        qhTitleView.setTitle("航线列表");
+        qhTitleView.setTitle(tag + "列表");
         qhTitleView.setBackView(R.mipmap.title_icon_back_2x);
-        qhTitleView.setRightView(R.mipmap.title_icon_add_2x);
+        qhTitleView.setRightView(tag.equals("航迹") ? 0 : R.mipmap.title_icon_add_2x);
         qhTitleView.setBackgroundResource(R.drawable.top_select);
         qhTitleView.setClickCallback(new QHTitleView.ClickCallback() {
             @Override
@@ -76,8 +97,10 @@ public class RouteListActivity extends Activity {
 
             @Override
             public void onRightClick() {
-                setResult(ACTIVITY_RESULT_ROUTE_ADD);
-                finish();
+                if (tag.equals("航线")) {
+                    setResult(ACTIVITY_RESULT_ROUTE_ADD);
+                    finish();
+                }
             }
         });
     }
@@ -92,27 +115,34 @@ public class RouteListActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent();
-                intent.putExtra("fileName", dataList.get(i).get("fileName").toString());
+                if (tag.equals("航线")) {
+                    intent.putExtra("fileName", dataList.get(i).get("fileName").toString());
+                } else {
+                    intent.putExtra("navtime", dataList.get(i).get("navtime").toString());
+                }
                 setResult(ACTIVITY_RESULT_ROUTE_SHOW, intent);
                 finish();
             }
         });
 
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Map<String, Object> item = (Map<String, Object>) adapterView.getAdapter().getItem(i);
-                final String fileName = item.get("fileName").toString();
-                File filePath = new File(Constant.ROUTE_FILE_PATH + "/" + fileName);
-                if (filePath.exists()) {
-                    filePath.delete();
+        if (tag.equals("航线")) {
+            listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    Map<String, Object> item = (Map<String, Object>) adapterView.getAdapter().getItem(i);
+                    final String fileName = item.get("fileName").toString();
+                    File filePath = new File(Constant.ROUTE_FILE_PATH + "/" + fileName);
+                    if (filePath.exists()) {
+                        filePath.delete();
+                    }
+                    Toast.makeText(context, "删除成功", Toast.LENGTH_SHORT).show();
+                    dataList.remove(item);
+                    testAdapter.notifyDataSetChanged();
+                    return true;
                 }
-                Toast.makeText(context, "删除成功", Toast.LENGTH_SHORT).show();
-                dataList.remove(item);
-                testAdapter.notifyDataSetChanged();
-                return true;
-            }
-        });
+            });
+        }
+
     }
 
     public List<Map<String, Object>> getFilesData() {
@@ -148,7 +178,42 @@ public class RouteListActivity extends Activity {
         return dataList;
     }
 
+    public List<Map<String, Object>> getRouteData() {
+        dataList.clear();
 
+        try {
+            List<String> navs = new ArrayList<>();
+            Cursor cursor = db.execQuery("select navtime from t_location group by navtime");
+            //判断游标是否为空
+            if (cursor.moveToFirst()) {
+                //遍历游标
+                for(int i = 0; i < cursor.getCount(); i++){
+                    cursor.moveToPosition(i);
+                    //获得ID
+                    String navtime = cursor.getString(0);
+                    //输出用户信息
+                    if (navtime != null) {
+                        navs.add(navtime);
+                        Date date = new Date(Long.parseLong(navtime));
+
+                        Map<String, Object> map = new Hashtable<>();
+                        map.put("fileName",  DateUtil.Date2String(date));
+                        map.put("lastModifyTime", "");
+                        map.put("lastModifyStamp", "");
+                        map.put("fileLength", "");
+                        map.put("navtime", navtime);
+                        dataList.add(map);
+                    }
+                }
+            }
+            cursor.close();
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
+
+        testAdapter.notifyDataSetChanged();
+        return dataList;
+    }
     @Override
     public void onBackPressed() {
         setResult(ACTIVITY_RESULT_ROUTE_NOTHING);

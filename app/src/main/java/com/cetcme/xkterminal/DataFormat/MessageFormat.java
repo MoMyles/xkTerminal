@@ -5,6 +5,7 @@ import android.telephony.PhoneNumberUtils;
 import com.cetcme.xkterminal.DataFormat.Util.ByteUtil;
 import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
 import com.cetcme.xkterminal.DataFormat.Util.Util;
+import com.cetcme.xkterminal.MyClass.Constant;
 
 import java.io.UnsupportedEncodingException;
 
@@ -75,6 +76,7 @@ public class MessageFormat {
         byte[] lengthBytes = new byte[]{getDataLengthByte(message, 0)};
         byte[] messageBytes = new byte[0];
         try {
+            message = shortcutMessage(message); // 裁剪内容到限制54字节内
             messageBytes = message.getBytes("GB2312");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -143,6 +145,7 @@ public class MessageFormat {
 //        System.out.println("messageContent: " + msg[1]);
 //        System.out.println("type: " + msg[2]);
 
+        /*
         String content = "121.2a14,31.1234";
         String[] strings = content.split(",");
         try {
@@ -153,6 +156,9 @@ public class MessageFormat {
         } catch (NumberFormatException e) {
             e.getStackTrace();
         }
+        */
+
+        System.out.println(shortcutMessage("一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十一12二"));
     }
 
     private static byte getDataLengthByte (String message, int frameCountInt) {
@@ -168,4 +174,17 @@ public class MessageFormat {
         return Util.BitToByte(frameCount + messageLengthBitStr);
     }
 
+
+    private static String shortcutMessage(String message) {
+        try {
+            if (message.getBytes("GB2312").length > 54) {
+                return shortcutMessage(message.substring(0, message.length() - 1));
+            } else {
+                return message;
+            }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
 }

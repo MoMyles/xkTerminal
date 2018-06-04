@@ -108,7 +108,7 @@ public class DataHandler extends Handler {
                                 myApplication.getCurrentLocation().setLatitude(lat);
                                 myApplication.getCurrentLocation().setSpeed(speed);
                                 myApplication.getCurrentLocation().setHeading(head);
-                                myApplication.getCurrentLocation().setAcqtime(new Date());
+                                myApplication.getCurrentLocation().setAcqtime(Constant.SYSTEM_DATE);
                                 EventBus.getDefault().post(myApplication.getCurrentLocation());
                             } catch (NumberFormatException e) {
                                 e.getStackTrace();
@@ -172,8 +172,11 @@ public class DataHandler extends Handler {
                 }
 
                 String status = Util.byteToBit(ByteUtil.subBytes(bytes, 21, 22)[0]);
+                // 取消 来自数据串口的是否定位信息
+                /*
                 boolean gpsStatus = status.charAt(7) == '1';
                 myApplication.mainActivity.gpsBar.setGPSStatus(gpsStatus);
+                */
                 String communication_from = status.charAt(6) == '1' ? "北斗" : "GPRS";
                 PreferencesUtils.putString(myApplication.mainActivity, "communication_from", communication_from);
                 // 这里不加break

@@ -63,10 +63,10 @@ public class RvShipAdapter extends RecyclerView.Adapter<RvShipAdapter.VH> {
             }
             if (ovci != null) {
                 holder.hangxiang.setText(ovci.fCourseOverGround + " °");
-                holder.width.setText(ovci.fSpeedOverGround + " kn");
+                holder.speed.setText(ovci.fSpeedOverGround + " kn");
             } else {
                 holder.hangxiang.setText("0 °");
-                holder.width.setText("0 knot");
+                holder.speed.setText("0 kn");
             }
             holder.mLl.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -90,7 +90,7 @@ public class RvShipAdapter extends RecyclerView.Adapter<RvShipAdapter.VH> {
             holder.length.setText("");
             holder.width.setText("");
             holder.hangxiang.setText("0 °");
-            holder.width.setText("0 kn");
+            holder.speed.setText("0 kn");
         }
     }
 

@@ -56,8 +56,10 @@ import java.io.UnsupportedEncodingException;
 import java.security.InvalidParameterException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -112,6 +114,7 @@ public class MyApplication extends Application {
     public long oldAisReceiveTime = System.currentTimeMillis();
 
     public boolean isAisFirst = true;
+    public boolean isAisConnected = false;
 
     private Timer timer;
 
@@ -911,13 +914,21 @@ public class MyApplication extends Application {
                         || gpsDataStr.startsWith("!AIVDO")) {
 //                    Log.e("TAG", "receive: " + gpsDataStr);
                     oldAisReceiveTime = System.currentTimeMillis();
+                    isAisConnected = true;
                     if (mainActivity != null) {
-                        mainActivity.gpsBar.setAisStatus(true);
+                        mainActivity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mainActivity.gpsBar.setAisStatus(true);
+                            }
+                        });
                     }
+                    Log.e("TAG", gpsDataStr);
                     AisInfo aisInfo = YimaAisParse.mParseAISSentence(gpsDataStr);
                     if (aisInfo != null) {
                         Log.i(TAG, aisInfo.MsgType + "");
                         if (14 == aisInfo.MsgType) {
+                            Log.e("TAG_14", gpsDataStr);
                             Log.e("TAG", ConvertUtil.bytesToHexString(tmpByts));
                             // 报警信息
                             if (aisInfo.mmsi > 0) {
@@ -961,7 +972,7 @@ public class MyApplication extends Application {
                         }
                     }
                 } else if (gpsDataStr.startsWith("$GPGSV")) {
-                    Log.e("TAG", "receive: " + gpsDataStr);
+//                    Log.e("TAG", "receive: " + gpsDataStr);
                     try {
                         String newStr = gpsDataStr.substring(gpsDataStr.indexOf(",") + 1, gpsDataStr.lastIndexOf("*"));
                         String[] arr = newStr.split(",");
@@ -1254,69 +1265,93 @@ public class MyApplication extends Application {
     */
 
     public byte[] createAisWarnInfoMessage(String message) {
-        String headStr = "!AIVDM,1,1,0,A,";
-        byte[] headByts = headStr.getBytes();
+        String headStr = "!AIVDO,1,1,0,A,";
         StringBuffer sb = new StringBuffer("00111000");
         // 消息ID
-        String mmsi = "";
+        String mmsi = "413000000";
         if (sp != null) {
             mmsi = sp.getString("shipNo", "");
         }
-        // MMSI
-        byte[] mmsiArr = mmsi.getBytes();
-        StringBuffer mmsiStr = new StringBuffer();
-        for (int i = 0; i < mmsiArr.length; i++) {
-            mmsiStr.append(bu0(Long.toString(mmsiArr[i], 2)));
-        }
-        int bu = 30 - 8 * mmsiArr.length;//30位补0
-        if (bu > 0) {
+        int bu = 30;
+        if (!"".equals(mmsi)){
+            // MMSI
+            String mmsiByts =Integer.toBinaryString(Integer.valueOf(mmsi));
+            bu = 30 - mmsiByts.length();//30位补0
+            if (bu > 0) {
+                for (int i = 0; i < bu; i++) {
+                    sb.append("0");
+                }
+            }
+            sb.append(mmsiByts);
+        } else {
             for (int i = 0; i < bu; i++) {
                 sb.append("0");
             }
         }
-        sb.append(mmsiStr);
         //备用
         sb.append("00");
         //安全文本内容
         byte[] byts = message.getBytes();
         for (int i = 0; i < byts.length; i++) {
-            String tmp = Long.toString(byts[i] & 0x3f, 2);
-            Log.e("TAG", "content: " + bu0_6(tmp));
+            String tmp = Integer.toBinaryString(byts[i] & 0x3F);
+            //Log.e("TAG_CONTENT", tmp);
             sb.append(bu0_6(tmp));
         }
-        int len = byts.length * 6;
-        int v = 8 - len % 8;
-        if (len % 8 != 0) {
-            for (int i = 0; i < v; i++) {
-                sb.append("0");
+        //比特总数
+        sb.append(bu0_8(Integer.toBinaryString(sb.toString().length() & 0xFF)));
+        int len = sb.toString().length();
+        int v = 0;
+        if (len % 6 != 0) {
+            v = 6 - len % 6;
+            if (len % 6 != 0) {
+                for (int i = 0; i < v; i++) {
+                    sb.append("0");
+                }
             }
         }
-        //比特总数
-        sb.append(bu0(Integer.toString(sb.toString().length(), 2)));
+        String keys = "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_ !\"#$%&'()*+,-./0123456789:;<=>?";
         //
         String finalStr = sb.toString();
         len = finalStr.length();
-        Log.e("TAG", "len: " + len);
-        byte[] newByts = new byte[len / 8];
+//        byte[] newByts = new byte[len / 8];
         int index = 0;
-        for (int i = 0; i < len; i += 8) {
+        StringBuffer test = new StringBuffer();
+        for (int i = 0; i < len; i += 6) {
             String ss = "";
-            for (int j = i; j < i + 8; j++) {
+            for (int j = i; j < i + 6; j++) {
                 ss += finalStr.charAt(j);
             }
-            byte b = Long.valueOf(ss, 2).byteValue();
-            newByts[index++] = b;
+            test.append(ss + ",");
+            int l =  Integer.valueOf(ss, 2);
+            if (l > 15 && l < 32) {
+                l = Integer.valueOf("01" + ss, 2);
+            } else if(l > 31 && l < 48) {
+                l = Integer.valueOf("10" + ss, 2);
+            } else if (l > 47 && l < 64) {
+                l = Integer.valueOf("11" + ss, 2);
+            }
+            try {
+                headStr += keys.charAt(l);
+            } catch (Exception e){
+
+            }
+//            headStr += new String(new byte[]{b});
+//            newByts[index++] = b;
         }
+        Log.e("TAG", test.toString());
         //校验和
-        String last = "," + v;
-        byte[] ll = last.getBytes();
-        newByts = ByteUtil.byteMerger(headByts, newByts);
-        newByts = ByteUtil.byteMerger(newByts, ll);
-        last = "*" + Util.computeCheckSum(newByts, 0, newByts.length);
-        return ByteUtil.byteMerger(newByts, last.getBytes());
+        headStr += "," + v;
+//        byte[] ll = last.getBytes();
+        //newByts = ByteUtil.byteMerger(headByts, newByts);
+        //newByts = ByteUtil.byteMerger(newByts, ll);
+        String last = "*" + Util.computeCheckSum(headStr.getBytes(), 0, headStr.getBytes().length);
+        headStr += last;
+//        byte[] finalByts = ByteUtil.byteMerger(newByts, last.getBytes());
+//        Log.e("TAG", ConvertUtil.bytesToHexString(newByts));
+        return headStr.getBytes();
     }
 
-    private String bu0(String numberStr) {
+    private String bu0_8(String numberStr) {
         if (TextUtils.isEmpty(numberStr)) return "";
         int len = numberStr.length();
         if (len < 8) {

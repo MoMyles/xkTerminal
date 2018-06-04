@@ -222,7 +222,12 @@ public class DataHandler extends Handler {
             case SERIAL_PORT_ALERT_SEND_SUCCESS:
                 // 报警发送成功
                 myApplication.mainActivity.gpsBar.showAlerting(false);
-                Toast.makeText(myApplication.mainActivity, "遇险报警发送成功", Toast.LENGTH_SHORT).show();
+                StringBuffer str = new StringBuffer("遇险报警");
+                if(MyApplication.getInstance().isAisConnected){
+                    str.append("和AIS安全广播");
+                }
+                str.append("发送成功");
+                Toast.makeText(myApplication.mainActivity, str.toString(), Toast.LENGTH_SHORT).show();
                 break;
             case SERIAL_PORT_SHOW_ALERT_ACTIVITY:
                 // 显示报警activity

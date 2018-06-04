@@ -19,7 +19,7 @@ public class DateUtil {
 	public static enum DatePattern {
 		YYYYMMDDHHMMSS_("yyyy-MM-dd HH:mm:ss"), YYYYMMDDHHMMSS("yyyy/MM/dd HH:mm:ss"), YYYYMMDD("yyyy/MM/dd"),
 		YYYYMMDDHHMMSSSS("yyyyMMddHHmmssSS"), UTC("yyyyMMdd.HHmmss"), UTC_NO_DOT("yyyyMMddHHmmss"),
-		LOCAL("yyyyMMdd HHmmss");
+		LOCAL("yyyyMMdd HHmmss"), HHMMSS("HH:mm:ss");
 
 		String pattern;
 

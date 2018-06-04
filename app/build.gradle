@@ -59,4 +59,6 @@ dependencies {
     implementation files('libs/Msc.jar')
     implementation files('libs/YimaApi.jar')
 
+    implementation 'com.github.lecho:hellocharts-library:1.5.8@aar'
+
 }

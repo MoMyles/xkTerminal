@@ -5,6 +5,7 @@ package com.cetcme.xkterminal.widget;
  */
 
 public class Satellite {
+    private int no;
     private int num;// 信号强度
     private int elevationAngle;// 仰角 0 - 90
     private int azimuth;// 方位角 0 - 359
@@ -12,6 +13,14 @@ public class Satellite {
     private String satelliteType;// 卫星类型
 
     public Satellite() {
+    }
+
+    public int getNo() {
+        return no;
+    }
+
+    public void setNo(int no) {
+        this.no = no;
     }
 
     public int getNum() {

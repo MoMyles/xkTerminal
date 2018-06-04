@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
 import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.DateUtil;
@@ -28,6 +29,7 @@ import org.xutils.DbManager;
 import org.xutils.ex.DbException;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Timer;
@@ -55,6 +57,12 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
     TextView tv_head;
     @BindView(R.id.tv_speed)
     TextView tv_speed;
+    @BindView(R.id.tv_end_time)
+    TextView tv_end_time;
+    @BindView(R.id.tv_fangwei)
+    TextView tv_fangwei;
+    @BindView(R.id.tv_dis)
+    TextView tv_dis;
 
     private int startWp = -1;
     private int endWp = -1;
@@ -166,11 +174,9 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                     }
                     lastReportTime = com.cetcme.xkterminal.MyClass.Constant.SYSTEM_DATE.getTime();
 
-
                     btn_navigation.setText("结束导航");
 
                 }
-                inNavigating = !inNavigating;
                 fMainView.mYimaLib.CenterMap(myLocation.getLongitude(), myLocation.getLatitude());
             }
         });
@@ -182,36 +188,34 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
     @Override
     protected void onStart() {
         super.onStart();
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                fMainView.mYimaLib.SetCurrentScale(8878176.0f);
-                fMainView.postInvalidate();
-
-
-                // TODO: test 添加自身位置，实际需要从Event中取
-
-                timer = new Timer();
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        LocationBean locationBean = new LocationBean();
-                        locationBean.setLongitude((int) ((121.12 + addOne) * 10000000));
-                        locationBean.setLatitude((int) ((31.12 + addOne) * 10000000));
-                        locationBean.setHeading(45f);
-                        locationBean.setSpeed(12.3f);
-                        locationBean.setAcqtime(com.cetcme.xkterminal.MyClass.Constant.SYSTEM_DATE);
-                        EventBus.getDefault().post(locationBean);
-                        addOne += 0.003f;
-                    }
-                }, 1000, 1000);
-
-
-                // end
-
-            }
-        }, 10);
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                fMainView.mYimaLib.SetCurrentScale(8878176.0f);
+//                fMainView.postInvalidate();
+//
+//
+//                // TODO: test 添加自身位置，实际需要从Event中取
+//
+//                timer = new Timer();
+//                timer.schedule(new TimerTask() {
+//                    @Override
+//                    public void run() {
+//                        LocationBean locationBean = new LocationBean();
+//                        locationBean.setLongitude((int) ((121.12 + addOne) * 10000000));
+//                        locationBean.setLatitude((int) ((31.12 + addOne) * 10000000));
+//                        locationBean.setHeading(45f);
+//                        locationBean.setSpeed(12.3f);
+//                        EventBus.getDefault().post(locationBean);
+//                        addOne += 0.003f;
+//                    }
+//                }, 1000, 1000);
+//
+//
+//                // end
+//
+//            }
+//        }, 10);
     }
 
     @Override
@@ -480,7 +484,8 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
             }
 
             // 计算终点距离，判断是否结束导航
-            if (getNavigationEndDistance(myLocation, endWp) < Constant.NAVIGATION_END_DIST) {
+            double restDis = getNavigationEndDistance(myLocation, endWp);
+            if (restDis < Constant.NAVIGATION_END_DIST) {
                 toast.setText("已到达目的地附近，导航结束");
                 toast.show();
                 MainActivity.play("已到达目的地附近，导航结束");
@@ -496,6 +501,18 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                     }
                 }, 500);
             }
+
+            //更新距离、方位等信息
+            double time = restDis / myLocation.getSpeed();// 小时
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.HOUR_OF_DAY, (int) time);
+            tv_end_time.setText(DateUtil.parseDateToString(calendar.getTime(), DateUtil.DatePattern.HHMMSS));
+            M_POINT wpCoor = fMainView.mYimaLib.getWayPointCoor(endWp);
+            double fangwei = fMainView.mYimaLib.GetBearingBetwTwoPoint(myLocation.getLongitude(), myLocation.getLatitude(),
+                    wpCoor.x, wpCoor.y);//方位
+            tv_fangwei.setText(fangwei+"°");
+            tv_dis.setText(restDis+"");
+            inNavigating = !inNavigating;
         }
     }
 

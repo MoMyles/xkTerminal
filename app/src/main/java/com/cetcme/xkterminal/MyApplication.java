@@ -4,11 +4,13 @@ import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.DataFormat.IDFormat;
@@ -24,6 +26,8 @@ import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.MyClass.SoundPlay;
 import com.cetcme.xkterminal.Navigation.GpsInfo;
 import com.cetcme.xkterminal.Navigation.GpsParse;
+import com.cetcme.xkterminal.Navigation.NavigationMainActivity;
+import com.cetcme.xkterminal.Navigation.RouteListActivity;
 import com.cetcme.xkterminal.Navigation.SkiaDrawView;
 import com.cetcme.xkterminal.Socket.SocketManager;
 import com.cetcme.xkterminal.Socket.SocketServer;
@@ -55,8 +59,10 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidParameterException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -511,11 +517,95 @@ public class MyApplication extends Application {
                             break;
                     }
                     break;
+                case "route_list":
+                    jsonObject.put("apiType", "route_list");
+                    jsonObject.put("code", "0");
+                    jsonObject.put("msg", "获取成功");
+                    jsonObject.put("data", getRouteList());
+                    SocketServer.send(jsonObject);
+                    break;
+                case "route_detail":
+                    String navtime = receiveJson.getString("navtime");
+                    jsonObject.put("apiType", "route_detail");
+                    jsonObject.put("code", "0");
+                    jsonObject.put("msg", "获取成功");
+                    jsonObject.put("navtime", receiveJson.getString("navtime"));
+                    jsonObject.put("data", getRouteDetail(navtime));
+                    SocketServer.send(jsonObject);
+                    break;
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
+    }
+
+    /**
+     * 获取航迹列表
+     * @return
+     */
+    public JSONArray getRouteList() {
+        JSONArray routeList = new JSONArray();
+        try {
+            Cursor cursor = db.execQuery("select navtime from t_location group by navtime");
+            //判断游标是否为空
+            if (cursor.moveToFirst()) {
+                //遍历游标
+                for(int i = 0; i < cursor.getCount(); i++){
+                    cursor.moveToPosition(i);
+                    String navtime = cursor.getString(0);
+                    if (navtime != null) {
+                        JSONObject jsonObject = new JSONObject();
+                        try {
+                            jsonObject.put("navtime", navtime);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        routeList.put(jsonObject);
+                    }
+                }
+            }
+            cursor.close();
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
+
+        return routeList;
+    }
+
+    /**
+     * 获取航迹内容 返回String
+     * @param navtime
+     * @return
+     */
+    public String getRouteDetail(String navtime) {
+        String detail;
+        try {
+            List<LocationBean> list = db.selector(LocationBean.class)
+                    .where("navtime", "=", navtime)
+                    .orderBy("acqtime")
+                    .findAll();
+            if (list == null || list.isEmpty()) {
+                detail = "未查询到相关轨迹信息";
+            } else {
+                detail = "";
+                for (LocationBean lb : list) {
+                    detail += lb.toString();
+                }
+            }
+            db.delete(list);
+            Date date = new Date(Long.parseLong(navtime));
+            Toast.makeText(mainActivity, "已删除航迹：" + com.cetcme.xkterminal.MyClass.DateUtil.Date2String(date), Toast.LENGTH_SHORT).show();
+
+            JSONObject jsonObject1 = new JSONObject();
+            jsonObject1.put("apiType", "refreshRouteList");
+            EventBus.getDefault().post(new SmsEvent(jsonObject1));
+        } catch (Exception e) {
+            e.printStackTrace();
+            detail = "未查询到相关轨迹信息";
+        }
+
+        return detail;
     }
 
     public JSONArray getSmsList() {

@@ -13,12 +13,18 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.DateUtil;
 import com.cetcme.xkterminal.R;
 import com.qiuhong.qhlibrary.QHTitleView.QHTitleView;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.xutils.DbManager;
 import org.xutils.ex.DbException;
 
@@ -65,6 +71,7 @@ public class RouteListActivity extends Activity {
         ButterKnife.bind(this);
         context = this;
 
+        EventBus.getDefault().register(this);
         // PermissionUtil.verifyStoragePermissions(this);
 
 
@@ -81,6 +88,12 @@ public class RouteListActivity extends Activity {
             getRouteData();
         }
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
     }
 
     private void initTitleView() {
@@ -261,6 +274,22 @@ public class RouteListActivity extends Activity {
         class ViewHolder {
             TextView mTv1;
             TextView mTv2;
+        }
+    }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void Event(SmsEvent smsEvent) {
+        JSONObject receiveJson = smsEvent.getReceiveJson();
+        try {
+            String apiType = receiveJson.getString("apiType");
+            switch (apiType) {
+                case "refreshRouteList":
+                    getRouteData();
+                    break;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 }

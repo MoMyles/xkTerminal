@@ -228,6 +228,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                         locationBean.setLatitude((int) ((31.12 + addOne) * 10000000));
                         locationBean.setHeading(45f);
                         locationBean.setSpeed(12.3f);
+                        locationBean.setAcqtime(com.cetcme.xkterminal.MyClass.Constant.SYSTEM_DATE);
                         EventBus.getDefault().post(locationBean);
                         addOne += 0.003f;
                     }
@@ -538,7 +539,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
             double fangwei = fMainView.mYimaLib.GetBearingBetwTwoPoint(myLocation.getLongitude(), myLocation.getLatitude(),
                     wpCoor.x, wpCoor.y);//方位
             tv_fangwei.setText(String.format("%.2f°", fangwei));
-            tv_dis.setText(String.format("%.2f°", restDis));
+            tv_dis.setText(String.format("%.2f", restDis));
 //            inNavigating = !inNavigating;
         }
     }

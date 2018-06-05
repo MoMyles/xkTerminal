@@ -128,6 +128,20 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
         super.onResume();
     }
 
+    @Override
+    protected void onDestroy() {
+        if (routeID != -1) {
+            int[] ids = fMainView.mYimaLib.GetRouteWayPointsID(routeID);
+            fMainView.mYimaLib.DeleteRouteWayPoint(routeID, 0, ids.length); // 必须在调用DeleteWayPoint之前
+            for (int id : ids) {
+                fMainView.mYimaLib.DeleteWayPoint(id);
+            }
+        }
+        fMainView.mYimaLib.RotateMapByScrnCenter(0);
+        fMainView.clearTrack();
+        super.onDestroy();
+    }
+
     /**
      * 放大地图
      *
@@ -624,11 +638,6 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
         tvRoute.setOnClickListener(this);
         final LinearLayout tvNavigator = contentView.findViewById(R.id.tv_navigator);
         tvNavigator.setOnClickListener(this);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
     }
 
     public void Back_Event(View view) {

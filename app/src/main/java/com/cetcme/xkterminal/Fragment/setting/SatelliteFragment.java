@@ -29,7 +29,6 @@ import org.xutils.DbManager;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.Timer;
@@ -157,18 +156,8 @@ public class SatelliteFragment extends Fragment {
     private void refreshSatellite() {
         mSatelliteList.clear();
         Random random = new Random();
-        for (int i = 0; i < 4; i++) {
-            Satellite satellite1 = new Satellite();
-            int j = random.nextInt(50);
-            satellite1.setNum(j);
-            int k = random.nextInt(359);
-            satellite1.setAzimuth(k);
-            int l = random.nextInt(90);
-            satellite1.setElevationAngle(l);
-            satellite1.setNo(random.nextInt(90));
-            mSatelliteList.add(satellite1);
-        }
         DbManager db = MyApplication.getInstance().getDb();
+        String str = ",";
         try {
             List<GPSBean> list = db.selector(GPSBean.class).findAll();
             for (GPSBean g : list) {
@@ -178,6 +167,26 @@ public class SatelliteFragment extends Fragment {
                 satellite.setAzimuth(g.getFangwei());
                 satellite.setElevationAngle(g.getYangjiao());
                 mSatelliteList.add(satellite);
+                str += g.getNo() + ",";
+            }
+
+            for (int i = 0, k = 0; i < 15 - mSatelliteList.size(); k++) {
+                Satellite satellite1 = new Satellite();
+                int j = random.nextInt(50);
+                if (k == 100) {
+                    break;
+                }
+                if (str.indexOf("," + j + ",") >= 0) {
+                    continue;
+                }
+                i++;
+                satellite1.setNum(j);
+                int kk = random.nextInt(359);
+                satellite1.setAzimuth(kk);
+                int l = random.nextInt(90);
+                satellite1.setElevationAngle(l);
+                satellite1.setNo(random.nextInt(90));
+                mSatelliteList.add(satellite1);
             }
 
         } catch (Exception e) {
@@ -206,10 +215,10 @@ public class SatelliteFragment extends Fragment {
         Axis axis = new Axis();
         //循环初始化每根柱子，
         for (int i = 0; i < numColumns; i++) {
-            axisValues.add(new AxisValue(i).setLabel(mSatelliteList.get(random.nextInt(mSatelliteList.size())).getNum()+""));
+            axisValues.add(new AxisValue(i).setLabel(mSatelliteList.get(i).getNum() + ""));
             values = new ArrayList<>();
             //每一根柱子中只有一根小柱子
-            values.add(new SubcolumnValue(mSatelliteList.get(random.nextInt(mSatelliteList.size())).getNo() * 1.0f, ChartUtils.pickColor()));
+            values.add(new SubcolumnValue(mSatelliteList.get(i).getNo() * 1.0f, ChartUtils.pickColor()));
             //初始化Column
             Column column = new Column(values);
             column.setHasLabels(true);

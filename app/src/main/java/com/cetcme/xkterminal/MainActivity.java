@@ -203,10 +203,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }).start();
 
-        if (gpsBar != null) {
-            gpsBar.setAisStatus(true);
-            gpsBar.setGPSStatus(true);
-        }
+//        if (gpsBar != null) {
+//            gpsBar.setAisStatus(true);
+//            gpsBar.setGPSStatus(true);
+//        }
     }
 
     /**

@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,9 +17,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.cetcme.xkterminal.DataFormat.AlertFormat;
 import com.cetcme.xkterminal.Event.SmsEvent;
@@ -33,6 +36,7 @@ import com.cetcme.xkterminal.Navigation.WarnArea;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 import com.cetcme.xkterminal.Sqlite.Bean.OtherShipBean;
+import com.qiuhong.qhlibrary.QHTitleView.QHTitleView;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
@@ -49,7 +53,6 @@ import org.xutils.ex.DbException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
 import yimamapapi.skia.AisInfo;
 import yimamapapi.skia.M_POINT;
@@ -584,14 +587,45 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                 ll_ship_list.setVisibility(View.VISIBLE);
                 showOtherShip = true;
             }
+        } else if ("openBiaowei".equals(action)) {
+            doBiaoWei = true;
+            showOtherShip = false;
+            Toast.makeText(getActivity(), "请选择标位点", Toast.LENGTH_SHORT).show();
         }
     }
-
+    // 标位操作
+    private boolean doBiaoWei = false;
     @Override
     public void onMapClicked(M_POINT m_point) {
-        if (ll_ship_list.getVisibility() == View.VISIBLE) {
-            ll_ship_list.setVisibility(View.GONE);
-            showOtherShip = false;
+        if (showOtherShip) {
+            if (ll_ship_list.getVisibility() == View.VISIBLE) {
+                ll_ship_list.setVisibility(View.GONE);
+                showOtherShip = false;
+            }
+        } else if (doBiaoWei) {
+            doBiaoWei = false;
+            final View view = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_biaowei, null);
+            final QHTitleView title = view.findViewById(R.id.title);
+            title.setTitle("标位设置");
+            final EditText et1 = view.findViewById(R.id.et1);
+            final EditText et2 = view.findViewById(R.id.et2);
+            et1.setText(m_point.x/1e7 + "");
+            et2.setText(m_point.y/1e7 + "");
+            final Button b1 = view.findViewById(R.id.btn1);//确定
+            final Button b2 = view.findViewById(R.id.btn2);//取消
+            b1.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    //TODO 确定
+                }
+            });
+            b2.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    //TODO 取消
+                }
+            });
+            new AlertDialog.Builder(getActivity()).setView(view).setCancelable(false).show();
         }
     }
 

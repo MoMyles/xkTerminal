@@ -10,7 +10,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.DataFormat.IDFormat;
@@ -26,8 +25,6 @@ import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.MyClass.SoundPlay;
 import com.cetcme.xkterminal.Navigation.GpsInfo;
 import com.cetcme.xkterminal.Navigation.GpsParse;
-import com.cetcme.xkterminal.Navigation.NavigationMainActivity;
-import com.cetcme.xkterminal.Navigation.RouteListActivity;
 import com.cetcme.xkterminal.Navigation.SkiaDrawView;
 import com.cetcme.xkterminal.Socket.SocketManager;
 import com.cetcme.xkterminal.Socket.SocketServer;
@@ -36,6 +33,8 @@ import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 import com.cetcme.xkterminal.Sqlite.Bean.MessageBean;
 import com.cetcme.xkterminal.Sqlite.Bean.OtherShipBean;
 import com.cetcme.xkterminal.Sqlite.Proxy.MessageProxy;
+import com.ftdi.j2xx.D2xxManager;
+import com.ftdi.j2xx.FT_Device;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
 import com.joanzapata.iconify.Iconify;
@@ -62,7 +61,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -174,17 +172,14 @@ public class MyApplication extends Application {
             mSerialPort = getSerialPort();
             mOutputStream = mSerialPort.getOutputStream();
             mInputStream = mSerialPort.getInputStream();
-
-            aisSerialPort = getAisSerialPort();
-            aisOutputStream = aisSerialPort.getOutputStream();
-            aisInputStream = aisSerialPort.getInputStream();
-
-            // Create a receiving thread
             ReadThread mReadThread = new ReadThread();
             mReadThread.start();
 
-            AisReadThread aisReadThread = new AisReadThread();
-            aisReadThread.start();
+//            aisSerialPort = getAisSerialPort();
+//            aisOutputStream = aisSerialPort.getOutputStream();
+//            aisInputStream = aisSerialPort.getInputStream();
+//            AisReadThread aisReadThread = new AisReadThread();
+//            aisReadThread.start();
 
         } catch (SecurityException e) {
             DisplayError(R.string.error_security);
@@ -248,8 +243,6 @@ public class MyApplication extends Application {
         currentLocation.setHeading(0.0f);
         currentLocation.setAcqtime(new Date(Constant.SYSTEM_DATE.getTime()));
         currentLocation.setSpeed(0.0f);
-
-        Log.e("TAG_CESHI", new String(createAisWarnInfoMessage("测试警告信息")));
 
     }
 
@@ -542,6 +535,7 @@ public class MyApplication extends Application {
 
     /**
      * 获取航迹列表
+     *
      * @return
      */
     public JSONArray getRouteList() {
@@ -551,7 +545,7 @@ public class MyApplication extends Application {
             //判断游标是否为空
             if (cursor.moveToFirst()) {
                 //遍历游标
-                for(int i = 0; i < cursor.getCount(); i++){
+                for (int i = 0; i < cursor.getCount(); i++) {
                     cursor.moveToPosition(i);
                     String navtime = cursor.getString(0);
                     if (navtime != null) {
@@ -575,6 +569,7 @@ public class MyApplication extends Application {
 
     /**
      * 获取航迹内容 返回String
+     *
      * @param navtime
      * @return
      */
@@ -1360,9 +1355,9 @@ public class MyApplication extends Application {
             mmsi = sp.getString("shipNo", "");
         }
         int bu = 30;
-        if (!"".equals(mmsi)){
+        if (!"".equals(mmsi)) {
             // MMSI
-            String mmsiByts =Integer.toBinaryString(Integer.valueOf(mmsi));
+            String mmsiByts = Integer.toBinaryString(Integer.valueOf(mmsi));
             bu = 30 - mmsiByts.length();//30位补0
             if (bu > 0) {
                 for (int i = 0; i < bu; i++) {
@@ -1409,17 +1404,17 @@ public class MyApplication extends Application {
                 ss += finalStr.charAt(j);
             }
             test.append(ss + ",");
-            int l =  Integer.valueOf(ss, 2);
+            int l = Integer.valueOf(ss, 2);
             if (l > 15 && l < 32) {
                 l = Integer.valueOf("01" + ss, 2);
-            } else if(l > 31 && l < 48) {
+            } else if (l > 31 && l < 48) {
                 l = Integer.valueOf("10" + ss, 2);
             } else if (l > 47 && l < 64) {
                 l = Integer.valueOf("11" + ss, 2);
             }
             try {
                 headStr += keys.charAt(l);
-            } catch (Exception e){
+            } catch (Exception e) {
 
             }
 //            headStr += new String(new byte[]{b});
@@ -1465,4 +1460,5 @@ public class MyApplication extends Application {
         }
         return numberStr;
     }
+
 }

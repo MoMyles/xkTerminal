@@ -79,6 +79,8 @@ public class SkiaDrawView extends View {
 //        mYimaLib.SetOwnShipBasicInfo("基站-2431", "4132431", 100, 20);
 //        mYimaLib.SetDisplayCategory(3);
 //        mYimaLib.SetIfShowSoundingAndMinMaxSound(true, 0, 20);
+
+
     }
 
     @Override
@@ -94,6 +96,52 @@ public class SkiaDrawView extends View {
         createLine(canvas, Color.RED, LINE_CHIWEIYU);
         createLine(canvas, Color.BLUE, LINE_BLUE1);
         createLine(canvas, Color.BLUE, LINE_BLUE2);
+
+
+//        int[] arrGeoX = new int[]{(int)(122.4151167*1e7),(int)(122.23819*1e7),(int)(119.5712833*1e7)};
+//        int[] arrGeoY = new int[]{(int)(29.9224167*1e7),(int)(29.97372*1e7),(int)(25.2664833*1e7)};
+//        // 添加点
+//        mYimaLib.tmAppendLayer(1);//添加点图层
+//        curLayerPos2 = mYimaLib.tmGetLayerCount() - 1;
+//        mYimaLib.tmSetLayerName(curLayerPos2, "点图层");
+//        mYimaLib.tmSetLayerDrawOrNot(curLayerPos2, true);
+//        mYimaLib.tmAddLayerAttribute(curLayerPos2, 4, "point");//添加图层属性：属性名称："物标名称",属性值类型：4（字符串）
+//        for (int iObj = 0; iObj < arrGeoX.length; iObj++) {
+//            mYimaLib.tmAppendObjectInLayer(curLayerPos2, 0);//在图层上添加一个点物标
+//            int objCount = mYimaLib.tmGetLayerObjectCount(curLayerPos2);
+//            objLayerPos2.add(objCount);
+//            //layerAttrCount = mYimaLib.tmGetLayerObjectAttrCount(curLayerPos2);
+//            //mYimaLib.tmSetObjectAttrValueString(curLayerPos2, objCount - 1, layerAttrCount - 1, sdf.format(list.get(iObj).getAcqtime()));//设置物标属性值字符串
+//            mYimaLib.tmSetPointObjectCoor(curLayerPos2, objCount - 1, arrGeoX[iObj], arrGeoY[iObj]);//设置物标坐标
+//            if (iObj == 0) {
+//                try {
+//                    String str = new String("标位1".getBytes("gbk"), "gbk");
+//                    mYimaLib.tmSetPointObjectStyle(curLayerPos2, objCount - 1, 1,
+//                            true, 255, 0, 0, 20,
+//                            str, "", 20, 0, 0, 0, true, false, 0, 0, 0, 0);//设置物标样式
+//                } catch (UnsupportedEncodingException e) {
+//                    e.printStackTrace();
+//                }
+//            } else if (iObj == arrGeoX.length - 1) {
+//                try {
+//                    String str = new String("标位2".getBytes("gbk"), "gbk");
+//                    mYimaLib.tmSetPointObjectStyle(curLayerPos2, objCount - 1, 1,
+//                            true, 0, 255, 0, 20,
+//                            str, "", 20, 0, 0, 0, true, false, 0, 0, 0, 0);//设置物标样式
+//                } catch (UnsupportedEncodingException e) {
+//                    e.printStackTrace();
+//                }
+//            } else if (iObj > 0) {
+//                try {
+//                    String str = new String("标位3".getBytes("gbk"), "gbk");
+//                    mYimaLib.tmSetPointObjectStyle(curLayerPos2, objCount - 1, 1,
+//                            true, 0, 0, 255, 20,
+//                            str, "", 20, 0, 0, 0, true, false, 0, 0, 0, 0);//设置物标样式
+//                } catch (UnsupportedEncodingException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
 //        Paint paint = new Paint();
 //        paint.setARGB(255,255, 0, 0);
 //        canvas.drawRect(0, 0, 500, 800, paint);
@@ -369,15 +417,15 @@ public class SkiaDrawView extends View {
             if (iObj == 0) {
                 mYimaLib.tmSetPointObjectStyle(curLayerPos2, objCount - 1, 1,
                         true, iObj * 10, iObj * 10, 255 - iObj * 10, 20,
-                        sdf.format(list.get(iObj).getAcqtime()) + "("+list.get(iObj).getSpeed()+" kn)", "", 20, 0, 0, 0, true, false, 0, 0, 0, 0);//设置物标样式
+                        sdf.format(list.get(iObj).getAcqtime()) + "(" + list.get(iObj).getSpeed() + " kn)", "", 20, 0, 0, 0, true, false, 0, 0, 0, 0);//设置物标样式
             } else if (iObj == arrGeoX.length - 1) {
                 mYimaLib.tmSetPointObjectStyle(curLayerPos2, objCount - 1, 3,
                         true, iObj * 10, iObj * 10, 255 - iObj * 10, 20,
-                        sdf.format(list.get(iObj).getAcqtime()), "", 20, 0, 0, 0, true, false, 0, 0, 0, 0);//设置物标样式
+                        sdf.format(list.get(iObj).getAcqtime()) + "(" + list.get(iObj).getSpeed() + " kn)", "", 20, 0, 0, 0, true, false, 0, 0, 0, 0);//设置物标样式
             } else if (iObj > 0) {
                 mYimaLib.tmSetPointObjectStyle(curLayerPos2, objCount - 1, 2,
                         true, iObj * 10, iObj * 10, 255 - iObj * 10, 20,
-                        sdf.format(list.get(iObj).getAcqtime()), "", 20, 0, 0, 0, true, false, 0, 0, 0, 0);//设置物标样式
+                        sdf.format(list.get(iObj).getAcqtime()) + "(" + list.get(iObj).getSpeed() + " kn)", "", 20, 0, 0, 0, true, false, 0, 0, 0, 0);//设置物标样式
             }
         }
         postInvalidate();

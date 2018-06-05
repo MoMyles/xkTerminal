@@ -104,7 +104,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-                android:text="121.231"/>
+                android:text="---"/>
 
         </LinearLayout>
 
@@ -123,7 +123,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-                android:text="31.231"/>
+                android:text="---"/>
         </LinearLayout>
 
         <LinearLayout
@@ -141,7 +141,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-                android:text="31.2"/>
+                android:text="---"/>
         </LinearLayout>
 
         <LinearLayout
@@ -159,7 +159,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-                android:text="31.2"/>
+                android:text="---"/>
         </LinearLayout>
 
         <LinearLayout
@@ -218,5 +218,17 @@
 
 
     </LinearLayout>
+
+    <Switch
+        android:id="@+id/switch_rotate"
+        android:layout_width="wrap_content"
+        android:layout_height="56dp"
+        android:layout_marginRight="10dp"
+        android:switchMinWidth="24dp"
+        android:text="跟随船头"
+        android:textOff="关"
+        android:textOn="开"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ly_status" />
 
 </android.support.constraint.ConstraintLayout>

@@ -85,7 +85,7 @@ public class MyApplication extends Application {
     private SharedPreferences sp = null;
 
     private static MyApplication mContext;
-    private static LocationBean currentLocation;
+    public static LocationBean currentLocation;
     public DbManager db;
 
     public DataHandler mHandler;
@@ -240,7 +240,7 @@ public class MyApplication extends Application {
         currentLocation.setLongitude(0);
         currentLocation.setLatitude(0);
         currentLocation.setHeading(0.0f);
-        currentLocation.setAcqtime(new Date(Constant.SYSTEM_DATE.getTime() - 10 * 60 * 1000));
+        currentLocation.setAcqtime(new Date(Constant.SYSTEM_DATE.getTime()));
         currentLocation.setSpeed(0.0f);
 
         Log.e("TAG_CESHI", new String(createAisWarnInfoMessage("测试警告信息")));

@@ -223,6 +223,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
         }
 
         loadOwnShipInfo();
+        // TODO: test?
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -231,13 +232,14 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                 skiaDrawView.mYimaLib.SetCurrentScale(8878176.0f);
                 skiaDrawView.postInvalidate();
             }
-        }, 200);
+        }, 10);
 
         LocationBean lb = new LocationBean();
         lb.setLongitude((int) (121.768783 * 1e7));
         lb.setLatitude((int) (28.696902 * 1e7));
         lb.setHeading(166.1f);
         lb.setSpeed(0.9f);
+        MyApplication.currentLocation = lb;
         EventBus.getDefault().post(lb);
 
 

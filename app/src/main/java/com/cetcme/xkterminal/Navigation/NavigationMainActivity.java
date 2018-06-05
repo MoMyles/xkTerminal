@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
@@ -110,6 +111,21 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
         btnNaviGo = findViewById(R.id.navi_go);
         btnNaviCancel.setOnClickListener(this);
         btnNaviGo.setOnClickListener(this);
+
+        // 显示本船位置
+        LocationBean currentLocation = MyApplication.getInstance().getCurrentLocation();
+        setOwnShip(currentLocation, currentLocation.getHeading(), false);
+    }
+
+    @Override
+    protected void onResume() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                fMainView.postInvalidate();
+            }
+        }, 10);
+        super.onResume();
     }
 
     /**
@@ -637,5 +653,13 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
             }
         }
 //        Log.e(TAG, "addLocation: ok");
+    }
+
+    public void setOwnShip(LocationBean locationBean, float heading, boolean rotateScreen) {
+        fMainView.mYimaLib.SetOwnShipCurrentInfo(locationBean.getLongitude(), locationBean.getLatitude(), heading, 50, 50, 0, 0);
+        fMainView.mYimaLib.SetOwnShipShowSymbol(false, 4, true, 16, 5000000);
+        fMainView.mYimaLib.RotateMapByScrnCenter(rotateScreen ? 0 - heading : 0);
+        fMainView.mYimaLib.CenterMap(locationBean.getLongitude(), locationBean.getLatitude());
+        fMainView.postInvalidate();
     }
 }

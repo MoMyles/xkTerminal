@@ -11,13 +11,16 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
 import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.MyApplication;
+import com.cetcme.xkterminal.MyClass.GPSFormatUtils;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 
@@ -63,10 +66,13 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
     @BindView(R.id.tv_dis)
     TextView tv_dis;
 
+    @BindView(R.id.switch_rotate)
+    Switch switch_rotate;
+
     private int startWp = -1;
     private int endWp = -1;
     private int routeID = -1;
-    private LocationBean myLocation;
+    private LocationBean myLocation = MyApplication.getInstance().getCurrentLocation();
 
     private boolean inNavigating = false;
     private Toast toast;
@@ -94,6 +100,11 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
 
         ButterKnife.bind(this);
         toast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
+
+        // 更新位置
+        Log.i(TAG, "onCreate: " + myLocation.toString());
+        setOwnShip(myLocation, myLocation.getHeading(), inNavigating);
+        updateShipInfo(myLocation);
 
         // 如果是从航线文件进入导航界面
         routeFileName = getIntent().getStringExtra("routeFileName");
@@ -159,6 +170,9 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                     toast.setText("开始导航");
                     toast.show();
 
+                    // 刷新本船位置，用户旋转开关
+//                    setOwnShip(myLocation, myLocation.getHeading(), switch_rotate.isChecked());
+
                     if (endDistToRead == -1) {
                         // 选取终点
                         M_POINT startPoint = fMainView.mYimaLib.getWayPointCoor(startWp);
@@ -174,9 +188,19 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                     lastReportTime = com.cetcme.xkterminal.MyClass.Constant.SYSTEM_DATE.getTime();
 
                     btn_navigation.setText("结束导航");
-
                 }
+                inNavigating = !inNavigating;
                 fMainView.mYimaLib.CenterMap(myLocation.getLongitude(), myLocation.getLatitude());
+            }
+        });
+
+        switch_rotate.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (myLocation != null && inNavigating) {
+                    fMainView.mYimaLib.RotateMapByScrnCenter(b ? 0 - myLocation.getHeading() : 0);
+                    fMainView.postInvalidate();
+                }
             }
         });
     }
@@ -187,34 +211,33 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
     @Override
     protected void onStart() {
         super.onStart();
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                fMainView.mYimaLib.SetCurrentScale(8878176.0f);
-//                fMainView.postInvalidate();
-//
-//
-//                // TODO: test 添加自身位置，实际需要从Event中取
-//
-//                timer = new Timer();
-//                timer.schedule(new TimerTask() {
-//                    @Override
-//                    public void run() {
-//                        LocationBean locationBean = new LocationBean();
-//                        locationBean.setLongitude((int) ((121.12 + addOne) * 10000000));
-//                        locationBean.setLatitude((int) ((31.12 + addOne) * 10000000));
-//                        locationBean.setHeading(45f);
-//                        locationBean.setSpeed(12.3f);
-//                        EventBus.getDefault().post(locationBean);
-//                        addOne += 0.003f;
-//                    }
-//                }, 1000, 1000);
-//
-//
-//                // end
-//
-//            }
-//        }, 10);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                fMainView.mYimaLib.SetCurrentScale(8878176.0f);
+                fMainView.postInvalidate();
+
+                // TODO: test 添加自身位置，实际需要从Event中取
+
+                timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        LocationBean locationBean = new LocationBean();
+                        locationBean.setLongitude((int) ((121.12 + addOne) * 10000000));
+                        locationBean.setLatitude((int) ((31.12 + addOne) * 10000000));
+                        locationBean.setHeading(45f);
+                        locationBean.setSpeed(12.3f);
+                        EventBus.getDefault().post(locationBean);
+                        addOne += 0.003f;
+                    }
+                }, 1000, 1000);
+
+
+                // end
+
+            }
+        }, 10);
     }
 
     @Override
@@ -299,7 +322,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
      * @param view
      */
     public void OwnCenterClick_Event(View view) {
-        if (myLocation.getLongitude() == 0.0 && myLocation.getLatitude() == 0.0) return;
+        if (myLocation == null || (myLocation.getLongitude() == 0.0 && myLocation.getLatitude() == 0.0)) return;
         fMainView.mYimaLib.CenterMap(myLocation.getLongitude(), myLocation.getLatitude());
         fMainView.postInvalidate();//刷新fMainView
     }
@@ -408,12 +431,17 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
         isDanger = false;
         if (timer != null) timer.cancel();
         if (routeID != -1) {
-            fMainView.mYimaLib.DeleteRoute(routeID);
             int[] ids = fMainView.mYimaLib.GetRouteWayPointsID(routeID);
+            fMainView.mYimaLib.DeleteRouteWayPoint(routeID, 0, ids.length); // 必须在调用DeleteWayPoint之前
             for (int id : ids) {
                 fMainView.mYimaLib.DeleteWayPoint(id);
             }
         }
+        if (endWp != -1) {
+            fMainView.mYimaLib.DeleteWayPoint(endWp);
+        }
+
+        fMainView.mYimaLib.RotateMapByScrnCenter(0);
         super.onDestroy();
     }
 
@@ -425,9 +453,9 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onLocationEvent(LocationBean lb) {
-        Log.i("TAG", "onLocationEvent: 收到自身位置");
-        Log.i("TAG", "onLocationEvent: 纬度lat:" + lb.getLatitude());
-        Log.i("TAG", "onLocationEvent: 经度lon:" + lb.getLongitude());
+        Log.i("NavigationActivity", "onLocationEvent: 收到自身位置");
+        Log.i("NavigationActivity", "onLocationEvent: 纬度lat:" + lb.getLatitude());
+        Log.i("NavigationActivity", "onLocationEvent: 经度lon:" + lb.getLongitude());
         if (myLocation == null) {
             myLocation = lb;
             fMainView.mYimaLib.CenterMap(myLocation.getLongitude(), myLocation.getLatitude());
@@ -440,7 +468,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
             fMainView.mYimaLib.SetWayPointCoor(startWp, myLocation.getLongitude(), myLocation.getLatitude());
 
         // 根据每次gps信息更新位置
-        setOwnShip(myLocation, lb.getHeading(), inNavigating);
+        setOwnShip(myLocation, lb.getHeading(), inNavigating && switch_rotate.isChecked());
 
         // 更新框
         updateShipInfo(lb);
@@ -509,9 +537,9 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
             M_POINT wpCoor = fMainView.mYimaLib.getWayPointCoor(endWp);
             double fangwei = fMainView.mYimaLib.GetBearingBetwTwoPoint(myLocation.getLongitude(), myLocation.getLatitude(),
                     wpCoor.x, wpCoor.y);//方位
-            tv_fangwei.setText(fangwei+"°");
-            tv_dis.setText(restDis+"");
-            inNavigating = !inNavigating;
+            tv_fangwei.setText(String.format("%.2f°", fangwei));
+            tv_dis.setText(String.format("%.2f°", restDis));
+//            inNavigating = !inNavigating;
         }
     }
 
@@ -528,9 +556,9 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
      * @param locationBean
      */
     private void updateShipInfo(LocationBean locationBean) {
-        tv_lon.setText(String.format("%.3f", locationBean.getLongitude() / 10000000f));
-        tv_lat.setText(String.format("%.3f", locationBean.getLatitude() / 10000000f));
-        tv_head.setText(locationBean.getHeading() + "");
-        tv_speed.setText(locationBean.getSpeed() + "");
+        tv_lon.setText(GPSFormatUtils.DDtoDMS(locationBean.getLongitude() / 10000000d, true));
+        tv_lat.setText(GPSFormatUtils.DDtoDMS(locationBean.getLatitude() / 10000000d, false));
+        tv_head.setText(locationBean.getHeading() + "°");
+        tv_speed.setText(String.format("%.1f", locationBean.getSpeed()) + "kn");
     }
 }

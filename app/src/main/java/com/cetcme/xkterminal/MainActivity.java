@@ -1121,8 +1121,12 @@ public class MainActivity extends AppCompatActivity {
             case REQUEST_CODE_PIN_ACTIVITY:
                 switch (resultCode) {
                     case PinActivity.RESULT_CODE_MAP:
+                        // MainFragment里接收
+                        EventBus.getDefault().post("pin_map");
                         break;
                     case PinActivity.RESULT_CODE_CO:
+                        // MainFragment里接收
+                        EventBus.getDefault().post("pin_co");
                         break;
                 }
                 break;
@@ -1446,12 +1450,6 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    /**
-     * 打开标位弹窗
-     */
-    public void openBiaowei() {
-        EventBus.getDefault().post("openBiaowei");
-    }
 
     private class USBReadThread extends Thread {
         Handler mHandler;

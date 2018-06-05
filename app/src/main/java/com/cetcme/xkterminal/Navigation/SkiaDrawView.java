@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -13,9 +14,11 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
+import com.cetcme.xkterminal.Sqlite.Bean.PinBean;
 
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -430,6 +433,63 @@ public class SkiaDrawView extends View {
         }
         postInvalidate();
         Toast.makeText(mContext, "轨迹显示完成", Toast.LENGTH_SHORT).show();
+    }
+
+    private int curLayerPos3 = -1;
+    private List<Integer> objLayerPos3 = new ArrayList<>();
+
+    //显示标位物标
+    public void showBiaoWei(List<PinBean> list) {
+        if (list == null || list.isEmpty()) return;
+        clearBiaoWeiTrack();
+        // 添加点
+        mYimaLib.tmAppendLayer(1);//添加点图层
+        curLayerPos3 = mYimaLib.tmGetLayerCount() - 1;
+        mYimaLib.tmSetLayerName(curLayerPos3, "点图层");
+        mYimaLib.tmSetLayerDrawOrNot(curLayerPos3, true);
+        mYimaLib.tmAddLayerAttribute(curLayerPos3, 4, "point");//添加图层属性：属性名称："物标名称",属性值类型：4（字符串）
+        int[] arrGeoX = new int[list.size()];
+        int[] arrGeoY = new int[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            PinBean lb = list.get(i);
+            arrGeoX[i] = lb.getLon();
+            arrGeoY[i] = lb.getLat();
+        }
+        for (int iObj = 0; iObj < arrGeoX.length; iObj++) {
+            mYimaLib.tmAppendObjectInLayer(curLayerPos3, 0);//在图层上添加一个点物标
+            int objCount = mYimaLib.tmGetLayerObjectCount(curLayerPos3);
+            objLayerPos3.add(objCount);
+            //layerAttrCount = mYimaLib.tmGetLayerObjectAttrCount(curLayerPos2);
+            //mYimaLib.tmSetObjectAttrValueString(curLayerPos2, objCount - 1, layerAttrCount - 1, sdf.format(list.get(iObj).getAcqtime()));//设置物标属性值字符串
+            mYimaLib.tmSetPointObjectCoor(curLayerPos3, objCount - 1, arrGeoX[iObj], arrGeoY[iObj]);//设置物标坐标
+            try {
+                String str = new String(list.get(iObj).getName().getBytes("gbk"), "gbk");
+                int color = list.get(iObj).getColor();
+//                int hexColor = ContextCompat.getColor(mContext, color);
+                mYimaLib.tmSetPointObjectStyle(curLayerPos3, objCount - 1, 2,
+                        true, color & 0xFFFF0000, color & 0xFF00FF00
+                        , color & 0xFF0000FF, 20,
+                        str, "", 20, 0, 0, 0, true, false, 0, 0, 5, 0);//设置物标样式
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+        postInvalidate();
+        Toast.makeText(mContext, "标位已显示", Toast.LENGTH_SHORT).show();
+    }
+
+    public void clearBiaoWeiTrack() {
+        if (curLayerPos3 != -1) {
+            for (int a : objLayerPos3) {
+                mYimaLib.tmDeleteGeoObject(curLayerPos3, a);
+            }
+            objLayerPos3.clear();
+            mYimaLib.tmClearLayer(curLayerPos3);
+            mYimaLib.tmDeleteLayer(curLayerPos3);
+            curLayerPos3 = -1;
+        }
+        postInvalidate();
     }
 
     public void clearTrack() {

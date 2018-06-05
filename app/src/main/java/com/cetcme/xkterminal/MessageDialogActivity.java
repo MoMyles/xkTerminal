@@ -26,7 +26,7 @@ public class MessageDialogActivity extends Activity {
     @BindView(R.id.tv_title) TextView tv_title;
 
     int type = -1;
-
+    String content;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,23 +35,31 @@ public class MessageDialogActivity extends Activity {
 
         // type 0: 救护, 1: 报警提醒, 2: 夜间点名, 3: 告警信息
         type = getIntent().getIntExtra("type", -1);
+
+        content = getIntent().getStringExtra("content");
+
         switch (type) {
             case TYPE_RESCUE:
                 tv_title.setText("救护短信");
+                rescue_content_tv.setText(content);
                 SoundPlay.startAlertSound(MessageDialogActivity.this);
                 break;
             case TYPE_ALERT:
                 tv_title.setText("报警提醒");
+                rescue_content_tv.setText(content);
                 break;
             case TYPE_CALL_ROLL:
                 tv_title.setText("夜间点名");
+                String[] arr = content.split(":");
+                if (arr.length == 2) {
+                    rescue_content_tv.setText(arr[0]);
+                }
                 break;
             case TYPE_ALARM:
                 tv_title.setText("告警信息");
+                rescue_content_tv.setText(content);
                 break;
         }
-
-        rescue_content_tv.setText(getIntent().getStringExtra("content"));
         confirm_bt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -72,8 +80,12 @@ public class MessageDialogActivity extends Activity {
                 //
                 break;
             case TYPE_CALL_ROLL:
-                byte[] bytes = MessageFormat.format(Constant.SERVER_BD_NUMBER, "1", MessageFormat.MESSAGE_TYPE_CALL_THE_ROLL);
-                MyApplication.getInstance().sendBytes(bytes);
+                // 短信内容 "夜间点名:userid"
+                String[] arr = content.split(":");
+                if (arr.length == 2) {
+                    byte[] bytes = MessageFormat.format(Constant.SERVER_BD_NUMBER, arr[1], MessageFormat.MESSAGE_TYPE_CALL_THE_ROLL, 0);
+                    MyApplication.getInstance().sendBytes(bytes);
+                }
                 break;
         }
     }

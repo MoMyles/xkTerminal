@@ -91,7 +91,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/id_menu">
 
-
         <Button
             android:id="@+id/navi_cancel"
             android:layout_width="wrap_content"

@@ -85,7 +85,7 @@ public class MyApplication extends Application {
     private SharedPreferences sp = null;
 
     private static MyApplication mContext;
-    private static LocationBean currentLocation;
+    public static LocationBean currentLocation;
     public DbManager db;
 
     public DataHandler mHandler;
@@ -163,7 +163,7 @@ public class MyApplication extends Application {
         };
 
         //TODO: test for phone
-        /*
+
         try {
             mSerialPort = getSerialPort();
             mOutputStream = mSerialPort.getOutputStream();
@@ -187,7 +187,7 @@ public class MyApplication extends Application {
         } catch (InvalidParameterException e) {
             DisplayError(R.string.error_configuration);
         }
-        */
+
 
         //显示所有path
 //        String[] paths =  mSerialPortFinder.getAllDevicesPath();
@@ -240,7 +240,7 @@ public class MyApplication extends Application {
         currentLocation.setLongitude(0);
         currentLocation.setLatitude(0);
         currentLocation.setHeading(0.0f);
-        currentLocation.setAcqtime(new Date(Constant.SYSTEM_DATE.getTime() - 10 * 60 * 1000));
+        currentLocation.setAcqtime(new Date(Constant.SYSTEM_DATE.getTime()));
         currentLocation.setSpeed(0.0f);
 
         Log.e("TAG_CESHI", new String(createAisWarnInfoMessage("测试警告信息")));
@@ -450,7 +450,7 @@ public class MyApplication extends Application {
                     MessageProxy.insert(db, message);
                     failedMessageId = message.getId();
 
-                    byte[] messageBytes = MessageFormat.format(message.getReceiver(), message.getContent(), message.getReceiver().length() == 11 ? MessageFormat.MESSAGE_TYPE_CELLPHONE : MessageFormat.MESSAGE_TYPE_NORMAL);
+                    byte[] messageBytes = MessageFormat.format(message.getReceiver(), message.getContent(), message.getReceiver().length() == 11 ? MessageFormat.MESSAGE_TYPE_CELLPHONE : MessageFormat.MESSAGE_TYPE_NORMAL, 0);
                     sendBytes(messageBytes);
                     System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
 

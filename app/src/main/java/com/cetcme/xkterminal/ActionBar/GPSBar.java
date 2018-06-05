@@ -355,9 +355,11 @@ public class GPSBar extends RelativeLayout {
         textView_location_status.setText(gpsStatus ? "已定位" : "未定位");
         if (gpsStatus) textView_location_status.setVisibility(VISIBLE);
         if (!gpsStatus && (Constant.SYSTEM_DATE.getTime() - lastNoGpsReportTime) >= noGpsReportPeriod) {
-            if (mainActivity != null) mainActivity.showMessageDialog("未获取定位", MessageDialogActivity.TYPE_ALERT);
-            MainActivity.play("您有新的短消息，请注意查收");
-            lastNoGpsReportTime = Constant.SYSTEM_DATE.getTime();
+            if (mainActivity != null) {
+                mainActivity.showMessageDialog("未获取定位", MessageDialogActivity.TYPE_ALERT);
+                MainActivity.play("未获取定位");
+                lastNoGpsReportTime = Constant.SYSTEM_DATE.getTime();
+            }
         }
         noGps = !gpsStatus;
     }

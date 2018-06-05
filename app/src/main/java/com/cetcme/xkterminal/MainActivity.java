@@ -209,30 +209,30 @@ public class MainActivity extends AppCompatActivity {
             }
         }, 0, 60 * 1000);
 
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//
-//                while (true) {
-//                    if (System.currentTimeMillis() - MyApplication.getInstance().oldAisReceiveTime > 60 * 1000) {
-//                        runOnUiThread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                if (gpsBar != null) {
-//                                    gpsBar.setAisStatus(false);
-//                                    MyApplication.getInstance().isAisConnected = false;
-//                                }
-//                            }
-//                        });
-//                    }
-//                    try {
-//                        Thread.sleep(200);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
-//        }).start();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                while (true) {
+                    if (System.currentTimeMillis() - MyApplication.getInstance().oldAisReceiveTime > 60 * 1000) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (gpsBar != null) {
+                                    gpsBar.setAisStatus(false);
+                                    MyApplication.getInstance().isAisConnected = false;
+                                }
+                            }
+                        });
+                    }
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
 
 //        if (gpsBar != null) {
 //            gpsBar.setAisStatus(true);
@@ -1334,16 +1334,16 @@ public class MainActivity extends AppCompatActivity {
                         String type = (String) map.get("type");
                         if ("!AIVDM".equals(type)
                                 || "!AIVDO".equals(type)) {
-//                            MyApplication.getInstance().oldAisReceiveTime = System.currentTimeMillis();
-//                            MyApplication.getInstance().isAisConnected = true;
-//                            if (MyApplication.getInstance().mainActivity != null) {
-//                                MyApplication.getInstance().mainActivity.runOnUiThread(new Runnable() {
-//                                    @Override
-//                                    public void run() {
-//                                        MyApplication.getInstance().mainActivity.gpsBar.setAisStatus(true);
-//                                    }
-//                                });
-//                            }
+                            MyApplication.getInstance().oldAisReceiveTime = System.currentTimeMillis();
+                            MyApplication.getInstance().isAisConnected = true;
+                            if (MyApplication.getInstance().mainActivity != null) {
+                                MyApplication.getInstance().mainActivity.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        MyApplication.getInstance().mainActivity.gpsBar.setAisStatus(true);
+                                    }
+                                });
+                            }
                             AisInfo aisInfo = YimaAisParse.mParseAISSentence(newStr);
                             if (aisInfo != null) {
                                 if (14 == aisInfo.MsgType) {
@@ -1509,8 +1509,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             } else if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action) && index == 1) {
-                MyApplication.getInstance().isAisConnected = true;
-                gpsBar.setAisStatus(true);
+//                MyApplication.getInstance().isAisConnected = true;
+//                gpsBar.setAisStatus(true);
             }
             if (index > 1) {
                 index = 0;

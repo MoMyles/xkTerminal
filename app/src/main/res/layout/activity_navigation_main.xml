@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -13,13 +12,13 @@
     <TextView
         android:layout_width="52dp"
         android:layout_height="52dp"
+        android:layout_marginLeft="8dp"
         android:layout_marginStart="38dp"
         android:layout_marginTop="38dp"
         android:background="@mipmap/title_icon_back_2x"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         android:onClick="Back_Event"
-        android:layout_marginLeft="8dp"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.joanzapata.iconify.widget.IconTextView
         android:id="@+id/id_menu"
@@ -33,31 +32,37 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <android.support.v7.widget.AppCompatButton
-        android:id="@+id/clearTrack"
-        android:layout_width="128dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginBottom="16dp"
-        android:layout_marginRight="16dp"
-        android:text="清空轨迹"
-        android:textColor="#000"
-        android:textSize="14sp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/id_menu"
-        app:layout_constraintRight_toRightOf="parent" />
-
     <LinearLayout
         android:id="@+id/ll_zoom"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:gravity="right"
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@id/ly_bottom"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginRight="8dp">
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/clearTrack"
+            android:layout_width="128dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="清空轨迹"
+            android:textColor="#000"
+            android:textSize="14sp"
+            android:visibility="gone" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/listTrack"
+            android:layout_width="128dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="查看航迹列表"
+            android:textColor="#000"
+            android:textSize="14sp"
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/btn_zoom_out"

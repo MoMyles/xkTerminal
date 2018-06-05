@@ -369,7 +369,7 @@ public class SkiaDrawView extends View {
             if (iObj == 0) {
                 mYimaLib.tmSetPointObjectStyle(curLayerPos2, objCount - 1, 1,
                         true, iObj * 10, iObj * 10, 255 - iObj * 10, 20,
-                        sdf.format(list.get(iObj).getAcqtime()), "", 20, 0, 0, 0, true, false, 0, 0, 0, 0);//设置物标样式
+                        sdf.format(list.get(iObj).getAcqtime()) + "("+list.get(iObj).getSpeed()+" kn)", "", 20, 0, 0, 0, true, false, 0, 0, 0, 0);//设置物标样式
             } else if (iObj == arrGeoX.length - 1) {
                 mYimaLib.tmSetPointObjectStyle(curLayerPos2, objCount - 1, 3,
                         true, iObj * 10, iObj * 10, 255 - iObj * 10, 20,
@@ -390,6 +390,7 @@ public class SkiaDrawView extends View {
                 mYimaLib.tmDeleteGeoObject(curLayerPos2, a);
             }
             objLayerPos2.clear();
+            mYimaLib.tmClearLayer(curLayerPos2);
             mYimaLib.tmDeleteLayer(curLayerPos2);
             curLayerPos2 = -1;
         }
@@ -398,6 +399,7 @@ public class SkiaDrawView extends View {
                 mYimaLib.tmDeleteGeoObject(curLayerPos, a);
             }
             objLayerPos.clear();
+            mYimaLib.tmClearLayer(curLayerPos);
             mYimaLib.tmDeleteLayer(curLayerPos);
             curLayerPos = -1;
         }

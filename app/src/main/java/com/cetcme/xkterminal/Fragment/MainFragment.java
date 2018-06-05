@@ -234,13 +234,13 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
             }
         }, 10);
 
-        LocationBean lb = new LocationBean();
-        lb.setLongitude((int) (121.768783 * 1e7));
-        lb.setLatitude((int) (28.696902 * 1e7));
-        lb.setHeading(166.1f);
-        lb.setSpeed(0.9f);
-        MyApplication.currentLocation = lb;
-        EventBus.getDefault().post(lb);
+//        LocationBean lb = new LocationBean();
+//        lb.setLongitude((int) (121.768783 * 1e7));
+//        lb.setLatitude((int) (28.696902 * 1e7));
+//        lb.setHeading(166.1f);
+//        lb.setSpeed(0.9f);
+//        MyApplication.currentLocation = lb;
+//        EventBus.getDefault().post(lb);
 
 
         // 作假200艘船

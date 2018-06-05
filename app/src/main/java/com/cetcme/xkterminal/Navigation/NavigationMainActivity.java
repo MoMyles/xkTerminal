@@ -1,22 +1,17 @@
 package com.cetcme.xkterminal.Navigation;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
-import android.support.v7.widget.AppCompatEditText;
 import android.text.InputType;
-import android.text.TextUtils;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -25,26 +20,15 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.PopupWindow;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bigkoo.pickerview.builder.TimePickerBuilder;
-import com.bigkoo.pickerview.listener.OnTimeSelectListener;
-import com.bigkoo.pickerview.view.TimePickerView;
-
 import com.cetcme.xkterminal.MyApplication;
-import com.cetcme.xkterminal.MyClass.DateUtil;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
-import com.iflytek.cloud.ErrorCode;
-import com.iflytek.cloud.InitListener;
-import com.iflytek.cloud.SpeechConstant;
-import com.iflytek.cloud.SpeechError;
-import com.iflytek.cloud.SpeechSynthesizer;
-import com.iflytek.cloud.SynthesizerListener;
-import com.iflytek.cloud.util.ResourceUtil;
 import com.joanzapata.iconify.widget.IconTextView;
+import com.qiuhong.qhlibrary.QHTitleView.QHTitleView;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
@@ -55,12 +39,9 @@ import org.xutils.ex.DbException;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import butterknife.ButterKnife;
 import yimamapapi.skia.M_POINT;
-import yimamapapi.skia.YimaLib;
 
 public class NavigationMainActivity extends AppCompatActivity implements SkiaDrawView.OnMapClickListener, View.OnClickListener {
 
@@ -73,6 +54,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     private IconTextView mITVMenu;
     private AppCompatButton mClearTrack;
+    private AppCompatButton mListTrack;
     private LinearLayout mLlBottom;
     private DbManager db = MyApplication.getInstance().getDb();
     private int type = 0;
@@ -84,6 +66,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
 
     private static final int REQUSET_CODE_HANGXIAN = 0;
     private static final int REQUSET_CODE_HANGJI = 1;
+    private final List<LocationBean> hangjiList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +86,8 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
         mITVMenu.setOnClickListener(this);
         mClearTrack = findViewById(R.id.clearTrack);
         mClearTrack.setOnClickListener(this);
+        mListTrack = findViewById(R.id.listTrack);
+        mListTrack.setOnClickListener(this);
         mLlBottom = findViewById(R.id.ly_bottom);
 
 
@@ -244,6 +229,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
 
 
     private M_POINT point = new M_POINT();
+
     /**
      * 添加路径点
      *
@@ -411,11 +397,14 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
                                     .where("navtime", "=", navtime)
                                     .orderBy("acqtime")
                                     .findAll();
+                            hangjiList.clear();
                             if (list == null || list.isEmpty()) {
                                 Toast.makeText(NavigationMainActivity.this, "未查询到相关轨迹信息", Toast.LENGTH_SHORT).show();
                             } else {
+                                hangjiList.addAll(list);
                                 fMainView.AddLineLayerAndObject(list);
                                 mClearTrack.setVisibility(View.VISIBLE);
+                                mListTrack.setVisibility(View.VISIBLE);
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -579,6 +568,17 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
             case R.id.clearTrack:
                 fMainView.clearTrack();
                 mClearTrack.setVisibility(View.GONE);
+                mListTrack.setVisibility(View.GONE);
+                break;
+            case R.id.listTrack:
+                final View content = LayoutInflater.from(getApplicationContext()).inflate(R.layout.dialog_route_list, null);
+                final QHTitleView qhTitleView = content.findViewById(R.id.qhTitleView);
+                qhTitleView.setTitle("查看航迹列表");
+                final ListView listView = content.findViewById(R.id.listView);
+                HangjiAdapter adapter = new HangjiAdapter(this, hangjiList);
+                listView.setAdapter(adapter);
+                new AlertDialog.Builder(this).setView(content)
+                        .show();
                 break;
             case R.id.tv_route:
                 type = 1;
@@ -595,7 +595,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
                 startActivityForResult(new Intent(this, RouteListActivity.class), REQUSET_CODE_HANGXIAN);
                 break;
             case R.id.navi_go:
-                Intent intent = new Intent( this, NavigationActivity.class);
+                Intent intent = new Intent(this, NavigationActivity.class);
                 intent.putExtra("routeFileName", routeFileName);
                 startActivity(intent);
                 break;

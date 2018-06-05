@@ -41,7 +41,7 @@ public class DrawSatellite extends View {
         p.setAntiAlias(true);
         p.setStyle(Paint.Style.FILL);
         p.setColor(Color.RED);
-        p.setTextSize(20);
+        p.setTextSize(16);
 
         drawCircle(canvas,p);
 
@@ -98,7 +98,13 @@ public class DrawSatellite extends View {
 //        int signLevel=snrToSignalLevel(snr);  //暂时不用
 //      String info = String.format("#%s_%s", satellite.getNum(), snr);
         String info = String.valueOf(satellite.getNum());
-        canvas.drawText(info, (float) (x)-5, (float) (y)+5, p);
+        float detX = 0;
+        if (info.length() == 1) {
+            detX = 5;
+        } else if (info.length() == 2) {
+            detX = 10;
+        }
+        canvas.drawText(info, (float) (x) - detX, (float) (y)+5, p);
 
     }
 

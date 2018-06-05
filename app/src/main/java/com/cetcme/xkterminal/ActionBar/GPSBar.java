@@ -375,6 +375,7 @@ public class GPSBar extends RelativeLayout {
         @Override
         public void run() {
             super.run();
+            bootTime = Constant.SYSTEM_DATE.getTime();
             int i = 0;
             do {
                 try {
@@ -396,13 +397,23 @@ public class GPSBar extends RelativeLayout {
                     handler.sendMessage(message);
 
                     // 判断是否为定位超过10分钟
+                    // 如果是第一次 就不提示
                     Date date = MyApplication.getInstance().getCurrentLocation().getAcqtime();
                     if (date != null) {
                         long locationTime = date.getTime();
                         Message message1 = new Message();
                         message1.what = UPDATE_GPS_STATUS;
-                        message1.obj = (Constant.SYSTEM_DATE.getTime() - locationTime) <= noGpsReportPeriod;
-                        handler.sendMessage(message1);
+                        boolean obj = (Constant.SYSTEM_DATE.getTime() - locationTime) <= noGpsReportPeriod;
+                        message1.obj = obj;
+
+                        // 如果未定位 10分钟之内 不提示， 10分钟之后 提示
+                        if (!obj) {
+                            if ((Constant.SYSTEM_DATE.getTime() - bootTime) > 60 * 1000 * 10) {
+                                handler.sendMessage(message1);
+                            }
+                        } else {
+                            handler.sendMessage(message1);
+                        }
                     }
                 }
 
@@ -433,6 +444,8 @@ public class GPSBar extends RelativeLayout {
             } while (true);
         }
     }
+
+    long bootTime = 0;
 
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {

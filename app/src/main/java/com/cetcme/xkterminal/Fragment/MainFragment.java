@@ -281,6 +281,18 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
         return view;
     }
 
+    @Override
+    public void onResume() {
+        Log.i("MainFragment", "onResume: ");
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                skiaDrawView.postInvalidate();
+            }
+        }, 10);
+        super.onResume();
+    }
+
     private final List<WarnArea> areas = new ArrayList<>();
     private int curLayerPos = -1;
 

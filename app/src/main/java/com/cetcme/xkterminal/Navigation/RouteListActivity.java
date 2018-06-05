@@ -257,6 +257,7 @@ public class RouteListActivity extends Activity {
                 vh = new ViewHolder();
                 vh.mTv1 = view.findViewById(R.id.tv_name);
                 vh.mTv2 = view.findViewById(R.id.tv_time);
+                view.setTag(vh);
             } else {
                 vh = (ViewHolder) view.getTag();
             }

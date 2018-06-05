@@ -506,7 +506,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void onBackPressed() {
 
-
         if (backBar.getVisibility() == View.VISIBLE) {
             backBar.button_back.performClick();
             return;
@@ -1089,7 +1088,6 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
-
     public void openOtherShips() {
         EventBus.getDefault().post("openShip");
     }
@@ -1107,6 +1105,27 @@ public class MainActivity extends AppCompatActivity {
                         }
                     })
                     .show();
+        }
+    }
+
+    public void openPinList() {
+        startActivityForResult(new Intent(this, PinActivity.class), REQUEST_CODE_PIN_ACTIVITY);
+    }
+
+    private static final int REQUEST_CODE_PIN_ACTIVITY = 0;
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case REQUEST_CODE_PIN_ACTIVITY:
+                switch (resultCode) {
+                    case PinActivity.RESULT_CODE_MAP:
+                        break;
+                    case PinActivity.RESULT_CODE_CO:
+                        break;
+                }
+                break;
         }
     }
 

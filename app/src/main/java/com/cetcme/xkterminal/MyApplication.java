@@ -241,7 +241,7 @@ public class MyApplication extends Application {
         currentLocation.setLongitude(0);
         currentLocation.setLatitude(0);
         currentLocation.setHeading(0.0f);
-        currentLocation.setAcqtime(new Date(Constant.SYSTEM_DATE.getTime()));
+        currentLocation.setAcqtime(new Date(Constant.SYSTEM_DATE.getTime() - 10 * 60 * 1000));
         currentLocation.setSpeed(0.0f);
 
     }

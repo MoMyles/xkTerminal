@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.Constant;
+import com.cetcme.xkterminal.MyClass.GPSFormatUtils;
 import com.cetcme.xkterminal.MyClass.ScreenUtil;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.Sqlite.Bean.GPSBean;
@@ -25,6 +26,9 @@ import com.cetcme.xkterminal.widget.DrawSatellite;
 import com.cetcme.xkterminal.widget.Satellite;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.xutils.DbManager;
 
 import java.text.SimpleDateFormat;
@@ -81,6 +85,7 @@ public class SatelliteFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_satellite, container, false);
+        EventBus.getDefault().register(this);
         init(view);
         handler = new Handler() {
             @Override
@@ -88,20 +93,26 @@ public class SatelliteFragment extends Fragment {
                 switch (msg.what) {
                     case 1:
                         LocationBean lb = (LocationBean) msg.obj;
-                        mLongitude.setText(lb.getLongitude() * 1.0 / 1e7 + "");
-                        mLatitude.setText(lb.getLatitude() * 1.0 / 1e7 + "");
+                        mLongitude.setText(GPSFormatUtils.DDtoDMS(lb.getLongitude() / 10000000d, true));
+                        mLatitude.setText(GPSFormatUtils.DDtoDMS(lb.getLatitude() / 10000000d, false));
                         mTime.setText(timeFormat.format(Constant.SYSTEM_DATE));
                         mDate.setText(dateFormat.format(Constant.SYSTEM_DATE));
                         mSatellite.setText(mSatelliteList.size() + "");
                         Random random = new Random();
                         int f = random.nextInt(5) + 1;
                         float ff = random.nextFloat();
-                        mElevation.setText(f + ff + " 米");
+                        mElevation.setText(String.format("%.1f米", f + ff));
                         break;
                 }
             }
         };
         return view;
+    }
+
+    @Override
+    public void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
     }
 
     private void init(View view) {
@@ -172,7 +183,8 @@ public class SatelliteFragment extends Fragment {
                 }
             }
 
-            for (int i = 0, k = 0; i < 15 - mSatelliteList.size(); k++) {
+            int count = mSatelliteList.size();
+            for (int i = 0, k = 0; i < 15 - count; k++) {
                 Satellite satellite1 = new Satellite();
                 int j = random.nextInt(50);
                 if (k == 100) {
@@ -235,6 +247,14 @@ public class SatelliteFragment extends Fragment {
         columnChartData.setAxisXBottom(axis);
         //给画表格的View添加要画的表格
         gpsBar.setColumnChartData(columnChartData);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(LocationBean lb) {
+        Message msg = Message.obtain();
+        msg.obj = lb;
+        msg.what = 1;
+        handler.sendMessage(msg);
     }
 
 }

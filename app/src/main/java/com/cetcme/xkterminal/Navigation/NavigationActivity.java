@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
 import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.MyApplication;
+import com.cetcme.xkterminal.MyClass.GPSFormatUtils;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 
@@ -414,6 +415,9 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                 fMainView.mYimaLib.DeleteWayPoint(id);
             }
         }
+
+        if (startWp != -1) fMainView.mYimaLib.DeleteWayPoint(startWp);
+        if (endWp != -1) fMainView.mYimaLib.DeleteWayPoint(endWp);
         super.onDestroy();
     }
 
@@ -430,7 +434,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
         Log.i("TAG", "onLocationEvent: 经度lon:" + lb.getLongitude());
         if (myLocation == null) {
             myLocation = lb;
-            fMainView.mYimaLib.CenterMap(myLocation.getLongitude(), myLocation.getLatitude());
+//            fMainView.mYimaLib.CenterMap(myLocation.getLongitude(), myLocation.getLatitude());
         } else {
             myLocation = lb;
         }
@@ -529,8 +533,8 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
      * @param locationBean
      */
     private void updateShipInfo(LocationBean locationBean) {
-        tv_lon.setText(String.format("%.3f", locationBean.getLongitude() / 10000000f));
-        tv_lat.setText(String.format("%.3f", locationBean.getLatitude() / 10000000f));
+        tv_lon.setText(GPSFormatUtils.DDtoDMS(locationBean.getLongitude() / 10000000d, true));
+        tv_lat.setText(GPSFormatUtils.DDtoDMS(locationBean.getLatitude() / 10000000d, false));
         tv_head.setText(locationBean.getHeading() + "");
         tv_speed.setText(locationBean.getSpeed() + "");
     }

@@ -391,6 +391,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
             case 1: // 航迹
                 switch (resultCode) {
                     case RouteListActivity.ACTIVITY_RESULT_ROUTE_SHOW:
+                        menu.dismiss();
                         String navtime = data.getStringExtra("navtime");
                         try {
                             List<LocationBean> list = db.selector(LocationBean.class)

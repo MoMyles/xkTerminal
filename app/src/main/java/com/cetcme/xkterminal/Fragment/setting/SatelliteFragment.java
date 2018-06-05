@@ -160,14 +160,16 @@ public class SatelliteFragment extends Fragment {
         String str = ",";
         try {
             List<GPSBean> list = db.selector(GPSBean.class).findAll();
-            for (GPSBean g : list) {
-                Satellite satellite = new Satellite();
-                satellite.setNo(g.getXinhao());
-                satellite.setNum(g.getNo());
-                satellite.setAzimuth(g.getFangwei());
-                satellite.setElevationAngle(g.getYangjiao());
-                mSatelliteList.add(satellite);
-                str += g.getNo() + ",";
+            if (list != null && !list.isEmpty()) {
+                for (GPSBean g : list) {
+                    Satellite satellite = new Satellite();
+                    satellite.setNo(g.getXinhao());
+                    satellite.setNum(g.getNo());
+                    satellite.setAzimuth(g.getFangwei());
+                    satellite.setElevationAngle(g.getYangjiao());
+                    mSatelliteList.add(satellite);
+                    str += g.getNo() + ",";
+                }
             }
 
             for (int i = 0, k = 0; i < 15 - mSatelliteList.size(); k++) {

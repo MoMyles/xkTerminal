@@ -29,6 +29,7 @@ import org.xutils.ex.DbException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Timer;
+import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -136,6 +137,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                             finish();
                         }
                     }, 500);
+
                 } else {
                     if (myLocation.getLongitude() == 0 && myLocation.getLatitude() == 0) {
                         toast.setText("未获取自身定位");
@@ -173,6 +175,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
 
                 }
                 fMainView.mYimaLib.CenterMap(myLocation.getLongitude(), myLocation.getLatitude());
+                inNavigating = !inNavigating;
             }
         });
     }
@@ -183,34 +186,34 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
     @Override
     protected void onStart() {
         super.onStart();
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                fMainView.mYimaLib.SetCurrentScale(8878176.0f);
-//                fMainView.postInvalidate();
-//
-//
-//                // TODO: test 添加自身位置，实际需要从Event中取
-//
-//                timer = new Timer();
-//                timer.schedule(new TimerTask() {
-//                    @Override
-//                    public void run() {
-//                        LocationBean locationBean = new LocationBean();
-//                        locationBean.setLongitude((int) ((121.12 + addOne) * 10000000));
-//                        locationBean.setLatitude((int) ((31.12 + addOne) * 10000000));
-//                        locationBean.setHeading(45f);
-//                        locationBean.setSpeed(12.3f);
-//                        EventBus.getDefault().post(locationBean);
-//                        addOne += 0.003f;
-//                    }
-//                }, 1000, 1000);
-//
-//
-//                // end
-//
-//            }
-//        }, 10);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                fMainView.mYimaLib.SetCurrentScale(8878176.0f);
+                fMainView.postInvalidate();
+
+
+                // TODO: test 添加自身位置，实际需要从Event中取
+
+                timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        LocationBean locationBean = new LocationBean();
+                        locationBean.setLongitude((int) ((121.12 + addOne) * 10000000));
+                        locationBean.setLatitude((int) ((31.12 + addOne) * 10000000));
+                        locationBean.setHeading(45f);
+                        locationBean.setSpeed(12.3f);
+                        EventBus.getDefault().post(locationBean);
+                        addOne += 0.003f;
+                    }
+                }, 1000, 1000);
+
+
+                // end
+
+            }
+        }, 10);
     }
 
     @Override
@@ -507,7 +510,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                     wpCoor.x, wpCoor.y);//方位
             tv_fangwei.setText(fangwei+"°");
             tv_dis.setText(restDis+"");
-            inNavigating = !inNavigating;
+
         }
     }
 

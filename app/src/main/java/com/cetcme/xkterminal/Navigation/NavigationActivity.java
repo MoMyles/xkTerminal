@@ -111,6 +111,16 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
 
         fMainView.setOnMapClickListener(this);
 
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                //121.768783,28.696902
+                fMainView.mYimaLib.CenterMap((int) (121.768783 * 1e7), (int) (28.696902 * 1e7));
+                fMainView.mYimaLib.SetCurrentScale(8878176.0f / 32);
+                fMainView.postInvalidate();
+            }
+        }, 10);
+
         btn_navigation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

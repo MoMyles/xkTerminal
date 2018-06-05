@@ -232,7 +232,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
             public void run() {
                 //121.768783,28.696902
                 skiaDrawView.mYimaLib.CenterMap((int) (121.768783 * 1e7), (int) (28.696902 * 1e7));
-                skiaDrawView.mYimaLib.SetCurrentScale(8878176.0f);
+                skiaDrawView.mYimaLib.SetCurrentScale(8878176.0f / 32);
                 skiaDrawView.postInvalidate();
             }
         }, 10);

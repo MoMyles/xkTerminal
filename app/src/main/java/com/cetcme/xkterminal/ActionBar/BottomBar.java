@@ -33,6 +33,7 @@ public class BottomBar extends RelativeLayout implements View.OnClickListener {
     private Button button_post;
     private Button button_about;
     private Button button_other_ship;
+  
     private Button button_pin;
 
     private ArrayList<Button> buttons = new ArrayList<>();

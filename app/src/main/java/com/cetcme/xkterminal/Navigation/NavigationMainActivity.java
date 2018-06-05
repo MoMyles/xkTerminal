@@ -578,8 +578,10 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
                 final ListView listView = content.findViewById(R.id.listView);
                 HangjiAdapter adapter = new HangjiAdapter(this, hangjiList);
                 listView.setAdapter(adapter);
-                new AlertDialog.Builder(this).setView(content)
-                        .show();
+                final AlertDialog alertDialog = new AlertDialog.Builder(this).setView(content).create();
+                alertDialog.getWindow().setLayout(QMUIDisplayHelper.getScreenWidth(this) * 8 / 10,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                alertDialog.show();
                 break;
             case R.id.tv_route:
                 type = 1;

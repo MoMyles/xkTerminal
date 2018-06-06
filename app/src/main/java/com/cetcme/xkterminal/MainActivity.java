@@ -71,6 +71,7 @@ import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
 
 import org.codice.common.ais.Decoder;
 import org.codice.common.ais.message.Message18;
+import org.codice.common.ais.message.Message19;
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -216,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
 
                 while (true) {
-                    if (System.currentTimeMillis() - MyApplication.getInstance().oldAisReceiveTime > 60 * 1000) {
+                    if (System.currentTimeMillis() - MyApplication.getInstance().oldAisReceiveTime >= 5 * 60 * 1000) {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -1325,7 +1326,7 @@ public class MainActivity extends AppCompatActivity {
                 //readText.append(String.copyValueOf(readDataToText, 0, iavailable));
                 headIndex.clear();
                 String gpsDataStr = preRestStr + String.copyValueOf(readDataToText, 0, iavailable);
-                Log.e("TAG_OLD", gpsDataStr);
+                // Log.e("TAG_OLD", gpsDataStr);
                 int len = gpsDataStr.length();
                 if (len <= 6) {
                     preRestStr = gpsDataStr;
@@ -1375,6 +1376,7 @@ public class MainActivity extends AppCompatActivity {
                                         || aisInfo.MsgType == 14
                                         || aisInfo.MsgType == 18
                                         || aisInfo.MsgType == 19) {
+                                    Log.e("TAG", aisInfo.MsgType + ", " + newStr);
                                     if (14 == aisInfo.MsgType) {
                                         // 报警信息
                                         if (aisInfo.mmsi > 0) {
@@ -1460,7 +1462,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         private void judge18(String newStr, AisInfo aisInfo) {
-            if (18 == aisInfo.MsgType) {
+            if (18 == aisInfo.MsgType
+                    || 19 == aisInfo.MsgType) {
                 try {
                     List<org.codice.common.ais.message.Message> list = new Decoder().parseString(newStr);
                     if (list != null && !list.isEmpty()) {
@@ -1472,6 +1475,16 @@ public class MainActivity extends AppCompatActivity {
                                 locationBean.setLongitude((int) (m18.getLon() * 1e7));
                                 locationBean.setSpeed((float) m18.getSog());
                                 locationBean.setHeading((float) m18.getTrueHeading());
+                                locationBean.setAcqtime(Constant.SYSTEM_DATE);
+                                MyApplication.getInstance().currentLocation = locationBean;
+                                EventBus.getDefault().post(locationBean);
+                            } else if (19 == m.getMessageType()) {
+                                Message19 m19 = (Message19) m;
+                                LocationBean locationBean = new LocationBean();
+                                locationBean.setLatitude((int) (m19.getLat() * 1e7));
+                                locationBean.setLongitude((int) (m19.getLon() * 1e7));
+                                locationBean.setSpeed((float) m19.getSog());
+                                locationBean.setHeading((float) m19.getTrueHeading());
                                 locationBean.setAcqtime(Constant.SYSTEM_DATE);
                                 MyApplication.getInstance().currentLocation = locationBean;
                                 EventBus.getDefault().post(locationBean);
@@ -1564,8 +1577,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             } else if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action) && index == 1) {
-//                MyApplication.getInstance().isAisConnected = true;
-//                gpsBar.setAisStatus(true);
+                MyApplication.getInstance().isAisConnected = true;
+                gpsBar.setAisStatus(true);
             }
             if (index > 1) {
                 index = 0;

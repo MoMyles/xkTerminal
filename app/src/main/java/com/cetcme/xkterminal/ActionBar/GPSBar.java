@@ -403,6 +403,7 @@ public class GPSBar extends RelativeLayout {
                         long locationTime = date.getTime();
                         Message message1 = new Message();
                         message1.what = UPDATE_GPS_STATUS;
+                        Log.e("GPSBar", "系统时间：" + DateUtil.Date2String(Constant.SYSTEM_DATE) + "，定位时间：" +  DateUtil.Date2String(date));
                         boolean obj = (Constant.SYSTEM_DATE.getTime() - locationTime) <= noGpsReportPeriod;
                         message1.obj = obj;
 

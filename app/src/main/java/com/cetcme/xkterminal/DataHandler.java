@@ -47,17 +47,17 @@ public class DataHandler extends Handler {
 
     private MyApplication myApplication;
 
-    private DbManager db = MyApplication.getInstance().getDb();
+    private DbManager db;
 
     public DataHandler(MyApplication myApplication) {
         this.myApplication = myApplication;
+        this.db = MyApplication.getInstance().getDb();
     }
 
     String content = "";
 
     @Override
     public void handleMessage(Message msg) {
-
         try {
             byte[] bytes = msg.getData().getByteArray("bytes");
 

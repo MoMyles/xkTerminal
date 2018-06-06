@@ -145,6 +145,8 @@ public class MyApplication extends Application {
 
         EventBus.getDefault().register(this);
 
+        initDb();
+
         handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
@@ -210,7 +212,7 @@ public class MyApplication extends Application {
         mHandler = new DataHandler(this);
 
 
-        initDb();
+
 
         // 语音
         Iconify.with(new FontAwesomeModule());

@@ -24,8 +24,8 @@
 
                 <TextView
                     style="@style/setting_tv_title"
-                    android:layout_marginLeft="150dp"
-                    android:layout_marginStart="150dp"
+                    android:layout_marginLeft="120dp"
+                    android:layout_marginStart="120dp"
                     android:text="距离报警：" />
 
                 <Switch
@@ -45,8 +45,8 @@
                 <EditText
                     android:id="@+id/et_warn_distance"
                     style="@style/setting_tv_title"
-                    android:layout_marginEnd="150dp"
-                    android:layout_marginRight="150dp"
+                    android:layout_marginEnd="120dp"
+                    android:layout_marginRight="120dp"
                     android:gravity="center"
                     android:inputType="number"
                     android:text="200" />

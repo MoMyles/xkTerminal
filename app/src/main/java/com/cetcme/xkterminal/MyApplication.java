@@ -236,7 +236,7 @@ public class MyApplication extends Application {
             }
         }, 10000, 5 * 60 * 1000);
 
-        //TODO: fake
+        //TODO: fake 初始化定位点
         currentLocation = new LocationBean();
         currentLocation.setLongitude(0);
         currentLocation.setLatitude(0);

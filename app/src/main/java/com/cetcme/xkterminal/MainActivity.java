@@ -80,7 +80,6 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -1370,46 +1369,53 @@ public class MainActivity extends AppCompatActivity {
                             }
                             AisInfo aisInfo = YimaAisParse.mParseAISSentence(newStr);
                             if (aisInfo != null) {
-                                if (14 == aisInfo.MsgType) {
-                                    // 报警信息
-                                    if (aisInfo.mmsi > 0) {
-                                        String message = aisInfo.warnMsgInfo;
-                                        if (TextUtils.isEmpty(message)) {
-                                            message = "AIS报警";
+                                if (aisInfo.MsgType == 1
+                                        || aisInfo.MsgType == 2
+                                        || aisInfo.MsgType == 3
+                                        || aisInfo.MsgType == 14
+                                        || aisInfo.MsgType == 18
+                                        || aisInfo.MsgType == 19) {
+                                    if (14 == aisInfo.MsgType) {
+                                        // 报警信息
+                                        if (aisInfo.mmsi > 0) {
+                                            String message = aisInfo.warnMsgInfo;
+                                            if (TextUtils.isEmpty(message)) {
+                                                message = "AIS报警";
+                                            }
+                                            MyApplication.getInstance().sendBytes(WarnFormat.format("" + aisInfo.mmsi, message));
                                         }
-                                        MyApplication.getInstance().sendBytes(WarnFormat.format("" + aisInfo.mmsi, message));
-                                    }
-                                } else {
-                                    int mmsi = -99;
-                                    try {
-                                        mmsi = Integer.valueOf(PreferencesUtils.getString(MainActivity.this, "shipNo", "0")).intValue();
-                                    } catch (Exception e) {
-                                    }
-                                    if (aisInfo.bOwnShip) {
-                                        judge18(newStr, aisInfo);
                                     } else {
-                                        if (mmsi == aisInfo.mmsi) {
+                                        int mmsi = -99;
+                                        try {
+                                            mmsi = Integer.valueOf(PreferencesUtils.getString(MainActivity.this, "shipNo", "0")).intValue();
+                                        } catch (Exception e) {
+                                        }
+                                        if (aisInfo.bOwnShip) {
                                             judge18(newStr, aisInfo);
                                         } else {
-                                            if (18 == aisInfo.MsgType) {
-                                                try {
-                                                    List<org.codice.common.ais.message.Message> list = new Decoder().parseString(newStr);
-                                                    if (list != null && !list.isEmpty()) {
-                                                        for (org.codice.common.ais.message.Message m : list) {
-                                                            if (18 == m.getMessageType()) {
-                                                                Message18 m18 = (Message18) m;
-                                                                aisInfo.latititude = (int) (m18.getLat() * 1e7);
-                                                                aisInfo.longtitude = (int) (m18.getLon() * 1e7);
-                                                                aisInfo.SOG = (float) m18.getSog();
-                                                                aisInfo.COG = (float) m18.getCog();
+                                            if (mmsi == aisInfo.mmsi) {
+                                                judge18(newStr, aisInfo);
+                                            } else {
+                                                if (18 == aisInfo.MsgType) {
+                                                    try {
+                                                        List<org.codice.common.ais.message.Message> list = new Decoder().parseString(newStr);
+                                                        if (list != null && !list.isEmpty()) {
+                                                            for (org.codice.common.ais.message.Message m : list) {
+                                                                if (18 == m.getMessageType()) {
+                                                                    Message18 m18 = (Message18) m;
+                                                                    aisInfo.latititude = (int) (m18.getLat() * 1e7);
+                                                                    aisInfo.longtitude = (int) (m18.getLon() * 1e7);
+                                                                    aisInfo.SOG = (float) m18.getSog();
+                                                                    aisInfo.COG = (float) m18.getCog();
+                                                                }
                                                             }
                                                         }
+                                                    } catch (Exception e) {
+                                                        e.printStackTrace();
                                                     }
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
                                                 }
+                                                EventBus.getDefault().post(aisInfo);
                                             }
-                                            EventBus.getDefault().post(aisInfo);
                                         }
                                     }
                                 }
@@ -1466,7 +1472,7 @@ public class MainActivity extends AppCompatActivity {
                                 locationBean.setLongitude((int) (m18.getLon() * 1e7));
                                 locationBean.setSpeed((float) m18.getSog());
                                 locationBean.setHeading((float) m18.getTrueHeading());
-                                locationBean.setAcqtime(new Date(m18.getTimestamp()));
+                                locationBean.setAcqtime(Constant.SYSTEM_DATE);
                                 MyApplication.getInstance().currentLocation = locationBean;
                                 EventBus.getDefault().post(locationBean);
                             }

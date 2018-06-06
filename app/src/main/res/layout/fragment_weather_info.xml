@@ -24,8 +24,8 @@
 
                 <TextView
                     style="@style/setting_tv_title"
-                    android:layout_marginLeft="120dp"
-                    android:layout_marginStart="120dp"
+                    android:layout_marginLeft="@dimen/setting_padding"
+                    android:layout_marginStart="@dimen/setting_padding"
                     android:text="风速："/>
 
                 <TextView
@@ -46,8 +46,8 @@
                     android:id="@+id/tv_wind_head"
                     style="@style/setting_tv_title"
                     android:gravity="center"
-                    android:layout_marginRight="120dp"
-                    android:layout_marginEnd="120dp"
+                    android:layout_marginRight="@dimen/setting_padding"
+                    android:layout_marginEnd="@dimen/setting_padding"
                     android:text="---"/>
 
             </LinearLayout>
@@ -66,8 +66,8 @@
 
                 <TextView
                     style="@style/setting_tv_title"
-                    android:layout_marginLeft="120dp"
-                    android:layout_marginStart="120dp"
+                    android:layout_marginLeft="@dimen/setting_padding"
+                    android:layout_marginStart="@dimen/setting_padding"
                     android:text="风级："/>
 
                 <TextView
@@ -88,8 +88,8 @@
                     android:id="@+id/tv_air_pressure"
                     style="@style/setting_tv_title"
                     android:gravity="center"
-                    android:layout_marginRight="120dp"
-                    android:layout_marginEnd="120dp"
+                    android:layout_marginRight="@dimen/setting_padding"
+                    android:layout_marginEnd="@dimen/setting_padding"
                     android:text="---"/>
 
             </LinearLayout>
@@ -108,8 +108,8 @@
 
                 <TextView
                     style="@style/setting_tv_title"
-                    android:layout_marginLeft="120dp"
-                    android:layout_marginStart="120dp"
+                    android:layout_marginLeft="@dimen/setting_padding"
+                    android:layout_marginStart="@dimen/setting_padding"
                     android:text="浪高："/>
 
                 <TextView
@@ -130,8 +130,8 @@
                     android:id="@+id/tv_air_temp"
                     style="@style/setting_tv_title"
                     android:gravity="center"
-                    android:layout_marginRight="120dp"
-                    android:layout_marginEnd="120dp"
+                    android:layout_marginRight="@dimen/setting_padding"
+                    android:layout_marginEnd="@dimen/setting_padding"
                     android:text="---"/>
 
             </LinearLayout>

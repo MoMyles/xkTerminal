@@ -32,6 +32,7 @@ import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import org.xutils.DbManager;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -171,8 +172,17 @@ public class MessageNewFragment extends Fragment{
                 final String[] builtInFriendNames = mainActivity.getResources().getStringArray(R.array.friendName);
                 final String[] builtInFriendNumbers = mainActivity.getResources().getStringArray(R.array.friendNumber);
 
+                //TODO: 防止friends为空 后续改进
+                try {
+                    FriendBean friendBean = new FriendBean();
+                    friendBean.setName("123");
+                    db.saveBindingId(friendBean);
+                    db.delete(friendBean);
+                } catch (Exception e) {
+
+                }
+
                 final List<FriendBean> friends = FriendProxy.getAll(db);
-                if (friends == null) return;
                 // 显示序号
                 final String[] showItems = new String[builtInFriendNames.length + friends.size()];
                 for (int i = 0; i < showItems.length; i++) {

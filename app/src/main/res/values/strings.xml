@@ -62,17 +62,17 @@
     </string-array>
 
     <string-array name="friendName">
-        <item>好友1</item>
-        <item>好友2</item>
-        <item>好友3</item>
-        <item>好友4</item>
+        <item>平台</item>
+        <item>设备1</item>
+        <item>设备2</item>
+        <item>设备3</item>
     </string-array>
 
     <string-array name="friendNumber">
-        <item>11111111</item>
-        <item>22222222</item>
-        <item>33333333</item>
-        <item>44444444</item>
+        <item>372741</item>
+        <item>318219</item>
+        <item>318216</item>
+        <item>344408</item>
     </string-array>
 
     <!-- TODO: Remove or change this placeholder text -->

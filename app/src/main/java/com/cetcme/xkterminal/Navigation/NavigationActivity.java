@@ -64,7 +64,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
     private int startWp = -1;
     private int endWp = -1;
     private int routeID = -1;
-    private LocationBean myLocation;
+    private LocationBean myLocation = MyApplication.getInstance().getCurrentLocation();
 
     private boolean inNavigating = false;
     private Toast toast;
@@ -125,7 +125,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
             @Override
             public void onClick(View view) {
 
-                if (myLocation == null) {
+                if (myLocation == null || ( myLocation.getLongitude() == 0 && myLocation.getLatitude() == 0)) {
                     toast.setText("未获取自身定位");
                     toast.show();
                     MainActivity.play("未获取自身定位");
@@ -189,6 +189,23 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                 inNavigating = !inNavigating;
             }
         });
+
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                LocationBean lb = MyApplication.getInstance().getCurrentLocation();
+                if (lb.getLatitude() != 0 && lb.getLongitude() != 0) {
+                    setOwnShip(lb, lb.getHeading(), false);
+                    updateShipInfo(lb);
+                } else {
+                    // 没有位置则固定中心点 121.768783,28.696902
+                    fMainView.mYimaLib.CenterMap((int) (121.768783 * 1e7), (int) (28.696902 * 1e7));
+                }
+                fMainView.mYimaLib.SetCurrentScale(8878176.0f);
+                fMainView.postInvalidate();
+            }
+        }, 200);
     }
 
     float addOne = 0.003f;
@@ -197,35 +214,35 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
     @Override
     protected void onStart() {
         super.onStart();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                fMainView.mYimaLib.SetCurrentScale(8878176.0f);
-                fMainView.postInvalidate();
-
-
-                // TODO: test 添加自身位置，实际需要从Event中取
-                /*
-                timer = new Timer();
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        LocationBean locationBean = new LocationBean();
-                        locationBean.setLongitude((int) ((121.12 + addOne) * 10000000));
-                        locationBean.setLatitude((int) ((31.12 + addOne) * 10000000));
-                        locationBean.setHeading(45f);
-                        locationBean.setSpeed(12.3f);
-                        locationBean.setAcqtime(com.cetcme.xkterminal.MyClass.Constant.SYSTEM_DATE);
-                        EventBus.getDefault().post(locationBean);
-                        addOne += 0.003f;
-                    }
-                }, 1000, 1000);
-                */
-
-                // end
-
-            }
-        }, 10);
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                fMainView.mYimaLib.SetCurrentScale(8878176.0f);
+//                fMainView.postInvalidate();
+//
+//
+//                // TODO: test 添加自身位置，实际需要从Event中取
+//                /*
+//                timer = new Timer();
+//                timer.schedule(new TimerTask() {
+//                    @Override
+//                    public void run() {
+//                        LocationBean locationBean = new LocationBean();
+//                        locationBean.setLongitude((int) ((121.12 + addOne) * 10000000));
+//                        locationBean.setLatitude((int) ((31.12 + addOne) * 10000000));
+//                        locationBean.setHeading(45f);
+//                        locationBean.setSpeed(12.3f);
+//                        locationBean.setAcqtime(com.cetcme.xkterminal.MyClass.Constant.SYSTEM_DATE);
+//                        EventBus.getDefault().post(locationBean);
+//                        addOne += 0.003f;
+//                    }
+//                }, 1000, 1000);
+//                */
+//
+//                // end
+//
+//            }
+//        }, 10);
     }
 
     @Override
@@ -240,7 +257,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
         if (routeFileName == null) {
             if (!inNavigating) {
 
-                if (myLocation == null) {
+                if (myLocation == null || (myLocation.getLatitude() == 0 && myLocation.getLongitude() == 0)) {
                     toast.setText("未获取自身定位");
                     toast.show();
                     MainActivity.play("未获取自身定位");

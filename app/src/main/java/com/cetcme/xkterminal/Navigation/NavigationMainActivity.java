@@ -104,12 +104,18 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                //121.768783,28.696902
-                fMainView.mYimaLib.CenterMap((int) (121.768783 * 1e7), (int) (28.696902 * 1e7));
-                fMainView.mYimaLib.SetCurrentScale(8878176.0f / 32);
+                LocationBean lb = MyApplication.getInstance().getCurrentLocation();
+                if (lb.getLatitude() != 0 && lb.getLongitude() != 0) {
+                    setOwnShip(lb, lb.getHeading(), false);
+//                    skiaDrawView.mYimaLib.CenterMap(myLocation.x, myLocation.y);
+                } else {
+                    // 没有位置则固定中心点 121.768783,28.696902
+                    fMainView.mYimaLib.CenterMap((int) (121.768783 * 1e7), (int) (28.696902 * 1e7));
+                }
+                fMainView.mYimaLib.SetCurrentScale(8878176.0f);
                 fMainView.postInvalidate();
             }
-        }, 10);
+        }, 200);
     }
 
     @Override

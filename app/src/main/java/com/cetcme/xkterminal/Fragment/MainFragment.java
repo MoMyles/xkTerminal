@@ -319,7 +319,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                 skiaDrawView.mYimaLib.SetCurrentScale(8878176.0f);
                 skiaDrawView.postInvalidate();
             }
-        }, 50);
+        }, 200);
         return view;
     }
 

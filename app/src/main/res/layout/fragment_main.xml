@@ -203,6 +203,18 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/switch_yuqu" />
 
+        <Switch
+            android:id="@+id/switch_pin"
+            android:layout_width="wrap_content"
+            android:layout_height="56dp"
+            android:layout_marginRight="10dp"
+            android:switchMinWidth="24dp"
+            android:text="标位显示"
+            android:textOff="关"
+            android:textOn="开"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/switch_warn_area" />
+
         <LinearLayout
             android:id="@+id/ll_zoom"
             android:layout_width="wrap_content"

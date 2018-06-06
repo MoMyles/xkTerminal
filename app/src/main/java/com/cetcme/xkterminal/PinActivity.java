@@ -1,14 +1,21 @@
 package com.cetcme.xkterminal;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.cetcme.xkterminal.MyClass.GPSFormatUtils;
 import com.cetcme.xkterminal.Sqlite.Bean.PinBean;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 
 import org.xutils.DbManager;
 import org.xutils.ex.DbException;
@@ -103,6 +110,31 @@ public class PinActivity extends Activity {
     private void initListView() {
         testAdapter = new TestAdapter();
         listView.setAdapter(testAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(PinActivity.this);
+                builder.setMessage("确定要删除标位吗？");
+                builder.setPositiveButton("删除",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                try {
+                                    db.delete(dataList.get(i));
+                                } catch (DbException e) {
+                                    e.printStackTrace();
+                                }
+                                dataList.remove(i);
+                                testAdapter.notifyDataSetChanged();
+
+                                Toast.makeText(MyApplication.getInstance().mainActivity, "删除成功", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                builder.setNeutralButton("取消", null);
+
+                builder.show();
+            }
+        });
     }
 
     public List<PinBean> getPinData() {

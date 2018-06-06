@@ -465,11 +465,11 @@ public class SkiaDrawView extends View {
             try {
                 String str = new String(list.get(iObj).getName().getBytes("gbk"), "gbk");
                 int color = list.get(iObj).getColor();
-                int hexColor = ContextCompat.getColor(mContext, color);
+//                int hexColor = ContextCompat.getColor(mContext, color);
                 mYimaLib.tmSetPointObjectStyle(curLayerPos3, objCount - 1, 2,
-                        true, hexColor & 0xFFFF0000, hexColor & 0xFF00FF00
-                        , hexColor & 0xFF0000FF, 20,
-                        str, "", 20, 0, 0, 0, true, false, 0, 0, 0, 0);//设置物标样式
+                        true, color & 0xFFFF0000, color & 0xFF00FF00
+                        , color & 0xFF0000FF, 20,
+                        str, "", 20, 0, 0, 0, true, false, 0, 0, 5, 0);//设置物标样式
             } catch (Exception e) {
                 e.printStackTrace();
             }

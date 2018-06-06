@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,6 +37,7 @@ import com.cetcme.xkterminal.Navigation.WarnArea;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 import com.cetcme.xkterminal.Sqlite.Bean.OtherShipBean;
+import com.cetcme.xkterminal.Sqlite.Bean.PinBean;
 import com.qiuhong.qhlibrary.QHTitleView.QHTitleView;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
@@ -71,7 +73,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
     private LinearLayout ll_ship_list;
     private RecyclerView rv_ships;
 
-    private Switch mSwitchYQ, mSwitchArea;
+    private Switch mSwitchYQ, mSwitchArea, mSwitchPin;
 
     private Button zoomOut, zoomIn;
 
@@ -199,6 +201,10 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
         mSwitchYQ.setChecked(PreferencesUtils.getBoolean(getActivity(), "mainFrgYuqu", false));
         mSwitchArea = view.findViewById(R.id.switch_warn_area);
         mSwitchArea.setChecked(PreferencesUtils.getBoolean(getActivity(), "mainFrgWarnArea", false));
+        mSwitchPin = view.findViewById(R.id.switch_pin);
+//        mSwitchPin.setChecked(PreferencesUtils.getBoolean(getActivity(), "mainFrgPin", false));
+        mSwitchPin.setChecked(false);
+
         warnArea = mSwitchArea.isChecked();
         showWarnAreas();
         mSwitchYQ.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -214,6 +220,23 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                 PreferencesUtils.putBoolean(getActivity(), "mainFrgWarnArea", b);
                 warnArea = b;
                 showWarnAreas();
+            }
+        });
+
+        mSwitchPin.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+//                PreferencesUtils.putBoolean(getActivity(), "mainFrgPin", b);
+                if (b) {
+                    try {
+                        List<PinBean> list = db.selector(PinBean.class).findAll();
+                        if (list != null && !list.isEmpty()) skiaDrawView.showBiaoWei(list);
+                    } catch (DbException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    skiaDrawView.clearBiaoWeiTrack();
+                }
             }
         });
 
@@ -286,11 +309,11 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
 
     @Override
     public void onResume() {
-        Log.i("MainFragment", "onResume: ");
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 skiaDrawView.postInvalidate();
+                mSwitchPin.setChecked(false);
             }
         }, 10);
         super.onResume();
@@ -599,10 +622,12 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                 ll_ship_list.setVisibility(View.VISIBLE);
                 showOtherShip = true;
             }
-        } else if ("openBiaowei".equals(action)) {
+        } else if ("pin_map".equals(action)) {
             doBiaoWei = true;
             showOtherShip = false;
             Toast.makeText(getActivity(), "请选择标位点", Toast.LENGTH_SHORT).show();
+        } else if ("pin_co".equals(action)) {
+            openPinDialog(null);
         }
     }
     // 标位操作
@@ -616,29 +641,153 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
             }
         } else if (doBiaoWei) {
             doBiaoWei = false;
-            final View view = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_biaowei, null);
-            final QHTitleView title = view.findViewById(R.id.title);
-            title.setTitle("标位设置");
-            final EditText et1 = view.findViewById(R.id.et1);
-            final EditText et2 = view.findViewById(R.id.et2);
+            openPinDialog(m_point);
+        }
+    }
+
+    /**
+     * 标位对话框 输入内容
+     * @param m_point
+     */
+    private void openPinDialog(M_POINT m_point) {
+        final View view = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_biaowei, null);
+        final QHTitleView title = view.findViewById(R.id.title);
+        title.setTitle("标位设置");
+        title.setClickCallback(new QHTitleView.ClickCallback() {
+            @Override
+            public void onBackClick() {
+                //
+            }
+
+            @Override
+            public void onRightClick() {
+                //
+            }
+        });
+
+        final EditText et1 = view.findViewById(R.id.et1);
+        final EditText et2 = view.findViewById(R.id.et2);
+        final EditText et3 = view.findViewById(R.id.et3);
+        final EditText et4 = view.findViewById(R.id.et4); // 用来存显色标志 1 2 3 4隐藏
+
+        if (m_point != null) {
             et1.setText(m_point.x/1e7 + "");
             et2.setText(m_point.y/1e7 + "");
-            final Button b1 = view.findViewById(R.id.btn1);//确定
-            final Button b2 = view.findViewById(R.id.btn2);//取消
-            b1.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    //TODO 确定
-                }
-            });
-            b2.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    //TODO 取消
-                }
-            });
-            new AlertDialog.Builder(getActivity()).setView(view).setCancelable(false).show();
         }
+
+        final TextView tv1 = view.findViewById(R.id.tv1);
+        final TextView tv2 = view.findViewById(R.id.tv2);
+        final TextView tv3 = view.findViewById(R.id.tv3);
+        final TextView tv4 = view.findViewById(R.id.tv4);
+
+        final RelativeLayout.LayoutParams layoutParams =  new RelativeLayout.LayoutParams(30, 30);
+        layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT,RelativeLayout.TRUE);
+
+        final RelativeLayout.LayoutParams layoutParams_big =  new RelativeLayout.LayoutParams(40, 40);
+        layoutParams_big.addRule(RelativeLayout.CENTER_IN_PARENT,RelativeLayout.TRUE);
+
+        tv1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                et4.setText("1");
+                tv1.setLayoutParams(layoutParams_big);
+                tv2.setLayoutParams(layoutParams);
+                tv3.setLayoutParams(layoutParams);
+                tv4.setLayoutParams(layoutParams);
+            }
+        });
+
+        tv2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                et4.setText("2");
+                tv1.setLayoutParams(layoutParams);
+                tv2.setLayoutParams(layoutParams_big);
+                tv3.setLayoutParams(layoutParams);
+                tv4.setLayoutParams(layoutParams);
+            }
+        });
+
+        tv3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                et4.setText("3");
+                tv1.setLayoutParams(layoutParams);
+                tv2.setLayoutParams(layoutParams);
+                tv3.setLayoutParams(layoutParams_big);
+                tv4.setLayoutParams(layoutParams);
+            }
+        });
+
+        tv4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                et4.setText("4");
+                tv1.setLayoutParams(layoutParams);
+                tv2.setLayoutParams(layoutParams);
+                tv3.setLayoutParams(layoutParams);
+                tv4.setLayoutParams(layoutParams_big);
+            }
+        });
+
+        final Button b1 = view.findViewById(R.id.btn1);//确定
+        final Button b2 = view.findViewById(R.id.btn2);//取消
+
+        final AlertDialog pinDialog = new AlertDialog.Builder(getActivity()).setView(view).setCancelable(false).create();
+
+        b1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String name = et3.getText().toString();
+                String lonStr = et1.getText().toString();
+                String latStr = et2.getText().toString();
+
+                try {
+                    int lon = (int) (Float.parseFloat(lonStr) * 1e7);
+                    int lat = (int) (Float.parseFloat(latStr) * 1e7);
+                    PinBean pinBean = new PinBean();
+                    pinBean.setColor(getResources().getColor(android.R.color.black));
+                    pinBean.setLat(lat);
+                    pinBean.setLon(lon);
+                    pinBean.setName(name);
+                    switch (et4.getText().toString()) {
+                        case "1":
+                            pinBean.setColor(getResources().getColor(android.R.color.holo_red_dark));
+                            break;
+                        case "2":
+                            pinBean.setColor(getResources().getColor(android.R.color.holo_green_dark));
+                            break;
+                        case "3":
+                            pinBean.setColor(getResources().getColor(android.R.color.holo_blue_dark));
+                            break;
+                        case "4":
+                            pinBean.setColor(getResources().getColor(android.R.color.holo_orange_dark));
+                            break;
+                        default:
+                            pinBean.setColor(getResources().getColor(android.R.color.holo_red_dark));
+                            break;
+                    }
+                    try {
+                        db.saveBindingId(pinBean);
+                        pinDialog.cancel();
+                        Toast.makeText(getActivity(), "标位保存成功", Toast.LENGTH_SHORT).show();
+                    } catch (DbException e) {
+                        e.printStackTrace();
+                    }
+                } catch (Exception e) {
+                    e.getStackTrace();
+                    Toast.makeText(getActivity(), "请输入正确内容", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        b2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pinDialog.cancel();
+            }
+        });
+
+        pinDialog.show();
     }
 
     @Override

@@ -37,7 +37,6 @@ public class SeriveStatusFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        EventBus.getDefault().unregister(this);
         unbinder.unbind();
     }
 

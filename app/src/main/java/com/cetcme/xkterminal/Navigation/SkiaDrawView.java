@@ -76,7 +76,7 @@ public class SkiaDrawView extends View {
     public void onSizeChanged(int w, int h, int oldw, int oldh) {
         fSkiaBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         String strTtfFilePath = Constant.YIMA_WORK_PATH + "/DroidSansFallback.ttf";
-//        mYimaLib.SetDisplayCategory(3);
+        mYimaLib.SetDisplayCategory(3);
         mYimaLib.RefreshDrawer(fSkiaBitmap, strTtfFilePath);//刷新绘制器，需要传入字体文件地址，用户可以自己修改为别的字体
         mYimaLib.OverViewLibMap(0);//概览第一幅图
 //        mYimaLib.SetOwnShipBasicInfo("基站-2431", "4132431", 100, 20);

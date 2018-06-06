@@ -100,6 +100,16 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
         // 显示本船位置
         LocationBean currentLocation = MyApplication.getInstance().getCurrentLocation();
         setOwnShip(currentLocation, currentLocation.getHeading(), false);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                //121.768783,28.696902
+                fMainView.mYimaLib.CenterMap((int) (121.768783 * 1e7), (int) (28.696902 * 1e7));
+                fMainView.mYimaLib.SetCurrentScale(8878176.0f / 32);
+                fMainView.postInvalidate();
+            }
+        }, 10);
     }
 
     @Override

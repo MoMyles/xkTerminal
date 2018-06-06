@@ -69,6 +69,8 @@ import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
 
+import org.codice.common.ais.Decoder;
+import org.codice.common.ais.message.Message18;
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -78,6 +80,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -1113,6 +1116,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private static final int REQUEST_CODE_PIN_ACTIVITY = 0;
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -1171,9 +1175,7 @@ public class MainActivity extends AppCompatActivity {
     int portNumber = 1; /*port number*/
 
 
-
-    public void SetConfig(int baud, byte dataBits, byte stopBits, byte parity, byte flowControl)
-    {
+    public void SetConfig(int baud, byte dataBits, byte stopBits, byte parity, byte flowControl) {
         if (ftDev == null) return;
         if (ftDev.isOpen() == false) {
             Log.e("j2xx", "SetConfig: device not open");
@@ -1276,7 +1278,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     public void connectFunction() {
         if (ftdid2xx == null) return;
         int tmpProtNumber = openIndex + 1;
@@ -1343,7 +1344,7 @@ public class MainActivity extends AppCompatActivity {
                         headIndex.add(map);
                     } else {
                         if (len - i < 6) {
-                            preRestStr = gpsDataStr.substring(i+1);
+                            preRestStr = gpsDataStr.substring(i + 1);
                         }
                     }
                 }
@@ -1385,26 +1386,29 @@ public class MainActivity extends AppCompatActivity {
                                     } catch (Exception e) {
                                     }
                                     if (aisInfo.bOwnShip) {
-                                        LocationBean locationBean = new LocationBean();
-                                        locationBean.setLatitude(aisInfo.latititude);
-                                        locationBean.setLongitude(aisInfo.longtitude);
-                                        locationBean.setSpeed(aisInfo.SOG);
-                                        locationBean.setHeading(aisInfo.COG);
-                                        locationBean.setAcqtime(Constant.SYSTEM_DATE);
-                                        MyApplication.getInstance().currentLocation = locationBean;
-                                        EventBus.getDefault().post(locationBean);
+                                        judge18(newStr, aisInfo);
                                     } else {
                                         if (mmsi == aisInfo.mmsi) {
-                                            Log.e("TAG", "本船:" + aisInfo.mmsi);
-                                            LocationBean locationBean = new LocationBean();
-                                            locationBean.setLatitude(aisInfo.latititude);
-                                            locationBean.setLongitude(aisInfo.longtitude);
-                                            locationBean.setSpeed(aisInfo.SOG);
-                                            locationBean.setHeading(aisInfo.COG);
-                                            locationBean.setAcqtime(Constant.SYSTEM_DATE);
-                                            MyApplication.getInstance().currentLocation = locationBean;
-                                            EventBus.getDefault().post(locationBean);
+                                            judge18(newStr, aisInfo);
                                         } else {
+                                            if (18 == aisInfo.MsgType) {
+                                                try {
+                                                    List<org.codice.common.ais.message.Message> list = new Decoder().parseString(newStr);
+                                                    if (list != null && !list.isEmpty()) {
+                                                        for (org.codice.common.ais.message.Message m : list) {
+                                                            if (18 == m.getMessageType()) {
+                                                                Message18 m18 = (Message18) m;
+                                                                aisInfo.latititude = (int) (m18.getLat() * 1e7);
+                                                                aisInfo.longtitude = (int) (m18.getLon() * 1e7);
+                                                                aisInfo.SOG = (float) m18.getSog();
+                                                                aisInfo.COG = (float) m18.getCog();
+                                                            }
+                                                        }
+                                                    }
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
                                             EventBus.getDefault().post(aisInfo);
                                         }
                                     }
@@ -1448,6 +1452,40 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+
+        private void judge18(String newStr, AisInfo aisInfo) {
+            if (18 == aisInfo.MsgType) {
+                try {
+                    List<org.codice.common.ais.message.Message> list = new Decoder().parseString(newStr);
+                    if (list != null && !list.isEmpty()) {
+                        for (org.codice.common.ais.message.Message m : list) {
+                            if (18 == m.getMessageType()) {
+                                Message18 m18 = (Message18) m;
+                                LocationBean locationBean = new LocationBean();
+                                locationBean.setLatitude((int) (m18.getLat() * 1e7));
+                                locationBean.setLongitude((int) (m18.getLon() * 1e7));
+                                locationBean.setSpeed((float) m18.getSog());
+                                locationBean.setHeading((float) m18.getTrueHeading());
+                                locationBean.setAcqtime(new Date(m18.getTimestamp()));
+                                MyApplication.getInstance().currentLocation = locationBean;
+                                EventBus.getDefault().post(locationBean);
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                LocationBean locationBean = new LocationBean();
+                locationBean.setLatitude(aisInfo.latititude);
+                locationBean.setLongitude(aisInfo.longtitude);
+                locationBean.setSpeed(aisInfo.SOG);
+                locationBean.setHeading(aisInfo.COG);
+                locationBean.setAcqtime(Constant.SYSTEM_DATE);
+                MyApplication.getInstance().currentLocation = locationBean;
+                EventBus.getDefault().post(locationBean);
+            }
+        }
     };
 
 
@@ -1489,20 +1527,18 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
     int index = 0;
     /***********USB broadcast receiver*******************************************/
-    private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver()
-    {
+    private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
         @Override
-        public void onReceive(Context context, Intent intent)
-        {
+        public void onReceive(Context context, Intent intent) {
             String TAG = "FragL";
             String action = intent.getAction();
             //Log.e("TAG", action);
             index++;
-            if(UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action) && index == 1)
-            {
-                Log.i(TAG,"DETACHED...");
+            if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action) && index == 1) {
+                Log.i(TAG, "DETACHED...");
                 MyApplication.getInstance().isAisConnected = false;
                 gpsBar.setAisStatus(false);
                 DevCount = -1;
@@ -1510,17 +1546,13 @@ public class MainActivity extends AppCompatActivity {
                 bReadThreadGoing = false;
                 try {
                     Thread.sleep(50);
-                }
-                catch (InterruptedException e) {
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
 
-                if(ftDev != null)
-                {
-                    synchronized(ftDev)
-                    {
-                        if( true == ftDev.isOpen())
-                        {
+                if (ftDev != null) {
+                    synchronized (ftDev) {
+                        if (true == ftDev.isOpen()) {
                             ftDev.close();
                         }
                     }

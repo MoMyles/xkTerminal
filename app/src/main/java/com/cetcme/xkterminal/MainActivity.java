@@ -88,8 +88,13 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import aisparser.Message1;
+import aisparser.Message14;
+import aisparser.Message2;
+import aisparser.Message3;
+import aisparser.Sixbit;
+import aisparser.Vdm;
 import yimamapapi.skia.AisInfo;
-import yimamapapi.skia.YimaAisParse;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -147,6 +152,11 @@ public class MainActivity extends AppCompatActivity {
 
         readData = new byte[readLength];
         readDataToText = new char[readLength];
+        try {
+            typeMap = new JSONObject("{\"0\":\"000000\",\"1\":\"000001\",\"2\":\"000010\",\"3\":\"000011\",\"4\":\"000100\",\"5\":\"000101\",\"6\":\"000110\",\"7\":\"000111\",\"8\":\"001000\",\"9\":\"001001\",\":\":\"001010\",\";\":\"001011\",\"<\":\"001100\",\"=\":\"001101\",\">\":\"001110\",\"?\":\"001111\",\"@\":\"010000\",\"A\":\"010001\",\"B\":\"010010\",\"C\":\"010011\",\"D\":\"010100\",\"E\":\"010101\",\"F\":\"010110\",\"G\":\"010111\",\"H\":\"011000\",\"I\":\"011001\",\"J\":\"011010\",\"K\":\"011011\",\"L\":\"011100\",\"M\":\"011101\",\"N\":\"011110\",\"O\":\"011111\",\"P\":\"100000\",\"Q\":\"100001\",\"R\":\"100010\",\"S\":\"100011\",\"T\":\"100100\",\"U\":\"100101\",\"V\":\"100110\",\"W\":\"100111\",\"`\":\"101000\",\"a\":\"101001\",\"b\":\"101010\",\"c\":\"101011\",\"d\":\"101100\",\"e\":\"101101\",\"f\":\"101110\",\"g\":\"101111\",\"h\":\"110000\",\"i\":\"110001\",\"j\":\"110010\",\"k\":\"110011\",\"l\":\"110100\",\"m\":\"110101\",\"n\":\"110110\",\"o\":\"110111\",\"p\":\"111000\",\"q\":\"111001\",\"r\":\"111010\",\"s\":\"111011\",\"t\":\"111100\",\"u\":\"111101\",\"v\":\"111110\",\"w\":\"111111\"}");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         //设置当前窗体为全屏显示
         Window window = getWindow();
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -1319,16 +1329,16 @@ public class MainActivity extends AppCompatActivity {
 
     private String preRestStr = "";
     private final List<Map<String, Object>> headIndex = new ArrayList<>();
+    private JSONObject typeMap;
+    private final Vdm vdm = new Vdm();
 
     @SuppressLint("HandlerLeak")
     final Handler usbHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             if (iavailable > 0) {
-                //readText.append(String.copyValueOf(readDataToText, 0, iavailable));
                 headIndex.clear();
                 String gpsDataStr = preRestStr + String.copyValueOf(readDataToText, 0, iavailable);
-//                Log.e("TAG_OLD", gpsDataStr + ":" +preRestStr);
                 int len = gpsDataStr.length();
                 if (len <= 6) {
                     preRestStr = gpsDataStr;
@@ -1339,11 +1349,20 @@ public class MainActivity extends AppCompatActivity {
                     if ("!AIVDM".equals(headStr)
                             || "!AIVDO".equals(headStr)
                             || "$GPGSV".equals(headStr)) {
-                        //我要的头
-                        Map<String, Object> map = new HashMap<>();
-                        map.put("type", headStr);
-                        map.put("index", i);
-                        headIndex.add(map);
+                        int end = gpsDataStr.indexOf("\n", i+1);
+                        if (end != -1) {
+                            String str = gpsDataStr.substring(i+7, end + 1);
+                            if (str.contains("$") || str.contains("!")) {
+                                continue;
+                            }
+                            //我要的头
+                            Map<String, Object> map = new HashMap<>();
+                            map.put("type", headStr);
+                            map.put("index", i);
+                            headIndex.add(map);
+                        } else {
+                            preRestStr = gpsDataStr.substring(i);
+                        }
                     } else {
                         if (len - i < 6) {
                             preRestStr = gpsDataStr.substring(i + 1);
@@ -1354,79 +1373,110 @@ public class MainActivity extends AppCompatActivity {
                     Map<String, Object> map = headIndex.get(i);
                     int end = gpsDataStr.indexOf("\n", (Integer) map.get("index") + 1);
                     if (end != -1) {
-                        String newStr = gpsDataStr.substring((Integer) map.get("index"), end);
-                        // Log.e("TAG_SUB", newStr);
+                        String newStr = gpsDataStr.substring((Integer) map.get("index"), end + 1);
                         preRestStr = "";
                         String type = (String) map.get("type");
                         if ("!AIVDM".equals(type)
                                 || "!AIVDO".equals(type)) {
-                            MyApplication.getInstance().oldAisReceiveTime = System.currentTimeMillis();
-                            MyApplication.getInstance().isAisConnected = true;
-                            if (MyApplication.getInstance().mainActivity != null) {
-                                MyApplication.getInstance().mainActivity.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        MyApplication.getInstance().mainActivity.gpsBar.setAisStatus(true);
-                                    }
-                                });
-                            }
-                            AisInfo aisInfo = YimaAisParse.mParseAISSentence(newStr);
-                            if (aisInfo != null) {
-                                if (aisInfo.MsgType == 1
-                                        || aisInfo.MsgType == 2
-                                        || aisInfo.MsgType == 3
-                                        || aisInfo.MsgType == 14
-                                        || aisInfo.MsgType == 18
-                                        || aisInfo.MsgType == 19) {
-                                    Log.e("TAG", aisInfo.MsgType + ", " + newStr);
-                                    if (14 == aisInfo.MsgType) {
-                                        // 报警信息
-                                        if (aisInfo.mmsi > 0) {
-                                            String message = aisInfo.warnMsgInfo;
+                            Log.e("TAG", "ais: "+ newStr);
+                            try {
+                                MyApplication.getInstance().oldAisReceiveTime = System.currentTimeMillis();
+                                MyApplication.getInstance().isAisConnected = true;
+                                if (MyApplication.getInstance().mainActivity != null) {
+                                    MyApplication.getInstance().mainActivity.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            MyApplication.getInstance().mainActivity.gpsBar.setAisStatus(true);
+                                        }
+                                    });
+                                }
+                                boolean isOwn = "!AIVDO".equals(type);
+                                int result = vdm.add(newStr);
+                                if (0 == result) {
+                                    AisInfo aisInfo = new AisInfo("null");
+                                    Sixbit sixbit = vdm.sixbit();
+                                    switch (vdm.msgid()) {
+                                        case 1:
+                                            Message1 message1 = new Message1();
+                                            message1.parse(sixbit);
+                                            aisInfo.mmsi = (int) message1.userid();
+                                            aisInfo.COG = message1.cog() / 10.0f;
+                                            aisInfo.SOG = message1.sog() / 10.0f;
+                                            aisInfo.MsgType = 1;
+                                            aisInfo.longtitude = (int)(message1.longitude() * 1.0 / 600000 * 1e7);
+                                            aisInfo.latititude = (int)(message1.latitude() * 1.0 / 600000 * 1e7);
+                                            break;
+                                        case 2:
+                                            Message2 message2 = new Message2();
+                                            message2.parse(sixbit);
+                                            aisInfo.mmsi = (int) message2.userid();
+                                            aisInfo.COG = message2.cog() / 10.0f;
+                                            aisInfo.SOG = message2.sog() / 10.0f;
+                                            aisInfo.MsgType = 2;
+                                            aisInfo.longtitude = (int)(message2.longitude() * 1.0 / 600000 * 1e7);
+                                            aisInfo.latititude = (int)(message2.latitude() * 1.0 / 600000 * 1e7);
+                                            break;
+                                        case 3:
+                                            Message3 message3 = new Message3();
+                                            message3.parse(sixbit);
+                                            aisInfo.mmsi = (int) message3.userid();
+                                            aisInfo.COG = message3.cog() / 10.0f;
+                                            aisInfo.SOG = message3.sog() / 10.0f;
+                                            aisInfo.MsgType = 3;
+                                            aisInfo.longtitude = (int)(message3.longitude() * 1.0 / 600000 * 1e7);
+                                            aisInfo.latititude = (int)(message3.latitude() * 1.0 / 600000 * 1e7);
+                                            break;
+                                        case 14:
+                                            Message14 message14 = new Message14();
+                                            message14.parse(sixbit);
+                                            String message = message14.message();
                                             if (TextUtils.isEmpty(message)) {
                                                 message = "AIS报警";
                                             }
-                                            MyApplication.getInstance().sendBytes(WarnFormat.format("" + aisInfo.mmsi, message));
-                                        }
+                                            MyApplication.getInstance().sendBytes(WarnFormat.format("" + message14.userid(), message));
+                                            break;
+                                        case 18:
+                                            aisparser.Message18 message18 = new aisparser.Message18();
+                                            message18.parse(sixbit);
+                                            aisInfo.mmsi = (int) message18.userid();
+                                            aisInfo.COG = message18.cog() / 10.0f;
+                                            aisInfo.SOG = message18.sog() / 10.0f;
+                                            aisInfo.MsgType = 18;
+                                            aisInfo.longtitude = (int)(message18.longitude() * 1.0 / 600000 * 1e7);
+                                            aisInfo.latititude = (int)(message18.latitude() * 1.0 / 600000 * 1e7);
+                                            break;
+                                        case 19:
+                                            aisparser.Message19 message19 = new aisparser.Message19();
+                                            message19.parse(sixbit);
+                                            aisInfo.mmsi = (int) message19.userid();
+                                            aisInfo.COG = message19.cog() / 10.0f;
+                                            aisInfo.SOG = message19.sog() / 10.0f;
+                                            aisInfo.MsgType = 19;
+                                            aisInfo.longtitude = (int)(message19.longitude() * 1.0 / 600000 * 1e7);
+                                            aisInfo.latititude = (int)(message19.latitude() * 1.0 / 600000 * 1e7);
+                                            break;
+                                    }
+                                    int mmsi = Integer.valueOf(PreferencesUtils.getString(MainActivity.this, "shipNo", "0")).intValue();
+                                    if (isOwn) {
+                                        // 本船
+                                        judge18(newStr, aisInfo);
                                     } else {
-                                        int mmsi = -99;
-                                        try {
-                                            mmsi = Integer.valueOf(PreferencesUtils.getString(MainActivity.this, "shipNo", "0")).intValue();
-                                        } catch (Exception e) {
-                                        }
-                                        if (aisInfo.bOwnShip) {
+                                        // 其他船
+                                        if (mmsi == aisInfo.mmsi) {
                                             judge18(newStr, aisInfo);
                                         } else {
-                                            if (mmsi == aisInfo.mmsi) {
-                                                judge18(newStr, aisInfo);
-                                            } else {
-                                                if (18 == aisInfo.MsgType) {
-                                                    try {
-                                                        List<org.codice.common.ais.message.Message> list = new Decoder().parseString(newStr);
-                                                        if (list != null && !list.isEmpty()) {
-                                                            for (org.codice.common.ais.message.Message m : list) {
-                                                                if (18 == m.getMessageType()) {
-                                                                    Message18 m18 = (Message18) m;
-                                                                    aisInfo.latititude = (int) (m18.getLat() * 1e7);
-                                                                    aisInfo.longtitude = (int) (m18.getLon() * 1e7);
-                                                                    aisInfo.SOG = (float) m18.getSog();
-                                                                    aisInfo.COG = (float) m18.getCog();
-                                                                }
-                                                            }
-                                                        }
-                                                    } catch (Exception e) {
-                                                        e.printStackTrace();
-                                                    }
-                                                }
-                                                EventBus.getDefault().post(aisInfo);
-                                            }
+                                            EventBus.getDefault().post(aisInfo);
                                         }
                                     }
                                 }
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
                         } else if ("$GPGSV".equals(type)) {
+                            Log.e("TAG", "gps: "+ newStr);
                             try {
-                                newStr = gpsDataStr.substring(gpsDataStr.indexOf(",") + 1, gpsDataStr.lastIndexOf("*"));
+                                newStr = newStr.substring(newStr.indexOf(",") + 1, newStr.lastIndexOf("*")) + ",";
+                                boolean isDou = newStr.endsWith(",");
                                 String[] arr = newStr.split(",");
                                 for (int j = 3; j < arr.length; j += 4) {
                                     int no = Integer.valueOf(arr[j]);
@@ -1434,7 +1484,9 @@ public class MainActivity extends AppCompatActivity {
                                     int fangwei = Integer.valueOf(arr[j + 2]);
                                     int xinhao = 0;
                                     // xinhao arr[j + 3] 可能为空
-                                    xinhao = Integer.valueOf("".equals(arr[j + 3]) ? "0" : arr[j + 3]);
+                                    if (!isDou) {
+                                        xinhao = Integer.valueOf("".equals(arr[j + 3]) ? "0" : arr[j + 3]);
+                                    }
                                     GPSBean bean = db.selector(GPSBean.class).where("no", "=", no).findFirst();
                                     if (bean == null) {
                                         // 不存在
@@ -1449,7 +1501,7 @@ public class MainActivity extends AppCompatActivity {
                                         bean.setYangjiao(yangjiao);
                                         bean.setFangwei(fangwei);
                                         bean.setXinhao(xinhao);
-                                        db.saveOrUpdate(bean);
+                                        db.update(bean, "yangjiao", "fangwei", "xinhao");
                                     }
                                 }
                             } catch (Exception e) {

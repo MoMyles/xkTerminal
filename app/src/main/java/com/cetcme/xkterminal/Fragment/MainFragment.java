@@ -606,7 +606,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
             // 显示所有船
             skiaDrawView.mYimaLib.SetAllOtherVesselDrawOrNot(true);
             skiaDrawView.postInvalidate();
-            Log.e("TAG", aisInfo.mmsi + ", " + aisInfo.longtitude + ", " + aisInfo.latititude);
+//            Log.e("TAG", aisInfo.mmsi + ", " + aisInfo.longtitude + ", " + aisInfo.latititude);
 //                String str = String.format("mmsi:{0},msgType:{1},shipName:{2},cog:{3},sog:{4}", aisInfo.mmsi, aisInfo.MsgType,aisInfo.shipName, aisInfo.COG
 //                , aisInfo.SOG);
 //                datas.add(str);

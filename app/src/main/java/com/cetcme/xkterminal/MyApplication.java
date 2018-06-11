@@ -5,6 +5,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.media.audiofx.LoudnessEnhancer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -122,6 +123,8 @@ public class MyApplication extends Application {
 
     private Timer timer;
 
+    private JSONObject keyMap;
+
     /**
      * 加载库文件（只需调用一次）
      */
@@ -133,6 +136,13 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        try {
+            String keyJsonStr = "{\"000000\":\"0\",\"000001\":\"1\",\"000010\":\"2\",\"000011\":\"3\",\"000100\":\"4\",\"000101\":\"5\",\"000110\":\"6\",\"000111\":\"7\",\"001000\":\"8\",\"001001\":\"9\",\"001010\":\":\",\"001011\":\";\",\"001100\":\"<\",\"001101\":\"=\",\"001110\":\">\",\"001111\":\"?\",\"010000\":\"@\",\"010001\":\"A\",\"010010\":\"B\",\"010011\":\"C\",\"010100\":\"D\",\"010101\":\"E\",\"010110\":\"F\",\"010111\":\"G\",\"011000\":\"H\",\"011001\":\"I\",\"011010\":\"J\",\"011011\":\"K\",\"011100\":\"L\",\"011101\":\"M\",\"011110\":\"N\",\"011111\":\"O\",\"100000\":\"P\",\"100001\":\"Q\",\"100010\":\"R\",\"100011\":\"S\",\"100100\":\"T\",\"100101\":\"U\",\"100110\":\"V\",\"100111\":\"W\",\"101000\":\"`\",\"101001\":\"a\",\"101010\":\"b\",\"101011\":\"c\",\"101100\":\"d\",\"101101\":\"e\",\"101110\":\"f\",\"101111\":\"g\",\"110000\":\"h\",\"110001\":\"i\",\"110010\":\"j\",\"110011\":\"k\",\"110100\":\"l\",\"110101\":\"m\",\"110110\":\"n\",\"110111\":\"o\",\"111000\":\"p\",\"111001\":\"q\",\"111010\":\"r\",\"111011\":\"s\",\"111100\":\"t\",\"111101\":\"u\",\"111110\":\"v\",\"111111\":\"w\"}";
+            keyMap = new JSONObject(keyJsonStr);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         mContext = this;
         sp = getSharedPreferences("xkTerminal", MODE_PRIVATE);
         if (!PreferencesUtils.getBoolean(this, "copiedYimaFile")) {
@@ -1349,7 +1359,7 @@ public class MyApplication extends Application {
 
     */
 
-    public byte[] createAisWarnInfoMessage(String message) {
+    public String createAisWarnInfoMessage(String message) {
         String headStr = "!AIVDO,1,1,0,A,";
         StringBuffer sb = new StringBuffer("00111000");
         // 消息ID
@@ -1375,79 +1385,55 @@ public class MyApplication extends Application {
         }
         //备用
         sb.append("00");
-        //安全文本内容
+        //TODO 安全文本内容
         byte[] byts = message.getBytes();
         for (int i = 0; i < byts.length; i++) {
             String tmp = Integer.toBinaryString(byts[i] & 0x3F);
             //Log.e("TAG_CONTENT", tmp);
             sb.append(bu0_6(tmp));
         }
-        //比特总数
-        sb.append(bu0_8(Integer.toBinaryString(sb.toString().length() & 0xFF)));
-        int len = sb.toString().length();
+        //比特总数=
         int v = 0;
+        int len = sb.toString().length();
         if (len % 6 != 0) {
             v = 6 - len % 6;
-            if (len % 6 != 0) {
-                for (int i = 0; i < v; i++) {
-                    sb.append("0");
-                }
+            for (int i = 0; i < v; i++) {
+                sb.append("0");
             }
         }
-        String keys = "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_ !\"#$%&'()*+,-./0123456789:;<=>?";
-        //
         String finalStr = sb.toString();
         len = finalStr.length();
-//        byte[] newByts = new byte[len / 8];
-        int index = 0;
-        StringBuffer test = new StringBuffer();
+        int ck = 0;
         for (int i = 0; i < len; i += 6) {
             String ss = "";
             for (int j = i; j < i + 6; j++) {
                 ss += finalStr.charAt(j);
             }
-            test.append(ss + ",");
-            int l = Integer.valueOf(ss, 2);
-            if (l > 15 && l < 32) {
-                l = Integer.valueOf("01" + ss, 2);
-            } else if (l > 31 && l < 48) {
-                l = Integer.valueOf("10" + ss, 2);
-            } else if (l > 47 && l < 64) {
-                l = Integer.valueOf("11" + ss, 2);
-            }
             try {
-                headStr += keys.charAt(l);
+                headStr += keyMap.getString(ss);
             } catch (Exception e) {
-
+                e.printStackTrace();
             }
 //            headStr += new String(new byte[]{b});
+
 //            newByts[index++] = b;
         }
-        Log.e("TAG", test.toString());
+        Log.e("TAG", "content: "+headStr);
         //校验和
         headStr += "," + v;
+        len = headStr.length();
+        for (int i=1;i<len;i++){
+            ck ^= headStr.charAt(i);
+        }
+
 //        byte[] ll = last.getBytes();
         //newByts = ByteUtil.byteMerger(headByts, newByts);
         //newByts = ByteUtil.byteMerger(newByts, ll);
-        String last = "*" + Util.computeCheckSum(headStr.getBytes(), 0, headStr.getBytes().length);
+        String last = "*" + Integer.toHexString(ck);
         headStr += last;
 //        byte[] finalByts = ByteUtil.byteMerger(newByts, last.getBytes());
 //        Log.e("TAG", ConvertUtil.bytesToHexString(newByts));
-        return headStr.getBytes();
-    }
-
-    private String bu0_8(String numberStr) {
-        if (TextUtils.isEmpty(numberStr)) return "";
-        int len = numberStr.length();
-        if (len < 8) {
-            StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < 8 - len; i++) {
-                sb.append("0");
-            }
-            sb.append(numberStr);
-            return sb.toString();
-        }
-        return numberStr;
+        return headStr;
     }
 
     private String bu0_6(String numberStr) {

@@ -24,8 +24,8 @@
 
                 <TextView
                     style="@style/setting_tv_title"
-                    android:layout_marginLeft="120dp"
-                    android:layout_marginStart="120dp"
+                    android:layout_marginLeft="@dimen/setting_padding"
+                    android:layout_marginStart="@dimen/setting_padding"
                     android:text="用户地址："/>
 
                 <TextView
@@ -45,8 +45,8 @@
                 <TextView
                     style="@style/setting_tv_title"
                     android:gravity="center"
-                    android:layout_marginRight="120dp"
-                    android:layout_marginEnd="120dp"
+                    android:layout_marginRight="@dimen/setting_padding"
+                    android:layout_marginEnd="@dimen/setting_padding"
                     android:text="---"/>
 
             </LinearLayout>
@@ -65,8 +65,8 @@
 
                 <TextView
                     style="@style/setting_tv_title"
-                    android:layout_marginLeft="120dp"
-                    android:layout_marginStart="120dp"
+                    android:layout_marginLeft="@dimen/setting_padding"
+                    android:layout_marginStart="@dimen/setting_padding"
                     android:text="位置数据报告："/>
 
                 <TextView
@@ -85,8 +85,8 @@
                 <TextView
                     style="@style/setting_tv_title"
                     android:gravity="center"
-                    android:layout_marginRight="120dp"
-                    android:layout_marginEnd="120dp"
+                    android:layout_marginRight="@dimen/setting_padding"
+                    android:layout_marginEnd="@dimen/setting_padding"
                     android:text="---"/>
 
             </LinearLayout>
@@ -105,8 +105,8 @@
 
                 <TextView
                     style="@style/setting_tv_title"
-                    android:layout_marginLeft="120dp"
-                    android:layout_marginStart="120dp"
+                    android:layout_marginLeft="@dimen/setting_padding"
+                    android:layout_marginStart="@dimen/setting_padding"
                     android:text="GPS定位频度："/>
 
                 <TextView
@@ -125,8 +125,8 @@
                 <TextView
                     style="@style/setting_tv_title"
                     android:gravity="center"
-                    android:layout_marginRight="120dp"
-                    android:layout_marginEnd="120dp"
+                    android:layout_marginRight="@dimen/setting_padding"
+                    android:layout_marginEnd="@dimen/setting_padding"
                     android:text="---"/>
 
             </LinearLayout>
@@ -145,8 +145,8 @@
 
                 <TextView
                     style="@style/setting_tv_title"
-                    android:layout_marginLeft="120dp"
-                    android:layout_marginStart="120dp"
+                    android:layout_marginLeft="@dimen/setting_padding"
+                    android:layout_marginStart="@dimen/setting_padding"
                     android:text="速度零值门限："/>
 
                 <TextView
@@ -165,8 +165,8 @@
                 <TextView
                     style="@style/setting_tv_title"
                     android:gravity="center"
-                    android:layout_marginRight="120dp"
-                    android:layout_marginEnd="120dp"
+                    android:layout_marginRight="@dimen/setting_padding"
+                    android:layout_marginEnd="@dimen/setting_padding"
                     android:text="---"/>
 
             </LinearLayout>
@@ -185,8 +185,8 @@
 
                 <TextView
                     style="@style/setting_tv_title"
-                    android:layout_marginLeft="120dp"
-                    android:layout_marginStart="120dp"
+                    android:layout_marginLeft="@dimen/setting_padding"
+                    android:layout_marginStart="@dimen/setting_padding"
                     android:text="定位区分门限："/>
 
                 <TextView
@@ -205,8 +205,8 @@
                 <TextView
                     style="@style/setting_tv_title"
                     android:gravity="center"
-                    android:layout_marginRight="120dp"
-                    android:layout_marginEnd="120dp"
+                    android:layout_marginRight="@dimen/setting_padding"
+                    android:layout_marginEnd="@dimen/setting_padding"
                     android:text="---"/>
 
             </LinearLayout>
@@ -225,8 +225,8 @@
 
                 <TextView
                     style="@style/setting_tv_title"
-                    android:layout_marginLeft="120dp"
-                    android:layout_marginStart="120dp"
+                    android:layout_marginLeft="@dimen/setting_padding"
+                    android:layout_marginStart="@dimen/setting_padding"
                     android:text="供电电压："/>
 
                 <TextView
@@ -246,8 +246,8 @@
                 <TextView
                     style="@style/setting_tv_title"
                     android:gravity="center"
-                    android:layout_marginRight="120dp"
-                    android:layout_marginEnd="120dp"
+                    android:layout_marginRight="@dimen/setting_padding"
+                    android:layout_marginEnd="@dimen/setting_padding"
                     android:text=""/>
 
             </LinearLayout>

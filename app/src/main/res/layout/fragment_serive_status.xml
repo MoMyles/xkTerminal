@@ -24,8 +24,8 @@
 
                 <TextView
                     style="@style/setting_tv_title"
-                    android:layout_marginLeft="120dp"
-                    android:layout_marginStart="120dp"
+                    android:layout_marginLeft="@dimen/setting_padding"
+                    android:layout_marginStart="@dimen/setting_padding"
                     android:text="紧急报警："/>
 
                 <TextView
@@ -46,8 +46,8 @@
                     android:id="@+id/communication_from_textView"
                     style="@style/setting_tv_title"
                     android:gravity="center"
-                    android:layout_marginRight="120dp"
-                    android:layout_marginEnd="120dp"
+                    android:layout_marginRight="@dimen/setting_padding"
+                    android:layout_marginEnd="@dimen/setting_padding"
                     android:text="允许"/>
 
             </LinearLayout>
@@ -66,8 +66,8 @@
 
                 <TextView
                     style="@style/setting_tv_title"
-                    android:layout_marginLeft="120dp"
-                    android:layout_marginStart="120dp"
+                    android:layout_marginLeft="@dimen/setting_padding"
+                    android:layout_marginStart="@dimen/setting_padding"
                     android:text="开关机报告："/>
 
                 <TextView
@@ -86,8 +86,8 @@
                 <TextView
                     style="@style/setting_tv_title"
                     android:gravity="center"
-                    android:layout_marginRight="120dp"
-                    android:layout_marginEnd="120dp"
+                    android:layout_marginRight="@dimen/setting_padding"
+                    android:layout_marginEnd="@dimen/setting_padding"
                     android:text="允许"/>
 
             </LinearLayout>
@@ -106,8 +106,8 @@
 
                 <TextView
                     style="@style/setting_tv_title"
-                    android:layout_marginLeft="120dp"
-                    android:layout_marginStart="120dp"
+                    android:layout_marginLeft="@dimen/setting_padding"
+                    android:layout_marginStart="@dimen/setting_padding"
                     android:text="AIS报警："/>
 
                 <TextView
@@ -126,8 +126,8 @@
                 <TextView
                     style="@style/setting_tv_title"
                     android:gravity="center"
-                    android:layout_marginRight="120dp"
-                    android:layout_marginEnd="120dp"
+                    android:layout_marginRight="@dimen/setting_padding"
+                    android:layout_marginEnd="@dimen/setting_padding"
                     android:text="允许"/>
 
             </LinearLayout>
@@ -146,8 +146,8 @@
 
                 <TextView
                     style="@style/setting_tv_title"
-                    android:layout_marginLeft="120dp"
-                    android:layout_marginStart="120dp"
+                    android:layout_marginLeft="@dimen/setting_padding"
+                    android:layout_marginStart="@dimen/setting_padding"
                     android:text="短信发送："/>
 
                 <TextView
@@ -167,8 +167,8 @@
                 <TextView
                     style="@style/setting_tv_title"
                     android:gravity="center"
-                    android:layout_marginRight="120dp"
-                    android:layout_marginEnd="120dp"
+                    android:layout_marginRight="@dimen/setting_padding"
+                    android:layout_marginEnd="@dimen/setting_padding"
                     android:text=""/>
 
             </LinearLayout>
@@ -189,8 +189,8 @@
 
                 <TextView
                     style="@style/setting_tv_title"
-                    android:layout_marginLeft="120dp"
-                    android:layout_marginStart="120dp"
+                    android:layout_marginLeft="@dimen/setting_padding"
+                    android:layout_marginStart="@dimen/setting_padding"
                     android:text="定位区分门限："/>
 
                 <TextView
@@ -209,8 +209,8 @@
                 <TextView
                     style="@style/setting_tv_title"
                     android:gravity="center"
-                    android:layout_marginRight="120dp"
-                    android:layout_marginEnd="120dp"
+                    android:layout_marginRight="@dimen/setting_padding"
+                    android:layout_marginEnd="@dimen/setting_padding"
                     android:text="允许"/>
 
             </LinearLayout>

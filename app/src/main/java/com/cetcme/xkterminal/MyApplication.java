@@ -145,6 +145,8 @@ public class MyApplication extends Application {
 
         EventBus.getDefault().register(this);
 
+        initDb();
+
         handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
@@ -210,7 +212,7 @@ public class MyApplication extends Application {
         mHandler = new DataHandler(this);
 
 
-        initDb();
+
 
         // 语音
         Iconify.with(new FontAwesomeModule());
@@ -1063,7 +1065,8 @@ public class MyApplication extends Application {
                             int yangjiao = Integer.valueOf(arr[i + 1]);
                             int fangwei = Integer.valueOf(arr[i + 2]);
                             int xinhao = 0;
-                            xinhao = Integer.valueOf(arr[i + 3]);
+                            // xinhao arr[i + 3] 可能为空
+                            xinhao = Integer.valueOf(arr[i + 3].equals("") ? "0" : arr[i + 3]);
                             GPSBean bean = db.selector(GPSBean.class).where("no", "=", no).findFirst();
                             if (bean == null) {
                                 // 不存在

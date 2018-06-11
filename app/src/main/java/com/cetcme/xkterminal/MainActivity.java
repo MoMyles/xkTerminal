@@ -1,5 +1,6 @@
 package com.cetcme.xkterminal;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -1319,6 +1320,7 @@ public class MainActivity extends AppCompatActivity {
     private String preRestStr = "";
     private final List<Map<String, Object>> headIndex = new ArrayList<>();
 
+    @SuppressLint("HandlerLeak")
     final Handler usbHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -1326,7 +1328,7 @@ public class MainActivity extends AppCompatActivity {
                 //readText.append(String.copyValueOf(readDataToText, 0, iavailable));
                 headIndex.clear();
                 String gpsDataStr = preRestStr + String.copyValueOf(readDataToText, 0, iavailable);
-                // Log.e("TAG_OLD", gpsDataStr);
+//                Log.e("TAG_OLD", gpsDataStr + ":" +preRestStr);
                 int len = gpsDataStr.length();
                 if (len <= 6) {
                     preRestStr = gpsDataStr;
@@ -1424,14 +1426,15 @@ public class MainActivity extends AppCompatActivity {
                             }
                         } else if ("$GPGSV".equals(type)) {
                             try {
-                                newStr = newStr.substring(gpsDataStr.indexOf(",") + 1, gpsDataStr.lastIndexOf("*"));
+                                newStr = gpsDataStr.substring(gpsDataStr.indexOf(",") + 1, gpsDataStr.lastIndexOf("*"));
                                 String[] arr = newStr.split(",");
                                 for (int j = 3; j < arr.length; j += 4) {
                                     int no = Integer.valueOf(arr[j]);
                                     int yangjiao = Integer.valueOf(arr[j + 1]);
                                     int fangwei = Integer.valueOf(arr[j + 2]);
                                     int xinhao = 0;
-                                    xinhao = Integer.valueOf(arr[j + 3]);
+                                    // xinhao arr[j + 3] 可能为空
+                                    xinhao = Integer.valueOf("".equals(arr[j + 3]) ? "0" : arr[j + 3]);
                                     GPSBean bean = db.selector(GPSBean.class).where("no", "=", no).findFirst();
                                     if (bean == null) {
                                         // 不存在

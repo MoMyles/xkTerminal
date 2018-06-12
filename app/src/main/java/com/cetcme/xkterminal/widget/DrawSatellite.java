@@ -50,7 +50,7 @@ public class DrawSatellite extends View {
     private void drawCircle(Canvas canvas,Paint p){
         mSatelliteBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.mipmap.ic_satellite_blue);
         for(Satellite s : mSatelliteList){
-            drawSatellite(canvas, s, mSatelliteX, mSateLliteY, Math.min(mSatelliteX, mSateLliteY) - 20);
+            drawSatellite(canvas, s, mSatelliteX, mSateLliteY, Math.min(mSatelliteX, mSateLliteY) - 10);
         }
     }
 

@@ -131,6 +131,7 @@ public class SatelliteFragment extends Fragment {
         mDate = view.findViewById(R.id.date_tv);
         mDouble = view.findViewById(R.id.bestPosa_accuracy_tv);
         gpsBar = view.findViewById(R.id.bar_gps);
+        gpsBar.setInteractive(false);
 
         //初始化
         int realWidth = QMUIDisplayHelper.dp2px(getActivity()

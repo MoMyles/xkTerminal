@@ -228,12 +228,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
 //                PreferencesUtils.putBoolean(getActivity(), "mainFrgPin", b);
                 if (b) {
-                    try {
-                        List<PinBean> list = db.selector(PinBean.class).findAll();
-                        if (list != null && !list.isEmpty()) skiaDrawView.showBiaoWei(list);
-                    } catch (DbException e) {
-                        e.printStackTrace();
-                    }
+                    showBiaoweis();
                 } else {
                     skiaDrawView.clearBiaoWeiTrack();
                 }
@@ -328,15 +323,30 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+                skiaDrawView.changeFishState(mSwitchYQ.isChecked());
                 skiaDrawView.postInvalidate();
-                mSwitchPin.setChecked(false);
+                showWarnAreas();
+                if (mSwitchPin.isChecked()) {
+                    showBiaoweis();
+                }
+//                mSwitchPin.setChecked(false);
             }
         }, 50);
         super.onResume();
     }
 
+    private void showBiaoweis() {
+        try {
+            List<PinBean> list = db.selector(PinBean.class).findAll();
+            if (list != null && !list.isEmpty()) skiaDrawView.showBiaoWei(list);
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
+    }
+
     private final List<WarnArea> areas = new ArrayList<>();
     private int curLayerPos = -1;
+
 
     private void showWarnAreas() {
         if (warnArea) {
@@ -646,8 +656,10 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
             openPinDialog(null);
         }
     }
+
     // 标位操作
     private boolean doBiaoWei = false;
+
     @Override
     public void onMapClicked(M_POINT m_point) {
         if (showOtherShip) {
@@ -663,6 +675,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
 
     /**
      * 标位对话框 输入内容
+     *
      * @param m_point
      */
     private void openPinDialog(M_POINT m_point) {
@@ -687,8 +700,8 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
         final EditText et4 = view.findViewById(R.id.et4); // 用来存显色标志 1 2 3 4隐藏
 
         if (m_point != null) {
-            et1.setText(m_point.x/1e7 + "");
-            et2.setText(m_point.y/1e7 + "");
+            et1.setText(m_point.x / 1e7 + "");
+            et2.setText(m_point.y / 1e7 + "");
         }
 
         final TextView tv1 = view.findViewById(R.id.tv1);
@@ -696,11 +709,11 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
         final TextView tv3 = view.findViewById(R.id.tv3);
         final TextView tv4 = view.findViewById(R.id.tv4);
 
-        final RelativeLayout.LayoutParams layoutParams =  new RelativeLayout.LayoutParams(30, 30);
-        layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT,RelativeLayout.TRUE);
+        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(30, 30);
+        layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
 
-        final RelativeLayout.LayoutParams layoutParams_big =  new RelativeLayout.LayoutParams(40, 40);
-        layoutParams_big.addRule(RelativeLayout.CENTER_IN_PARENT,RelativeLayout.TRUE);
+        final RelativeLayout.LayoutParams layoutParams_big = new RelativeLayout.LayoutParams(40, 40);
+        layoutParams_big.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
 
         tv1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -787,6 +800,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                         db.saveBindingId(pinBean);
                         pinDialog.cancel();
                         Toast.makeText(getActivity(), "标位保存成功", Toast.LENGTH_SHORT).show();
+                        showBiaoweis();
                     } catch (DbException e) {
                         e.printStackTrace();
                     }

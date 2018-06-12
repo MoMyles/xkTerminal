@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -25,6 +24,7 @@ import java.util.List;
 import yimamapapi.skia.M_POINT;
 import yimamapapi.skia.OtherShipBaicInfo;
 import yimamapapi.skia.OtherVesselCurrentInfo;
+import yimamapapi.skia.PointArrayInfo;
 import yimamapapi.skia.YimaLib;
 
 public class SkiaDrawView extends View {
@@ -62,6 +62,8 @@ public class SkiaDrawView extends View {
     private int pasteWidth, pasteHeight; //pinch时贴图宽度和高度
     private M_POINT scrnCenterPointGeo;
 
+    private final List<PinBean> pinBeans = new ArrayList<>();
+
     public SkiaDrawView(Context ctx, AttributeSet attr) {
         super(ctx, attr);
         mYimaLib = new YimaLib();
@@ -79,19 +81,13 @@ public class SkiaDrawView extends View {
         mYimaLib.SetDisplayCategory(3);
         mYimaLib.RefreshDrawer(fSkiaBitmap, strTtfFilePath);//刷新绘制器，需要传入字体文件地址，用户可以自己修改为别的字体
         mYimaLib.OverViewLibMap(0);//概览第一幅图
-//        mYimaLib.SetOwnShipBasicInfo("基站-2431", "4132431", 100, 20);
-//        mYimaLib.SetDisplayCategory(3);
-//        mYimaLib.SetIfShowSoundingAndMinMaxSound(true, 0, 20);
-
-
     }
 
     @Override
     public void onDraw(Canvas canvas) {
         mYimaLib.ViewDraw(fSkiaBitmap, null, null);
-        //YimaLib.ViewDraw(fSkiaBitmap, "com/example/viewdraw/viewdrawinndkskiausestaticlib/SkiaDrawView", "AfterDraw");//绘制海图到fSkiaBitmap
-        canvas.drawBitmap(fSkiaBitmap, 0, 0, null);//
-
+        canvas.drawBitmap(fSkiaBitmap, 0, 0, null);
+        // 禁渔线
         createLine(canvas, Color.BLACK, LINE_JIN_TUO);
         createLine(canvas, Color.RED, LINE_DALU_LINGHAI);
         createLine(canvas, Color.RED, LINE_XISHA);
@@ -100,56 +96,35 @@ public class SkiaDrawView extends View {
         createLine(canvas, Color.BLUE, LINE_BLUE1);
         createLine(canvas, Color.BLUE, LINE_BLUE2);
 
+        if (!pinBeans.isEmpty()) {
+            int[] arrGeoX = new int[pinBeans.size()];
+            int[] arrGeoY = new int[pinBeans.size()];
+            for (int i = 0; i < pinBeans.size(); i++) {
+                PinBean lb = pinBeans.get(i);
+                arrGeoX[i] = lb.getLon();
+                arrGeoY[i] = lb.getLat();
+            }
+            PointArrayInfo arrayInfo = mYimaLib.getScrnPointsFromGeoPoints(arrGeoX, arrGeoY, pinBeans.size());
+            if (arrayInfo.arrPoints != null) {
+                for (int i=0;i<arrayInfo.arrPoints.size();i++) {
+                    M_POINT point = arrayInfo.arrPoints.get(i);
+                    PinBean pb = pinBeans.get(i);
+                    Paint mPaint = new Paint();
+                    mPaint.setAntiAlias(true);
+                    mPaint.setDither(true);
+                    mPaint.setColor(pb.getColor());
+                    int radius = 12;
+                    canvas.drawCircle(point.x, point.y, radius, mPaint);
+                    mPaint.setColor(Color.BLACK);
+                    int textSize = 18;
+                    mPaint.setTextSize(textSize);
+                    String str = pb.getName();
+                    int fontNum = str.length();
+                    canvas.drawText(str, point.x + (radius*2 - fontNum * textSize) / 2 - radius, point.y + (radius*2 - textSize) / 2 + radius, mPaint);
+                }
+            }
+        }
 
-//        int[] arrGeoX = new int[]{(int)(122.4151167*1e7),(int)(122.23819*1e7),(int)(119.5712833*1e7)};
-//        int[] arrGeoY = new int[]{(int)(29.9224167*1e7),(int)(29.97372*1e7),(int)(25.2664833*1e7)};
-//        // 添加点
-//        mYimaLib.tmAppendLayer(1);//添加点图层
-//        curLayerPos2 = mYimaLib.tmGetLayerCount() - 1;
-//        mYimaLib.tmSetLayerName(curLayerPos2, "点图层");
-//        mYimaLib.tmSetLayerDrawOrNot(curLayerPos2, true);
-//        mYimaLib.tmAddLayerAttribute(curLayerPos2, 4, "point");//添加图层属性：属性名称："物标名称",属性值类型：4（字符串）
-//        for (int iObj = 0; iObj < arrGeoX.length; iObj++) {
-//            mYimaLib.tmAppendObjectInLayer(curLayerPos2, 0);//在图层上添加一个点物标
-//            int objCount = mYimaLib.tmGetLayerObjectCount(curLayerPos2);
-//            objLayerPos2.add(objCount);
-//            //layerAttrCount = mYimaLib.tmGetLayerObjectAttrCount(curLayerPos2);
-//            //mYimaLib.tmSetObjectAttrValueString(curLayerPos2, objCount - 1, layerAttrCount - 1, sdf.format(list.get(iObj).getAcqtime()));//设置物标属性值字符串
-//            mYimaLib.tmSetPointObjectCoor(curLayerPos2, objCount - 1, arrGeoX[iObj], arrGeoY[iObj]);//设置物标坐标
-//            if (iObj == 0) {
-//                try {
-//                    String str = new String("标位1".getBytes("gbk"), "gbk");
-//                    mYimaLib.tmSetPointObjectStyle(curLayerPos2, objCount - 1, 1,
-//                            true, 255, 0, 0, 20,
-//                            str, "", 20, 0, 0, 0, true, false, 0, 0, 0, 0);//设置物标样式
-//                } catch (UnsupportedEncodingException e) {
-//                    e.printStackTrace();
-//                }
-//            } else if (iObj == arrGeoX.length - 1) {
-//                try {
-//                    String str = new String("标位2".getBytes("gbk"), "gbk");
-//                    mYimaLib.tmSetPointObjectStyle(curLayerPos2, objCount - 1, 1,
-//                            true, 0, 255, 0, 20,
-//                            str, "", 20, 0, 0, 0, true, false, 0, 0, 0, 0);//设置物标样式
-//                } catch (UnsupportedEncodingException e) {
-//                    e.printStackTrace();
-//                }
-//            } else if (iObj > 0) {
-//                try {
-//                    String str = new String("标位3".getBytes("gbk"), "gbk");
-//                    mYimaLib.tmSetPointObjectStyle(curLayerPos2, objCount - 1, 1,
-//                            true, 0, 0, 255, 20,
-//                            str, "", 20, 0, 0, 0, true, false, 0, 0, 0, 0);//设置物标样式
-//                } catch (UnsupportedEncodingException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
-//        Paint paint = new Paint();
-//        paint.setARGB(255,255, 0, 0);
-//        canvas.drawRect(0, 0, 500, 800, paint);
-
-        Log.i("SkiaDrawView.onDraw", "onDraw end.");
     }
 
     private void createLine(Canvas canvas, int color, String line) {
@@ -441,53 +416,59 @@ public class SkiaDrawView extends View {
     //显示标位物标
     public void showBiaoWei(List<PinBean> list) {
         if (list == null || list.isEmpty()) return;
-        clearBiaoWeiTrack();
-        // 添加点
-        mYimaLib.tmAppendLayer(1);//添加点图层
-        curLayerPos3 = mYimaLib.tmGetLayerCount() - 1;
-        mYimaLib.tmSetLayerName(curLayerPos3, "点图层");
-        mYimaLib.tmSetLayerDrawOrNot(curLayerPos3, true);
-        mYimaLib.tmAddLayerAttribute(curLayerPos3, 4, "point");//添加图层属性：属性名称："物标名称",属性值类型：4（字符串）
-        int[] arrGeoX = new int[list.size()];
-        int[] arrGeoY = new int[list.size()];
-        for (int i = 0; i < list.size(); i++) {
-            PinBean lb = list.get(i);
-            arrGeoX[i] = lb.getLon();
-            arrGeoY[i] = lb.getLat();
-        }
-        for (int iObj = 0; iObj < arrGeoX.length; iObj++) {
-            mYimaLib.tmAppendObjectInLayer(curLayerPos3, 0);//在图层上添加一个点物标
-            int objCount = mYimaLib.tmGetLayerObjectCount(curLayerPos3);
-            objLayerPos3.add(objCount);
-            //layerAttrCount = mYimaLib.tmGetLayerObjectAttrCount(curLayerPos2);
-            //mYimaLib.tmSetObjectAttrValueString(curLayerPos2, objCount - 1, layerAttrCount - 1, sdf.format(list.get(iObj).getAcqtime()));//设置物标属性值字符串
-            mYimaLib.tmSetPointObjectCoor(curLayerPos3, objCount - 1, arrGeoX[iObj], arrGeoY[iObj]);//设置物标坐标
-            try {
-                String str = new String(list.get(iObj).getName().getBytes("gbk"), "gbk");
-                int color = list.get(iObj).getColor();
-//                int hexColor = ContextCompat.getColor(mContext, color);
-                mYimaLib.tmSetPointObjectStyle(curLayerPos3, objCount - 1, 2,
-                        true, color & 0xFFFF0000, color & 0xFF00FF00
-                        , color & 0xFF0000FF, 20,
-                        str, "", 20, 0, 0, 0, true, false, 0, 0, 5, 0);//设置物标样式
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        }
+        pinBeans.clear();
+        pinBeans.addAll(list);
+//        clearBiaoWeiTrack();
+//        // 添加点
+//        mYimaLib.tmAppendLayer(1);//添加点图层
+//        curLayerPos3 = mYimaLib.tmGetLayerCount() - 1;
+//        mYimaLib.tmSetLayerName(curLayerPos3, "点图层");
+//        mYimaLib.tmSetLayerDrawOrNot(curLayerPos3, true);
+//        mYimaLib.tmAddLayerAttribute(curLayerPos3, 4, "point");//添加图层属性：属性名称："物标名称",属性值类型：4（字符串）
+//        int[] arrGeoX = new int[list.size()];
+//        int[] arrGeoY = new int[list.size()];
+//        for (int i = 0; i < list.size(); i++) {
+//            PinBean lb = list.get(i);
+//            arrGeoX[i] = lb.getLon();
+//            arrGeoY[i] = lb.getLat();
+//        }
+////        mYimaLib.SetSymbolAsTrueTypeSymbol(2, "宋体", "gbk", -20, 10);
+//        for (int iObj = 0; iObj < arrGeoX.length; iObj++) {
+//            mYimaLib.tmAppendObjectInLayer(curLayerPos3, 0);//在图层上添加一个点物标
+//            int objCount = mYimaLib.tmGetLayerObjectCount(curLayerPos3);
+//            objLayerPos3.add(objCount);
+//            //layerAttrCount = mYimaLib.tmGetLayerObjectAttrCount(curLayerPos2);
+//            //mYimaLib.tmSetObjectAttrValueString(curLayerPos2, objCount - 1, layerAttrCount - 1, sdf.format(list.get(iObj).getAcqtime()));//设置物标属性值字符串
+//            mYimaLib.tmSetPointObjectCoor(curLayerPos3, objCount - 1, arrGeoX[iObj], arrGeoY[iObj]);//设置物标坐标
+//            try {
+//                String str = new String(list.get(iObj).getName().getBytes("gbk"), "gbk");
+//                int color = list.get(iObj).getColor();
+//                mYimaLib.tmSetPointObjectStyleReferLibrary(curLayerPos3, objCount, 2, true, 255, 0, 0, 0 , 0);
+//                mYimaLib.tmSetPointObjectStyle(curLayerPos3, objCount - 1, 2,
+//                        true, (color & 0xFF0000) >> 16, (color & 0x00FF00) >> 8
+//                        , color & 0x0000FF, 20,
+//                        str, "", 20, 0, 0, 0, true, false, 0, 0, -20, 10);//设置物标样式
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//
+//        }
         postInvalidate();
-        Toast.makeText(mContext, "标位已显示", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(mContext, "标位已显示", Toast.LENGTH_SHORT).show();
     }
 
     public void clearBiaoWeiTrack() {
-        if (curLayerPos3 != -1) {
-            for (int a : objLayerPos3) {
-                mYimaLib.tmDeleteGeoObject(curLayerPos3, a);
-            }
-            objLayerPos3.clear();
-            mYimaLib.tmClearLayer(curLayerPos3);
-            mYimaLib.tmDeleteLayer(curLayerPos3);
-            curLayerPos3 = -1;
+//        if (curLayerPos3 != -1) {
+//            for (int a : objLayerPos3) {
+//                mYimaLib.tmDeleteGeoObject(curLayerPos3, a);
+//            }
+//            objLayerPos3.clear();
+//            mYimaLib.tmClearLayer(curLayerPos3);
+//            mYimaLib.tmDeleteLayer(curLayerPos3);
+//            curLayerPos3 = -1;
+//        }
+        if (pinBeans!=null){
+            pinBeans.clear();
         }
         postInvalidate();
     }

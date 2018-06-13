@@ -232,8 +232,9 @@ public class SatelliteFragment extends Fragment {
         List<AxisValue> axisValues = new ArrayList<>();
 
         Axis axis = new Axis();
+        int len = Math.min(numColumns, mSatelliteList.size());
         //循环初始化每根柱子，
-        for (int i = 0; i < numColumns; i++) {
+        for (int i = 0; i < len; i++) {
             axisValues.add(new AxisValue(i).setLabel(mSatelliteList.get(i).getNum() + ""));
             values = new ArrayList<>();
             //每一根柱子中只有一根小柱子

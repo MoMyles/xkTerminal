@@ -131,6 +131,7 @@ public class SatelliteFragment extends Fragment {
         mDate = view.findViewById(R.id.date_tv);
         mDouble = view.findViewById(R.id.bestPosa_accuracy_tv);
         gpsBar = view.findViewById(R.id.bar_gps);
+        gpsBar.setInteractive(false);
 
         //初始化
         int realWidth = QMUIDisplayHelper.dp2px(getActivity()
@@ -187,25 +188,25 @@ public class SatelliteFragment extends Fragment {
                 }
             }
 
-            int count = mSatelliteList.size();
-            for (int i = 0, k = 0; i < 15 - count; k++) {
-                Satellite satellite1 = new Satellite();
-                int j = random.nextInt(50);
-                if (k == 100) {
-                    break;
-                }
-                if (str.indexOf("," + j + ",") >= 0) {
-                    continue;
-                }
-                i++;
-                satellite1.setNum(j);
-                int kk = random.nextInt(359);
-                satellite1.setAzimuth(kk);
-                int l = random.nextInt(90);
-                satellite1.setElevationAngle(l);
-                satellite1.setNo(random.nextInt(90));
-                mSatelliteList.add(satellite1);
-            }
+//            int count = mSatelliteList.size();
+//            for (int i = 0, k = 0; i < 15 - count; k++) {
+//                Satellite satellite1 = new Satellite();
+//                int j = random.nextInt(50);
+//                if (k == 100) {
+//                    break;
+//                }
+//                if (str.indexOf("," + j + ",") >= 0) {
+//                    continue;
+//                }
+//                i++;
+//                satellite1.setNum(j);
+//                int kk = random.nextInt(359);
+//                satellite1.setAzimuth(kk);
+//                int l = random.nextInt(90);
+//                satellite1.setElevationAngle(l);
+//                satellite1.setNo(random.nextInt(90));
+//                mSatelliteList.add(satellite1);
+//            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -231,8 +232,9 @@ public class SatelliteFragment extends Fragment {
         List<AxisValue> axisValues = new ArrayList<>();
 
         Axis axis = new Axis();
+        int len = Math.min(numColumns, mSatelliteList.size());
         //循环初始化每根柱子，
-        for (int i = 0; i < numColumns; i++) {
+        for (int i = 0; i < len; i++) {
             axisValues.add(new AxisValue(i).setLabel(mSatelliteList.get(i).getNum() + ""));
             values = new ArrayList<>();
             //每一根柱子中只有一根小柱子

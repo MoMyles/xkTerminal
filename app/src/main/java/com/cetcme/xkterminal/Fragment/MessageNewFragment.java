@@ -90,6 +90,14 @@ public class MessageNewFragment extends Fragment{
             titleBar.setTitle("新建短信");
             text_count_textView.setText(Constant.MESSAGE_CONTENT_MAX_LENGTH + "");
         }
+
+        if (tg.equals("reply")) {
+            titleBar.setTitle("回复短信");
+            receiver_editText.setText(receive);
+//            content_editText.setText(content);
+            text_count_textView.setText(getRemainContentLength() + "");
+        }
+
         if (tg.equals("relay")) {
             titleBar.setTitle("转发短信");
 //            receiver_editText.setText(receive);
@@ -135,7 +143,7 @@ public class MessageNewFragment extends Fragment{
             public void afterTextChanged(Editable editable) {
                 modifyContentIntoLength();
 
-                if (tg.equals("new") || tg.equals("relay") || tg.equals("resend")) {
+                if (tg.equals("new") || tg.equals("relay") || tg.equals("resend") || tg.equals("reply")) {
                     text_count_textView.setText(getRemainContentLength() + "");
                 }
             }

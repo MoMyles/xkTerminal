@@ -131,8 +131,10 @@ public class MessageFragment extends Fragment{
 
                 QMUIBottomSheet.BottomListSheetBuilder bottomListSheetBuilder = new QMUIBottomSheet.BottomListSheetBuilder(getActivity());
                 bottomListSheetBuilder.addItem("转发");
-                if (tg.equals("send") && (boolean) dataList.get(i).get("sendOK")) {
+                if (tg.equals("send")) {
                     bottomListSheetBuilder.addItem("重新发送");
+                } else if (tg.equals("receive")) {
+                    bottomListSheetBuilder.addItem("回复");
                 }
                 bottomListSheetBuilder.setOnSheetItemClickListener(new QMUIBottomSheet.BottomListSheetBuilder.OnSheetItemClickListener() {
                     @Override
@@ -147,7 +149,7 @@ public class MessageFragment extends Fragment{
                         if (position == 0) {
                             mainActivity.initNewFragment("relay");
                         } else if (position == 1) {
-                            mainActivity.initNewFragment("resend");
+                            mainActivity.initNewFragment(tg.equals("send") ? "resend" : "reply");
                         }
                     }
                 });

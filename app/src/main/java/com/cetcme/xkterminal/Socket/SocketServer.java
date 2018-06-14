@@ -45,6 +45,15 @@ public class SocketServer {
                 socket = serverSocket.accept(); //等待客户端连接
                 System.out.println("得到客户端连接：" + socket);
                 startReader(socket);
+                
+                // 提示登陆
+                try {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("apiType", "login");
+                    EventBus.getDefault().post(jsonObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
 
         } catch (IOException e) {

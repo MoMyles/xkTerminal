@@ -21,6 +21,7 @@ import com.cetcme.xkterminal.MyClass.DateUtil;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.Sqlite.Bean.MessageBean;
 import com.cetcme.xkterminal.Sqlite.Proxy.MessageProxy;
+import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet;
 
 import org.xutils.DbManager;
 
@@ -126,13 +127,33 @@ public class MessageFragment extends Fragment{
 
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                System.out.println("message id: " + dataList.get(i));
-                mainActivity.messageId = dataList.get(i).get("id").toString();
-                mainActivity.messageReceiver = dataList.get(i).get("sender").toString();
-                mainActivity.messageContent = dataList.get(i).get("content").toString();
-                mainActivity.messageTime = dataList.get(i).get("time").toString();
-                mainActivity.initNewFragment("relay");
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int i, long l) {
+
+                QMUIBottomSheet.BottomListSheetBuilder bottomListSheetBuilder = new QMUIBottomSheet.BottomListSheetBuilder(getActivity());
+                bottomListSheetBuilder.addItem("转发");
+                if (tg.equals("send") && (boolean) dataList.get(i).get("sendOK")) {
+                    bottomListSheetBuilder.addItem("重新发送");
+                }
+                bottomListSheetBuilder.setOnSheetItemClickListener(new QMUIBottomSheet.BottomListSheetBuilder.OnSheetItemClickListener() {
+                    @Override
+                    public void onClick(QMUIBottomSheet dialog, View itemView, int position, String tag) {
+                        dialog.dismiss();
+//                        Toast.makeText(getActivity(), "Item " + (position + 1), Toast.LENGTH_SHORT).show();
+
+                        mainActivity.messageId = dataList.get(i).get("id").toString();
+                        mainActivity.messageReceiver = dataList.get(i).get("sender").toString();
+                        mainActivity.messageContent = dataList.get(i).get("content").toString();
+                        mainActivity.messageTime = dataList.get(i).get("time").toString();
+                        if (position == 0) {
+                            mainActivity.initNewFragment("relay");
+                        } else if (position == 1) {
+                            mainActivity.initNewFragment("resend");
+                        }
+                    }
+                });
+                QMUIBottomSheet qmuiBottomSheet = bottomListSheetBuilder.build();
+                qmuiBottomSheet.show();
+
                 return true;
             }
         });
@@ -198,6 +219,7 @@ public class MessageFragment extends Fragment{
             map.put("receiver", message.getReceiver());
             map.put("content", message.getContent().replace("\n", " "));
             map.put("id", message.getId());
+            map.put("sendOK", message.isSendOK());
             if (tg.equals("send")) {
                 map.put("status", message.isSendOK() ? "" : "失败");
             } else {

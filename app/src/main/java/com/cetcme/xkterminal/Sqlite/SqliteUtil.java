@@ -49,7 +49,7 @@ public class SqliteUtil {
         if (cursor.moveToFirst()) {
             //遍历游标
             for(int i = 0; i < cursor.getCount(); i++){
-                cursor.move(i);
+                cursor.moveToPosition(i);
                 //获得ID
                 int id = cursor.getInt(0);
                 String sender = cursor.getString(1);

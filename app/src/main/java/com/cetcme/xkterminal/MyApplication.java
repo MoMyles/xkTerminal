@@ -81,8 +81,6 @@ public class MyApplication extends Application {
     public MainActivity mainActivity;
     public IDCardActivity idCardActivity;
 
-    private SharedPreferences sp = null;
-
     private static MyApplication mContext;
     public static LocationBean currentLocation;
     public DbManager db;
@@ -117,9 +115,6 @@ public class MyApplication extends Application {
 
     private Timer timer;
 
-    private JSONObject keyMap;
-    private JSONObject contentMap;
-
     /**
      * 加载库文件（只需调用一次）
      */
@@ -132,16 +127,8 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        try {
-            String keyJsonStr = "{\"000000\":\"0\",\"000001\":\"1\",\"000010\":\"2\",\"000011\":\"3\",\"000100\":\"4\",\"000101\":\"5\",\"000110\":\"6\",\"000111\":\"7\",\"001000\":\"8\",\"001001\":\"9\",\"001010\":\":\",\"001011\":\";\",\"001100\":\"<\",\"001101\":\"=\",\"001110\":\">\",\"001111\":\"?\",\"010000\":\"@\",\"010001\":\"A\",\"010010\":\"B\",\"010011\":\"C\",\"010100\":\"D\",\"010101\":\"E\",\"010110\":\"F\",\"010111\":\"G\",\"011000\":\"H\",\"011001\":\"I\",\"011010\":\"J\",\"011011\":\"K\",\"011100\":\"L\",\"011101\":\"M\",\"011110\":\"N\",\"011111\":\"O\",\"100000\":\"P\",\"100001\":\"Q\",\"100010\":\"R\",\"100011\":\"S\",\"100100\":\"T\",\"100101\":\"U\",\"100110\":\"V\",\"100111\":\"W\",\"101000\":\"`\",\"101001\":\"a\",\"101010\":\"b\",\"101011\":\"c\",\"101100\":\"d\",\"101101\":\"e\",\"101110\":\"f\",\"101111\":\"g\",\"110000\":\"h\",\"110001\":\"i\",\"110010\":\"j\",\"110011\":\"k\",\"110100\":\"l\",\"110101\":\"m\",\"110110\":\"n\",\"110111\":\"o\",\"111000\":\"p\",\"111001\":\"q\",\"111010\":\"r\",\"111011\":\"s\",\"111100\":\"t\",\"111101\":\"u\",\"111110\":\"v\",\"111111\":\"w\"}";
-            String contentJsonStr = "{\"@\":\"000000\",\"A\":\"000001\",\"B\":\"000010\",\"C\":\"000011\",\"D\":\"000100\",\"E\":\"000101\",\"F\":\"000110\",\"G\":\"000111\",\"H\":\"001000\",\"I\":\"001001\",\"J\":\"001010\",\"K\":\"001011\",\"L\":\"001100\",\"M\":\"001101\",\"N\":\"001110\",\"O\":\"001111\",\"P\":\"010000\",\"Q\":\"010001\",\"R\":\"010010\",\"S\":\"010011\",\"T\":\"010100\",\"U\":\"010101\",\"V\":\"010110\",\"W\":\"010111\",\"X\":\"011000\",\"Y\":\"011001\",\"Z\":\"011010\",\"[\":\"011011\",\"\\\\\":\"011100\",\"]\":\"011101\",\"^\":\"011110\",\"_\":\"011111\",\" \":\"100000\",\"!\":\"100001\",\"\\\"\":\"100010\",\"#\":\"100011\",\"$\":\"100100\",\"%\":\"100101\",\"&\":\"100110\",\"'\":\"100111\",\"(\":\"101000\",\")\":\"101001\",\"*\":\"101010\",\"+\":\"101011\",\",\":\"101100\",\"-\":\"101101\",\".\":\"101110\",\"/\":\"101111\",\"0\":\"110000\",\"1\":\"110001\",\"2\":\"110010\",\"3\":\"110011\",\"4\":\"110100\",\"5\":\"110101\",\"6\":\"110110\",\"7\":\"110111\",\"8\":\"111000\",\"9\":\"111001\",\":\":\"111010\",\";\":\"111011\",\"<\":\"111100\",\"=\":\"111101\",\">\":\"111110\",\"?\":\"111111\"}";
-            keyMap = new JSONObject(keyJsonStr);
-            contentMap = new JSONObject(contentJsonStr);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
         mContext = this;
-        sp = getSharedPreferences("xkTerminal", MODE_PRIVATE);
+
         if (!PreferencesUtils.getBoolean(this, "copiedYimaFile")) {
             copyYimaFile();
             PreferencesUtils.putBoolean(this, "copiedYimaFile", true);
@@ -177,7 +164,7 @@ public class MyApplication extends Application {
 
         //TODO: test for phone
 
-       /* try {
+       try {
             mSerialPort = getSerialPort();
             mOutputStream = mSerialPort.getOutputStream();
             mInputStream = mSerialPort.getInputStream();
@@ -196,7 +183,7 @@ public class MyApplication extends Application {
             DisplayError(R.string.error_unknown);
         } catch (InvalidParameterException e) {
             DisplayError(R.string.error_configuration);
-        }*/
+        }
 
 
         //显示所有path
@@ -250,9 +237,6 @@ public class MyApplication extends Application {
         currentLocation.setHeading(0.0f);
         currentLocation.setAcqtime(new Date(Constant.SYSTEM_DATE.getTime() - 10 * 60 * 1000));
         currentLocation.setSpeed(0.0f);
-
-        Log.e("TAG", createAisWarnInfoMessage("Help!"));
-
     }
 
     /**
@@ -1020,13 +1004,10 @@ public class MyApplication extends Application {
                             }
                         });
                     }
-                    Log.e("TAG", gpsDataStr);
                     AisInfo aisInfo = YimaAisParse.mParseAISSentence(gpsDataStr);
                     if (aisInfo != null) {
                         Log.i(TAG, aisInfo.MsgType + "");
                         if (14 == aisInfo.MsgType) {
-                            Log.e("TAG_14", gpsDataStr);
-                            Log.e("TAG", ConvertUtil.bytesToHexString(tmpByts));
                             // 报警信息
                             if (aisInfo.mmsi > 0) {
                                 String message = aisInfo.warnMsgInfo;
@@ -1038,11 +1019,10 @@ public class MyApplication extends Application {
                         } else {
                             int mmsi = -99;
                             try {
-                                mmsi = Integer.valueOf(sp.getString("shipNo", "0")).intValue();
+                                mmsi = Integer.valueOf(PreferencesUtils.getString(mContext, "shipNo", "0")).intValue();
                             } catch (Exception e) {
                             }
                             if (aisInfo.bOwnShip) {
-                                Log.e("TAG", "本船:" + aisInfo.mmsi);
                                 LocationBean locationBean = new LocationBean();
                                 locationBean.setLatitude(aisInfo.latititude);
                                 locationBean.setLongitude(aisInfo.longtitude);
@@ -1053,7 +1033,6 @@ public class MyApplication extends Application {
                                 EventBus.getDefault().post(locationBean);
                             } else {
                                 if (mmsi == aisInfo.mmsi) {
-                                    Log.e("TAG", "本船:" + aisInfo.mmsi);
                                     LocationBean locationBean = new LocationBean();
                                     locationBean.setLatitude(aisInfo.latititude);
                                     locationBean.setLongitude(aisInfo.longtitude);
@@ -1149,97 +1128,4 @@ public class MyApplication extends Application {
         bytes = ByteUtil.byteMerger(bytes, "\r\n".getBytes());
         sendBytes(bytes);
     }
-
-    public String createAisWarnInfoMessage(String message) {
-        String headStr = "!AIVDO,1,1,0,A,";
-        StringBuffer sb = new StringBuffer("00111000");
-        // 消息ID
-        String mmsi = "413000000";
-        if (sp != null) {
-            mmsi = sp.getString("shipNo", "");
-        }
-        int bu = 30;
-        if (!"".equals(mmsi)) {
-            // MMSI
-            String mmsiByts = Integer.toBinaryString(Integer.valueOf(mmsi));
-            bu = 30 - mmsiByts.length();//30位补0
-            for (int i = 0; i < bu; i++) {
-                sb.append("0");
-            }
-            sb.append(mmsiByts);
-        } else {
-            for (int i = 0; i < bu; i++) {
-                sb.append("0");
-            }
-        }
-        //备用
-        sb.append("00");
-        if (!TextUtils.isEmpty(message)) {
-            message = message.toUpperCase();
-            for (int i = 0; i < message.length(); i++) {
-                try {
-                    sb.append(contentMap.getString(message.charAt(i) + ""));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        //比特总数=
-        int v = 0;
-        int len = sb.toString().length();
-        if (len % 6 != 0) {
-            v = 6 - len % 6;
-            for (int i = 0; i < v; i++) {
-                sb.append("0");
-            }
-        }
-        String finalStr = sb.toString();
-        len = finalStr.length();
-        int ck = 0;
-        for (int i = 0; i < len; i += 6) {
-            String ss = "";
-            for (int j = i; j < i + 6; j++) {
-                ss += finalStr.charAt(j);
-            }
-            try {
-                headStr += keyMap.getString(ss);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-//            headStr += new String(new byte[]{b});
-
-//            newByts[index++] = b;
-        }
-        // Log.e("TAG", "content: " + headStr);
-        //校验和
-        headStr += "," + v;
-        len = headStr.length();
-        for (int i = 1; i < len; i++) {
-            ck ^= headStr.charAt(i);
-        }
-
-//        byte[] ll = last.getBytes();
-        //newByts = ByteUtil.byteMerger(headByts, newByts);
-        //newByts = ByteUtil.byteMerger(newByts, ll);
-        String last = "*" + Integer.toHexString(ck);
-        headStr += last;
-//        byte[] finalByts = ByteUtil.byteMerger(newByts, last.getBytes());
-//        Log.e("TAG", ConvertUtil.bytesToHexString(newByts));
-        return headStr;
-    }
-
-    private String bu0_6(String numberStr) {
-        if (TextUtils.isEmpty(numberStr)) return "";
-        int len = numberStr.length();
-        if (len < 6) {
-            StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < 6 - len; i++) {
-                sb.append("0");
-            }
-            sb.append(numberStr);
-            return sb.toString();
-        }
-        return numberStr;
-    }
-
 }

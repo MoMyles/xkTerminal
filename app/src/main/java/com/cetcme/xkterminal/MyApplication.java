@@ -177,7 +177,7 @@ public class MyApplication extends Application {
 
         //TODO: test for phone
 
-       /* try {
+       try {
             mSerialPort = getSerialPort();
             mOutputStream = mSerialPort.getOutputStream();
             mInputStream = mSerialPort.getInputStream();
@@ -196,7 +196,7 @@ public class MyApplication extends Application {
             DisplayError(R.string.error_unknown);
         } catch (InvalidParameterException e) {
             DisplayError(R.string.error_configuration);
-        }*/
+        }
 
 
         //显示所有path

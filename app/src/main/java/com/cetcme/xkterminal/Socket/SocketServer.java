@@ -50,7 +50,7 @@ public class SocketServer {
                 try {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("apiType", "login");
-                    EventBus.getDefault().post(jsonObject);
+                    EventBus.getDefault().post(new SmsEvent(jsonObject));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

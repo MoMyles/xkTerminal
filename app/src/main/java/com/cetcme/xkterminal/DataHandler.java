@@ -10,6 +10,7 @@ import com.cetcme.xkterminal.DataFormat.IDFormat;
 import com.cetcme.xkterminal.DataFormat.MessageFormat;
 import com.cetcme.xkterminal.DataFormat.SignFormat;
 import com.cetcme.xkterminal.DataFormat.Util.ByteUtil;
+import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
 import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
 import com.cetcme.xkterminal.DataFormat.Util.Util;
 import com.cetcme.xkterminal.Event.SmsEvent;
@@ -188,14 +189,14 @@ public class DataHandler extends Handler {
                     String communication_from = status.charAt(6) == '1' ? "北斗" : "GPRS";
                     PreferencesUtils.putString(myApplication.mainActivity, "communication_from", communication_from);
                     // 这里不加break
-                case SERIAL_PORT_TIME:
+                case SERIAL_PORT_TIME: {
                     // 接收时间
-                    int year = ByteUtil.subBytes(bytes, 11, 12)[0]  & 0xFF;
-                    int month = ByteUtil.subBytes(bytes, 12, 13)[0]  & 0xFF;
-                    int day = ByteUtil.subBytes(bytes, 13, 14)[0]  & 0xFF;
-                    int hour = ByteUtil.subBytes(bytes, 14, 15)[0]  & 0xFF;
-                    int minute = ByteUtil.subBytes(bytes, 15, 16)[0]  & 0xFF;
-                    int second = ByteUtil.subBytes(bytes, 16, 17)[0]  & 0xFF;
+                    int year = ByteUtil.subBytes(bytes, 11, 12)[0] & 0xFF;
+                    int month = ByteUtil.subBytes(bytes, 12, 13)[0] & 0xFF;
+                    int day = ByteUtil.subBytes(bytes, 13, 14)[0] & 0xFF;
+                    int hour = ByteUtil.subBytes(bytes, 14, 15)[0] & 0xFF;
+                    int minute = ByteUtil.subBytes(bytes, 15, 16)[0] & 0xFF;
+                    int second = ByteUtil.subBytes(bytes, 16, 17)[0] & 0xFF;
                     String dateStr = "20" + year + "/" + month + "/" + day + " " + hour + ":" + minute + ":" + second;
                     Date date = DateUtil.parseStringToDate(dateStr);
                     // 加8小时
@@ -213,6 +214,7 @@ public class DataHandler extends Handler {
                     }
                     System.out.println(rightDate);
                     break;
+                }
                 case SERIAL_PORT_ID_EDIT_OK:
                     // $R2 刷卡器id修改成功 获取 获取成功
                     String deviceID = IDFormat.unFormat(bytes);
@@ -275,15 +277,41 @@ public class DataHandler extends Handler {
                     }
 
                     break;
-                case SERIAL_PORT_RECEIVE_NEW_SIGN:
+                case SERIAL_PORT_RECEIVE_NEW_SIGN: {
                     // 接收身份证信息
                     String[] idStrings = SignFormat.unFormat(bytes);
                     String id = idStrings[0];
                     String name = idStrings[1];
-                    String nation = "--";
-                    String idAddress = "xx市xx区xx小区xx幢xx室";
-                    myApplication.mainActivity.showIDCardDialog(id, name, nation, idAddress);
+                    String nation = "---";
+                    String idAddress = "---";
+
+                    String timeBytesStr = idStrings[2];
+                    byte[] timeBytes = ConvertUtil.hexStringToByte(timeBytesStr);
+                    int year = ByteUtil.subBytes(timeBytes, 0, 1)[0] & 0xFF;
+                    int month = ByteUtil.subBytes(timeBytes, 1, 2)[0] & 0xFF;
+                    int day = ByteUtil.subBytes(timeBytes, 2, 3)[0] & 0xFF;
+                    int hour = ByteUtil.subBytes(timeBytes, 3, 4)[0] & 0xFF;
+                    int minute = ByteUtil.subBytes(timeBytes, 4, 5)[0] & 0xFF;
+                    int second = ByteUtil.subBytes(timeBytes, 5, 6)[0] & 0xFF;
+
+                    Date date;
+                    if (year < 18) {
+                        date = Constant.SYSTEM_DATE;
+                    } else {
+                        String dateStr = "20" + year + "/" + month + "/" + day + " " + hour + ":" + minute + ":" + second;
+                        date = DateUtil.parseStringToDate(dateStr);
+                        // 加8小时
+
+                        int originalTimeZone = PreferencesUtils.getInt(myApplication.mainActivity, "time_zone");
+                        if (originalTimeZone == -1) originalTimeZone = Constant.TIME_ZONE;
+
+                        long rightTime = date.getTime() + (originalTimeZone - 12) * 3600 * 1000;
+                        date = new Date(rightTime);
+                    }
+                    myApplication.mainActivity.showIDCardDialog(id, name, nation, idAddress, date);
                     break;
+                    }
+
                 case SERIAL_PORT_MODIFY_SCREEN_BRIGHTNESS:
                     // 调节背光
                     ScreenBrightness.modifyBrightness(myApplication.mainActivity);

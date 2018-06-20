@@ -143,13 +143,21 @@ public class MessageFragment extends Fragment{
 //                        Toast.makeText(getActivity(), "Item " + (position + 1), Toast.LENGTH_SHORT).show();
 
                         mainActivity.messageId = dataList.get(i).get("id").toString();
-                        mainActivity.messageReceiver = dataList.get(i).get("sender").toString();
                         mainActivity.messageContent = dataList.get(i).get("content").toString();
                         mainActivity.messageTime = dataList.get(i).get("time").toString();
                         if (position == 0) {
                             mainActivity.initNewFragment("relay");
                         } else if (position == 1) {
-                            mainActivity.initNewFragment(tg.equals("send") ? "resend" : "reply");
+                            if (tg.equals("send")) {
+                                // 重新发送
+                                mainActivity.messageReceiver = dataList.get(i).get("receiver").toString();
+                                mainActivity.initNewFragment("resend");
+                            } else {
+                                // 回复
+                                mainActivity.messageReceiver = dataList.get(i).get("sender").toString();
+                                mainActivity.initNewFragment("reply");
+                            }
+
                         }
                     }
                 });

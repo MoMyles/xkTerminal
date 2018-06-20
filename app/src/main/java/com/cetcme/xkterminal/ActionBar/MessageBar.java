@@ -140,4 +140,8 @@ public class MessageBar extends RelativeLayout implements View.OnClickListener {
         }
     }
 
+    public void setNewBtnVisible(boolean visible) {
+        button_new.setVisibility(visible ? VISIBLE : GONE);
+    }
+
 }

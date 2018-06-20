@@ -3,8 +3,10 @@ package com.cetcme.xkterminal.DataFormat;
 import com.cetcme.xkterminal.DataFormat.Util.ByteUtil;
 import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
 import com.cetcme.xkterminal.DataFormat.Util.Util;
+import com.cetcme.xkterminal.MyClass.Constant;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Date;
 
 /**
  * Created by qiuhong on 22/01/2018.
@@ -27,19 +29,21 @@ public class SignFormat {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-
-        String id = ConvertUtil.turnIdbytesToString(frameData, 11, 9);
+        byte[] randem = ByteUtil.subBytes(frameData, 11, 12);
+        String id = ConvertUtil.turnIdbytesToString(frameData, 12, 9); // from 12 t0 21
         String name = ""; //ConvertUtil.asciiToString(ByteUtil.subBytes(frameData, 3, 12));
 
+        byte[] timeBytes = ByteUtil.subBytes(frameData, 21, 27);
+
         try {
-            name = ConvertUtil.turnNameBytesToString(ByteUtil.subBytes(frameData, 20, 32), 0);
+            name = ConvertUtil.turnNameBytesToString(ByteUtil.subBytes(frameData, 27, 39), 0);
 //            name = new String(ByteUtil.subBytes(frameData, 20, 32), "GBK");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         name = Util.stringRemoveZero(name);
 
-        return new String[]{id, name};
+        return new String[]{id, name, ConvertUtil.bytesToHexString(timeBytes)};
     }
 
     public static byte[] format() {

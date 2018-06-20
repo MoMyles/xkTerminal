@@ -50,8 +50,7 @@
                 android:layout_marginTop="8dp"
                 android:gravity="center"
                 android:text="打卡记录"
-                android:textSize="16sp"
-                android:visibility="gone" />
+                android:textSize="16sp" />
 
             <Button
                 android:id="@+id/button_alert"

@@ -82,6 +82,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -201,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 showMessageDialog("测试短信", MessageDialogActivity.TYPE_CALL_ROLL);
             }
-        }, 2000);
+        }, 2000)
         */
 
         // TODO: fake
@@ -252,6 +253,9 @@ public class MainActivity extends AppCompatActivity {
 //            gpsBar.setAisStatus(true);
 //            gpsBar.setGPSStatus(true);
 //        }
+
+        // test
+//        addMessage("123456", "ceshiduanxin", false);
     }
 
     /**
@@ -463,8 +467,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void addSignLog(String id, String name) {
-        SignProxy.insert(db, id, name, Constant.SYSTEM_DATE, false);
+    public void addSignLog(String id, String name, Date date) {
+        SignProxy.insert(db, id, name, date, false);
     }
 
     public void addAlertLog(String type) {
@@ -479,7 +483,7 @@ public class MainActivity extends AppCompatActivity {
         GroupProxy.insert(db, name, Integer.parseInt(number));
     }
 
-    public void showIDCardDialog(String id, String name, String nation, String address) {
+    public void showIDCardDialog(String id, String name, String nation, String address, Date date) {
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
         bundle.putString("sex", Util.idCardGetSex(id));
@@ -497,8 +501,7 @@ public class MainActivity extends AppCompatActivity {
             ((MyApplication) getApplication()).idCardActivity.setData(bundle);
         }
 
-        addSignLog(id, name);
-
+        addSignLog(id, name, date);
     }
 
     public static boolean idCardDialogOpen = false;
@@ -582,12 +585,20 @@ public class MainActivity extends AppCompatActivity {
         sendBar.setVisibility(View.GONE);
     }
 
-    private void showMessageBar() {
+    private void showMessageBar(String tg) {
         bottomBar.setVisibility(View.GONE);
         messageBar.setVisibility(View.VISIBLE);
         pageBar.setVisibility(View.GONE);
         backBar.setVisibility(View.GONE);
         sendBar.setVisibility(View.GONE);
+
+        if (tg != null) {
+            if (tg.equals("send")) {
+                messageBar.setNewBtnVisible(true);
+            } else {
+                messageBar.setNewBtnVisible(false);
+            }
+        }
     }
 
     private void showPageBar() {
@@ -647,7 +658,7 @@ public class MainActivity extends AppCompatActivity {
         transaction.commit();
 
         messageFragment.mainActivity = this;
-        showMessageBar();
+        showMessageBar(tg);
         fragmentName = "message";
         messageListStatus = tg;
     }
@@ -661,7 +672,7 @@ public class MainActivity extends AppCompatActivity {
         transaction.commit();
 
         if (tg.equals("inout")) {
-            showMessageBar();
+            showMessageBar("send");
             messageBar.isInout = true;
         } else {
             showPageBar();
@@ -700,7 +711,7 @@ public class MainActivity extends AppCompatActivity {
     public int messageIndex = -1;
 
     public void initNewFragment(String tg) {
-        if (!tg.equals("new") && (messageContent.isEmpty() || messageReceiver.isEmpty())) {
+        if (!tg.equals("new") && (messageContent.isEmpty())) {
             Toast.makeText(this, "请选择一条短信", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -734,7 +745,7 @@ public class MainActivity extends AppCompatActivity {
         transaction.show(messageFragment);
         transaction.commit();
 
-        showMessageBar();
+        showMessageBar(null);
         fragmentName = "message";
         backButtonStatus = "backToMain";
 

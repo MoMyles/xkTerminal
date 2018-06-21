@@ -605,6 +605,11 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
                 menu.dismiss();
                 break;
             case R.id.tv_navigator:
+                // 如果卫星中断 则返回
+                if (!MyApplication.isLocated) {
+                    Toast.makeText(this, "卫星已中断，无法导航", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 startActivity(new Intent(this, NavigationActivity.class));
                 menu.dismiss();
                 break;

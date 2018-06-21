@@ -115,6 +115,9 @@ public class MyApplication extends Application {
 
     private Timer timer;
 
+    //是否已定位, fake，收短信不处理， sendByte不处理，导航不处理，申报不处理
+    public static boolean isLocated = false;
+
     /**
      * 加载库文件（只需调用一次）
      */
@@ -1092,6 +1095,9 @@ public class MyApplication extends Application {
     }
 
     public void sendBytes(byte[] buffer) {
+        // 如果卫星中断 则返回 不发送短信
+        if (!MyApplication.isLocated) return;
+
         new SendingThread(buffer).start();
         System.out.println("发送包：" + ConvertUtil.bytesToHexString(buffer));
     }

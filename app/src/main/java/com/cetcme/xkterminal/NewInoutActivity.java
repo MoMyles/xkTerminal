@@ -72,6 +72,13 @@ public class NewInoutActivity extends Activity {
 
 
     public void postInout(View view) {
+
+        // 如果卫星中断 则返回
+        if (!MyApplication.isLocated) {
+            Toast.makeText(this, "卫星已中断，无法申报", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         LocationBean currentLocation = MyApplication.getInstance().getCurrentLocation();
 
         //test: 测试

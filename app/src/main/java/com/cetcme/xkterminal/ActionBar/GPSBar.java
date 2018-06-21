@@ -352,8 +352,9 @@ public class GPSBar extends RelativeLayout {
 
     public void setGPSStatus(boolean gpsStatus) {
         textView_location_status.setTextColor(gpsStatus ? 0xFF2657EC : 0xFFD0021B);
-        textView_location_status.setText(gpsStatus ? "已定位" : "未定位");
+        textView_location_status.setText(gpsStatus ? "已定位" : "卫星中断");
         if (gpsStatus) textView_location_status.setVisibility(VISIBLE);
+        /*
         if (!gpsStatus && (Constant.SYSTEM_DATE.getTime() - lastNoGpsReportTime) >= noGpsReportPeriod) {
             if (mainActivity != null) {
                 mainActivity.showMessageDialog("未获取定位", MessageDialogActivity.TYPE_ALERT);
@@ -361,6 +362,7 @@ public class GPSBar extends RelativeLayout {
                 lastNoGpsReportTime = Constant.SYSTEM_DATE.getTime();
             }
         }
+        */
         noGps = !gpsStatus;
     }
 
@@ -396,26 +398,30 @@ public class GPSBar extends RelativeLayout {
                     message.what = UPDATE_TIME;
                     handler.sendMessage(message);
 
-                    // 判断是否为定位超过10分钟
-                    // 如果是第一次 就不提示
+                    /*
+                    // 获取位置静态变量的时间
                     Date date = MyApplication.getInstance().getCurrentLocation().getAcqtime();
                     if (date != null) {
                         long locationTime = date.getTime();
                         Message message1 = new Message();
                         message1.what = UPDATE_GPS_STATUS;
-                        //Log.e("GPSBar", "系统时间：" + DateUtil.Date2String(Constant.SYSTEM_DATE) + "，定位时间：" +  DateUtil.Date2String(date));
+                        // 比较下 当前app时间 和 定位时间的大小 如果小于10分钟 则为true
                         boolean obj = (Constant.SYSTEM_DATE.getTime() - locationTime) <= noGpsReportPeriod;
                         message1.obj = obj;
 
                         // 如果未定位 10分钟之内 不提示， 10分钟之后 提示
                         if (!obj) {
+                            // msg.obj = false;
+                            // bootTime 为初始化时间
                             if ((Constant.SYSTEM_DATE.getTime() - bootTime) > 60 * 1000 * 10) {
                                 handler.sendMessage(message1);
                             }
                         } else {
+                            // msg.obj = true
                             handler.sendMessage(message1);
                         }
                     }
+                    */
                 }
 
                 // 未定位闪烁

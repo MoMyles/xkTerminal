@@ -1520,6 +1520,9 @@ public class MainActivity extends AppCompatActivity {
                                             break;
                                     }
                                     int mmsi = Integer.valueOf(PreferencesUtils.getString(MainActivity.this, "shipNo", "0")).intValue();
+                                    if (aisInfo.mmsi == -1) {
+                                        continue;
+                                    }
                                     if (isOwn) {
                                         // 本船
                                         judge18(newStr, aisInfo);

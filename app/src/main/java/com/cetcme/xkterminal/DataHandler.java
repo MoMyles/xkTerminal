@@ -181,13 +181,30 @@ public class DataHandler extends Handler {
                     }
 
                     String status = Util.byteToBit(ByteUtil.subBytes(bytes, 21, 22)[0]);
-                    // 取消 来自数据串口的是否定位信息
-                /*
-                boolean gpsStatus = status.charAt(7) == '1';
-                myApplication.mainActivity.gpsBar.setGPSStatus(gpsStatus);
-                */
-                    String communication_from = status.charAt(6) == '1' ? "北斗" : "GPRS";
-                    PreferencesUtils.putString(myApplication.mainActivity, "communication_from", communication_from);
+
+                    // 重新启用 来自数据串口的是否定位信息
+                    // 开机显示自检中loading 1 toast自检完成 如果0 弹窗 dismiss loading
+                    // 运行过程中收到 则不显示自检完成
+                    if (myApplication.mainActivity != null) {
+                        final boolean gpsStatus = status.charAt(7) == '1';
+                        myApplication.mainActivity.gpsBar.setGPSStatus(gpsStatus);
+                        if (!gpsStatus) {
+                            myApplication.mainActivity.showMessageDialog("卫星中断故障", MessageDialogActivity.TYPE_ALARM);
+                        }
+
+                        if (myApplication.mainActivity.isSelfCheckLoading) {
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    myApplication.mainActivity.dismissSelfCheckHud();
+                                    if (gpsStatus) Toast.makeText(myApplication.mainActivity, "自检完成", Toast.LENGTH_SHORT).show();
+                                }
+                            }, 5000);
+                        }
+
+                        String communication_from = status.charAt(6) == '1' ? "北斗" : "GPRS";
+                        PreferencesUtils.putString(myApplication.mainActivity, "communication_from", communication_from);
+                    }
                     // 这里不加break
                 case SERIAL_PORT_TIME: {
                     // 接收时间

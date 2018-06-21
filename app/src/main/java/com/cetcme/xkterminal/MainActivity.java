@@ -256,6 +256,45 @@ public class MainActivity extends AppCompatActivity {
 
         // test
 //        addMessage("123456", "ceshiduanxin", false);
+
+        // 设备自检中
+        showSelfCheckHud();
+
+        // test 开机设备自检逻辑
+//
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                boolean gpsStatus = true;
+//                gpsBar.setGPSStatus(gpsStatus);
+//                if (!gpsStatus) {
+//                    showMessageDialog("卫星中断故障", MessageDialogActivity.TYPE_ALARM);
+//                }
+//
+//                if (isSelfCheckLoading) {
+//                    dismissSelfCheckHud();
+//                    if (gpsStatus) Toast.makeText(MainActivity.this, "自检完成", Toast.LENGTH_SHORT).show();
+//                }
+//
+//
+//                new Handler().postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        boolean gpsStatus = false;
+//                        gpsBar.setGPSStatus(gpsStatus);
+//                        if (!gpsStatus) {
+//                            showMessageDialog("卫星中断故障", MessageDialogActivity.TYPE_ALARM);
+//                        }
+//
+//                        if (isSelfCheckLoading) {
+//                            dismissSelfCheckHud();
+//                            if (gpsStatus) Toast.makeText(MainActivity.this, "自检完成", Toast.LENGTH_SHORT).show();
+//                        }
+//                    }
+//                }, 5000);
+//            }
+//        }, 5000);
+//
     }
 
     /**
@@ -1098,6 +1137,19 @@ public class MainActivity extends AppCompatActivity {
 //                kProgressHUD.dismiss();
 //            }
 //        }, 1500);
+    }
+
+    public boolean isSelfCheckLoading = false;
+
+    public void showSelfCheckHud() {
+        kProgressHUD.setLabel("自检中");
+        kProgressHUD.show();
+        isSelfCheckLoading = true;
+    }
+
+    public void dismissSelfCheckHud() {
+        kProgressHUD.dismiss();
+        isSelfCheckLoading = false;
     }
 
     public void showAlertFailDialog() {

@@ -164,7 +164,8 @@ public class MyApplication extends Application {
                 }
             }
         };
-        
+
+        //TODO: test for phone
         try {
             mSerialPort = getSerialPort();
             mOutputStream = mSerialPort.getOutputStream();

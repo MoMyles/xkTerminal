@@ -211,6 +211,9 @@ public class SatelliteFragment extends Fragment {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        if (!MyApplication.isLocated){
+            mSatelliteList.clear();
+        }
         satelliteView.postInvalidate();
 
         final LocationBean lb = MyApplication.getInstance().getCurrentLocation();

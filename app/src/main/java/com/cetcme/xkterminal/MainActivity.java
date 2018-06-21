@@ -190,9 +190,6 @@ public class MainActivity extends AppCompatActivity {
         mWifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         createWifiHotspot();
 
-        // 发送启动$01，要求对方发时间
-        sendBootData();
-
         checkoutShutDown();
 
         // TODO: test
@@ -261,40 +258,45 @@ public class MainActivity extends AppCompatActivity {
         showSelfCheckHud();
 
         // test 开机设备自检逻辑
-//
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                boolean gpsStatus = true;
-//                gpsBar.setGPSStatus(gpsStatus);
-//                if (!gpsStatus) {
-//                    showMessageDialog("卫星中断故障", MessageDialogActivity.TYPE_ALARM);
-//                }
-//
-//                if (isSelfCheckLoading) {
-//                    dismissSelfCheckHud();
-//                    if (gpsStatus) Toast.makeText(MainActivity.this, "自检完成", Toast.LENGTH_SHORT).show();
-//                }
-//
-//
-//                new Handler().postDelayed(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        boolean gpsStatus = false;
-//                        gpsBar.setGPSStatus(gpsStatus);
-//                        if (!gpsStatus) {
-//                            showMessageDialog("卫星中断故障", MessageDialogActivity.TYPE_ALARM);
-//                        }
-//
-//                        if (isSelfCheckLoading) {
-//                            dismissSelfCheckHud();
-//                            if (gpsStatus) Toast.makeText(MainActivity.this, "自检完成", Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-//                }, 5000);
-//            }
-//        }, 5000);
-//
+        /*
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                boolean gpsStatus = true;
+                MyApplication.isLocated = true;
+                gpsBar.setGPSStatus(gpsStatus);
+                if (!gpsStatus) {
+                    showMessageDialog("卫星中断故障", MessageDialogActivity.TYPE_ALARM);
+                }
+
+                if (isSelfCheckLoading) {
+                    dismissSelfCheckHud();
+                    if (gpsStatus) Toast.makeText(MainActivity.this, "自检完成", Toast.LENGTH_SHORT).show();
+                }
+
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        boolean gpsStatus = false;
+                        gpsBar.setGPSStatus(gpsStatus);
+                        if (!gpsStatus) {
+                            showMessageDialog("卫星中断故障", MessageDialogActivity.TYPE_ALARM);
+                        }
+
+                        if (isSelfCheckLoading) {
+                            dismissSelfCheckHud();
+                            if (gpsStatus) Toast.makeText(MainActivity.this, "自检完成", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }, 5000);
+            }
+        }, 5000);
+        */
+
+
+        // 发送启动$01，要求对方发时间
+        sendBootData();
     }
 
     /**

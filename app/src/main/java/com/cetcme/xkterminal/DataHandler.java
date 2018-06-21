@@ -64,6 +64,8 @@ public class DataHandler extends Handler {
 
             switch (msg.what) {//根据收到的消息的what类型处理
                 case SERIAL_PORT_RECEIVE_NEW_MESSAGE:
+                    // 如果卫星中断 则返回 不显示短信
+                    if (!MyApplication.isLocated) return;
                     // 收到新短信
                     String[] messageStrings = MessageFormat.unFormat(bytes);
                     String address = messageStrings[0];
@@ -187,6 +189,7 @@ public class DataHandler extends Handler {
                     // 运行过程中收到 则不显示自检完成
                     if (myApplication.mainActivity != null) {
                         final boolean gpsStatus = status.charAt(7) == '1';
+                        myApplication.isLocated = gpsStatus;
                         myApplication.mainActivity.gpsBar.setGPSStatus(gpsStatus);
                         if (!gpsStatus) {
                             myApplication.mainActivity.showMessageDialog("卫星中断故障", MessageDialogActivity.TYPE_ALARM);

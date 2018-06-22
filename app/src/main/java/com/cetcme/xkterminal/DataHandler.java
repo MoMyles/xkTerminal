@@ -351,9 +351,9 @@ public class DataHandler extends Handler {
                         date = new Date(rightTime);
                     }
                     myApplication.mainActivity.showIDCardDialog(id, name, nation, idAddress, date);
+                    SoundPlay.playSignSound(myApplication);
                     break;
-                    }
-
+                }
                 case SERIAL_PORT_MODIFY_SCREEN_BRIGHTNESS:
                     // 调节背光
                     ScreenBrightness.modifyBrightness(myApplication.mainActivity);

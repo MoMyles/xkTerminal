@@ -358,7 +358,7 @@ public class MyApplication extends Application {
                 case "login":
                     if (mainActivity != null) {
                         Toast.makeText(mainActivity,"手机客户端登陆成功", Toast.LENGTH_SHORT).show();
-                        SoundPlay.playMessageSound(mainActivity);
+                        MainActivity.play("手机客户端登陆成功");
                     }
                     break;
                 case "device_info_set":

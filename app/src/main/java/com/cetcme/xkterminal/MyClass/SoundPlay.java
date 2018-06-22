@@ -13,6 +13,7 @@ public class SoundPlay {
 
     private static MediaPlayer alertMediaPlayer;
     private static MediaPlayer msgMediaPlayer;
+    private static MediaPlayer signMediaPlayer;
 
     public static void startAlertSound(Context context) {
         if (alertMediaPlayer == null) alertMediaPlayer = MediaPlayer.create(context, R.raw.alert);
@@ -29,6 +30,11 @@ public class SoundPlay {
     public static void playMessageSound(Context context) {
         if (msgMediaPlayer == null) msgMediaPlayer = MediaPlayer.create(context, R.raw.msg);
         msgMediaPlayer.start();
+    }
+
+    public static void playSignSound(Context context) {
+        if (signMediaPlayer == null) signMediaPlayer = MediaPlayer.create(context, R.raw.sign);
+        signMediaPlayer.start();
     }
 
 }

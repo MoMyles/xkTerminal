@@ -215,6 +215,7 @@ public class DataHandler extends Handler {
                         if (!gpsStatus) {
                             myApplication.mainActivity.showMessageDialog("卫星中断故障", MessageDialogActivity.TYPE_ALARM);
                             MainActivity.play("卫星中断故障");
+
                         }
 
                         if (myApplication.mainActivity.isSelfCheckLoading) {
@@ -229,6 +230,9 @@ public class DataHandler extends Handler {
                                     MainActivity.play("自检完成");
                                 }
                             }, 5000);
+                        } else {
+                            myApplication.isLocated = gpsStatus;
+                            myApplication.mainActivity.gpsBar.setGPSStatus(gpsStatus);
                         }
 
                         String communication_from = status.charAt(6) == '1' ? "北斗" : "GPRS";

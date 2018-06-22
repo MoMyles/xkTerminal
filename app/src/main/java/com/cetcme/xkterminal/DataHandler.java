@@ -2,6 +2,7 @@ package com.cetcme.xkterminal;
 
 import android.content.Intent;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.util.EventLog;
 import android.widget.Toast;
@@ -28,6 +29,8 @@ import org.xutils.DbManager;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class DataHandler extends Handler {
 
@@ -50,9 +53,25 @@ public class DataHandler extends Handler {
 
     private DbManager db;
 
+    private Timer timer = null;
+
     public DataHandler(MyApplication myApplication) {
         this.myApplication = myApplication;
         this.db = MyApplication.getInstance().getDb();
+
+        timer = new Timer();
+
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (MyApplication.getInstance().mainActivity != null) {
+                    MyApplication.getInstance().mainActivity.dismissSelfCheckHud();
+                }
+                Looper.prepare();
+                Toast.makeText(MyApplication.getInstance().getApplicationContext(), "自检失败", Toast.LENGTH_SHORT).show();
+                Looper.loop();
+            }
+        }, 2 * 60 * 1000);
     }
 
     String content = "";
@@ -197,6 +216,7 @@ public class DataHandler extends Handler {
                         }
 
                         if (myApplication.mainActivity.isSelfCheckLoading) {
+                            timer.cancel();
                             new Handler().postDelayed(new Runnable() {
                                 @Override
                                 public void run() {

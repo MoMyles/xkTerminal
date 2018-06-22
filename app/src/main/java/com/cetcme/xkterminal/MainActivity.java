@@ -295,15 +295,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }, 5000);
         */
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (kProgressHUD != null && kProgressHUD.isShowing()) {
-                    kProgressHUD.dismiss();
-                    Toast.makeText(MainActivity.this, "自检失败", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }, 2 * 60 * 1000);
 
 
         // 发送启动$01，要求对方发时间

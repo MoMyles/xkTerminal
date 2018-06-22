@@ -25,6 +25,7 @@
         android:layout_toRightOf="@+id/textView_time"
         android:gravity="center_vertical"
         android:text="AIS未连接"
+        android:textColor="#ff0000"
         android:textSize="22sp" />
 
     <!--经纬度航速航向 -->

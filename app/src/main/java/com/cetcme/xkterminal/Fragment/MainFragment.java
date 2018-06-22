@@ -11,7 +11,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -220,6 +219,9 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                 PreferencesUtils.putBoolean(getActivity(), "mainFrgWarnArea", b);
                 warnArea = b;
                 showWarnAreas();
+                if (MyApplication.currentLocation != null) {
+                    doAreaWarning(MyApplication.currentLocation);
+                }
             }
         });
 
@@ -527,9 +529,9 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onLocationEvent(LocationBean locationBean) {
         LocationBean lb = (LocationBean) locationBean;
-        Log.i("TAG", "onLocationEvent: 收到自身位置");
-        Log.i("TAG", "onLocationEvent: 纬度lat:" + lb.getLatitude());
-        Log.i("TAG", "onLocationEvent: 经度lon:" + lb.getLongitude());
+//        Log.i("TAG", "onLocationEvent: 收到自身位置");
+//        Log.i("TAG", "onLocationEvent: 纬度lat:" + lb.getLatitude());
+//        Log.i("TAG", "onLocationEvent: 经度lon:" + lb.getLongitude());
         if (myLocation == null) {
             myLocation = new M_POINT();
             myLocation.x = lb.getLongitude();
@@ -546,6 +548,14 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
         // 更新框
         updateShipInfo(lb);
 
+        doAreaWarning(lb);
+    }
+
+    /**
+     * 检测报警
+     * @param lb
+     */
+    private void doAreaWarning(LocationBean lb) {
         if (warnArea) {// 开启了区域报警
             for (WarnArea area : areas) {
                 List<Integer> geoX = area.getGeoX();

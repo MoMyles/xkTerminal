@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.MainActivity;
+import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.R;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
@@ -96,8 +97,8 @@ public class DBSettingFragment extends Fragment {
             }
         });
 
-        double voltage = ((MainActivity)getActivity()).voltage;
-        tv_voltage.setText(String.format("%.2f", voltage));
+//        double voltage = ((MainActivity)getActivity()).voltage;
+        tv_voltage.setText(String.format("%.2f", MyApplication.voltage));
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

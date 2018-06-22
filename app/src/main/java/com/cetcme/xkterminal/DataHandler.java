@@ -117,6 +117,7 @@ public class DataHandler extends Handler {
                                     int lat = (int) (Float.parseFloat(strings[1]) * 10000000);
                                     float speed = Float.parseFloat(strings[2]);
                                     float head = Float.parseFloat(strings[3]);
+                                    MyApplication.voltage = strings[4];
                                     myApplication.getCurrentLocation().setLongitude(lon);
                                     myApplication.getCurrentLocation().setLatitude(lat);
                                     myApplication.getCurrentLocation().setSpeed(speed);

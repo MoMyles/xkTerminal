@@ -115,8 +115,10 @@ public class MyApplication extends Application {
 
     private Timer timer;
 
-    //是否已定位, fake，收短信不处理， sendByte不处理，导航不处理，申报不处理
+    // 是否已定位, fake，收短信不处理， sendByte不处理，导航不处理，申报不处理
     public static boolean isLocated = false;
+    // 电压
+    public static String voltage = "-";
 
     /**
      * 加载库文件（只需调用一次）

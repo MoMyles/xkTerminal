@@ -327,15 +327,16 @@ public class DataHandler extends Handler {
 
                     String timeBytesStr = idStrings[2];
                     byte[] timeBytes = ConvertUtil.hexStringToByte(timeBytesStr);
-                    int year = ByteUtil.subBytes(timeBytes, 0, 1)[0] & 0xFF;
-                    int month = ByteUtil.subBytes(timeBytes, 1, 2)[0] & 0xFF;
-                    int day = ByteUtil.subBytes(timeBytes, 2, 3)[0] & 0xFF;
-                    int hour = ByteUtil.subBytes(timeBytes, 3, 4)[0] & 0xFF;
-                    int minute = ByteUtil.subBytes(timeBytes, 4, 5)[0] & 0xFF;
-                    int second = ByteUtil.subBytes(timeBytes, 5, 6)[0] & 0xFF;
+                    int year = Integer.valueOf(ByteUtil.bcd2Str(ByteUtil.subBytes(timeBytes, 0, 1)));
+                    int month = Integer.valueOf(ByteUtil.bcd2Str(ByteUtil.subBytes(timeBytes, 1, 2)));
+                    int day = Integer.valueOf(ByteUtil.bcd2Str(ByteUtil.subBytes(timeBytes, 2, 3)));
+                    int hour = Integer.valueOf(ByteUtil.bcd2Str(ByteUtil.subBytes(timeBytes, 3, 4)));
+                    int minute = Integer.valueOf(ByteUtil.bcd2Str(ByteUtil.subBytes(timeBytes, 4, 5)));
+                    int second = Integer.valueOf(ByteUtil.bcd2Str(ByteUtil.subBytes(timeBytes, 5, 6)));
 
                     Date date;
-                    if (year < 18) {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yy");
+                    if (year < Integer.valueOf(sdf.format(Constant.SYSTEM_DATE))) {
                         date = Constant.SYSTEM_DATE;
                     } else {
                         String dateStr = "20" + year + "/" + month + "/" + day + " " + hour + ":" + minute + ":" + second;

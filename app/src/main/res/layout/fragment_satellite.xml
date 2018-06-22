@@ -165,7 +165,8 @@
                         android:layout_height="0dp"
                         android:layout_weight="1.0"
                         android:gravity="center"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:visibility="invisible">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -199,7 +200,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="DOP："
+                            android:text="HDOP："
                             android:textSize="20sp" />
 
                         <TextView
@@ -288,7 +289,7 @@
                             android:id="@+id/bestPosa_accuracy_tv"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="2.31/2.0"
+                            android:text="2.31"
                             android:textSize="20sp" />
                     </LinearLayout>
 

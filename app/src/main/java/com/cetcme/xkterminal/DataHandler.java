@@ -136,6 +136,7 @@ public class DataHandler extends Handler {
                                     int lat = (int) (Float.parseFloat(strings[1]) * 10000000);
                                     float speed = Float.parseFloat(strings[2]);
                                     float head = Float.parseFloat(strings[3]);
+                                    MyApplication.voltage = strings[4];
                                     myApplication.getCurrentLocation().setLongitude(lon);
                                     myApplication.getCurrentLocation().setLatitude(lat);
                                     myApplication.getCurrentLocation().setSpeed(speed);
@@ -212,6 +213,7 @@ public class DataHandler extends Handler {
                         myApplication.mainActivity.gpsBar.setGPSStatus(gpsStatus);
                         if (!gpsStatus) {
                             myApplication.mainActivity.showMessageDialog("卫星中断故障", MessageDialogActivity.TYPE_ALARM);
+                            MainActivity.play("卫星中断故障");
                         }
 
                         if (myApplication.mainActivity.isSelfCheckLoading) {
@@ -350,9 +352,9 @@ public class DataHandler extends Handler {
                         date = new Date(rightTime);
                     }
                     myApplication.mainActivity.showIDCardDialog(id, name, nation, idAddress, date);
+                    SoundPlay.playSignSound(myApplication);
                     break;
-                    }
-
+                }
                 case SERIAL_PORT_MODIFY_SCREEN_BRIGHTNESS:
                     // 调节背光
                     ScreenBrightness.modifyBrightness(myApplication.mainActivity);

@@ -115,8 +115,10 @@ public class MyApplication extends Application {
 
     private Timer timer;
 
-    //是否已定位, fake，收短信不处理， sendByte不处理，导航不处理，申报不处理
+    // 是否已定位, fake，收短信不处理， sendByte不处理，导航不处理，申报不处理
     public static boolean isLocated = false;
+    // 电压
+    public static String voltage = "-";
 
     /**
      * 加载库文件（只需调用一次）
@@ -211,7 +213,7 @@ public class MyApplication extends Application {
         Iconify.with(new FontAwesomeModule());
 
         StringBuffer param = new StringBuffer();
-        param.append("appid=5afb90f6");
+        param.append("appid=5afb90f6"); // mao: 5afb90f6, qh: 5b2c61e9, lw: 5b2c638f
         param.append(",");
         // 设置使用v5+
         param.append(SpeechConstant.ENGINE_MODE + "=" + SpeechConstant.MODE_MSC);
@@ -356,7 +358,7 @@ public class MyApplication extends Application {
                 case "login":
                     if (mainActivity != null) {
                         Toast.makeText(mainActivity,"手机客户端登陆成功", Toast.LENGTH_SHORT).show();
-                        SoundPlay.playMessageSound(mainActivity);
+                        MainActivity.play("手机客户端登陆成功");
                     }
                     break;
                 case "device_info_set":

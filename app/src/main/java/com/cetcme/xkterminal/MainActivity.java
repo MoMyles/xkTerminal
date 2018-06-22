@@ -203,6 +203,7 @@ public class MainActivity extends AppCompatActivity {
         */
 
         // TODO: fake
+        /*
         volTimer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -220,6 +221,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         }, 0, 60 * 1000);
+        */
 
         new Thread(new Runnable() {
             @Override
@@ -1215,8 +1217,10 @@ public class MainActivity extends AppCompatActivity {
 
 
     //TODO: fake
+    /*
     public double voltage = 4.20;
     public Timer volTimer = new Timer();
+    */
 
     @Override
     protected void onResume() {

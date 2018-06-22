@@ -1095,9 +1095,6 @@ public class MyApplication extends Application {
     }
 
     public void sendBytes(byte[] buffer) {
-        // 如果卫星中断 则返回 不发送短信
-        if (!MyApplication.isLocated) return;
-
         new SendingThread(buffer).start();
         System.out.println("发送包：" + ConvertUtil.bytesToHexString(buffer));
     }

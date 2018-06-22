@@ -170,6 +170,9 @@ public class DataHandler extends Handler {
                     }
                     break;
                 case SERIAL_PORT_MESSAGE_SEND_SUCCESS:
+
+                    if (!MyApplication.isLocated) return;
+
                     // 短信发送成功
                     Toast.makeText(myApplication.mainActivity, "短信发送成功", Toast.LENGTH_SHORT).show();
 
@@ -275,6 +278,7 @@ public class DataHandler extends Handler {
                     Toast.makeText(myApplication.mainActivity, "终端ID：" + deviceID, Toast.LENGTH_LONG).show();
                     break;
                 case SERIAL_PORT_ALERT_SEND_SUCCESS:
+                    if (!MyApplication.isLocated) return;
                     // 报警发送成功
                     myApplication.mainActivity.gpsBar.showAlerting(false);
                     StringBuffer str = new StringBuffer("遇险报警");
@@ -285,11 +289,13 @@ public class DataHandler extends Handler {
                     Toast.makeText(myApplication.mainActivity, str.toString(), Toast.LENGTH_SHORT).show();
                     break;
                 case SERIAL_PORT_SHOW_ALERT_ACTIVITY:
+                    if (!MyApplication.isLocated) return;
                     // 显示报警activity
                     myApplication.mainActivity.gpsBar.showAlerting(false);
                     myApplication.mainActivity.showDangerDialog();
                     break;
                 case SERIAL_PORT_RECEIVE_NEW_ALERT:
+                    if (!MyApplication.isLocated) return;
                     // 增加报警记录，显示收到报警
                     myApplication.mainActivity.gpsBar.showAlerting(false);
                     try {

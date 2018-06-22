@@ -52,7 +52,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
     int routeID = -1;
 
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-    private IconTextView mITVMenu;
+    private Button mITVMenu;
     private AppCompatButton mClearTrack;
     private AppCompatButton mListTrack;
     private LinearLayout mLlBottom;

@@ -1706,6 +1706,7 @@ public class MainActivity extends AppCompatActivity {
             } else if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action) && index == 1) {
                 MyApplication.getInstance().isAisConnected = true;
                 gpsBar.setAisStatus(true);
+                play("AIS已连接");
             }
             if (index > 1) {
                 index = 0;

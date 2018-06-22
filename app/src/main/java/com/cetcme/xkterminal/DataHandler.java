@@ -213,6 +213,7 @@ public class DataHandler extends Handler {
                         myApplication.mainActivity.gpsBar.setGPSStatus(gpsStatus);
                         if (!gpsStatus) {
                             myApplication.mainActivity.showMessageDialog("卫星中断故障", MessageDialogActivity.TYPE_ALARM);
+                            MainActivity.play("卫星中断故障");
                         }
 
                         if (myApplication.mainActivity.isSelfCheckLoading) {

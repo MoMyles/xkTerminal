@@ -257,7 +257,7 @@ public class MainActivity extends AppCompatActivity {
 //        addMessage("123456", "ceshiduanxin", false);
 
         // 设备自检中
-        showSelfCheckHud();
+//        showSelfCheckHud();
 
         // test 开机设备自检逻辑
         /*

@@ -98,7 +98,7 @@ public class DBSettingFragment extends Fragment {
         });
 
 //        double voltage = ((MainActivity)getActivity()).voltage;
-        tv_voltage.setText(String.format("%.2f", MyApplication.voltage));
+//        tv_voltage.setText(String.format("%.2f", MyApplication.voltage));
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

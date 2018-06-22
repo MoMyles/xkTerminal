@@ -188,30 +188,30 @@ public class SatelliteFragment extends Fragment {
                 }
             }
 
-            int count = mSatelliteList.size();
-            for (int i = 0, k = 0; i < 15 - count; k++) {
-                Satellite satellite1 = new Satellite();
-                int j = random.nextInt(50);
-                if (k == 100) {
-                    break;
-                }
-                if (str.indexOf("," + j + ",") >= 0) {
-                    continue;
-                }
-                i++;
-                satellite1.setNum(j);
-                int kk = random.nextInt(359);
-                satellite1.setAzimuth(kk);
-                int l = random.nextInt(90);
-                satellite1.setElevationAngle(l);
-                satellite1.setNo(random.nextInt(90));
-                mSatelliteList.add(satellite1);
-            }
-            if (count > 15) {
-                for (int i=15;i<count;i++){
-                    mSatelliteList.remove(i);
-                }
-            }
+//            int count = mSatelliteList.size();
+//            for (int i = 0, k = 0; i < 15 - count; k++) {
+//                Satellite satellite1 = new Satellite();
+//                int j = random.nextInt(50);
+//                if (k == 100) {
+//                    break;
+//                }
+//                if (str.indexOf("," + j + ",") >= 0) {
+//                    continue;
+//                }
+//                i++;
+//                satellite1.setNum(j);
+//                int kk = random.nextInt(359);
+//                satellite1.setAzimuth(kk);
+//                int l = random.nextInt(90);
+//                satellite1.setElevationAngle(l);
+//                satellite1.setNo(random.nextInt(90));
+//                mSatelliteList.add(satellite1);
+//            }
+//            if (count > 15) {
+//                for (int i=15;i<count;i++){
+//                    mSatelliteList.remove(i);
+//                }
+//            }
 
         } catch (Exception e) {
             e.printStackTrace();

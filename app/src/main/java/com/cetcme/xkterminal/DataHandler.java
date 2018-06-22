@@ -130,7 +130,7 @@ public class DataHandler extends Handler {
                         // 更新位置
                         case MessageFormat.MESSAGE_TYPE_UPDATE_LOCATION:
                             String[] strings = content.split(",");
-                            if (strings.length == 4) {
+                            if (strings.length == 5) {
                                 try {
                                     int lon = (int) (Float.parseFloat(strings[0]) * 10000000);
                                     int lat = (int) (Float.parseFloat(strings[1]) * 10000000);
@@ -212,8 +212,6 @@ public class DataHandler extends Handler {
                     // 运行过程中收到 则不显示自检完成
                     if (myApplication.mainActivity != null) {
                         final boolean gpsStatus = status.charAt(7) == '1';
-                        myApplication.isLocated = gpsStatus;
-                        myApplication.mainActivity.gpsBar.setGPSStatus(gpsStatus);
                         if (!gpsStatus) {
                             myApplication.mainActivity.showMessageDialog("卫星中断故障", MessageDialogActivity.TYPE_ALARM);
                             MainActivity.play("卫星中断故障");
@@ -224,8 +222,11 @@ public class DataHandler extends Handler {
                             new Handler().postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
+                                    myApplication.isLocated = gpsStatus;
+                                    myApplication.mainActivity.gpsBar.setGPSStatus(gpsStatus);
                                     myApplication.mainActivity.dismissSelfCheckHud();
                                     if (gpsStatus) Toast.makeText(myApplication.mainActivity, "自检完成", Toast.LENGTH_SHORT).show();
+                                    MainActivity.play("自检完成");
                                 }
                             }, 5000);
                         }

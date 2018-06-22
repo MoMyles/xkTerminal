@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -148,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
         IntentFilter filter = new IntentFilter();
         filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
         filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
-        filter.setPriority(500);
+        filter.setPriority(1);
         this.registerReceiver(mUsbReceiver, filter);
 
         readData = new byte[readLength];
@@ -257,7 +258,7 @@ public class MainActivity extends AppCompatActivity {
 //        addMessage("123456", "ceshiduanxin", false);
 
         // 设备自检中
-//        showSelfCheckHud();
+        showSelfCheckHud();
 
         // test 开机设备自检逻辑
         /*
@@ -321,7 +322,7 @@ public class MainActivity extends AppCompatActivity {
                 // 初始化成功，之后可以调用startSpeaking方法
                 // 注：有的开发者在onCreate方法中创建完合成对象之后马上就调用startSpeaking进行合成，
                 // 正确的做法是将onCreate中的startSpeaking调用移至这里
-                // play("我打开了海图导航");
+//                play("我打开了海图导航");
             }
         }
     };
@@ -1547,18 +1548,19 @@ public class MainActivity extends AppCompatActivity {
                         } else if ("$GPGSV".equals(type)) {
                             Log.e("TAG", "gps: "+ newStr);
                             try {
-                                newStr = newStr.substring(newStr.indexOf(",") + 1, newStr.lastIndexOf("*")) + ",";
+                                newStr = newStr.substring(newStr.indexOf(",") + 1, newStr.lastIndexOf("*")) ;
                                 boolean isDou = newStr.endsWith(",");
+                                if (isDou) {
+                                    newStr += "0,";
+                                }
                                 String[] arr = newStr.split(",");
                                 for (int j = 3; j < arr.length; j += 4) {
                                     int no = Integer.valueOf(arr[j]);
                                     int yangjiao = Integer.valueOf(arr[j + 1]);
                                     int fangwei = Integer.valueOf(arr[j + 2]);
                                     int xinhao = 0;
-                                    // xinhao arr[j + 3] 可能为空
-                                    if (!isDou) {
-                                        xinhao = Integer.valueOf("".equals(arr[j + 3]) ? "0" : arr[j + 3]);
-                                    }
+                                    xinhao = Integer.valueOf("".equals(arr[j + 3]) ? "0" : arr[j + 3]);
+
                                     GPSBean bean = db.selector(GPSBean.class).where("no", "=", no).findFirst();
                                     if (bean == null) {
                                         // 不存在
@@ -1673,6 +1675,29 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+    public void disconnectFunction()
+    {
+        DevCount = -1;
+        currentIndex = -1;
+        bReadThreadGoing = false;
+        try {
+            Thread.sleep(50);
+        }
+        catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        if(ftDev != null)
+        {
+            synchronized(ftDev)
+            {
+                if( true == ftDev.isOpen())
+                {
+                    ftDev.close();
+                }
+            }
+        }
+    }
 
     int index = 0;
     /***********USB broadcast receiver*******************************************/
@@ -1687,28 +1712,20 @@ public class MainActivity extends AppCompatActivity {
                 Log.i(TAG, "DETACHED...");
                 MyApplication.getInstance().isAisConnected = false;
                 gpsBar.setAisStatus(false);
-                DevCount = -1;
-                currentIndex = -1;
-                bReadThreadGoing = false;
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                if (ftDev != null) {
-                    synchronized (ftDev) {
-                        if (true == ftDev.isOpen()) {
-                            ftDev.close();
-                        }
-                    }
-                }
+                disconnectFunction();
             } else if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action) && index == 1) {
+                disconnectFunction();
+                DevCount = 0;
+                createDeviceList();
+                if (DevCount > 0) {
+                    connectFunction();
+                    SetConfig(baudRate, dataBit, stopBit, parity, flowControl);
+                }
                 MyApplication.getInstance().isAisConnected = true;
                 gpsBar.setAisStatus(true);
                 play("AIS已连接");
             }
-            if (index > 1) {
+            if (index > 0) {
                 index = 0;
             }
         }

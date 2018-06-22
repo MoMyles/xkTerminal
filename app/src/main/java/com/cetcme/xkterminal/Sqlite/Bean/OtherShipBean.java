@@ -3,6 +3,9 @@ package com.cetcme.xkterminal.Sqlite.Bean;
 import org.xutils.db.annotation.Column;
 import org.xutils.db.annotation.Table;
 
+import java.sql.Timestamp;
+import java.util.Date;
+
 @Table(name="t_other_ship")
 public class OtherShipBean {
     @Column(name = "id", isId = true)
@@ -13,6 +16,8 @@ public class OtherShipBean {
     private int ship_id;
     @Column(name="ship_name")
     private String ship_name;
+    @Column(name="acq_time")
+    private Date acq_time;
 
     private boolean show = false;
 
@@ -56,6 +61,14 @@ public class OtherShipBean {
         this.show = show;
     }
 
+    public Date getAcq_time() {
+        return acq_time;
+    }
+
+    public void setAcq_time(Date acq_time) {
+        this.acq_time = acq_time;
+    }
+
     @Override
     public String toString() {
         return "OtherShipBean{" +
@@ -63,6 +76,8 @@ public class OtherShipBean {
                 ", mmsi=" + mmsi +
                 ", ship_id=" + ship_id +
                 ", ship_name='" + ship_name + '\'' +
+                ", acq_time=" + acq_time +
+                ", show=" + show +
                 '}';
     }
 }

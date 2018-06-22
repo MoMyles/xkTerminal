@@ -51,6 +51,7 @@ import org.json.JSONObject;
 import org.xutils.DbManager;
 import org.xutils.ex.DbException;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -615,8 +616,11 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                         , 0, aisInfo.SOG, 0);
                 osb.setShip_id(ship_id);
                 osb.setShip_name(aisInfo.shipName);
-                db.save(osb);
+                osb.setAcq_time(Constant.SYSTEM_DATE);
+                db.saveBindingId(osb);
             } else {
+                osb.setAcq_time(Constant.SYSTEM_DATE);
+                db.saveOrUpdate(osb);
                 // 存在， 更新信息
                 int versselId = skiaDrawView.mYimaLib.GetOtherVesselPosOfID(osb.getShip_id());
                 skiaDrawView.mYimaLib.SetOtherVesselCurrentInfo(versselId
@@ -626,6 +630,10 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
             // 显示所有船
             skiaDrawView.mYimaLib.SetAllOtherVesselDrawOrNot(true);
             skiaDrawView.postInvalidate();
+
+            if (showOtherShip){
+                updateOtherShipsInfo();
+            }
 //            Log.e("TAG", aisInfo.mmsi + ", " + aisInfo.longtitude + ", " + aisInfo.latititude);
 //                String str = String.format("mmsi:{0},msgType:{1},shipName:{2},cog:{3},sog:{4}", aisInfo.mmsi, aisInfo.MsgType,aisInfo.shipName, aisInfo.COG
 //                , aisInfo.SOG);
@@ -642,17 +650,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
     public void onOpenEvent(String action) {
         if ("openShip".equals(action)) {
 
-            try {
-                datas.clear();
-                final SharedPreferences sp = getActivity().getSharedPreferences("xkTerminal", MODE_PRIVATE);
-                List<OtherShipBean> list = db.selector(OtherShipBean.class).where("mmsi", "<>", sp.getString("shipNo", "")).findAll();
-                if (list != null && !list.isEmpty()) {
-                    datas.addAll(list);
-                }
-                rvShipAdapter.notifyDataSetChanged();
-            } catch (DbException e) {
-                e.printStackTrace();
-            }
+            updateOtherShipsInfo();
 
             if (ll_ship_list.getVisibility() == View.GONE) {
                 ll_ship_list.setVisibility(View.VISIBLE);
@@ -664,6 +662,20 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
             Toast.makeText(getActivity(), "请选择标位点", Toast.LENGTH_SHORT).show();
         } else if ("pin_co".equals(action)) {
             openPinDialog(null);
+        }
+    }
+
+    private void updateOtherShipsInfo() {
+        try {
+            datas.clear();
+            final SharedPreferences sp = getActivity().getSharedPreferences("xkTerminal", MODE_PRIVATE);
+            List<OtherShipBean> list = db.selector(OtherShipBean.class).where("mmsi", "<>", sp.getString("shipNo", "")).findAll();
+            if (list != null && !list.isEmpty()) {
+                datas.addAll(list);
+            }
+            rvShipAdapter.notifyDataSetChanged();
+        } catch (DbException e) {
+            e.printStackTrace();
         }
     }
 

@@ -45,9 +45,9 @@ public class DBSettingFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_setting_db, container, false);
-        if (!EventBus.getDefault().isRegistered(this)) {
-            EventBus.getDefault().register(this);
-        }
+//        if (!EventBus.getDefault().isRegistered(this)) {
+//            EventBus.getDefault().register(this);
+//        }
         Log.e("DBSettingFragment", "onCreateView: ");
         unbinder = ButterKnife.bind(this, view);
         initData(view);

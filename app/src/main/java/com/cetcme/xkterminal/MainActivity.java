@@ -299,7 +299,13 @@ public class MainActivity extends AppCompatActivity {
 
 
         // 发送启动$01，要求对方发时间
-        sendBootData();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Log.e("TAG", "开始发送$01");
+                sendBootData();
+            }
+        }, 2000);
     }
 
     /**
@@ -1125,7 +1131,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void sendBootData() {
+    public void sendBootData() {
         byte[] bytes = "$01".getBytes();
         bytes = ByteUtil.byteMerger(bytes, new byte[]{0x01, 0x00});
         bytes = ByteUtil.byteMerger(bytes, new byte[]{0x2A, 0x01});

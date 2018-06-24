@@ -95,14 +95,14 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
     private final int[] JIN_CHU_AREA_COLOR = new int[]{0, 0, 255};
 
 
-    private final int[] JIN_CHU_AREA_X = new int[]{(int) (121.259983 * 1e7), (int) (121.680821 * 1e7), (int) (121.675072 * 1e7), (int) (121.311725 * 1e7)};
+    private final int[] JIN_CHU_AREA_X = new int[]{(int) (122.259983 * 1e7), (int) (122.680821 * 1e7), (int) (122.675072 * 1e7), (int) (122.311725 * 1e7)};
     private final int[] JIN_CHU_AREA_Y = new int[]{(int) (28.722246 * 1e7), (int) (28.690818 * 1e7), (int) (28.199928 * 1e7), (int) (28.226411 * 1e7)};
 
-    private final int[] JIN_RU_AREA_X = new int[]{(int) (121.761309 * 1e7), (int) (121.949882 * 1e7), (int) (121.902739 * 1e7), (int) (121.772808 * 1e7)};
-    private final int[] JIN_RU_AREA_Y = new int[]{(int) (28.651267 * 1e7), (int) (28.660395 * 1e7), (int) (28.530491 * 1e7), (int) (28.517288 * 1e7)};
-
-    private final int[] JIN_YU_AREA_X = new int[]{(int) (121.583086 * 1e7), (int) (121.68887 * 1e7), (int) (121.676222 * 1e7), (int) (121.578486 * 1e7)};
-    private final int[] JIN_YU_AREA_Y = new int[]{(int) (28.222337 * 1e7), (int) (28.219282 * 1e7), (int) (28.159172 * 1e7), (int) (28.183627 * 1e7)};
+//    private final int[] JIN_RU_AREA_X = new int[]{(int) (121.761309 * 1e7), (int) (121.949882 * 1e7), (int) (121.902739 * 1e7), (int) (121.772808 * 1e7)};
+//    private final int[] JIN_RU_AREA_Y = new int[]{(int) (28.651267 * 1e7), (int) (28.660395 * 1e7), (int) (28.530491 * 1e7), (int) (28.517288 * 1e7)};
+//
+//    private final int[] JIN_YU_AREA_X = new int[]{(int) (121.583086 * 1e7), (int) (121.68887 * 1e7), (int) (121.676222 * 1e7), (int) (121.578486 * 1e7)};
+//    private final int[] JIN_YU_AREA_Y = new int[]{(int) (28.222337 * 1e7), (int) (28.219282 * 1e7), (int) (28.159172 * 1e7), (int) (28.183627 * 1e7)};
 
 
     private DbManager db;
@@ -361,22 +361,22 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
             }
             areas.add(new WarnArea(2, JIN_CHU_AREA_COLOR[0], JIN_CHU_AREA_COLOR[1]
                     , JIN_CHU_AREA_COLOR[2], geoX, geoY));
-            geoX = new Integer[JIN_RU_AREA_X.length];
-            geoY = new Integer[JIN_RU_AREA_Y.length];
-            for (int i = 0; i < JIN_RU_AREA_X.length; i++) {
-                geoX[i] = JIN_RU_AREA_X[i];
-                geoY[i] = JIN_RU_AREA_Y[i];
-            }
-            areas.add(new WarnArea(1, JIN_RU_AREA_COLOR[0], JIN_RU_AREA_COLOR[1]
-                    , JIN_RU_AREA_COLOR[2], geoX, geoY));
-            geoX = new Integer[JIN_YU_AREA_X.length];
-            geoY = new Integer[JIN_YU_AREA_Y.length];
-            for (int i = 0; i < JIN_YU_AREA_X.length; i++) {
-                geoX[i] = JIN_YU_AREA_X[i];
-                geoY[i] = JIN_YU_AREA_Y[i];
-            }
-            areas.add(new WarnArea(0, JIN_YU_AREA_COLOR[0], JIN_YU_AREA_COLOR[1]
-                    , JIN_YU_AREA_COLOR[2], geoX, geoY));
+//            geoX = new Integer[JIN_RU_AREA_X.length];
+//            geoY = new Integer[JIN_RU_AREA_Y.length];
+//            for (int i = 0; i < JIN_RU_AREA_X.length; i++) {
+//                geoX[i] = JIN_RU_AREA_X[i];
+//                geoY[i] = JIN_RU_AREA_Y[i];
+//            }
+//            areas.add(new WarnArea(1, JIN_RU_AREA_COLOR[0], JIN_RU_AREA_COLOR[1]
+//                    , JIN_RU_AREA_COLOR[2], geoX, geoY));
+//            geoX = new Integer[JIN_YU_AREA_X.length];
+//            geoY = new Integer[JIN_YU_AREA_Y.length];
+//            for (int i = 0; i < JIN_YU_AREA_X.length; i++) {
+//                geoX[i] = JIN_YU_AREA_X[i];
+//                geoY[i] = JIN_YU_AREA_Y[i];
+//            }
+//            areas.add(new WarnArea(0, JIN_YU_AREA_COLOR[0], JIN_YU_AREA_COLOR[1]
+//                    , JIN_YU_AREA_COLOR[2], geoX, geoY));
             curLayerPos = skiaDrawView.drawBanArea(areas);
         } else {
             for (WarnArea area : areas) {

@@ -1503,7 +1503,8 @@ public class MainActivity extends AppCompatActivity {
                                             if (TextUtils.isEmpty(message)) {
                                                 message = "AIS报警";
                                             }
-                                            MyApplication.getInstance().sendBytes(WarnFormat.format("" + message14.userid(), message));
+                                            // 暂时停用14发信息功能
+//                                            MyApplication.getInstance().sendBytes(WarnFormat.format("" + message14.userid(), message));
                                             break;
                                         case 18:
                                             aisparser.Message18 message18 = new aisparser.Message18();

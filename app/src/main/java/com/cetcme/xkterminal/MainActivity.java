@@ -63,7 +63,6 @@ import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
 
 import org.codice.common.ais.Decoder;
-import org.codice.common.ais.message.Message;
 import org.codice.common.ais.message.Message18;
 import org.codice.common.ais.message.Message19;
 import org.greenrobot.eventbus.EventBus;
@@ -73,7 +72,6 @@ import org.xutils.DbManager;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -299,20 +297,10 @@ public class MainActivity extends AppCompatActivity {
         }, 5000);
         */
 
-
-        // 发送启动$01，要求对方发时间
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Log.e("TAG", "开始发送$01");
-                sendBootData();
-            }
-        }, 2000);
-
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while(isSelfCheckLoading){
+                while (isSelfCheckLoading) {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -331,6 +319,14 @@ public class MainActivity extends AppCompatActivity {
             }
         }).start();
 
+        // 发送启动$01，要求对方发时间
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // Log.e("TAG", "开始发送$01");
+                sendBootData();
+            }
+        }, 2000);
     }
 
     class AisReadThread extends Thread {
@@ -369,11 +365,11 @@ public class MainActivity extends AppCompatActivity {
             if (!MyApplication.getInstance().isAisConnected) {
                 MyApplication.getInstance().isAisConnected = true;
                 runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            MyApplication.getInstance().mainActivity.gpsBar.setAisStatus(true);
-                            play("AIS已连接");
-                        }
+                    @Override
+                    public void run() {
+                        MyApplication.getInstance().mainActivity.gpsBar.setAisStatus(true);
+                        play("AIS已连接");
+                    }
                 });
             }
             // ! 号头
@@ -490,7 +486,7 @@ public class MainActivity extends AppCompatActivity {
                                             isMsg5 = true;
                                             Message5 message5 = new Message5();
                                             message5.parse(sixbit);
-                                            if (MyApplication.osbDataList != null && !MyApplication.osbDataList.isEmpty()){
+                                            if (MyApplication.osbDataList != null && !MyApplication.osbDataList.isEmpty()) {
                                                 for (OtherShipBean osb : MyApplication.osbDataList) {
                                                     if (osb.getMmsi() == message5.userid()) {
                                                         osb.setShip_name(message5.name());
@@ -506,7 +502,7 @@ public class MainActivity extends AppCompatActivity {
                                             isMsg5 = true;
                                             Message24 Message24 = new Message24();
                                             Message24.parse(sixbit);
-                                            if (MyApplication.osbDataList != null && !MyApplication.osbDataList.isEmpty()){
+                                            if (MyApplication.osbDataList != null && !MyApplication.osbDataList.isEmpty()) {
                                                 for (OtherShipBean osb : MyApplication.osbDataList) {
                                                     if (osb.getMmsi() == Message24.userid()) {
                                                         osb.setShip_name(Message24.name());
@@ -570,7 +566,7 @@ public class MainActivity extends AppCompatActivity {
                                 e.printStackTrace();
                             }
                         } else if ("$GPGSV".equals(type)) {
-                           // Log.e("TAG", "gps: " + newStr);
+                            // Log.e("TAG", "gps: " + newStr);
                             try {
                                 newStr = newStr.substring(newStr.indexOf(",") + 1, newStr.lastIndexOf("*"));
                                 boolean isDou = newStr.endsWith(",");

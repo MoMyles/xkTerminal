@@ -3,7 +3,6 @@ package com.cetcme.xkterminal;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.DataFormat.IDFormat;
@@ -53,6 +52,7 @@ public class DataHandler extends Handler {
     private DbManager db;
 
     private Timer timer = null;
+    private Timer timer30 = null;
 
     public DataHandler(MyApplication myApplication) {
         this.myApplication = myApplication;
@@ -72,6 +72,17 @@ public class DataHandler extends Handler {
                 Looper.loop();
             }
         }, 2 * 60 * 1000);
+
+        timer30 = new Timer();
+
+        timer30.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (!MyApplication.getInstance().isLocated) {
+                    MyApplication.getInstance().mainActivity.sendBootData();
+                }
+            }
+        }, 30 * 1000);
     }
 
     String content = "";
@@ -213,28 +224,37 @@ public class DataHandler extends Handler {
                     // 运行过程中收到 则不显示自检完成
                     if (myApplication.mainActivity != null) {
                         final boolean gpsStatus = status.charAt(7) == '1';
+
                         if (!gpsStatus) {
                             myApplication.mainActivity.showMessageDialog("卫星中断故障", MessageDialogActivity.TYPE_ALARM);
                             MainActivity.play("卫星中断故障");
-                        }
-
-                        if (myApplication.mainActivity.isSelfCheckLoading) {
-                            new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    myApplication.isLocated = gpsStatus;
-                                    myApplication.mainActivity.gpsBar.setGPSStatus(gpsStatus);
-                                    myApplication.mainActivity.dismissSelfCheckHud();
-                                    if (gpsStatus) {
-                                        Toast.makeText(myApplication.mainActivity, "自检完成", Toast.LENGTH_SHORT).show();
-                                        MainActivity.play("自检完成");
-                                    }
-                                }
-                            }, 2000);
+                            myApplication.mainActivity.dismissSelfCheckHud();
                         } else {
-                            myApplication.isLocated = gpsStatus;
-                            myApplication.mainActivity.gpsBar.setGPSStatus(gpsStatus);
+                            if (timer30 != null) {
+                                timer30.cancel();
+                            }
+                            if (myApplication.mainActivity.isSelfCheckLoading) {
+                                Toast.makeText(myApplication.mainActivity, "自检完成", Toast.LENGTH_SHORT).show();
+                                MainActivity.play("自检完成");
+                                myApplication.mainActivity.dismissSelfCheckHud();
+                            }
                         }
+                        myApplication.isLocated = gpsStatus;
+                        myApplication.mainActivity.gpsBar.setGPSStatus(gpsStatus);
+
+//                        if (myApplication.mainActivity.isSelfCheckLoading) {
+//                            new Handler().postDelayed(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    myApplication.isLocated = gpsStatus;
+//                                    myApplication.mainActivity.gpsBar.setGPSStatus(gpsStatus);
+//                                    myApplication.mainActivity.dismissSelfCheckHud();
+//                                    if (gpsStatus) {
+//
+//                                    }
+//                                }
+//                            }, 2000);
+//                        }
 
                         String communication_from = status.charAt(6) == '1' ? "北斗" : "GPRS";
                         PreferencesUtils.putString(myApplication.mainActivity, "communication_from", communication_from);

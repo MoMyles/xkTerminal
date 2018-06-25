@@ -120,7 +120,6 @@ public class MyApplication extends Application {
 
     public long oldAisReceiveTime = System.currentTimeMillis();
 
-    public boolean isAisFirst = true;
     public boolean isAisConnected = false;
 
     private Timer timer;
@@ -1048,17 +1047,20 @@ public class MyApplication extends Application {
                         String type = (String) map.get("type");
                         if ("!AIVDM".equals(type)
                                 || "!AIVDO".equals(type)) {
-                            Log.e("TAG", "ais: " + newStr);
+                            // Log.e("TAG", "ais: " + newStr);
                             try {
                                 MyApplication.getInstance().oldAisReceiveTime = System.currentTimeMillis();
-                                MyApplication.getInstance().isAisConnected = true;
-                                if (MyApplication.getInstance().mainActivity != null) {
-                                    MyApplication.getInstance().mainActivity.runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            MyApplication.getInstance().mainActivity.gpsBar.setAisStatus(true);
-                                        }
-                                    });
+                                if (!MyApplication.getInstance().isAisConnected) {
+                                    MyApplication.getInstance().isAisConnected = true;
+                                    if (MyApplication.getInstance().mainActivity != null) {
+                                        MyApplication.getInstance().mainActivity.runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                MyApplication.getInstance().mainActivity.gpsBar.setAisStatus(true);
+                                                MainActivity.play("AIS已连接");
+                                            }
+                                        });
+                                    }
                                 }
                                 boolean isOwn = "!AIVDO".equals(type);
                                 int result = vdm.add(newStr);

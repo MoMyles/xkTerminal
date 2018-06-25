@@ -51,7 +51,6 @@ import org.json.JSONObject;
 import org.xutils.DbManager;
 import org.xutils.ex.DbException;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -554,6 +553,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
 
     /**
      * 检测报警
+     *
      * @param lb
      */
     private void doAreaWarning(LocationBean lb) {
@@ -631,7 +631,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
             skiaDrawView.mYimaLib.SetAllOtherVesselDrawOrNot(true);
             skiaDrawView.postInvalidate();
 
-            if (showOtherShip){
+            if (showOtherShip) {
                 updateOtherShipsInfo();
             }
 //            Log.e("TAG", aisInfo.mmsi + ", " + aisInfo.longtitude + ", " + aisInfo.latititude);
@@ -673,7 +673,12 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
             if (list != null && !list.isEmpty()) {
                 datas.addAll(list);
             }
-            rvShipAdapter.notifyDataSetChanged();
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    rvShipAdapter.notifyDataSetChanged();
+                }
+            }, 200);
         } catch (DbException e) {
             e.printStackTrace();
         }

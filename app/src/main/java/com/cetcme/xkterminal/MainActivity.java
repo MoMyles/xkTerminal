@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -35,8 +34,6 @@ import com.cetcme.xkterminal.DataFormat.Util.ByteUtil;
 import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
 import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
 import com.cetcme.xkterminal.DataFormat.Util.Util;
-import com.cetcme.xkterminal.DataFormat.WarnFormat;
-import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.Fragment.AboutFragment;
 import com.cetcme.xkterminal.Fragment.LogFragment;
 import com.cetcme.xkterminal.Fragment.MainFragment;
@@ -87,8 +84,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import aisparser.Message1;
 import aisparser.Message14;
@@ -1425,9 +1420,9 @@ public class MainActivity extends AppCompatActivity {
                     if ("!AIVDM".equals(headStr)
                             || "!AIVDO".equals(headStr)
                             || "$GPGSV".equals(headStr)) {
-                        int end = gpsDataStr.indexOf("\n", i+1);
+                        int end = gpsDataStr.indexOf("\n", i + 1);
                         if (end != -1) {
-                            String str = gpsDataStr.substring(i+7, end + 1);
+                            String str = gpsDataStr.substring(i + 7, end + 1);
                             if (str.contains("$") || str.contains("!")) {
                                 continue;
                             }
@@ -1454,7 +1449,7 @@ public class MainActivity extends AppCompatActivity {
                         String type = (String) map.get("type");
                         if ("!AIVDM".equals(type)
                                 || "!AIVDO".equals(type)) {
-                            Log.e("TAG", "ais: "+ newStr);
+                            Log.e("TAG", "ais: " + newStr);
                             try {
                                 MyApplication.getInstance().oldAisReceiveTime = System.currentTimeMillis();
                                 MyApplication.getInstance().isAisConnected = true;
@@ -1479,8 +1474,8 @@ public class MainActivity extends AppCompatActivity {
                                             aisInfo.COG = message1.cog() / 10.0f;
                                             aisInfo.SOG = message1.sog() / 10.0f;
                                             aisInfo.MsgType = 1;
-                                            aisInfo.longtitude = (int)(message1.longitude() * 1.0 / 600000 * 1e7);
-                                            aisInfo.latititude = (int)(message1.latitude() * 1.0 / 600000 * 1e7);
+                                            aisInfo.longtitude = (int) (message1.longitude() * 1.0 / 600000 * 1e7);
+                                            aisInfo.latititude = (int) (message1.latitude() * 1.0 / 600000 * 1e7);
                                             break;
                                         case 2:
                                             Message2 message2 = new Message2();
@@ -1489,8 +1484,8 @@ public class MainActivity extends AppCompatActivity {
                                             aisInfo.COG = message2.cog() / 10.0f;
                                             aisInfo.SOG = message2.sog() / 10.0f;
                                             aisInfo.MsgType = 2;
-                                            aisInfo.longtitude = (int)(message2.longitude() * 1.0 / 600000 * 1e7);
-                                            aisInfo.latititude = (int)(message2.latitude() * 1.0 / 600000 * 1e7);
+                                            aisInfo.longtitude = (int) (message2.longitude() * 1.0 / 600000 * 1e7);
+                                            aisInfo.latititude = (int) (message2.latitude() * 1.0 / 600000 * 1e7);
                                             break;
                                         case 3:
                                             Message3 message3 = new Message3();
@@ -1499,8 +1494,8 @@ public class MainActivity extends AppCompatActivity {
                                             aisInfo.COG = message3.cog() / 10.0f;
                                             aisInfo.SOG = message3.sog() / 10.0f;
                                             aisInfo.MsgType = 3;
-                                            aisInfo.longtitude = (int)(message3.longitude() * 1.0 / 600000 * 1e7);
-                                            aisInfo.latititude = (int)(message3.latitude() * 1.0 / 600000 * 1e7);
+                                            aisInfo.longtitude = (int) (message3.longitude() * 1.0 / 600000 * 1e7);
+                                            aisInfo.latititude = (int) (message3.latitude() * 1.0 / 600000 * 1e7);
                                             break;
                                         case 14:
                                             Message14 message14 = new Message14();
@@ -1519,8 +1514,8 @@ public class MainActivity extends AppCompatActivity {
                                             aisInfo.COG = message18.cog() / 10.0f;
                                             aisInfo.SOG = message18.sog() / 10.0f;
                                             aisInfo.MsgType = 18;
-                                            aisInfo.longtitude = (int)(message18.longitude() * 1.0 / 600000 * 1e7);
-                                            aisInfo.latititude = (int)(message18.latitude() * 1.0 / 600000 * 1e7);
+                                            aisInfo.longtitude = (int) (message18.longitude() * 1.0 / 600000 * 1e7);
+                                            aisInfo.latititude = (int) (message18.latitude() * 1.0 / 600000 * 1e7);
                                             break;
                                         case 19:
                                             aisparser.Message19 message19 = new aisparser.Message19();
@@ -1529,8 +1524,8 @@ public class MainActivity extends AppCompatActivity {
                                             aisInfo.COG = message19.cog() / 10.0f;
                                             aisInfo.SOG = message19.sog() / 10.0f;
                                             aisInfo.MsgType = 19;
-                                            aisInfo.longtitude = (int)(message19.longitude() * 1.0 / 600000 * 1e7);
-                                            aisInfo.latititude = (int)(message19.latitude() * 1.0 / 600000 * 1e7);
+                                            aisInfo.longtitude = (int) (message19.longitude() * 1.0 / 600000 * 1e7);
+                                            aisInfo.latititude = (int) (message19.latitude() * 1.0 / 600000 * 1e7);
                                             break;
                                     }
                                     int mmsi = Integer.valueOf(PreferencesUtils.getString(MainActivity.this, "shipNo", "0")).intValue();
@@ -1553,9 +1548,9 @@ public class MainActivity extends AppCompatActivity {
                                 e.printStackTrace();
                             }
                         } else if ("$GPGSV".equals(type)) {
-                            Log.e("TAG", "gps: "+ newStr);
+                            Log.e("TAG", "gps: " + newStr);
                             try {
-                                newStr = newStr.substring(newStr.indexOf(",") + 1, newStr.lastIndexOf("*")) ;
+                                newStr = newStr.substring(newStr.indexOf(",") + 1, newStr.lastIndexOf("*"));
                                 boolean isDou = newStr.endsWith(",");
                                 if (isDou) {
                                     newStr += "0,";
@@ -1682,24 +1677,20 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
-    public void disconnectFunction()
-    {
+
+    public void disconnectFunction() {
         DevCount = -1;
         currentIndex = -1;
         bReadThreadGoing = false;
         try {
             Thread.sleep(50);
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        if(ftDev != null)
-        {
-            synchronized(ftDev)
-            {
-                if( true == ftDev.isOpen())
-                {
+        if (ftDev != null) {
+            synchronized (ftDev) {
+                if (true == ftDev.isOpen()) {
                     ftDev.close();
                 }
             }
@@ -1721,16 +1712,20 @@ public class MainActivity extends AppCompatActivity {
                 gpsBar.setAisStatus(false);
                 disconnectFunction();
             } else if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action) && index == 1) {
-                disconnectFunction();
-                DevCount = 0;
-                createDeviceList();
-                if (DevCount > 0) {
-                    connectFunction();
-                    SetConfig(baudRate, dataBit, stopBit, parity, flowControl);
+                try {
+                    disconnectFunction();
+                    DevCount = 0;
+                    createDeviceList();
+                    if (DevCount > 0) {
+                        connectFunction();
+                        SetConfig(baudRate, dataBit, stopBit, parity, flowControl);
+                    }
+                    MyApplication.getInstance().isAisConnected = true;
+                    gpsBar.setAisStatus(true);
+                    play("AIS已连接");
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "请重新插拔USB", Toast.LENGTH_SHORT).show();
                 }
-                MyApplication.getInstance().isAisConnected = true;
-                gpsBar.setAisStatus(true);
-                play("AIS已连接");
             }
             if (index > 0) {
                 index = 0;

@@ -13,6 +13,7 @@ public class DateUtil {
     private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public static String Date2String(Date date) {
+        if (date == null) return "";
         return sdf.format(date);
     }
 

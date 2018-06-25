@@ -1,10 +1,8 @@
 package com.cetcme.xkterminal;
 
-import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.EventLog;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.DataFormat.IDFormat;
@@ -89,8 +87,8 @@ public class DataHandler extends Handler {
                     String[] messageStrings = MessageFormat.unFormat(bytes);
                     String address = messageStrings[0];
                     String content = messageStrings[1];
-                    String type    = messageStrings[2];
-                    int group      = Integer.parseInt(messageStrings[3]);
+                    String type = messageStrings[2];
+                    int group = Integer.parseInt(messageStrings[3]);
                     int frameCount = Integer.parseInt(messageStrings[4]);
 
                     switch (type) {
@@ -130,7 +128,7 @@ public class DataHandler extends Handler {
                         // 更新位置
                         case MessageFormat.MESSAGE_TYPE_UPDATE_LOCATION:
                             String[] strings = content.split(",");
-                            if (strings.length == 4) {
+                            if (strings.length == 5) {
                                 try {
                                     int lon = (int) (Float.parseFloat(strings[0]) * 10000000);
                                     int lat = (int) (Float.parseFloat(strings[1]) * 10000000);
@@ -198,6 +196,7 @@ public class DataHandler extends Handler {
                     break;
                 case SERIAL_PORT_TIME_NUMBER_AND_COMMUNICATION_FROM:
                     // 先处理后面部分，时间部分由下一个case处理，不加break
+                    timer.cancel();
                     int myNumber = Util.bytesToInt2(ByteUtil.subBytes(bytes, 17, 21), 0);
                     if (myNumber != 0) {
                         PreferencesUtils.putString(myApplication.mainActivity, "myNumber", myNumber + "");
@@ -212,22 +211,27 @@ public class DataHandler extends Handler {
                     // 运行过程中收到 则不显示自检完成
                     if (myApplication.mainActivity != null) {
                         final boolean gpsStatus = status.charAt(7) == '1';
-                        myApplication.isLocated = gpsStatus;
-                        myApplication.mainActivity.gpsBar.setGPSStatus(gpsStatus);
                         if (!gpsStatus) {
                             myApplication.mainActivity.showMessageDialog("卫星中断故障", MessageDialogActivity.TYPE_ALARM);
                             MainActivity.play("卫星中断故障");
                         }
 
                         if (myApplication.mainActivity.isSelfCheckLoading) {
-                            timer.cancel();
                             new Handler().postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
+                                    myApplication.isLocated = gpsStatus;
+                                    myApplication.mainActivity.gpsBar.setGPSStatus(gpsStatus);
                                     myApplication.mainActivity.dismissSelfCheckHud();
-                                    if (gpsStatus) Toast.makeText(myApplication.mainActivity, "自检完成", Toast.LENGTH_SHORT).show();
+                                    if (gpsStatus) {
+                                        Toast.makeText(myApplication.mainActivity, "自检完成", Toast.LENGTH_SHORT).show();
+                                        MainActivity.play("自检完成");
+                                    }
                                 }
                             }, 5000);
+                        } else {
+                            myApplication.isLocated = gpsStatus;
+                            myApplication.mainActivity.gpsBar.setGPSStatus(gpsStatus);
                         }
 
                         String communication_from = status.charAt(6) == '1' ? "北斗" : "GPRS";
@@ -282,7 +286,7 @@ public class DataHandler extends Handler {
                     // 报警发送成功
                     myApplication.mainActivity.gpsBar.showAlerting(false);
                     StringBuffer str = new StringBuffer("遇险报警");
-                    if(MyApplication.getInstance().isAisConnected){
+                    if (MyApplication.getInstance().isAisConnected) {
                         str.append("和AIS安全广播");
                     }
                     str.append("发送成功");
@@ -314,7 +318,7 @@ public class DataHandler extends Handler {
                         // 落水报警
                         Toast.makeText(myApplication.mainActivity, "收到落水报警", Toast.LENGTH_SHORT).show();
                         myApplication.mainActivity.addAlertLog("落水");
-                    } else if (alertBytes[0] == 0x10 && alertBytes[1] == 0x00){
+                    } else if (alertBytes[0] == 0x10 && alertBytes[1] == 0x00) {
                         // 解除报警
                         PreferencesUtils.putBoolean(myApplication.mainActivity, "homePageAlertView", false);
                         if (myApplication.mainActivity.mainFragment != null) {

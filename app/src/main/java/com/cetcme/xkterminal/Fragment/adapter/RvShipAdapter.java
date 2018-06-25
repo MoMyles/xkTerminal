@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.cetcme.xkterminal.MyClass.DateUtil;
 import com.cetcme.xkterminal.Navigation.SkiaDrawView;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.Sqlite.Bean.OtherShipBean;
@@ -64,10 +65,15 @@ public class RvShipAdapter extends RecyclerView.Adapter<RvShipAdapter.VH> {
             if (ovci != null) {
                 holder.hangxiang.setText(ovci.fCourseOverGround + " °");
                 holder.speed.setText(ovci.fSpeedOverGround + " kn");
+                holder.lon.setText("" + (ovci.currentPoint.x * 1.0 / 1e7));
+                holder.lat.setText("" + (ovci.currentPoint.y * 1.0 / 1e7));
             } else {
                 holder.hangxiang.setText("0 °");
                 holder.speed.setText("0 kn");
+                holder.lon.setText("");
+                holder.lat.setText("");
             }
+            holder.acq.setText(DateUtil.Date2String(osb.getAcq_time()));
             holder.mLl.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -91,6 +97,9 @@ public class RvShipAdapter extends RecyclerView.Adapter<RvShipAdapter.VH> {
             holder.width.setText("");
             holder.hangxiang.setText("0 °");
             holder.speed.setText("0 kn");
+            holder.lon.setText("0.0 °");
+            holder.lat.setText("0.0 °");
+            holder.acq.setText("");
         }
     }
 
@@ -102,7 +111,7 @@ public class RvShipAdapter extends RecyclerView.Adapter<RvShipAdapter.VH> {
     class VH extends RecyclerView.ViewHolder {
 
         LinearLayout mLl, mLlShipInfo;
-        TextView mmsi, name, length, width, hangxiang, speed;
+        TextView mmsi, name, length, width, hangxiang, speed, lon, lat, acq;
 
         public VH(View itemView) {
             super(itemView);
@@ -114,7 +123,9 @@ public class RvShipAdapter extends RecyclerView.Adapter<RvShipAdapter.VH> {
             width = itemView.findViewById(R.id.tv_ship_width);
             hangxiang = itemView.findViewById(R.id.tv_ship_hangxiang);
             speed = itemView.findViewById(R.id.tv_ship_speed);
-
+            lon = itemView.findViewById(R.id.tv_ship_lon);
+            lat = itemView.findViewById(R.id.tv_ship_lat);
+            acq = itemView.findViewById(R.id.tv_ship_acq);
         }
     }
 }

@@ -51,6 +51,7 @@ import org.json.JSONObject;
 import org.xutils.DbManager;
 import org.xutils.ex.DbException;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -94,14 +95,14 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
     private final int[] JIN_CHU_AREA_COLOR = new int[]{0, 0, 255};
 
 
-    private final int[] JIN_CHU_AREA_X = new int[]{(int) (121.259983 * 1e7), (int) (121.680821 * 1e7), (int) (121.675072 * 1e7), (int) (121.311725 * 1e7)};
+    private final int[] JIN_CHU_AREA_X = new int[]{(int) (122.259983 * 1e7), (int) (122.680821 * 1e7), (int) (122.675072 * 1e7), (int) (122.311725 * 1e7)};
     private final int[] JIN_CHU_AREA_Y = new int[]{(int) (28.722246 * 1e7), (int) (28.690818 * 1e7), (int) (28.199928 * 1e7), (int) (28.226411 * 1e7)};
 
-    private final int[] JIN_RU_AREA_X = new int[]{(int) (121.761309 * 1e7), (int) (121.949882 * 1e7), (int) (121.902739 * 1e7), (int) (121.772808 * 1e7)};
-    private final int[] JIN_RU_AREA_Y = new int[]{(int) (28.651267 * 1e7), (int) (28.660395 * 1e7), (int) (28.530491 * 1e7), (int) (28.517288 * 1e7)};
-
-    private final int[] JIN_YU_AREA_X = new int[]{(int) (121.583086 * 1e7), (int) (121.68887 * 1e7), (int) (121.676222 * 1e7), (int) (121.578486 * 1e7)};
-    private final int[] JIN_YU_AREA_Y = new int[]{(int) (28.222337 * 1e7), (int) (28.219282 * 1e7), (int) (28.159172 * 1e7), (int) (28.183627 * 1e7)};
+//    private final int[] JIN_RU_AREA_X = new int[]{(int) (121.761309 * 1e7), (int) (121.949882 * 1e7), (int) (121.902739 * 1e7), (int) (121.772808 * 1e7)};
+//    private final int[] JIN_RU_AREA_Y = new int[]{(int) (28.651267 * 1e7), (int) (28.660395 * 1e7), (int) (28.530491 * 1e7), (int) (28.517288 * 1e7)};
+//
+//    private final int[] JIN_YU_AREA_X = new int[]{(int) (121.583086 * 1e7), (int) (121.68887 * 1e7), (int) (121.676222 * 1e7), (int) (121.578486 * 1e7)};
+//    private final int[] JIN_YU_AREA_Y = new int[]{(int) (28.222337 * 1e7), (int) (28.219282 * 1e7), (int) (28.159172 * 1e7), (int) (28.183627 * 1e7)};
 
 
     private DbManager db;
@@ -360,22 +361,22 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
             }
             areas.add(new WarnArea(2, JIN_CHU_AREA_COLOR[0], JIN_CHU_AREA_COLOR[1]
                     , JIN_CHU_AREA_COLOR[2], geoX, geoY));
-            geoX = new Integer[JIN_RU_AREA_X.length];
-            geoY = new Integer[JIN_RU_AREA_Y.length];
-            for (int i = 0; i < JIN_RU_AREA_X.length; i++) {
-                geoX[i] = JIN_RU_AREA_X[i];
-                geoY[i] = JIN_RU_AREA_Y[i];
-            }
-            areas.add(new WarnArea(1, JIN_RU_AREA_COLOR[0], JIN_RU_AREA_COLOR[1]
-                    , JIN_RU_AREA_COLOR[2], geoX, geoY));
-            geoX = new Integer[JIN_YU_AREA_X.length];
-            geoY = new Integer[JIN_YU_AREA_Y.length];
-            for (int i = 0; i < JIN_YU_AREA_X.length; i++) {
-                geoX[i] = JIN_YU_AREA_X[i];
-                geoY[i] = JIN_YU_AREA_Y[i];
-            }
-            areas.add(new WarnArea(0, JIN_YU_AREA_COLOR[0], JIN_YU_AREA_COLOR[1]
-                    , JIN_YU_AREA_COLOR[2], geoX, geoY));
+//            geoX = new Integer[JIN_RU_AREA_X.length];
+//            geoY = new Integer[JIN_RU_AREA_Y.length];
+//            for (int i = 0; i < JIN_RU_AREA_X.length; i++) {
+//                geoX[i] = JIN_RU_AREA_X[i];
+//                geoY[i] = JIN_RU_AREA_Y[i];
+//            }
+//            areas.add(new WarnArea(1, JIN_RU_AREA_COLOR[0], JIN_RU_AREA_COLOR[1]
+//                    , JIN_RU_AREA_COLOR[2], geoX, geoY));
+//            geoX = new Integer[JIN_YU_AREA_X.length];
+//            geoY = new Integer[JIN_YU_AREA_Y.length];
+//            for (int i = 0; i < JIN_YU_AREA_X.length; i++) {
+//                geoX[i] = JIN_YU_AREA_X[i];
+//                geoY[i] = JIN_YU_AREA_Y[i];
+//            }
+//            areas.add(new WarnArea(0, JIN_YU_AREA_COLOR[0], JIN_YU_AREA_COLOR[1]
+//                    , JIN_YU_AREA_COLOR[2], geoX, geoY));
             curLayerPos = skiaDrawView.drawBanArea(areas);
         } else {
             for (WarnArea area : areas) {
@@ -615,8 +616,11 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                         , 0, aisInfo.SOG, 0);
                 osb.setShip_id(ship_id);
                 osb.setShip_name(aisInfo.shipName);
-                db.save(osb);
+                osb.setAcq_time(Constant.SYSTEM_DATE);
+                db.saveBindingId(osb);
             } else {
+                osb.setAcq_time(Constant.SYSTEM_DATE);
+                db.saveOrUpdate(osb);
                 // 存在， 更新信息
                 int versselId = skiaDrawView.mYimaLib.GetOtherVesselPosOfID(osb.getShip_id());
                 skiaDrawView.mYimaLib.SetOtherVesselCurrentInfo(versselId
@@ -626,6 +630,10 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
             // 显示所有船
             skiaDrawView.mYimaLib.SetAllOtherVesselDrawOrNot(true);
             skiaDrawView.postInvalidate();
+
+            if (showOtherShip){
+                updateOtherShipsInfo();
+            }
 //            Log.e("TAG", aisInfo.mmsi + ", " + aisInfo.longtitude + ", " + aisInfo.latititude);
 //                String str = String.format("mmsi:{0},msgType:{1},shipName:{2},cog:{3},sog:{4}", aisInfo.mmsi, aisInfo.MsgType,aisInfo.shipName, aisInfo.COG
 //                , aisInfo.SOG);
@@ -642,17 +650,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
     public void onOpenEvent(String action) {
         if ("openShip".equals(action)) {
 
-            try {
-                datas.clear();
-                final SharedPreferences sp = getActivity().getSharedPreferences("xkTerminal", MODE_PRIVATE);
-                List<OtherShipBean> list = db.selector(OtherShipBean.class).where("mmsi", "<>", sp.getString("shipNo", "")).findAll();
-                if (list != null && !list.isEmpty()) {
-                    datas.addAll(list);
-                }
-                rvShipAdapter.notifyDataSetChanged();
-            } catch (DbException e) {
-                e.printStackTrace();
-            }
+            updateOtherShipsInfo();
 
             if (ll_ship_list.getVisibility() == View.GONE) {
                 ll_ship_list.setVisibility(View.VISIBLE);
@@ -664,6 +662,20 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
             Toast.makeText(getActivity(), "请选择标位点", Toast.LENGTH_SHORT).show();
         } else if ("pin_co".equals(action)) {
             openPinDialog(null);
+        }
+    }
+
+    private void updateOtherShipsInfo() {
+        try {
+            datas.clear();
+            final SharedPreferences sp = getActivity().getSharedPreferences("xkTerminal", MODE_PRIVATE);
+            List<OtherShipBean> list = db.selector(OtherShipBean.class).where("mmsi", "<>", sp.getString("shipNo", "")).findAll();
+            if (list != null && !list.isEmpty()) {
+                datas.addAll(list);
+            }
+            rvShipAdapter.notifyDataSetChanged();
+        } catch (DbException e) {
+            e.printStackTrace();
         }
     }
 

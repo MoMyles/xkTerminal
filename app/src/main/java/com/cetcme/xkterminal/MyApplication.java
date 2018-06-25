@@ -213,7 +213,7 @@ public class MyApplication extends Application {
         Iconify.with(new FontAwesomeModule());
 
         StringBuffer param = new StringBuffer();
-        param.append("appid=5afb90f6"); // mao: 5afb90f6, qh: 5b2c61e9, lw: 5b2c638f
+        param.append("appid=5b2c638f"); // mao: 5afb90f6, qh: 5b2c61e9, lw: 5b2c638f
         param.append(",");
         // 设置使用v5+
         param.append(SpeechConstant.ENGINE_MODE + "=" + SpeechConstant.MODE_MSC);

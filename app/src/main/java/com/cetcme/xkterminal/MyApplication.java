@@ -129,6 +129,8 @@ public class MyApplication extends Application {
     // 电压
     public static String voltage = "-";
 
+    public static final List<OtherShipBean> osbDataList = new ArrayList<>();
+
     /**
      * 加载库文件（只需调用一次）
      */

@@ -52,7 +52,7 @@ public class RvShipAdapter extends RecyclerView.Adapter<RvShipAdapter.VH> {
             }
             int vessel_id = skiaDrawView.mYimaLib.GetOtherVesselPosOfID(osb.getShip_id());
             final OtherShipBaicInfo osbi = skiaDrawView.mYimaLib.getOtherVesselBasicInfo(vessel_id);
-            final OtherVesselCurrentInfo ovci = skiaDrawView.mYimaLib.getOtherVesselCurrentInfo(vessel_id);
+            //final OtherVesselCurrentInfo ovci = skiaDrawView.mYimaLib.getOtherVesselCurrentInfo(vessel_id);
             holder.mmsi.setText("MMSI: " + osb.getMmsi() + " 渔船名称: " + osb.getShip_name());
             holder.name.setText(osb.getShip_name());
             if (osbi != null) {
@@ -62,11 +62,11 @@ public class RvShipAdapter extends RecyclerView.Adapter<RvShipAdapter.VH> {
                 holder.length.setText("");
                 holder.width.setText("");
             }
-            if (ovci != null) {
-                holder.hangxiang.setText(ovci.fCourseOverGround + " °");
-                holder.speed.setText(ovci.fSpeedOverGround + " kn");
-                holder.lon.setText("" + (ovci.currentPoint.x * 1.0 / 1e7));
-                holder.lat.setText("" + (ovci.currentPoint.y * 1.0 / 1e7));
+            if (osb != null) {
+                holder.hangxiang.setText(osb.getCog() + " °");
+                holder.speed.setText(osb.getSog()+ " kn");
+                holder.lon.setText("" + (osb.getLongitude() * 1.0 / 1e7));
+                holder.lat.setText("" + (osb.getLatitude() * 1.0 / 1e7));
             } else {
                 holder.hangxiang.setText("0 °");
                 holder.speed.setText("0 kn");
@@ -77,15 +77,16 @@ public class RvShipAdapter extends RecyclerView.Adapter<RvShipAdapter.VH> {
             holder.mLl.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (ovci != null) {
-                        M_POINT point = ovci.currentPoint;
-                        skiaDrawView.mYimaLib.CenterMap(point.x, point.y);
+                    if (osb != null) {
+                        //M_POINT point = ovci.currentPoint;
+                        skiaDrawView.mYimaLib.CenterMap(osb.getLongitude(), osb.getLatitude());
                         skiaDrawView.postInvalidate();
                     }
+                    boolean isShow = osb.isShow();
                     for (OtherShipBean o : mDatas) {
                         o.setShow(false);
                     }
-                    osb.setShow(true);
+                    osb.setShow(!isShow);
                     notifyDataSetChanged();
                 }
             });

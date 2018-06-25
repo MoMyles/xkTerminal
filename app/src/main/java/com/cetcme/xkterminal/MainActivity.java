@@ -348,15 +348,13 @@ public class MainActivity extends AppCompatActivity {
             MyApplication.getInstance().oldAisReceiveTime = System.currentTimeMillis();
             if (!MyApplication.getInstance().isAisConnected) {
                 MyApplication.getInstance().isAisConnected = true;
-                if (MyApplication.getInstance().mainActivity != null) {
-                    MyApplication.getInstance().mainActivity.runOnUiThread(new Runnable() {
+                runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             MyApplication.getInstance().mainActivity.gpsBar.setAisStatus(true);
-                            MainActivity.play("AIS已连接");
+                            play("AIS已连接");
                         }
-                    });
-                }
+                });
             }
             // ! 号头
             if (aisByts.size() > 0) {
@@ -411,7 +409,7 @@ public class MainActivity extends AppCompatActivity {
                         String type = (String) map.get("type");
                         if ("!AIVDM".equals(type)
                                 || "!AIVDO".equals(type)) {
-                            // Log.e("TAG", "ais: " + newStr);
+                            Log.e("TAG", "ais: " + newStr);
                             try {
 
                                 boolean isOwn = "!AIVDO".equals(type);
@@ -501,7 +499,7 @@ public class MainActivity extends AppCompatActivity {
                                 e.printStackTrace();
                             }
                         } else if ("$GPGSV".equals(type)) {
-                            Log.e("TAG", "gps: " + newStr);
+                           // Log.e("TAG", "gps: " + newStr);
                             try {
                                 newStr = newStr.substring(newStr.indexOf(",") + 1, newStr.lastIndexOf("*"));
                                 boolean isDou = newStr.endsWith(",");

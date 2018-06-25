@@ -8,7 +8,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -27,7 +26,6 @@ import com.cetcme.xkterminal.Navigation.GpsParse;
 import com.cetcme.xkterminal.Navigation.SkiaDrawView;
 import com.cetcme.xkterminal.Socket.SocketManager;
 import com.cetcme.xkterminal.Socket.SocketServer;
-import com.cetcme.xkterminal.Sqlite.Bean.GPSBean;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 import com.cetcme.xkterminal.Sqlite.Bean.MessageBean;
 import com.cetcme.xkterminal.Sqlite.Bean.OtherShipBean;
@@ -37,9 +35,6 @@ import com.iflytek.cloud.SpeechUtility;
 import com.joanzapata.iconify.Iconify;
 import com.joanzapata.iconify.fonts.FontAwesomeModule;
 
-import org.codice.common.ais.Decoder;
-import org.codice.common.ais.message.Message18;
-import org.codice.common.ais.message.Message19;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -60,22 +55,13 @@ import java.security.InvalidParameterException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import aisparser.Message1;
-import aisparser.Message14;
-import aisparser.Message2;
-import aisparser.Message3;
-import aisparser.Sixbit;
-import aisparser.Vdm;
 import android_serialport_api.SerialPort;
 import android_serialport_api.SerialPortFinder;
-import yimamapapi.skia.AisInfo;
 import yimamapapi.skia.M_POINT;
 import yimamapapi.skia.OtherVesselCurrentInfo;
 import yimamapapi.skia.YimaLib;
@@ -229,12 +215,24 @@ public class MyApplication extends Application {
         // 设置使用v5+
         param.append(SpeechConstant.ENGINE_MODE + "=" + SpeechConstant.MODE_MSC);
         SpeechUtility.createUtility(this, param.toString());
-
-        try {
-            db.delete(OtherShipBean.class);
-        } catch (DbException e) {
-            e.printStackTrace();
-        }
+        // 每隔1分钟 移除5分钟未收到AIS信息的渔船
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (osbDataList != null && !osbDataList.isEmpty()) {
+                    synchronized (osbDataList) {
+                        Iterator<OtherShipBean> it = osbDataList.iterator();
+                        while (it.hasNext()) {
+                            OtherShipBean o = it.next();
+                            if (Constant.SYSTEM_DATE.getTime() - o.getAcq_time().getTime() > (4 * 60 + 59) * 1000) {
+                                it.remove();
+                            }
+                        }
+                    }
+                }
+                new Handler().postDelayed(this, 60 * 1000);
+            }
+        }, 60 * 1000);
         // 距离报警
         warnTimer = new Timer();
         warnTimer.schedule(new TimerTask() {
@@ -792,7 +790,6 @@ public class MyApplication extends Application {
 //            }
 //        }
 //    }
-
 
 
     byte[] serialBuffer = new byte[100];

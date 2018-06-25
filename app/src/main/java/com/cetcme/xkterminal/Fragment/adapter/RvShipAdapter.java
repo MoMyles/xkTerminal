@@ -16,10 +16,6 @@ import com.cetcme.xkterminal.Sqlite.Bean.OtherShipBean;
 
 import java.util.List;
 
-import yimamapapi.skia.M_POINT;
-import yimamapapi.skia.OtherShipBaicInfo;
-import yimamapapi.skia.OtherVesselCurrentInfo;
-
 public class RvShipAdapter extends RecyclerView.Adapter<RvShipAdapter.VH> {
 
     private Context mContext;
@@ -50,21 +46,16 @@ public class RvShipAdapter extends RecyclerView.Adapter<RvShipAdapter.VH> {
             } else {
                 holder.mLlShipInfo.setVisibility(View.GONE);
             }
-            int vessel_id = skiaDrawView.mYimaLib.GetOtherVesselPosOfID(osb.getShip_id());
-            final OtherShipBaicInfo osbi = skiaDrawView.mYimaLib.getOtherVesselBasicInfo(vessel_id);
+//            int vessel_id = skiaDrawView.mYimaLib.GetOtherVesselPosOfID(osb.getShip_id());
+//            final OtherShipBaicInfo osbi = skiaDrawView.mYimaLib.getOtherVesselBasicInfo(vessel_id);
             //final OtherVesselCurrentInfo ovci = skiaDrawView.mYimaLib.getOtherVesselCurrentInfo(vessel_id);
-            holder.mmsi.setText("MMSI: " + osb.getMmsi() + " 渔船名称: " + osb.getShip_name());
-            holder.name.setText(osb.getShip_name());
-            if (osbi != null) {
-                holder.length.setText(osbi.fShipLength + "");
-                holder.width.setText(osbi.fShipBreath + "");
-            } else {
-                holder.length.setText("");
-                holder.width.setText("");
-            }
+            holder.mmsi.setText("MMSI: " + osb.getMmsi() + " 船名: " + osb.getShip_name());
+            holder.tv1.setText(osb.getCallsign());
+            holder.length.setText(osb.getLenght() + " m");
+            holder.width.setText(osb.getWidth() + " m");
             if (osb != null) {
                 holder.hangxiang.setText(osb.getCog() + " °");
-                holder.speed.setText(osb.getSog()+ " kn");
+                holder.speed.setText(osb.getSog() + " kn");
                 holder.lon.setText("" + (osb.getLongitude() * 1.0 / 1e7));
                 holder.lat.setText("" + (osb.getLatitude() * 1.0 / 1e7));
             } else {
@@ -92,10 +83,11 @@ public class RvShipAdapter extends RecyclerView.Adapter<RvShipAdapter.VH> {
             });
         } else {
             holder.mLlShipInfo.setVisibility(View.GONE);
+            holder.tv1.setText("");
             holder.mmsi.setText("");
             holder.mLl.setOnClickListener(null);
-            holder.length.setText("");
-            holder.width.setText("");
+            holder.length.setText("0 m");
+            holder.width.setText("0 m");
             holder.hangxiang.setText("0 °");
             holder.speed.setText("0 kn");
             holder.lon.setText("0.0 °");
@@ -112,14 +104,14 @@ public class RvShipAdapter extends RecyclerView.Adapter<RvShipAdapter.VH> {
     class VH extends RecyclerView.ViewHolder {
 
         LinearLayout mLl, mLlShipInfo;
-        TextView mmsi, name, length, width, hangxiang, speed, lon, lat, acq;
+        TextView mmsi, tv1, length, width, hangxiang, speed, lon, lat, acq;
 
         public VH(View itemView) {
             super(itemView);
             mLl = itemView.findViewById(R.id.ll_ship);
             mLlShipInfo = itemView.findViewById(R.id.ll_ship_info);
             mmsi = itemView.findViewById(R.id.tv_mmsi);
-            name = itemView.findViewById(R.id.tv_ship_name);
+            tv1 = itemView.findViewById(R.id.tv1);
             length = itemView.findViewById(R.id.tv_ship_length);
             width = itemView.findViewById(R.id.tv_ship_width);
             hangxiang = itemView.findViewById(R.id.tv_ship_hangxiang);

@@ -22,6 +22,33 @@ public class OtherShipBean {
     private int latitude;
     private float cog;
     private float sog;
+    private String callsign;
+    private int width;
+    private int lenght;
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public int getLenght() {
+        return lenght;
+    }
+
+    public void setLenght(int lenght) {
+        this.lenght = lenght;
+    }
+
+    public String getCallsign() {
+        return callsign;
+    }
+
+    public void setCallsign(String callsign) {
+        this.callsign = callsign;
+    }
 
     public float getSog() {
         return sog;

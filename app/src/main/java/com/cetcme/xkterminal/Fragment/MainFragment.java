@@ -686,6 +686,10 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                 ll_ship_list.setVisibility(View.VISIBLE);
                 showOtherShip = true;
             }
+        } else if ("openShip2".equals(action)) {
+            if (showOtherShip) {
+                updateOtherShipsInfo();
+            }
         } else if ("pin_map".equals(action)) {
             doBiaoWei = true;
             showOtherShip = false;

@@ -43,6 +43,7 @@ import com.cetcme.xkterminal.Socket.SocketServer;
 import com.cetcme.xkterminal.Sqlite.Bean.GPSBean;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 import com.cetcme.xkterminal.Sqlite.Bean.MessageBean;
+import com.cetcme.xkterminal.Sqlite.Bean.OtherShipBean;
 import com.cetcme.xkterminal.Sqlite.Proxy.AlertProxy;
 import com.cetcme.xkterminal.Sqlite.Proxy.FriendProxy;
 import com.cetcme.xkterminal.Sqlite.Proxy.GroupProxy;
@@ -86,6 +87,7 @@ import aisparser.Message1;
 import aisparser.Message14;
 import aisparser.Message2;
 import aisparser.Message3;
+import aisparser.Message5;
 import aisparser.Sixbit;
 import aisparser.Vdm;
 import android_serialport_api.SerialPort;
@@ -414,6 +416,7 @@ public class MainActivity extends AppCompatActivity {
 
                                 boolean isOwn = "!AIVDO".equals(type);
                                 int result = vdm.add(newStr);
+                                boolean isMsg5 = false;
                                 if (0 == result) {
                                     AisInfo aisInfo = new AisInfo("null");
                                     Sixbit sixbit = vdm.sixbit();
@@ -448,6 +451,22 @@ public class MainActivity extends AppCompatActivity {
                                             aisInfo.longtitude = (int) (message3.longitude() * 1.0 / 600000 * 1e7);
                                             aisInfo.latititude = (int) (message3.latitude() * 1.0 / 600000 * 1e7);
                                             break;
+                                        case 5:
+                                            isMsg5 = true;
+                                            Message5 message5 = new Message5();
+                                            message5.parse(sixbit);
+                                            if (MyApplication.osbDataList != null && !MyApplication.osbDataList.isEmpty()){
+                                                for (OtherShipBean osb : MyApplication.osbDataList) {
+                                                    if (osb.getMmsi() == message5.userid()) {
+                                                        osb.setShip_name(message5.name());
+                                                        osb.setCallsign(message5.callsign());
+                                                        osb.setWidth(message5.dim_port() + message5.dim_starboard());
+                                                        osb.setLenght(message5.dim_bow() + message5.dim_stern());
+                                                    }
+                                                }
+                                                EventBus.getDefault().post("openShip2");
+                                            }
+                                            break;
                                         case 14:
                                             Message14 message14 = new Message14();
                                             message14.parse(sixbit);
@@ -479,6 +498,7 @@ public class MainActivity extends AppCompatActivity {
                                             aisInfo.latititude = (int) (message19.latitude() * 1.0 / 600000 * 1e7);
                                             break;
                                     }
+                                    if (isMsg5) continue;
                                     int mmsi = Integer.valueOf(PreferencesUtils.getString(getApplicationContext(), "shipNo", "0")).intValue();
                                     if (aisInfo.mmsi == -1) {
                                         continue;

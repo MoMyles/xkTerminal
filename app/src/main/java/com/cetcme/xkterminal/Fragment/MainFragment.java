@@ -11,6 +11,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -606,7 +607,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
         int mmsi = aisInfo.mmsi;
         try {
             OtherShipBean osb = db.selector(OtherShipBean.class).where("mmsi", "=", mmsi).findFirst();
-            int ship_id = 0;
+            int ship_id = -1;
             if (osb == null) {
                 // 不存在， 新增
                 osb = new OtherShipBean();
@@ -619,13 +620,21 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                 osb.setAcq_time(Constant.SYSTEM_DATE);
                 db.saveBindingId(osb);
             } else {
+                int versselId = skiaDrawView.mYimaLib.GetOtherVesselPosOfID(osb.getShip_id());
+                if (-1 == versselId) {
+                    ship_id = skiaDrawView.mYimaLib.AddOtherVessel(true
+                            , aisInfo.longtitude, aisInfo.latititude, aisInfo.COG, aisInfo.COG
+                            , 0, aisInfo.SOG, 0);
+                    osb.setShip_id(ship_id);
+                } else {
+                    skiaDrawView.mYimaLib.SetOtherVesselCurrentInfo(versselId
+                            , aisInfo.longtitude, aisInfo.latititude, aisInfo.COG, aisInfo.COG
+                            , 0, aisInfo.SOG, 0);
+                }
                 osb.setAcq_time(Constant.SYSTEM_DATE);
                 db.saveOrUpdate(osb);
                 // 存在， 更新信息
-                int versselId = skiaDrawView.mYimaLib.GetOtherVesselPosOfID(osb.getShip_id());
-                skiaDrawView.mYimaLib.SetOtherVesselCurrentInfo(versselId
-                        , aisInfo.longtitude, aisInfo.latititude, aisInfo.COG, aisInfo.COG
-                        , 0, aisInfo.SOG, 0);
+                Log.e("TAG", "ship_id: " + osb.getShip_id()+ ", versselId: " + versselId+ ", old : " + aisInfo.longtitude + ", " + aisInfo.latititude);
             }
             // 显示所有船
             skiaDrawView.mYimaLib.SetAllOtherVesselDrawOrNot(true);

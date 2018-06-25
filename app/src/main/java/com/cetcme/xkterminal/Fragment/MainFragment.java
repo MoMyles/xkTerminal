@@ -111,7 +111,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
 //    private ListView mLvAisInfo;
 //    private final List<String> datas = new LinkedList<>();
     private RvShipAdapter rvShipAdapter;
-    private final List<OtherShipBean> datas = new LinkedList<>();
+//    private final List<OtherShipBean> datas = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -131,8 +131,8 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         rv_ships.setLayoutManager(linearLayoutManager);
         rv_ships.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
-        datas.clear();
-        rvShipAdapter = new RvShipAdapter(getActivity(), datas, skiaDrawView);
+        // datas.clear();
+        rvShipAdapter = new RvShipAdapter(getActivity(), MyApplication.osbDataList, skiaDrawView);
         rv_ships.setAdapter(rvShipAdapter);
 
         tv_lon = view.findViewById(R.id.tv_lon);
@@ -605,40 +605,61 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
     public void onAisEvent(AisInfo aisInfo) {
         if (aisInfo == null) return;
         int mmsi = aisInfo.mmsi;
-        try {
-            OtherShipBean osb = db.selector(OtherShipBean.class).where("mmsi", "=", mmsi).findFirst();
-            int ship_id = -1;
-            if (osb == null) {
+//        try {
+            //OtherShipBean osb = db.selector(OtherShipBean.class).where("mmsi", "=", mmsi).findFirst();
+            OtherShipBean osb = null;
+            for (OtherShipBean d : MyApplication.osbDataList) {
+                if (d.getMmsi() == mmsi) {
+                    osb = d;
+                    break;
+                }
+            }
+            if (osb != null) {
+                osb.setAcq_time(Constant.SYSTEM_DATE);
+                osb.setLongitude(aisInfo.longtitude);
+                osb.setLatitude(aisInfo.latititude);
+                osb.setCog(aisInfo.COG);
+                osb.setSog(aisInfo.SOG);
+            } else {
                 // 不存在， 新增
                 osb = new OtherShipBean();
                 osb.setMmsi(mmsi);
-                ship_id = skiaDrawView.mYimaLib.AddOtherVessel(true
-                        , aisInfo.longtitude, aisInfo.latititude, aisInfo.COG, aisInfo.COG
-                        , 0, aisInfo.SOG, 0);
-                osb.setShip_id(ship_id);
+//                ship_id = skiaDrawView.mYimaLib.AddOtherVessel(true
+//                        , aisInfo.longtitude, aisInfo.latititude, aisInfo.COG, aisInfo.COG
+//                        , 0, aisInfo.SOG, 0);
+//                osb.setShip_id(ship_id);
                 osb.setShip_name(aisInfo.shipName);
                 osb.setAcq_time(Constant.SYSTEM_DATE);
-                db.saveBindingId(osb);
-            } else {
-                int versselId = skiaDrawView.mYimaLib.GetOtherVesselPosOfID(osb.getShip_id());
-                if (-1 == versselId) {
-                    ship_id = skiaDrawView.mYimaLib.AddOtherVessel(true
-                            , aisInfo.longtitude, aisInfo.latititude, aisInfo.COG, aisInfo.COG
-                            , 0, aisInfo.SOG, 0);
-                    osb.setShip_id(ship_id);
-                } else {
-                    skiaDrawView.mYimaLib.SetOtherVesselCurrentInfo(versselId
-                            , aisInfo.longtitude, aisInfo.latititude, aisInfo.COG, aisInfo.COG
-                            , 0, aisInfo.SOG, 0);
-                }
-                osb.setAcq_time(Constant.SYSTEM_DATE);
-                db.saveOrUpdate(osb);
-                // 存在， 更新信息
-                Log.e("TAG", "ship_id: " + osb.getShip_id()+ ", versselId: " + versselId+ ", old : " + aisInfo.longtitude + ", " + aisInfo.latititude);
+                osb.setLongitude(aisInfo.longtitude);
+                osb.setLatitude(aisInfo.latititude);
+                osb.setCog(aisInfo.COG);
+                osb.setSog(aisInfo.SOG);
+                //db.saveBindingId(osb);
+                MyApplication.osbDataList.add(osb);
             }
-            // 显示所有船
-            skiaDrawView.mYimaLib.SetAllOtherVesselDrawOrNot(true);
-            skiaDrawView.postInvalidate();
+//            int ship_id = -1;
+//            if (osb == null) {
+//
+//            } else {
+//                int versselId = skiaDrawView.mYimaLib.GetOtherVesselPosOfID(osb.getShip_id());
+//                if (-1 == versselId) {
+//                    ship_id = skiaDrawView.mYimaLib.AddOtherVessel(true
+//                            , aisInfo.longtitude, aisInfo.latititude, aisInfo.COG, aisInfo.COG
+//                            , 0, aisInfo.SOG, 0);
+//                    osb.setShip_id(ship_id);
+//                } else {
+//                    skiaDrawView.mYimaLib.SetOtherVesselCurrentInfo(versselId
+//                            , aisInfo.longtitude, aisInfo.latititude, aisInfo.COG, aisInfo.COG
+//                            , 0, aisInfo.SOG, 0);
+//                }
+//                osb.setAcq_time(Constant.SYSTEM_DATE);
+//                //db.saveOrUpdate(osb);
+//                // 存在， 更新信息
+//                Log.e("TAG", "mmsi: " + aisInfo.mmsi+", ship_id: " + osb.getShip_id()+ ", versselId: " + versselId+ ", old : " + aisInfo.longtitude + ", " + aisInfo.latititude);
+//            }
+//            // 显示所有船
+//            skiaDrawView.mYimaLib.SetAllOtherVesselDrawOrNot(true);
+//            skiaDrawView.postInvalidate();
 
             if (showOtherShip) {
                 updateOtherShipsInfo();
@@ -648,9 +669,9 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
 //                , aisInfo.SOG);
 //                datas.add(str);
 //                aisInfoAdapter.notifyDataSetChanged();
-        } catch (DbException e) {
-            e.printStackTrace();
-        }
+//        } catch (DbException e) {
+//            e.printStackTrace();
+//        }
     }
 
     private boolean showOtherShip = false;
@@ -675,22 +696,30 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
     }
 
     private void updateOtherShipsInfo() {
-        try {
-            datas.clear();
-            final SharedPreferences sp = getActivity().getSharedPreferences("xkTerminal", MODE_PRIVATE);
-            List<OtherShipBean> list = db.selector(OtherShipBean.class).where("mmsi", "<>", sp.getString("shipNo", "")).findAll();
-            if (list != null && !list.isEmpty()) {
-                datas.addAll(list);
+//        try {
+//            datas.clear();
+//            final SharedPreferences sp = getActivity().getSharedPreferences("xkTerminal", MODE_PRIVATE);
+//            List<OtherShipBean> list = db.selector(OtherShipBean.class).where("mmsi", "<>", sp.getString("shipNo", "")).findAll();
+//            if (list != null && !list.isEmpty()) {
+//                datas.addAll(list);
+//            }
+            skiaDrawView.mYimaLib.ClearOtherVessels();
+            for (OtherShipBean osb : MyApplication.osbDataList) {
+                int ship_id = skiaDrawView.mYimaLib.AddOtherVessel(true
+                            , osb.getLongitude(), osb.getLatitude(), osb.getCog(), osb.getCog()
+                            , 0, osb.getSog(), 0);
+                osb.setShip_id(ship_id);
             }
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    rvShipAdapter.notifyDataSetChanged();
-                }
-            }, 200);
-        } catch (DbException e) {
-            e.printStackTrace();
-        }
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                rvShipAdapter.notifyDataSetChanged();
+            }
+        });
+
+//        } catch (DbException e) {
+//            e.printStackTrace();
+//        }
     }
 
     // 标位操作

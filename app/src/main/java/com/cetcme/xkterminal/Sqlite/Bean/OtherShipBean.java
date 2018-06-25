@@ -18,6 +18,42 @@ public class OtherShipBean {
     private String ship_name;
     @Column(name="acq_time")
     private Date acq_time;
+    private int longitude;
+    private int latitude;
+    private float cog;
+    private float sog;
+
+    public float getSog() {
+        return sog;
+    }
+
+    public void setSog(float sog) {
+        this.sog = sog;
+    }
+
+    public float getCog() {
+        return cog;
+    }
+
+    public void setCog(float cog) {
+        this.cog = cog;
+    }
+
+    public int getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(int longitude) {
+        this.longitude = longitude;
+    }
+
+    public int getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(int latitude) {
+        this.latitude = latitude;
+    }
 
     private boolean show = false;
 

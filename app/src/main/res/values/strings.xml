@@ -62,17 +62,27 @@
     </string-array>
 
     <string-array name="friendName">
-        <item>平台</item>
-        <item>设备1</item>
-        <item>设备2</item>
-        <item>设备3</item>
+        <item>船1舱内(28060017)</item>
+        <item>船2舱内(28060062)</item>
+        <item>船3舱内(28060031)</item>
+
+        <item>吴(13732587260)</item>
+        <item>徐(13705830170)</item>
+
+        <item>平台(372741)</item>
+        <item>船载北斗设备(256218)</item>
     </string-array>
 
     <string-array name="friendNumber">
+        <item>407477</item>
+        <item>407479</item>
+        <item>407478</item>
+
+        <item>13732587260</item>
+        <item>13705830170</item>
+
         <item>372741</item>
-        <item>318219</item>
-        <item>318216</item>
-        <item>344408</item>
+        <item>256218</item>
     </string-array>
 
     <!-- TODO: Remove or change this placeholder text -->

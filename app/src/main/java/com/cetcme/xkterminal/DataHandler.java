@@ -3,6 +3,7 @@ package com.cetcme.xkterminal;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.DataFormat.IDFormat;
@@ -67,6 +68,7 @@ public class DataHandler extends Handler {
                 }
                 Looper.prepare();
                 Toast.makeText(MyApplication.getInstance().getApplicationContext(), "自检失败", Toast.LENGTH_SHORT).show();
+                MainActivity.play("卫星中断故障");
                 Looper.loop();
             }
         }, 2 * 60 * 1000);
@@ -228,7 +230,7 @@ public class DataHandler extends Handler {
                                         MainActivity.play("自检完成");
                                     }
                                 }
-                            }, 5000);
+                            }, 2000);
                         } else {
                             myApplication.isLocated = gpsStatus;
                             myApplication.mainActivity.gpsBar.setGPSStatus(gpsStatus);

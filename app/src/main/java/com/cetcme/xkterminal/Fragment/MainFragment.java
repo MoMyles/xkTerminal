@@ -11,13 +11,13 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
@@ -53,7 +53,6 @@ import org.xutils.DbManager;
 import org.xutils.ex.DbException;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import yimamapapi.skia.AisInfo;
@@ -72,6 +71,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
     private LinearLayout alert_layout;
     private LinearLayout ll_ship_list;
     private RecyclerView rv_ships;
+    private ImageView iv1;
 
     private Switch mSwitchYQ, mSwitchArea, mSwitchPin;
 
@@ -118,6 +118,18 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_main, container, false);
         EventBus.getDefault().register(this);
 
+        iv1 = view.findViewById(R.id.iv1);
+        iv1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (MyApplication.currentLocation != null) {
+                    skiaDrawView.mYimaLib.CenterMap(MyApplication.currentLocation.getLongitude(), MyApplication.currentLocation.getLatitude());
+                    skiaDrawView.postInvalidate();
+                } else {
+                    SoundPlay.startAlertSound(getActivity());
+                }
+            }
+        });
 
         main_layout = view.findViewById(R.id.main_layout);
         skiaDrawView = view.findViewById(R.id.skiaView);
@@ -328,7 +340,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
             public void run() {
                 skiaDrawView.changeFishState(mSwitchYQ.isChecked());
                 skiaDrawView.postInvalidate();
-                showWarnAreas();
+//                showWarnAreas();
                 if (mSwitchPin.isChecked()) {
                     showBiaoweis();
                 }
@@ -606,37 +618,37 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
         if (aisInfo == null) return;
         int mmsi = aisInfo.mmsi;
 //        try {
-            //OtherShipBean osb = db.selector(OtherShipBean.class).where("mmsi", "=", mmsi).findFirst();
-            OtherShipBean osb = null;
-            for (OtherShipBean d : MyApplication.osbDataList) {
-                if (d.getMmsi() == mmsi) {
-                    osb = d;
-                    break;
-                }
+        //OtherShipBean osb = db.selector(OtherShipBean.class).where("mmsi", "=", mmsi).findFirst();
+        OtherShipBean osb = null;
+        for (OtherShipBean d : MyApplication.osbDataList) {
+            if (d.getMmsi() == mmsi) {
+                osb = d;
+                break;
             }
-            if (osb != null) {
-                osb.setAcq_time(Constant.SYSTEM_DATE);
-                osb.setLongitude(aisInfo.longtitude);
-                osb.setLatitude(aisInfo.latititude);
-                osb.setCog(aisInfo.COG);
-                osb.setSog(aisInfo.SOG);
-            } else {
-                // 不存在， 新增
-                osb = new OtherShipBean();
-                osb.setMmsi(mmsi);
+        }
+        if (osb != null) {
+            osb.setAcq_time(Constant.SYSTEM_DATE);
+            osb.setLongitude(aisInfo.longtitude);
+            osb.setLatitude(aisInfo.latititude);
+            osb.setCog(aisInfo.COG);
+            osb.setSog(aisInfo.SOG);
+        } else {
+            // 不存在， 新增
+            osb = new OtherShipBean();
+            osb.setMmsi(mmsi);
 //                ship_id = skiaDrawView.mYimaLib.AddOtherVessel(true
 //                        , aisInfo.longtitude, aisInfo.latititude, aisInfo.COG, aisInfo.COG
 //                        , 0, aisInfo.SOG, 0);
 //                osb.setShip_id(ship_id);
-                osb.setShip_name(aisInfo.shipName);
-                osb.setAcq_time(Constant.SYSTEM_DATE);
-                osb.setLongitude(aisInfo.longtitude);
-                osb.setLatitude(aisInfo.latititude);
-                osb.setCog(aisInfo.COG);
-                osb.setSog(aisInfo.SOG);
-                //db.saveBindingId(osb);
-                MyApplication.osbDataList.add(osb);
-            }
+            osb.setShip_name(aisInfo.shipName);
+            osb.setAcq_time(Constant.SYSTEM_DATE);
+            osb.setLongitude(aisInfo.longtitude);
+            osb.setLatitude(aisInfo.latititude);
+            osb.setCog(aisInfo.COG);
+            osb.setSog(aisInfo.SOG);
+            //db.saveBindingId(osb);
+            MyApplication.osbDataList.add(osb);
+        }
 //            int ship_id = -1;
 //            if (osb == null) {
 //
@@ -661,9 +673,9 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
 //            skiaDrawView.mYimaLib.SetAllOtherVesselDrawOrNot(true);
 //            skiaDrawView.postInvalidate();
 
-            if (showOtherShip) {
-                updateOtherShipsInfo();
-            }
+        if (showOtherShip) {
+            updateOtherShipsInfo();
+        }
 //            Log.e("TAG", aisInfo.mmsi + ", " + aisInfo.longtitude + ", " + aisInfo.latititude);
 //                String str = String.format("mmsi:{0},msgType:{1},shipName:{2},cog:{3},sog:{4}", aisInfo.mmsi, aisInfo.MsgType,aisInfo.shipName, aisInfo.COG
 //                , aisInfo.SOG);
@@ -707,13 +719,13 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
 //            if (list != null && !list.isEmpty()) {
 //                datas.addAll(list);
 //            }
-            skiaDrawView.mYimaLib.ClearOtherVessels();
-            for (OtherShipBean osb : MyApplication.osbDataList) {
-                int ship_id = skiaDrawView.mYimaLib.AddOtherVessel(true
-                            , osb.getLongitude(), osb.getLatitude(), osb.getCog(), osb.getCog()
-                            , 0, osb.getSog(), 0);
-                osb.setShip_id(ship_id);
-            }
+        skiaDrawView.mYimaLib.ClearOtherVessels();
+        for (OtherShipBean osb : MyApplication.osbDataList) {
+            int ship_id = skiaDrawView.mYimaLib.AddOtherVessel(true
+                    , osb.getLongitude(), osb.getLatitude(), osb.getCog(), osb.getCog()
+                    , 0, osb.getSog(), 0);
+            osb.setShip_id(ship_id);
+        }
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {

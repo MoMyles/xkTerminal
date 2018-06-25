@@ -39,26 +39,15 @@
     <string name="setting_tab_6">系统设置</string>
 
     <string-array name="smsTemplate">
+        <item>船1-船2</item>
+        <item>船1-船3</item>
+        <item>船1-平台</item>
+        <item>船1-手机</item>
+        <item>船3-船1</item>
+        <item>平台-船1</item>
         <item>固定短信模版1</item>
         <item>固定短信模版2</item>
         <item>固定短信模版3</item>
-        <item>固定短信模版4</item>
-        <item>固定短信模版5</item>
-        <item>固定短信模版6</item>
-        <item>固定短信模版7</item>
-        <item>固定短信模版8</item>
-        <item>固定短信模版9</item>
-        <item>固定短信模版10</item>
-        <item>固定短信模版11</item>
-        <item>固定短信模版12</item>
-        <item>固定短信模版13</item>
-        <item>固定短信模版14</item>
-        <item>固定短信模版15</item>
-        <item>固定短信模版16</item>
-        <item>固定短信模版17</item>
-        <item>固定短信模版18</item>
-        <item>固定短信模版19</item>
-        <item>固定短信模版20</item>
     </string-array>
 
     <string-array name="friendName">

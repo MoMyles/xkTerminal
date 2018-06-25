@@ -63,6 +63,7 @@ import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
 
 import org.codice.common.ais.Decoder;
+import org.codice.common.ais.message.Message;
 import org.codice.common.ais.message.Message18;
 import org.codice.common.ais.message.Message19;
 import org.greenrobot.eventbus.EventBus;
@@ -84,9 +85,12 @@ import java.util.List;
 import java.util.Map;
 
 import aisparser.Message1;
+import aisparser.Message11;
 import aisparser.Message14;
 import aisparser.Message2;
+import aisparser.Message24;
 import aisparser.Message3;
+import aisparser.Message4;
 import aisparser.Message5;
 import aisparser.Sixbit;
 import aisparser.Vdm;
@@ -304,15 +308,29 @@ public class MainActivity extends AppCompatActivity {
                 sendBootData();
             }
         }, 2000);
-        try {
-            aisSerialPort = MyApplication.getInstance().getAisSerialPort();
-            //aisOutputStream = aisSerialPort.getOutputStream();
-            aisInputStream = aisSerialPort.getInputStream();
-            AisReadThread aisReadThread = new AisReadThread();
-            aisReadThread.start();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(isSelfCheckLoading){
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                try {
+                    aisSerialPort = MyApplication.getInstance().getAisSerialPort();
+                    //aisOutputStream = aisSerialPort.getOutputStream();
+                    aisInputStream = aisSerialPort.getInputStream();
+                    AisReadThread aisReadThread = new AisReadThread();
+                    aisReadThread.start();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
     }
 
     class AisReadThread extends Thread {
@@ -420,6 +438,7 @@ public class MainActivity extends AppCompatActivity {
                                 if (0 == result) {
                                     AisInfo aisInfo = new AisInfo("null");
                                     Sixbit sixbit = vdm.sixbit();
+                                    Log.e("TAG", "msg: " + vdm.msgid());
                                     switch (vdm.msgid()) {
                                         case 1:
                                             Message1 message1 = new Message1();
@@ -451,6 +470,22 @@ public class MainActivity extends AppCompatActivity {
                                             aisInfo.longtitude = (int) (message3.longitude() * 1.0 / 600000 * 1e7);
                                             aisInfo.latititude = (int) (message3.latitude() * 1.0 / 600000 * 1e7);
                                             break;
+                                        case 4:
+                                            Message4 message4 = new Message4();
+                                            message4.parse(sixbit);
+                                            aisInfo.mmsi = (int) message4.userid();
+                                            aisInfo.MsgType = 4;
+                                            aisInfo.longtitude = (int) (message4.longitude() * 1.0 / 600000 * 1e7);
+                                            aisInfo.latititude = (int) (message4.latitude() * 1.0 / 600000 * 1e7);
+                                            break;
+                                        case 11:
+                                            Message11 message11 = new Message11();
+                                            message11.parse(sixbit);
+                                            aisInfo.mmsi = (int) message11.userid();
+                                            aisInfo.MsgType = 11;
+                                            aisInfo.longtitude = (int) (message11.longitude() * 1.0 / 600000 * 1e7);
+                                            aisInfo.latititude = (int) (message11.latitude() * 1.0 / 600000 * 1e7);
+                                            break;
                                         case 5:
                                             isMsg5 = true;
                                             Message5 message5 = new Message5();
@@ -462,6 +497,22 @@ public class MainActivity extends AppCompatActivity {
                                                         osb.setCallsign(message5.callsign());
                                                         osb.setWidth(message5.dim_port() + message5.dim_starboard());
                                                         osb.setLenght(message5.dim_bow() + message5.dim_stern());
+                                                    }
+                                                }
+                                                EventBus.getDefault().post("openShip2");
+                                            }
+                                            break;
+                                        case 24:
+                                            isMsg5 = true;
+                                            Message24 Message24 = new Message24();
+                                            Message24.parse(sixbit);
+                                            if (MyApplication.osbDataList != null && !MyApplication.osbDataList.isEmpty()){
+                                                for (OtherShipBean osb : MyApplication.osbDataList) {
+                                                    if (osb.getMmsi() == Message24.userid()) {
+                                                        osb.setShip_name(Message24.name());
+                                                        osb.setCallsign(Message24.callsign());
+                                                        osb.setWidth(Message24.dim_port() + Message24.dim_starboard());
+                                                        osb.setLenght(Message24.dim_bow() + Message24.dim_stern());
                                                     }
                                                 }
                                                 EventBus.getDefault().post("openShip2");
@@ -769,6 +820,17 @@ public class MainActivity extends AppCompatActivity {
             mTts.stopSpeaking();
             // 退出时释放连接
             mTts.destroy();
+        }
+
+        if (aisInputStream != null) {
+            try {
+                aisInputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (aisSerialPort != null) {
+            aisSerialPort.close();
         }
     }
 

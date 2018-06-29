@@ -147,7 +147,7 @@ public class MessageProxy {
         List<MessageBean> list = null;
         try {
             list = db.selector(MessageBean.class)
-                    .where("isSend","=", isSend)
+                    .where("isSend","=", isSend ? 1 : 0)
                     .and(WhereBuilder.b("deleted","=",false))
                     .limit(perPage)
                     .offset(page * perPage)

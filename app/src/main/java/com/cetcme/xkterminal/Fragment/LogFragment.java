@@ -46,13 +46,20 @@ import java.util.Map;
 @SuppressLint("ValidFragment")
 public class LogFragment extends Fragment{
 
+    private View view;
     private String tg;
     private TitleBar titleBar;
 
     private ListView listView;
+    private ListView listView2;
+    private ListView listView3;
     private int logPerPage;
     private SimpleAdapter simpleAdapter;
+    private SimpleAdapter simpleAdapter2;
+    private SimpleAdapter simpleAdapter3;
     private List<Map<String, Object>> dataList = new ArrayList<>();
+    private List<Map<String, Object>> dataList2 = new ArrayList<>();
+    private List<Map<String, Object>> dataList3 = new ArrayList<>();
 
     private int pageIndex = 0;
     private int totalPage = 1;
@@ -70,38 +77,93 @@ public class LogFragment extends Fragment{
         db = ((MyApplication) getActivity().getApplication()).db;
         EventBus.getDefault().register(this);
 
-        View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_log,container,false);
+        view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_log,container,false);
 
         logPerPage = CommonUtil.getCountPerPage(getContext(), getActivity());
 
         titleBar = view.findViewById(R.id.titleBar);
-        if (tg.equals("sign")) {
-            titleBar.setTitle("打卡记录");
-            view.findViewById(R.id.title_sign_layout).setVisibility(View.VISIBLE);
-            simpleAdapter = new SimpleAdapter(getActivity(), getSignData(), R.layout.cell_sign_list,
-                    new String[]{"number", "idCard", "name", "time"},
-                    new int[]{R.id.number_in_sign_cell, R.id.idCard_in_sign_cell, R.id.name_in_sign_cell, R.id.time_in_sign_cell});
-        }
-        if (tg.equals("alert")) {
-            titleBar.setTitle("报警记录");
-            view.findViewById(R.id.title_alert_layout).setVisibility(View.VISIBLE);
-            simpleAdapter = new SimpleAdapter(getActivity(), getAlertData(), R.layout.cell_alert_list,
-                    new String[]{"number", "type", "time"},
-                    new int[]{R.id.number_in_alert_cell, R.id.type_in_alert_cell, R.id.time_in_alert_cell});
-        }
-        if (tg.equals("inout")) {
-            titleBar.setTitle("进出港申报");
-            view.findViewById(R.id.title_inout_layout).setVisibility(View.VISIBLE);
-            simpleAdapter = new SimpleAdapter(getActivity(), getInoutData(), R.layout.cell_inout_list,
-                    new String[] {"number", "type", "count", "lon", "lat", "time"},
-                    new int[] {R.id.number_in_inout_cell, R.id.type_in_inout_cell, R.id.count_in_inout_cell, R.id.lon_in_inout_cell, R.id.lat_in_inout_cell, R.id.time_in_inout_cell});
-        }
+
+
+        simpleAdapter = new SimpleAdapter(getActivity(), getSignData(), R.layout.cell_sign_list,
+                new String[]{"number", "idCard", "name", "time"},
+                new int[]{R.id.number_in_sign_cell, R.id.idCard_in_sign_cell, R.id.name_in_sign_cell, R.id.time_in_sign_cell});
+        simpleAdapter2 = new SimpleAdapter(getActivity(), getAlertData(), R.layout.cell_alert_list,
+                new String[]{"number", "type", "time"},
+                new int[]{R.id.number_in_alert_cell, R.id.type_in_alert_cell, R.id.time_in_alert_cell});
+        simpleAdapter3 = new SimpleAdapter(getActivity(), getInoutData(), R.layout.cell_inout_list,
+                new String[] {"number", "type", "count", "lon", "lat", "time"},
+                new int[] {R.id.number_in_inout_cell, R.id.type_in_inout_cell, R.id.count_in_inout_cell, R.id.lon_in_inout_cell, R.id.lat_in_inout_cell, R.id.time_in_inout_cell});
 
         //设置listView
         listView = view.findViewById(R.id.list_view);
         listView.setAdapter(simpleAdapter);
+        //设置listView
+        listView2 = view.findViewById(R.id.list_view2);
+        listView2.setAdapter(simpleAdapter2);
+        //设置listView
+        listView3 = view.findViewById(R.id.list_view3);
+        listView3.setAdapter(simpleAdapter3);
 
+        if (tg.equals("sign")) {
+            titleBar.setTitle("打卡记录");
+            view.findViewById(R.id.title_sign_layout).setVisibility(View.VISIBLE);
+            listView.setVisibility(View.VISIBLE);
+        }
+        if (tg.equals("alert")) {
+            titleBar.setTitle("报警记录");
+            view.findViewById(R.id.title_alert_layout).setVisibility(View.VISIBLE);
+            listView2.setVisibility(View.VISIBLE);
+        }
+        if (tg.equals("inout")) {
+            titleBar.setTitle("进出港申报");
+            view.findViewById(R.id.title_inout_layout).setVisibility(View.VISIBLE);
+            listView3.setVisibility(View.VISIBLE);
+        }
         return view;
+    }
+
+    public void setTg(String tg) {
+        this.tg = tg;
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden) {
+            if (tg.equals("sign")) {
+                titleBar.setTitle("打卡记录");
+                view.findViewById(R.id.title_sign_layout).setVisibility(View.VISIBLE);
+                view.findViewById(R.id.title_alert_layout).setVisibility(View.GONE);
+                view.findViewById(R.id.title_inout_layout).setVisibility(View.GONE);
+                getSignData();
+                simpleAdapter.notifyDataSetChanged();
+                listView.setVisibility(View.VISIBLE);
+                listView2.setVisibility(View.GONE);
+                listView3.setVisibility(View.GONE);
+            }
+            if (tg.equals("alert")) {
+                titleBar.setTitle("报警记录");
+                view.findViewById(R.id.title_alert_layout).setVisibility(View.VISIBLE);
+                view.findViewById(R.id.title_sign_layout).setVisibility(View.GONE);
+                view.findViewById(R.id.title_inout_layout).setVisibility(View.GONE);
+                getAlertData();
+                simpleAdapter2.notifyDataSetChanged();
+                listView.setVisibility(View.GONE);
+                listView2.setVisibility(View.VISIBLE);
+                listView3.setVisibility(View.GONE);
+            }
+            if (tg.equals("inout")) {
+                titleBar.setTitle("进出港申报");
+                view.findViewById(R.id.title_inout_layout).setVisibility(View.VISIBLE);
+                view.findViewById(R.id.title_sign_layout).setVisibility(View.GONE);
+                view.findViewById(R.id.title_alert_layout).setVisibility(View.GONE);
+                getInoutData();
+                simpleAdapter3.notifyDataSetChanged();
+                listView.setVisibility(View.GONE);
+                listView2.setVisibility(View.GONE);
+                listView3.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
     public void nextPage() {
@@ -173,7 +235,7 @@ public class LogFragment extends Fragment{
     }
 
     private List<Map<String, Object>> getAlertData() {
-        dataList.clear();
+        dataList2.clear();
         long count = AlertProxy.getCount(db);
         totalPage = CommonUtil.getTotalPage(count, logPerPage);
         if (count == 0) {
@@ -182,7 +244,7 @@ public class LogFragment extends Fragment{
 
         List<AlertBean> list = AlertProxy.getByPage(db, logPerPage, pageIndex);
         if (list == null) {
-            return dataList;
+            return dataList2;
         }
 
         for (int i = 0; i < list.size(); i++) {
@@ -191,17 +253,17 @@ public class LogFragment extends Fragment{
             map.put("number", count - pageIndex * logPerPage - i);
             map.put("time", DateUtil.Date2String(alert.getTime()));
             map.put("type", alert.getType());
-            dataList.add(map);
+            dataList2.add(map);
         }
 
         modifyPageButton(pageIndex, totalPage);
 
-        return dataList;
+        return dataList2;
     }
 
     private List<Map<String, Object>> getInoutData() {
 
-        dataList.clear();
+        dataList3.clear();
         long count = InoutProxy.getCount(db);
         totalPage = CommonUtil.getTotalPage(count, logPerPage);
         if (count == 0) {
@@ -210,7 +272,7 @@ public class LogFragment extends Fragment{
 
         List<InoutBean> list = InoutProxy.getByPage(db, logPerPage, pageIndex);
         if (list == null) {
-            return dataList;
+            return dataList3;
         }
 
         // "number", "type", "count", "lon", "lat", "time"
@@ -223,12 +285,12 @@ public class LogFragment extends Fragment{
             map.put("count", inoutBean.getCount());
             map.put("lon", String.format("%.3f",inoutBean.getLon() / 10000000f));
             map.put("lat", String.format("%.3f",inoutBean.getLat() / 10000000f));
-            dataList.add(map);
+            dataList3.add(map);
         }
 
         modifyPageButton(pageIndex, totalPage);
 
-        return dataList;
+        return dataList3;
     }
 
     private void modifyPageButton(int currentPage, int totalPage) {

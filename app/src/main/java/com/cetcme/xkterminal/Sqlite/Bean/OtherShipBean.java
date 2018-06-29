@@ -25,6 +25,15 @@ public class OtherShipBean {
     private String callsign;
     private int width;
     private int lenght;
+    private int shipType;
+
+    public int getShipType() {
+        return shipType;
+    }
+
+    public void setShipType(int shipType) {
+        this.shipType = shipType;
+    }
 
     public int getWidth() {
         return width;

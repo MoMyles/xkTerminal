@@ -283,10 +283,16 @@ public class MessageFragment extends Fragment {
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
+        pageIndex = 0;
+        totalPage = 1;
         if (!hidden) {
             changeTitle();
             getMessageData();
-            simpleAdapter.notifyDataSetChanged();
+            if ("send".equals(tg)) {
+                simpleAdapter.notifyDataSetChanged();
+            }else{
+                simpleAdapter2.notifyDataSetChanged();
+            }
         }
     }
 
@@ -300,7 +306,11 @@ public class MessageFragment extends Fragment {
 
         pageIndex++;
         getMessageData();
-        simpleAdapter.notifyDataSetChanged();
+        if ("send".equals(tg)) {
+            simpleAdapter.notifyDataSetChanged();
+        }else{
+            simpleAdapter2.notifyDataSetChanged();
+        }
 
         modifyPageButton(pageIndex, totalPage);
 
@@ -315,7 +325,11 @@ public class MessageFragment extends Fragment {
 
         pageIndex--;
         getMessageData();
-        simpleAdapter.notifyDataSetChanged();
+        if ("send".equals(tg)) {
+            simpleAdapter.notifyDataSetChanged();
+        }else{
+            simpleAdapter2.notifyDataSetChanged();
+        }
 
         modifyPageButton(pageIndex, totalPage);
 
@@ -332,6 +346,7 @@ public class MessageFragment extends Fragment {
         if (count == 0) {
             totalPage = 1;
         }
+        modifyPageButton(pageIndex, totalPage);
 
         List<MessageBean> list = MessageProxy.getByPage(db, tg.equals("send"), messagePerPage, pageIndex);
         if (list == null) {
@@ -355,16 +370,17 @@ public class MessageFragment extends Fragment {
             }
             dataList.add(map);
         }
-
-        modifyPageButton(pageIndex, totalPage);
-
         return dataList;
     }
 
     public void setMessageRead(int index) {
 
         dataList.get(index).put("read", "");
-        simpleAdapter.notifyDataSetChanged();
+        if ("send".equals(tg)) {
+            simpleAdapter.notifyDataSetChanged();
+        }else{
+            simpleAdapter2.notifyDataSetChanged();
+        }
 
         int id = Integer.parseInt(dataList.get(index).get("id").toString());
         MessageProxy.setMessageReadById(db, id);
@@ -388,6 +404,10 @@ public class MessageFragment extends Fragment {
 
     public void reloadDate() {
         getMessageData();
-        simpleAdapter.notifyDataSetChanged();
+        if ("send".equals(tg)) {
+            simpleAdapter.notifyDataSetChanged();
+        }else{
+            simpleAdapter2.notifyDataSetChanged();
+        }
     }
 }

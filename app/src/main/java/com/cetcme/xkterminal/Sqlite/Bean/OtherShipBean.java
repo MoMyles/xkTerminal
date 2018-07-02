@@ -5,6 +5,8 @@ import org.xutils.db.annotation.Table;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Table(name="t_other_ship")
 public class OtherShipBean {
@@ -26,6 +28,22 @@ public class OtherShipBean {
     private int width;
     private int lenght;
     private int shipType;
+
+    private final Map<Integer, String> shipNameMap = new HashMap<>();
+
+    public OtherShipBean() {
+        shipNameMap.put(50, "引航船舶");
+        shipNameMap.put(51, "搜救船舶");
+        shipNameMap.put(52, "拖轮");
+        shipNameMap.put(53, "港口补给船");
+        shipNameMap.put(54, "安装有防污染设施或设备的船舶");
+        shipNameMap.put(55, "执法船舶");
+        shipNameMap.put(50, "引航船舶");
+
+
+        shipNameMap.put(58, "医疗运送船舶");
+        shipNameMap.put(59, "非武装冲突参与国的船舶和航空器");
+    }
 
     public int getShipType() {
         return shipType;

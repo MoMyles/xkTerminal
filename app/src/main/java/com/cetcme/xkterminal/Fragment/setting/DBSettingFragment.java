@@ -98,7 +98,7 @@ public class DBSettingFragment extends Fragment {
         });
 
 //        double voltage = ((MainActivity)getActivity()).voltage;
-        tv_voltage.setText(MyApplication.voltage + "V");
+        tv_voltage.setText(MyApplication.voltage.equals("-") ? "---" : MyApplication.voltage + "V");
     }
 
     /*

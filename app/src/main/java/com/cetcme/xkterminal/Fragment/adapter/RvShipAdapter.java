@@ -49,7 +49,8 @@ public class RvShipAdapter extends RecyclerView.Adapter<RvShipAdapter.VH> {
 //            int vessel_id = skiaDrawView.mYimaLib.GetOtherVesselPosOfID(osb.getShip_id());
 //            final OtherShipBaicInfo osbi = skiaDrawView.mYimaLib.getOtherVesselBasicInfo(vessel_id);
             //final OtherVesselCurrentInfo ovci = skiaDrawView.mYimaLib.getOtherVesselCurrentInfo(vessel_id);
-            holder.mmsi.setText("MMSI: " + osb.getMmsi() + " 船名: " + osb.getShip_name());
+            String shipName = osb.getShip_name() == null ? "" :  osb.getShip_name();
+            holder.mmsi.setText("MMSI: " + osb.getMmsi() + " 船名: " + shipName);
             holder.tv1.setText(osb.getCallsign());
             holder.length.setText(osb.getLenght() + " m");
             holder.width.setText(osb.getWidth() + " m");

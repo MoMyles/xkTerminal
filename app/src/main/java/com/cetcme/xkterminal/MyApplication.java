@@ -662,6 +662,23 @@ public class MyApplication extends Application {
         if (warnTimer != null) {
             warnTimer.cancel();
         }
+        if (mInputStream != null ){
+            try {
+                mInputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (mOutputStream != null) {
+            try {
+                mOutputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (mSerialPort != null) {
+            mSerialPort.close();
+        }
     }
 
 

@@ -126,7 +126,7 @@ public class MessageProxy {
         long count = 0;
         try {
             count = db.selector(MessageBean.class)
-                    .where("isSend","=", isSend ? 1 : 0)
+                    .where("isSend","=", isSend)
                     .count();
         } catch (DbException e) {
             e.printStackTrace();

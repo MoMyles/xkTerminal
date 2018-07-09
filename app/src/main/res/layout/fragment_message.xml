@@ -11,49 +11,49 @@
         android:layout_height="wrap_content" />
 
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:layout_marginEnd="20dp"
         android:layout_marginLeft="20dp"
-        android:layout_marginStart="20dp"
         android:layout_marginRight="20dp"
-        android:layout_marginEnd="20dp">
+        android:layout_marginStart="20dp"
+        android:orientation="horizontal">
 
         <TextView
             android:id="@+id/selected_in_message_cell"
             android:layout_width="60dp"
             android:layout_height="match_parent"
-            android:textSize="20sp"
-            android:textColor="#000000"
+            android:gravity="center_vertical"
             android:text="序号"
-            android:gravity="center_vertical"/>
+            android:textColor="#000000"
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/time_title_textView"
             android:layout_width="230dp"
             android:layout_height="match_parent"
-            android:textSize="20sp"
-            android:textColor="#000000"
+            android:gravity="center_vertical"
             android:text="时间"
-            android:gravity="center_vertical"/>
+            android:textColor="#000000"
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/sender_title_textView"
             android:layout_width="220dp"
             android:layout_height="match_parent"
-            android:textSize="20sp"
-            android:textColor="#000000"
+            android:gravity="center"
             android:text="发件人"
-            android:gravity="center"/>
+            android:textColor="#000000"
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/content_title_textView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:textSize="20sp"
-            android:textColor="#000000"
+            android:gravity="center_vertical"
             android:text="内容"
-            android:gravity="center_vertical"/>
+            android:textColor="#000000"
+            android:textSize="20sp" />
 
     </LinearLayout>
 
@@ -68,12 +68,19 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:orientation="vertical" >
+        android:orientation="vertical">
 
         <ListView
             android:id="@+id/list_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
+        <ListView
+            android:id="@+id/list_view2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
 
 
     </LinearLayout>

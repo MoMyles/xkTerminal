@@ -22,8 +22,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BROADCAST_STICKY"/>
 
-    <!--<uses-feature android:name="android.hardware.usb.host" />-->
-
+    <!-- <uses-feature android:name="android.hardware.usb.host" /> -->
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
@@ -32,8 +31,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <!--<service android:name=".services.BitBangModeIntentService"  android:enabled="true"/>-->
-        <!--<service android:name=".services.BitBangModeService"  android:enabled="true"/>-->
+
+        <!-- <service android:name=".services.BitBangModeIntentService"  android:enabled="true"/> -->
+        <!-- <service android:name=".services.BitBangModeService"  android:enabled="true"/> -->
         <!-- 开机广播接受者 -->
         <receiver android:name=".MyClass.BootBroadcastReceiver">
             <intent-filter>
@@ -83,7 +83,11 @@
             android:name=".SatelliteActivity"
             android:screenOrientation="sensorLandscape">
         </activity>
-        <activity android:name=".PinActivity"
+        <activity
+            android:name=".PinActivity"
+            android:theme="@style/myDialogActivityStyle">
+        </activity>
+        <activity android:name=".SelfCheckActivity"
                   android:theme="@style/myDialogActivityStyle">
         </activity>
     </application>

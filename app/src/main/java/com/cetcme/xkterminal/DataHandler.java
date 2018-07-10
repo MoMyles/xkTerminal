@@ -59,7 +59,6 @@ public class DataHandler extends Handler {
         this.db = MyApplication.getInstance().getDb();
 
         timer = new Timer();
-
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -71,10 +70,9 @@ public class DataHandler extends Handler {
                 MainActivity.play("卫星中断故障");
                 Looper.loop();
             }
-        }, 2 * 60 * 1000);
+        }, Constant.SELF_CHECK_TIME_OUT);
 
         timer30 = new Timer();
-
         timer30.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -82,7 +80,7 @@ public class DataHandler extends Handler {
                     MyApplication.getInstance().mainActivity.sendBootData();
                 }
             }
-        }, 30 * 1000);
+        }, Constant.SEND_BOOT_DATA_TIME);
     }
 
     String content = "";
@@ -120,8 +118,7 @@ public class DataHandler extends Handler {
                         case MessageFormat.MESSAGE_TYPE_RESCUE:
                             SoundPlay.playMessageSound(myApplication.mainActivity);
                             myApplication.sendLightOn(true);
-                            myApplication.mainActivity.showMessageDialog(content, MessageDialogActivity.TYPE_RESCUE);
-                            myApplication.mainActivity.addMessage(address, content, true);
+                            myApplication.mainActivity.showMessageDialog(address, content, MessageDialogActivity.TYPE_RESCUE);
                             break;
                         // 开启关闭短信功能
                         case MessageFormat.MESSAGE_TYPE_SMS_OPEN:
@@ -130,8 +127,7 @@ public class DataHandler extends Handler {
                         // 报警提醒
                         case MessageFormat.MESSAGE_TYPE_ALERT_REMIND:
                             SoundPlay.playMessageSound(myApplication.mainActivity);
-                            myApplication.mainActivity.showMessageDialog(content, MessageDialogActivity.TYPE_ALERT);
-                            myApplication.mainActivity.addMessage(address, content, true);
+                            myApplication.mainActivity.showMessageDialog(address, content, MessageDialogActivity.TYPE_ALERT);
                             break;
                         // 摇毙功能
                         case MessageFormat.MESSAGE_TYPE_SHUT_DOWN:
@@ -162,11 +158,12 @@ public class DataHandler extends Handler {
                         // 夜间点名
                         case MessageFormat.MESSAGE_TYPE_CALL_THE_ROLL:
                             SoundPlay.playMessageSound(myApplication.mainActivity);
-                            myApplication.mainActivity.showMessageDialog(content, MessageDialogActivity.TYPE_CALL_ROLL);
+                            // TODO:
+                            myApplication.mainActivity.showMessageDialog(address, content, MessageDialogActivity.TYPE_CALL_ROLL);
                             break;
                         // 告警信息，语音播报
                         case MessageFormat.MESSAGE_TYPE_REPORT_ALARM:
-                            myApplication.mainActivity.showMessageDialog(content, MessageDialogActivity.TYPE_ALARM);
+                            myApplication.mainActivity.showMessageDialog(address, content, MessageDialogActivity.TYPE_ALARM);
                             MainActivity.play("告警信息: " + content);
                             break;
                         default:
@@ -226,7 +223,7 @@ public class DataHandler extends Handler {
                         final boolean gpsStatus = status.charAt(7) == '1';
 
                         if (!gpsStatus) {
-                            myApplication.mainActivity.showMessageDialog("卫星中断故障", MessageDialogActivity.TYPE_ALARM);
+                            myApplication.mainActivity.showMessageDialog("自身设备", "卫星中断故障", MessageDialogActivity.TYPE_ALARM);
                             MainActivity.play("卫星中断故障");
                             myApplication.mainActivity.dismissSelfCheckHud();
                         } else {
@@ -301,7 +298,8 @@ public class DataHandler extends Handler {
                         e.printStackTrace();
                     }
                     SocketServer.send(sendJSON);
-                    Toast.makeText(myApplication.mainActivity, "终端ID：" + deviceID, Toast.LENGTH_LONG).show();
+                    EventBus.getDefault().post(new SmsEvent(sendJSON));
+//                    Toast.makeText(myApplication.mainActivity, "终端ID：" + deviceID, Toast.LENGTH_LONG).show();
                     break;
                 case SERIAL_PORT_ALERT_SEND_SUCCESS:
                     if (!MyApplication.isLocated) return;

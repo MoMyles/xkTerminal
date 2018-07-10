@@ -586,21 +586,21 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                     case 0:// 禁渔
                         if (exists) {
                             // 报警
-                            MyApplication.getInstance().mainActivity.showMessageDialog("禁渔区域报警", 1);
+                            MyApplication.getInstance().mainActivity.showMessageDialog("自身设备","禁渔区域报警", 1);
                             SoundPlay.startAlertSound(MyApplication.getInstance().mainActivity);
                         }
                         break;
                     case 1:// 禁入
                         if (exists) {
                             // 报警
-                            MyApplication.getInstance().mainActivity.showMessageDialog("禁入区域报警", 1);
+                            MyApplication.getInstance().mainActivity.showMessageDialog("自身设备", "禁入区域报警", 1);
                             SoundPlay.startAlertSound(MyApplication.getInstance().mainActivity);
                         }
                         break;
                     case 2:// 禁出
                         if (!exists) {
                             // 报警
-                            MyApplication.getInstance().mainActivity.showMessageDialog("禁出区域报警", 1);
+                            MyApplication.getInstance().mainActivity.showMessageDialog("自身设备", "禁出区域报警", 1);
                             SoundPlay.startAlertSound(MyApplication.getInstance().mainActivity);
                         }
                         break;

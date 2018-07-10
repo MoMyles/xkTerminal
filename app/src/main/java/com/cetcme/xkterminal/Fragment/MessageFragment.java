@@ -17,11 +17,14 @@ import com.cetcme.xkterminal.ActionBar.TitleBar;
 import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.CommonUtil;
+import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.DateUtil;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.Sqlite.Bean.MessageBean;
 import com.cetcme.xkterminal.Sqlite.Proxy.MessageProxy;
 import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 
 import org.xutils.DbManager;
 
@@ -132,6 +135,21 @@ public class MessageFragment extends Fragment {
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int i, long l) {
+
+                long count = MessageProxy.getCount(MyApplication.getInstance().getDb());
+                if (count >= Constant.LIMIT_MESSAGE) {
+                    new QMUIDialog.MessageDialogBuilder(mainActivity)
+                            .setTitle("提示")
+                            .setMessage("已达到短信最大数量(" + Constant.LIMIT_FRIEND + ")，请删除后再进行操作。")
+                            .addAction("确定", new QMUIDialogAction.ActionListener() {
+                                @Override
+                                public void onClick(QMUIDialog dialog, int index) {
+                                    dialog.dismiss();
+                                }
+                            })
+                            .show();
+                    return true;
+                }
 
                 QMUIBottomSheet.BottomListSheetBuilder bottomListSheetBuilder = new QMUIBottomSheet.BottomListSheetBuilder(getActivity());
                 bottomListSheetBuilder.addItem("转发");

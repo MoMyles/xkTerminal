@@ -75,6 +75,7 @@ import static com.cetcme.xkterminal.MainActivity.myNumber;
 public class MyApplication extends Application {
 
     public MainActivity mainActivity;
+    public MessageDialogActivity messageDialogActivity;
     public IDCardActivity idCardActivity;
 
     private static MyApplication mContext;
@@ -281,7 +282,7 @@ public class MyApplication extends Application {
 
                         double curHaili = SkiaDrawView.mYimaLib.GetDistBetwTwoPoint(start.x, start.y, end.x, end.y);
                         if (x_2 < x_ && y_2 < y_ && curHaili <= haili) {
-                            mainActivity.showMessageDialog("您即将撞船", 1);
+                            mainActivity.showMessageDialog("自身设备", "您即将撞船", 1);
                             SoundPlay.startAlertSound(mainActivity);
                         }
                     }
@@ -375,9 +376,9 @@ public class MyApplication extends Application {
                     String newID = data.getString("deviceID");
                     sendBytes(IDFormat.format(newID));
                     break;
-                case "device_id":
-                    sendBytes(IDFormat.getID());
-                    break;
+//                case "device_id":
+//                    sendBytes(IDFormat.getID());
+//                    break;
                 case "sms_list":
                     JSONArray smsList = getSmsList();
 

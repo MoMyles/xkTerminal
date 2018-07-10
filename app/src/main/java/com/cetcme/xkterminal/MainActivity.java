@@ -70,6 +70,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.xutils.DbManager;
+import org.xutils.ex.DbException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -171,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
 
         myNumber = PreferencesUtils.getString(this, "myNumber");
         if (myNumber == null || myNumber.isEmpty()) {
-            myNumber = "654321";
+            myNumber = "000000";
             PreferencesUtils.putString(this, "myNumber", myNumber);
         }
 
@@ -763,7 +764,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // 收到短信
-    public void addMessage(final String address, final String content, final boolean read) {
+    public int addMessage(final String address, final String content, final boolean read) {
         MessageBean message = new MessageBean();
         message.setSender(address);
         message.setReceiver(myNumber);
@@ -790,6 +791,7 @@ public class MainActivity extends AppCompatActivity {
         if (fragmentName.equals("message") && messageFragment.tg.equals("receive")) {
             messageFragment.reloadDate();
         }
+        return message.getId();
     }
 
     public void addSignLog(String id, String name, Date date) {
@@ -838,12 +840,19 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void showMessageDialog(String content, int type) {
-        // type 0: 救护, 1: 报警提醒, 2: 夜间点名
-        Intent intent = new Intent(MainActivity.this, MessageDialogActivity.class);
-        intent.putExtra("content", content);
-        intent.putExtra("type", type);
-        startActivity(intent);
+    public void showMessageDialog(String address, String content, int type) {
+        int id = addMessage(address, content, false);
+
+        if (MyApplication.getInstance().messageDialogActivity == null) {
+            // type 0: 救护, 1: 报警提醒, 2: 夜间点名
+            Intent intent = new Intent(MainActivity.this, MessageDialogActivity.class);
+            intent.putExtra("content", content);
+            intent.putExtra("type", type);
+            intent.putExtra("id", id);
+            startActivity(intent);
+        } else {
+            MyApplication.getInstance().messageDialogActivity.updateMessage(id, content, type);
+        }
     }
 
     public void onBackPressed() {
@@ -1527,8 +1536,24 @@ public class MainActivity extends AppCompatActivity {
                         // MainFragment里接收
                         EventBus.getDefault().post("pin_co");
                         break;
+                    case PinActivity.RESULT_OUT_OF_LIMIT:
+                        showInoutOutOfLimitDialog();
+                        break;
                 }
                 break;
         }
+    }
+
+    private void showInoutOutOfLimitDialog() {
+        new QMUIDialog.MessageDialogBuilder(MainActivity.this)
+                .setTitle("提示")
+                .setMessage("已达到标位最大数量(" + Constant.LIMIT_PIN + ")，请删除后再添加。")
+                .addAction("确定", new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
+                        dialog.dismiss();
+                    }
+                })
+                .show();
     }
 }

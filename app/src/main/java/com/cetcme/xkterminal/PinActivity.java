@@ -12,8 +12,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.GPSFormatUtils;
 import com.cetcme.xkterminal.Sqlite.Bean.PinBean;
+import com.cetcme.xkterminal.Sqlite.Proxy.FriendProxy;
+import com.cetcme.xkterminal.Sqlite.Proxy.PinProxy;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 
@@ -32,6 +35,7 @@ public class PinActivity extends Activity {
     public static final int RESULT_CODE_NOTHING = 0;
     public static final int RESULT_CODE_MAP = 1;
     public static final int RESULT_CODE_CO = 2;
+    public static final int RESULT_OUT_OF_LIMIT = 3;
 
     @BindView(R.id.listView)
     ListView listView;
@@ -56,20 +60,6 @@ public class PinActivity extends Activity {
         setContentView(R.layout.activity_pin);
         ButterKnife.bind(this);
 
-
-//        PinBean pinBean = new PinBean();
-//        pinBean.setColor(getResources().getColor(android.R.color.black));
-//        pinBean.setLat((int) (31.3 * 1e7));
-//        pinBean.setLon((int) (121.3 * 1e7));
-//        pinBean.setName("123");
-//        try {
-//            db.saveBindingId(pinBean);
-//        } catch (DbException e) {
-//            e.printStackTrace();
-//        }
-//
-//        System.out.println("pin: " + pinBean.toString());
-
         initTitleView();
         initListView();
         getPinData();
@@ -93,7 +83,11 @@ public class PinActivity extends Activity {
         tv_pin_map.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setResult(RESULT_CODE_MAP);
+                if (checkCount()) {
+                    setResult(RESULT_OUT_OF_LIMIT);
+                } else {
+                    setResult(RESULT_CODE_MAP);
+                }
                 finish();
             }
         });
@@ -101,11 +95,21 @@ public class PinActivity extends Activity {
         tv_pin_co.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setResult(RESULT_CODE_CO);
+                if (checkCount()) {
+                    setResult(RESULT_OUT_OF_LIMIT);
+                } else {
+                    setResult(RESULT_CODE_CO);
+                }
                 finish();
             }
         });
     }
+
+    private boolean checkCount() {
+        long count = PinProxy.getCount(MyApplication.getInstance().getDb());
+        return count >= Constant.LIMIT_PIN;
+    }
+
 
     private void initListView() {
         testAdapter = new TestAdapter();

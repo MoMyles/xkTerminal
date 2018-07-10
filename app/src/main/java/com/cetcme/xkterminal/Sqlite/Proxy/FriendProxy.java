@@ -50,6 +50,20 @@ public class FriendProxy {
     }
 
     /**
+     * 获取好友数量
+     * @param db
+     * @return
+     */
+    public static long getCount(DbManager db) {
+        try {
+            return db.selector(FriendBean.class).count();
+        } catch (DbException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    /**
      * 删除好友
      * @param db
      * @return

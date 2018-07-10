@@ -2,6 +2,7 @@ package com.cetcme.xkterminal.MyClass;
 
 import android.app.Activity;
 import android.content.Context;
+import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 

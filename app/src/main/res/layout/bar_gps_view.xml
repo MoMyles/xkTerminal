@@ -14,7 +14,34 @@
         android:layout_marginStart="20dp"
         android:gravity="center_vertical"
         android:text="00:00:00"
-        android:textSize="22sp" />
+        android:textSize="36sp" />
+
+    <LinearLayout
+        android:id="@+id/ly_date"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@+id/textView_time">
+
+        <TextView
+            android:id="@+id/tv_date"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="---"
+            android:textSize="15sp"
+            android:gravity="bottom"/>
+        <TextView
+            android:id="@+id/tv_lunar"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="---"
+            android:textSize="14sp"
+            android:gravity="top"/>
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/textView_ais_status"
@@ -22,7 +49,7 @@
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:layout_marginLeft="20dp"
-        android:layout_toRightOf="@+id/textView_time"
+        android:layout_toRightOf="@+id/ly_date"
         android:gravity="center_vertical"
         android:text="AIS未连接"
         android:textColor="#ff0000"

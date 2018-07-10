@@ -21,4 +21,8 @@
     <color name="bar_divider">#D4D6D8</color>
     <color name="tab_panel_bg">#ffffff</color>
     <color name="tab_panel_divider">@color/bar_divider</color>
+
+    <color name="check_wait">#D8D8D8</color>
+    <color name="check_success">#32C183</color>
+    <color name="check_fail">#E66474</color>
 </resources>

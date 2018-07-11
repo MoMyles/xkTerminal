@@ -741,7 +741,7 @@ public class SystemSettingFragment extends Fragment {
                         if (text != null && text.length() > 0 && text.length() <= 3 && isNumber(text.toString())) {
                             int number = Integer.parseInt(text.toString());
                             if (number < 1 || number > 255) {
-                                Toast.makeText(getActivity(), "分组编号超出氛围(1到255)", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity(), "分组编号超出范围(1到255)", Toast.LENGTH_SHORT).show();
                             } else {
                                 group[1] = text.toString();
                                 mainActivity.addGroup(group[0], group[1]);
@@ -874,6 +874,11 @@ public class SystemSettingFragment extends Fragment {
         String yimaStr = SkiaDrawView.mYimaLib.GetDeviceIDForLicSvr();
 //        SkiaDrawView.mYimaLib.SetLicenceKeyFromSvr();
 //        Log.e("YIMA", "onCreateView: " + yimaStr);
+
         return yimaStr;
+    }
+
+    private int getUserId() {
+        return SkiaDrawView.mYimaLib.GetUsrID();
     }
 }

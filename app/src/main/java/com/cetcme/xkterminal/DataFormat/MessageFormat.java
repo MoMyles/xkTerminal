@@ -26,7 +26,7 @@ public class MessageFormat {
     public static final String MESSAGE_TYPE_UPDATE_LOCATION     = "08"; // 更新位置信息
     public static final String MESSAGE_TYPE_REPORT_ALARM        = "09"; // 告警信息，语音播报
     public static final String MESSAGE_TYPE_CALL_THE_ROLL       = "10"; // 夜间点名
-
+    public static final String MESSAGE_TYPE_GROUP               = "11"; // 组播添加和删除 x,y  x=0 quit x=1 add
 
     private static final String messageHead = "$04";
 

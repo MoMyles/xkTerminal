@@ -166,6 +166,20 @@ public class DataHandler extends Handler {
                             myApplication.mainActivity.showMessageDialog(address, content, MessageDialogActivity.TYPE_ALARM);
                             MainActivity.play("告警信息: " + content);
                             break;
+                        // 添加删除组播号
+                        case MessageFormat.MESSAGE_TYPE_GROUP: {
+                            String[] value = content.split(",");
+                            if (value[0].equals("0")) {
+                                // 删除
+                                myApplication.mainActivity.addGroup("group", value[1]);
+                                Toast.makeText(myApplication.mainActivity, "您已加入分组：" + value[1], Toast.LENGTH_SHORT).show();
+                            } else {
+                                // 添加
+                                myApplication.mainActivity.deleteGroup(value[1]);
+                                Toast.makeText(myApplication.mainActivity, "您已退出分组：" + value[1], Toast.LENGTH_SHORT).show();
+                            }
+                            break;
+                        }
                         default:
                             // 判断分组 group -1为非分组短信，其他为组号，
                             if (group == -1 || GroupProxy.hasGroup(db, group)) {

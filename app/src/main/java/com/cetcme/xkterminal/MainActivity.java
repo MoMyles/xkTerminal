@@ -813,6 +813,10 @@ public class MainActivity extends AppCompatActivity {
         GroupProxy.insert(db, name, Integer.parseInt(number));
     }
 
+    public void deleteGroup(String number) {
+        GroupProxy.deleteByNumber(db, number);
+    }
+
     public void showIDCardDialog(String id, String name, String nation, String address, Date date) {
         Bundle bundle = new Bundle();
         bundle.putString("name", name);

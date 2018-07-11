@@ -30,7 +30,7 @@
 
         <TextView
             android:id="@+id/time_title_textView"
-            android:layout_width="230dp"
+            android:layout_width="210dp"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
             android:text="时间"
@@ -39,7 +39,7 @@
 
         <TextView
             android:id="@+id/sender_title_textView"
-            android:layout_width="220dp"
+            android:layout_width="140dp"
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="发件人"
@@ -52,6 +52,7 @@
             android:layout_height="match_parent"
             android:gravity="center_vertical"
             android:text="内容"
+            android:layout_marginLeft="5dp"
             android:textColor="#000000"
             android:textSize="20sp" />
 

@@ -4,6 +4,7 @@ import com.cetcme.xkterminal.Sqlite.Bean.FriendBean;
 import com.cetcme.xkterminal.Sqlite.Bean.GroupBean;
 
 import org.xutils.DbManager;
+import org.xutils.db.sqlite.WhereBuilder;
 import org.xutils.ex.DbException;
 
 import java.util.List;
@@ -44,6 +45,19 @@ public class GroupProxy {
             e.printStackTrace();
         }
         return list;
+    }
+
+    /**
+     * 删除分组
+     * @param db
+     * @return
+     */
+    public static void deleteByNumber(DbManager db, String number) {
+        try {
+            db.delete(GroupBean.class, WhereBuilder.b("number", "=", number));
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

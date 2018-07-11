@@ -42,6 +42,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 import org.xutils.DbManager;
 
 import java.io.UnsupportedEncodingException;
@@ -55,6 +56,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.cetcme.xkterminal.Navigation.Constant.YIMA_WORK_PATH;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -62,6 +64,7 @@ import static android.content.Context.MODE_PRIVATE;
 public class SystemSettingFragment extends Fragment {
 
     private TextView wifi_ssid_textView;
+    private TextView tv_yima_serial;
 
     private TextView time_zone_textView;
     private Button time_zone_minus_btn;
@@ -238,6 +241,7 @@ public class SystemSettingFragment extends Fragment {
             }
         });
 
+        /*
         // 用户分组
         view.findViewById(R.id.group_add_textView).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -252,6 +256,7 @@ public class SystemSettingFragment extends Fragment {
                 groupDelete();
             }
         });
+        */
         //本船信息
         view.findViewById(R.id.own_ship_textView).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -436,6 +441,68 @@ public class SystemSettingFragment extends Fragment {
                                     if (text.toString().equals(Constant.ADMIN_PASSWORD)) {
 //                                        dialog.dismiss();
                                         System.exit(0);
+                                    } else {
+                                        Toast.makeText(getActivity(), "管理密码错误", Toast.LENGTH_SHORT).show();
+                                    }
+                                } else {
+                                    Toast.makeText(getActivity(), "请填入内容", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        })
+                        .show();
+            }
+        });
+
+        tv_yima_serial = view.findViewById(R.id.tv_yima_serial);
+        tv_yima_serial.setText(PreferencesUtils.getString(getActivity(), "yimaSerial"));
+
+        tv_yima_serial.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
+                builder.setTitle("请输入管理密码")
+                        .setInputType(InputType.TYPE_CLASS_TEXT)
+                        .addAction("取消", new QMUIDialogAction.ActionListener() {
+                            @Override
+                            public void onClick(QMUIDialog dialog, int index) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .addAction("确认", new QMUIDialogAction.ActionListener() {
+                            @Override
+                            public void onClick(QMUIDialog dialog, int index) {
+                                CharSequence text = builder.getEditText().getText();
+                                if (text != null && text.length() > 0) {
+                                    if (text.toString().equals(Constant.ADMIN_PASSWORD)) {
+
+                                        dialog.dismiss();
+
+                                        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
+                                        builder.setTitle("设置海图序列号")
+                                                .setPlaceholder("请输入新的海图序列号")
+                                                .setInputType(InputType.TYPE_CLASS_NUMBER)
+                                                .addAction("取消", new QMUIDialogAction.ActionListener() {
+                                                    @Override
+                                                    public void onClick(QMUIDialog dialog, int index) {
+                                                        dialog.dismiss();
+                                                    }
+                                                })
+                                                .addAction("确认", new QMUIDialogAction.ActionListener() {
+                                                    @Override
+                                                    public void onClick(QMUIDialog dialog, int index) {
+                                                        CharSequence text = builder.getEditText().getText();
+                                                        if (text != null && text.length() > 0) {
+                                                            PreferencesUtils.putString(getActivity(), "yimaSerial", text.toString());
+                                                            dialog.dismiss();
+                                                            tv_yima_serial.setText(text.toString());
+                                                            // TODO:
+                                                            SkiaDrawView.mYimaLib.SetLicenceKeyFromSvr(text.toString(), YIMA_WORK_PATH);
+                                                        } else {
+                                                            Toast.makeText(getActivity(), "请填入内容", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    }
+                                                })
+                                                .show();
                                     } else {
                                         Toast.makeText(getActivity(), "管理密码错误", Toast.LENGTH_SHORT).show();
                                     }

@@ -70,11 +70,11 @@ public class Constant {
     public static final boolean SHOW_NUMBER_FRIEND_LIST = true;
 
     // 存数据库内容的条数限制 TODO 确定数量
-    public static final int LIMIT_MESSAGE = 10; //?
-    public static final int LIMIT_INOUT = 5; //?
-    public static final int LIMIT_FRIEND = 5;
-    public static final int LIMIT_SMS_TEMP = 5;
-    public static final int LIMIT_PIN = 5; //?
+    public static final int LIMIT_MESSAGE = 2000; //?
+    public static final int LIMIT_INOUT = 50; //?
+    public static final int LIMIT_FRIEND = 50;
+    public static final int LIMIT_SMS_TEMP = 50;
+    public static final int LIMIT_PIN = 50; //?
 
     // 管理密码 用于设置终端ID 和 退出应用
     public static final String ADMIN_PASSWORD = "admin";

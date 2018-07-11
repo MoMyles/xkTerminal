@@ -88,27 +88,17 @@
                     android:layout_marginStart="@dimen/setting_padding"
                     android:layout_weight="1"
                     android:gravity="center_vertical"
-                    android:text="用户分组："
+                    android:text="WIFI SSID："
                     android:textColor="#000000"
                     android:textSize="18sp" />
 
                 <TextView
-                    android:id="@+id/group_add_textView"
-                    android:layout_width="125dp"
+                    android:id="@+id/wifi_ssid_textView"
+                    android:layout_width="250dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="0.5"
+                    android:layout_weight="1"
                     android:gravity="center"
-                    android:text="增加"
-                    android:textColor="#000000"
-                    android:textSize="18sp" />
-
-                <TextView
-                    android:id="@+id/group_delete_textView"
-                    android:layout_width="125dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.5"
-                    android:gravity="center"
-                    android:text="删除"
+                    android:text="---"
                     android:textColor="#000000"
                     android:textSize="18sp" />
 
@@ -121,15 +111,50 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center_vertical"
-                    android:text="时区："
+                    android:text="海图序列号："
                     android:textColor="#000000"
-                    android:textSize="18sp" />
+                    android:textSize="18sp"/>
 
-                <LinearLayout
+                <TextView
+                    android:id="@+id/tv_yima_serial"
                     android:layout_width="250dp"
                     android:layout_height="match_parent"
                     android:layout_marginEnd="@dimen/setting_padding"
                     android:layout_marginRight="@dimen/setting_padding"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="#000000"
+                    android:textSize="18sp"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_alignParentBottom="true"
+                android:background="#b7b7b7" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="250dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:text="时区："
+                    android:textColor="#000000"
+                    android:textSize="18sp"
+                    android:layout_marginLeft="@dimen/setting_padding"
+                    android:layout_marginStart="@dimen/setting_padding"/>
+
+                <LinearLayout
+                    android:layout_width="250dp"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
@@ -156,6 +181,31 @@
                         android:layout_height="50dp"
                         android:text="+" />
                 </LinearLayout>
+
+                <android.support.v4.widget.Space
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent" />
+
+                <TextView
+                    android:layout_width="250dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:text="RDSS定位："
+                    android:textColor="#000000"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/tv_rdss"
+                    android:layout_width="250dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="@dimen/setting_padding"
+                    android:layout_marginRight="@dimen/setting_padding"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="点击发送"
+                    android:textColor="#000000"
+                    android:textSize="18sp" />
 
             </LinearLayout>
 
@@ -307,79 +357,19 @@
                     android:textSize="18sp"/>
             </LinearLayout>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="1px"
-                android:layout_alignParentBottom="true"
-                android:background="#b7b7b7" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="250dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="@dimen/setting_padding"
-                    android:layout_marginStart="@dimen/setting_padding"
-                    android:layout_weight="1"
-                    android:gravity="center_vertical"
-                    android:text="WIFI SSID："
-                    android:textColor="#000000"
-                    android:textSize="18sp" />
-
-                <TextView
-                    android:id="@+id/wifi_ssid_textView"
-                    android:layout_width="250dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="---"
-                    android:textColor="#000000"
-                    android:textSize="18sp" />
-
-                <android.support.v4.widget.Space
-                    android:layout_width="50dp"
-                    android:layout_height="match_parent" />
-
-                <TextView
-                    android:layout_width="250dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center_vertical"
-                    android:text="RDSS定位："
-                    android:textColor="#000000"
-                    android:textSize="18sp" />
-
-                <TextView
-                    android:id="@+id/tv_rdss"
-                    android:layout_width="250dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginEnd="@dimen/setting_padding"
-                    android:layout_marginRight="@dimen/setting_padding"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="点击发送"
-                    android:textColor="#000000"
-                    android:textSize="18sp" />
-
-            </LinearLayout>
-
             <!--退出按钮-->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="18dp"
                 android:gravity="center">
 
                 <Button
                     android:id="@+id/btn_finish"
-                    android:layout_width="200dp"
-                    android:layout_height="60dp"
+                    android:layout_width="180dp"
+                    android:layout_height="56dp"
                     android:background="@drawable/message_num_bg"
                     android:text="退出"
                     android:textColor="@color/qmui_config_color_white"

@@ -105,7 +105,7 @@ public class MessageBar extends RelativeLayout implements View.OnClickListener {
                     if (count >= Constant.LIMIT_MESSAGE) {
                         new QMUIDialog.MessageDialogBuilder(mainActivity)
                                 .setTitle("提示")
-                                .setMessage("已达到短信最大数量(" + Constant.LIMIT_FRIEND + ")，请删除后再发件。")
+                                .setMessage("已达到短信最大数量(" + Constant.LIMIT_MESSAGE + ")，请删除后再发件。")
                                 .addAction("确定", new QMUIDialogAction.ActionListener() {
                                     @Override
                                     public void onClick(QMUIDialog dialog, int index) {

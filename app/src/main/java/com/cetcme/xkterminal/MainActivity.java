@@ -23,6 +23,7 @@ import com.cetcme.xkterminal.ActionBar.BackBar;
 import com.cetcme.xkterminal.ActionBar.BottomBar;
 import com.cetcme.xkterminal.ActionBar.GPSBar;
 import com.cetcme.xkterminal.ActionBar.MessageBar;
+import com.cetcme.xkterminal.ActionBar.MessageDetailBar;
 import com.cetcme.xkterminal.ActionBar.PageBar;
 import com.cetcme.xkterminal.ActionBar.SendBar;
 import com.cetcme.xkterminal.DataFormat.MessageFormat;
@@ -36,6 +37,7 @@ import com.cetcme.xkterminal.Fragment.MainFragment;
 import com.cetcme.xkterminal.Fragment.MessageFragment;
 import com.cetcme.xkterminal.Fragment.MessageNewFragment;
 import com.cetcme.xkterminal.Fragment.SettingTabFragment;
+import com.cetcme.xkterminal.MyClass.CommonUtil;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.DensityUtil;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
@@ -111,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
     public PageBar pageBar;
     public BackBar backBar;
     public SendBar sendBar;
+    public MessageDetailBar messageDetailBar;
 
     private Fragment currentFragment;
     public MainFragment mainFragment;
@@ -118,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
     private LogFragment logFragment;
     private SettingTabFragment settingFragment;
     private AboutFragment aboutFragment;
-    private MessageNewFragment messageNewFragment;
+    public MessageNewFragment messageNewFragment;
 
     public String fragmentName = "main";
 
@@ -877,6 +880,11 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        if (messageDetailBar.getVisibility() == View.VISIBLE) {
+            messageDetailBar.button_back.performClick();
+            return;
+        }
+
         if (!hasPressedBackOnce) {
             backToast = Toast.makeText(this, "再按一次返回键退出程序", Toast.LENGTH_SHORT);
             backToast.show();
@@ -901,6 +909,7 @@ public class MainActivity extends AppCompatActivity {
         pageBar = findViewById(R.id.pageBar);
         backBar = findViewById(R.id.backBar);
         sendBar = findViewById(R.id.sendBar);
+        messageDetailBar = findViewById(R.id.messageDetailBar);
 
         gpsBar.mainActivity = this;
         bottomBar.mainActivity = this;
@@ -908,6 +917,7 @@ public class MainActivity extends AppCompatActivity {
         pageBar.mainActivity = this;
         backBar.mainActivity = this;
         sendBar.mainActivity = this;
+        messageDetailBar.mainActivity = this;
 
     }
 
@@ -917,6 +927,7 @@ public class MainActivity extends AppCompatActivity {
         pageBar.setVisibility(View.GONE);
         backBar.setVisibility(View.GONE);
         sendBar.setVisibility(View.GONE);
+        messageDetailBar.setVisibility(View.GONE);
     }
 
     private void showMessageBar(String tg) {
@@ -925,6 +936,7 @@ public class MainActivity extends AppCompatActivity {
         pageBar.setVisibility(View.GONE);
         backBar.setVisibility(View.GONE);
         sendBar.setVisibility(View.GONE);
+        messageDetailBar.setVisibility(View.GONE);
         if (tg != null) {
             if (messageFragment != null) {
                 messageFragment.setTg(tg);
@@ -943,6 +955,7 @@ public class MainActivity extends AppCompatActivity {
         pageBar.setVisibility(View.VISIBLE);
         backBar.setVisibility(View.GONE);
         sendBar.setVisibility(View.GONE);
+        messageDetailBar.setVisibility(View.GONE);
     }
 
     private void showBackBar() {
@@ -951,14 +964,26 @@ public class MainActivity extends AppCompatActivity {
         pageBar.setVisibility(View.GONE);
         backBar.setVisibility(View.VISIBLE);
         sendBar.setVisibility(View.GONE);
+        messageDetailBar.setVisibility(View.GONE);
     }
 
-    private void showSendBar() {
+    public void showSendBar() {
         bottomBar.setVisibility(View.GONE);
         messageBar.setVisibility(View.GONE);
         pageBar.setVisibility(View.GONE);
         backBar.setVisibility(View.GONE);
         sendBar.setVisibility(View.VISIBLE);
+        messageDetailBar.setVisibility(View.GONE);
+    }
+
+    private void showMessageDetailBar(String messageListStatus) {
+        bottomBar.setVisibility(View.GONE);
+        messageBar.setVisibility(View.GONE);
+        pageBar.setVisibility(View.GONE);
+        backBar.setVisibility(View.GONE);
+        sendBar.setVisibility(View.GONE);
+        messageDetailBar.setVisibility(View.VISIBLE);
+        messageDetailBar.setStatus(messageListStatus);
     }
 
     public void initMainFragment() {
@@ -983,7 +1008,7 @@ public class MainActivity extends AppCompatActivity {
         messageReceiver = "";
         messageContent = "";
         messageTime = "";
-        messageId = "";
+        messageId = -1;
         messageIndex = -1;
     }
 
@@ -1083,7 +1108,7 @@ public class MainActivity extends AppCompatActivity {
     public String messageReceiver = "";
     public String messageContent = "";
     public String messageTime = "";
-    public String messageId = "";
+    public int messageId = -1;
     public int messageIndex = -1;
 
     public void initNewFragment(String tg) {
@@ -1093,7 +1118,7 @@ public class MainActivity extends AppCompatActivity {
         }
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 //        if (logFragment == null){
-        messageNewFragment = new MessageNewFragment(tg, messageReceiver, messageContent, messageTime);
+        messageNewFragment = new MessageNewFragment(tg, messageReceiver, messageContent, messageTime, messageId);
         messageNewFragment.mainActivity = this;
 //        }
 //        transaction.replace(R.id.main_frame_layout, messageNewFragment);
@@ -1105,7 +1130,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (tg.equals("detail")) {
             messageFragment.setMessageRead(messageIndex);
-            showBackBar();
+            showMessageDetailBar(messageListStatus);
             backButtonStatus = "backToMessageList";
         } else {
             showSendBar();
@@ -1166,6 +1191,13 @@ public class MainActivity extends AppCompatActivity {
 
         if (receiver.isEmpty()) {
             QHDialog qhDialog = new QHDialog(this, "提示", "收件人为空！");
+            qhDialog.setOnlyOneButtonText("好的");
+            qhDialog.show();
+            return;
+        }
+
+        if (!CommonUtil.isNumber(receiver)) {
+            QHDialog qhDialog = new QHDialog(this, "提示", "请正确填写收件人地址");
             qhDialog.setOnlyOneButtonText("好的");
             qhDialog.show();
             return;

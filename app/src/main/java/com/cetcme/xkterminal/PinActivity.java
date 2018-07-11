@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,8 +41,8 @@ public class PinActivity extends Activity {
     @BindView(R.id.listView)
     ListView listView;
 
-    @BindView(R.id.tv_back)
-    TextView tv_back;
+    @BindView(R.id.iv_back)
+    ImageView iv_back;
 
     @BindView(R.id.tv_pin_map)
     TextView tv_pin_map;
@@ -72,7 +73,7 @@ public class PinActivity extends Activity {
     }
 
     private void initTitleView() {
-        tv_back.setOnClickListener(new View.OnClickListener() {
+        iv_back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 setResult(RESULT_CODE_NOTHING);

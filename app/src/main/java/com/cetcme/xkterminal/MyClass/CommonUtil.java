@@ -6,6 +6,9 @@ import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Created by qiuhong on 15/01/2018.
  */
@@ -31,5 +34,17 @@ public class CommonUtil {
                 return true;
         }
         return false;
+    }
+
+
+    /**
+     * 是否全是数字
+     * @param txt
+     * @return
+     */
+    public static boolean isNumber(String txt) {
+        Pattern p = Pattern.compile("[0-9]*");
+        Matcher m = p.matcher(txt);
+        return m.matches();
     }
 }

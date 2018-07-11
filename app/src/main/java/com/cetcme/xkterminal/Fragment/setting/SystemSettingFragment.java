@@ -26,6 +26,7 @@ import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.CommonUtil;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
+import com.cetcme.xkterminal.Navigation.SkiaDrawView;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.SelfCheckActivity;
 import com.cetcme.xkterminal.Sqlite.Bean.FriendBean;
@@ -74,6 +75,9 @@ public class SystemSettingFragment extends Fragment {
 
     @BindView(R.id.tv_device_id)
     TextView tv_device_id;
+
+    @BindView(R.id.tv_yima_id)
+    TextView tv_yima_id;
 
     // 用于添加好友内容缓存
     private String[] friend = {"", ""};
@@ -446,7 +450,6 @@ public class SystemSettingFragment extends Fragment {
 
     }
 
-
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(SmsEvent smsEvent) {
         try {
@@ -464,8 +467,6 @@ public class SystemSettingFragment extends Fragment {
         }
     }
 
-
-
     private void getData() {
 
         String ssid = PreferencesUtils.getString(getActivity(), "wifiSSID");
@@ -478,6 +479,7 @@ public class SystemSettingFragment extends Fragment {
 //        boolean rdssOpen = PreferencesUtils.getBoolean(getActivity(), "rdss", false);
 //        tv_rdss.setText(rdssOpen ? "关闭" : "开启");
 
+        tv_yima_id.setText(getYimaId());
     }
 
     private void smsTempAdd() {
@@ -867,4 +869,11 @@ public class SystemSettingFragment extends Fragment {
         return m.matches();
     }
 
+    private String getYimaId() {
+
+        String yimaStr = SkiaDrawView.mYimaLib.GetDeviceIDForLicSvr();
+//        SkiaDrawView.mYimaLib.SetLicenceKeyFromSvr();
+//        Log.e("YIMA", "onCreateView: " + yimaStr);
+        return yimaStr;
+    }
 }

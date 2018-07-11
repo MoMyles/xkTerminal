@@ -24,6 +24,7 @@ import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.DateUtil;
 import com.cetcme.xkterminal.MyClass.LunarUtil;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
+import com.cetcme.xkterminal.MyClass.widget.MyTextView;
 import com.cetcme.xkterminal.R;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
@@ -262,10 +263,10 @@ public class GPSBar extends RelativeLayout {
         textViews.add(textView_message);
         textViews.add(textView_time);
 
-        for (TextView textview : textViews) {
-            textview.getPaint().setFakeBoldText(true);
-            textview.setTextColor(0xFF000000);
-        }
+//        for (TextView textview : textViews) {
+//            textview.getPaint().setFakeBoldText(true);
+//            textview.setTextColor(0xFF000000);
+//        }
     }
 
     private void screenshot() {

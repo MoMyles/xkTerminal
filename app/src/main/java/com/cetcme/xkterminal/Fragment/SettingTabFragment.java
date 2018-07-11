@@ -167,8 +167,9 @@ public class SettingTabFragment extends Fragment {
         fragments.add(new SatelliteFragment());
         fragments.add(new WarningSettingFragment());
         fragments.add(new SeriveStatusFragment());
-        fragments.add(new WeatherInfoFragment());
+//        fragments.add(new WeatherInfoFragment());
         fragments.add(new SystemSettingFragment());
+        fragments.add(new AboutFragment());
 
         ly_tab1.setOnClickListener(new TabOnClickListener(0));
         ly_tab2.setOnClickListener(new TabOnClickListener(1));

@@ -42,7 +42,7 @@ public class Constant {
     // 短信发送间隔
     public static final int MESSAGE_SEND_LIMIT_TIME = 60000;
 
-    // 自检超时时间
+    // 开机自检超时时间
     public static final int SELF_CHECK_TIME_OUT = 6 * 1000; //2 * 60 * 1000; TODO
 
     // 开机之后隔多久发开机数据包
@@ -70,7 +70,7 @@ public class Constant {
     public static final boolean SHOW_NUMBER_FRIEND_LIST = true;
 
     // 存数据库内容的条数限制 TODO 确定数量
-    public static final int LIMIT_MESSAGE = 5; //?
+    public static final int LIMIT_MESSAGE = 10; //?
     public static final int LIMIT_INOUT = 5; //?
     public static final int LIMIT_FRIEND = 5;
     public static final int LIMIT_SMS_TEMP = 5;

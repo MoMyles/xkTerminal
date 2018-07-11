@@ -88,7 +88,6 @@ public class MessageFragment extends Fragment {
         return view;
     }
 
-
     private void create(ListView listView, final List<Map<String, Object>> dataList) {
         simpleAdapter = new SimpleAdapter(getActivity(), getMessageData(), R.layout.cell_message_list,
                 new String[]{"number", "time", "receiver", "content", "status"},
@@ -97,27 +96,9 @@ public class MessageFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-                /* 详情 和 转发按钮
-                System.out.println("message id: " + dataList.get(i));
-                mainActivity.messageBar.setDetailAndRelayButtonEnable(true);
-                if (i == selectedIndex) return;
-                dataList.get(i).put("selected", "●");
-                if (selectedIndex != -1) dataList.get(selectedIndex).put("selected", "");
-                selectedIndex = i;
-                simpleAdapter.notifyDataSetChanged();
-
-                mainActivity.messageIndex = i;
-                mainActivity.messageId = dataList.get(i).get("id").toString();
-                mainActivity.messageReceiver = dataList.get(i).get("sender").toString();
-                mainActivity.messageContent = dataList.get(i).get("content").toString();
-                mainActivity.messageTime = dataList.get(i).get("time").toString();
-                */
-
-
                 // 单击进入
                 mainActivity.messageIndex = i;
-                mainActivity.messageId = dataList.get(i).get("id").toString();
+                mainActivity.messageId = Integer.parseInt(dataList.get(i).get("id").toString());
                 if (tg.equals("receive")) {
                     mainActivity.messageReceiver = dataList.get(i).get("sender").toString();
                 } else {
@@ -129,64 +110,6 @@ public class MessageFragment extends Fragment {
 
                 dataList.get(i).put("status", "");
                 simpleAdapter.notifyDataSetChanged();
-            }
-        });
-
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int i, long l) {
-
-                long count = MessageProxy.getCount(MyApplication.getInstance().getDb());
-                if (count >= Constant.LIMIT_MESSAGE) {
-                    new QMUIDialog.MessageDialogBuilder(mainActivity)
-                            .setTitle("提示")
-                            .setMessage("已达到短信最大数量(" + Constant.LIMIT_FRIEND + ")，请删除后再进行操作。")
-                            .addAction("确定", new QMUIDialogAction.ActionListener() {
-                                @Override
-                                public void onClick(QMUIDialog dialog, int index) {
-                                    dialog.dismiss();
-                                }
-                            })
-                            .show();
-                    return true;
-                }
-
-                QMUIBottomSheet.BottomListSheetBuilder bottomListSheetBuilder = new QMUIBottomSheet.BottomListSheetBuilder(getActivity());
-                bottomListSheetBuilder.addItem("转发");
-                if (tg.equals("send")) {
-                    bottomListSheetBuilder.addItem("重新发送");
-                } else if (tg.equals("receive")) {
-                    bottomListSheetBuilder.addItem("回复");
-                }
-                bottomListSheetBuilder.setOnSheetItemClickListener(new QMUIBottomSheet.BottomListSheetBuilder.OnSheetItemClickListener() {
-                    @Override
-                    public void onClick(QMUIBottomSheet dialog, View itemView, int position, String tag) {
-                        dialog.dismiss();
-//                        Toast.makeText(getActivity(), "Item " + (position + 1), Toast.LENGTH_SHORT).show();
-
-                        mainActivity.messageId = dataList.get(i).get("id").toString();
-                        mainActivity.messageContent = dataList.get(i).get("content").toString();
-                        mainActivity.messageTime = dataList.get(i).get("time").toString();
-                        if (position == 0) {
-                            mainActivity.initNewFragment("relay");
-                        } else if (position == 1) {
-                            if (tg.equals("send")) {
-                                // 重新发送
-                                mainActivity.messageReceiver = dataList.get(i).get("receiver").toString();
-                                mainActivity.initNewFragment("resend");
-                            } else {
-                                // 回复
-                                mainActivity.messageReceiver = dataList.get(i).get("sender").toString();
-                                mainActivity.initNewFragment("reply");
-                            }
-
-                        }
-                    }
-                });
-                QMUIBottomSheet qmuiBottomSheet = bottomListSheetBuilder.build();
-                qmuiBottomSheet.show();
-
-                return true;
             }
         });
     }
@@ -199,27 +122,9 @@ public class MessageFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-                /* 详情 和 转发按钮
-                System.out.println("message id: " + dataList.get(i));
-                mainActivity.messageBar.setDetailAndRelayButtonEnable(true);
-                if (i == selectedIndex) return;
-                dataList.get(i).put("selected", "●");
-                if (selectedIndex != -1) dataList.get(selectedIndex).put("selected", "");
-                selectedIndex = i;
-                simpleAdapter.notifyDataSetChanged();
-
-                mainActivity.messageIndex = i;
-                mainActivity.messageId = dataList.get(i).get("id").toString();
-                mainActivity.messageReceiver = dataList.get(i).get("sender").toString();
-                mainActivity.messageContent = dataList.get(i).get("content").toString();
-                mainActivity.messageTime = dataList.get(i).get("time").toString();
-                */
-
-
                 // 单击进入
                 mainActivity.messageIndex = i;
-                mainActivity.messageId = dataList.get(i).get("id").toString();
+                mainActivity.messageId = Integer.parseInt(dataList.get(i).get("id").toString());
                 if (tg.equals("receive")) {
                     mainActivity.messageReceiver = dataList.get(i).get("sender").toString();
                 } else {
@@ -231,49 +136,6 @@ public class MessageFragment extends Fragment {
 
                 dataList.get(i).put("status", "");
                 simpleAdapter2.notifyDataSetChanged();
-            }
-        });
-
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int i, long l) {
-
-                QMUIBottomSheet.BottomListSheetBuilder bottomListSheetBuilder = new QMUIBottomSheet.BottomListSheetBuilder(getActivity());
-                bottomListSheetBuilder.addItem("转发");
-                if (tg.equals("send")) {
-                    bottomListSheetBuilder.addItem("重新发送");
-                } else if (tg.equals("receive")) {
-                    bottomListSheetBuilder.addItem("回复");
-                }
-                bottomListSheetBuilder.setOnSheetItemClickListener(new QMUIBottomSheet.BottomListSheetBuilder.OnSheetItemClickListener() {
-                    @Override
-                    public void onClick(QMUIBottomSheet dialog, View itemView, int position, String tag) {
-                        dialog.dismiss();
-//                        Toast.makeText(getActivity(), "Item " + (position + 1), Toast.LENGTH_SHORT).show();
-
-                        mainActivity.messageId = dataList.get(i).get("id").toString();
-                        mainActivity.messageContent = dataList.get(i).get("content").toString();
-                        mainActivity.messageTime = dataList.get(i).get("time").toString();
-                        if (position == 0) {
-                            mainActivity.initNewFragment("relay");
-                        } else if (position == 1) {
-                            if (tg.equals("send")) {
-                                // 重新发送
-                                mainActivity.messageReceiver = dataList.get(i).get("receiver").toString();
-                                mainActivity.initNewFragment("resend");
-                            } else {
-                                // 回复
-                                mainActivity.messageReceiver = dataList.get(i).get("sender").toString();
-                                mainActivity.initNewFragment("reply");
-                            }
-
-                        }
-                    }
-                });
-                QMUIBottomSheet qmuiBottomSheet = bottomListSheetBuilder.build();
-                qmuiBottomSheet.show();
-
-                return true;
             }
         });
     }
@@ -313,8 +175,6 @@ public class MessageFragment extends Fragment {
             }
         }
     }
-
-    private int selectedIndex = -1;
 
     public void nextPage() {
         if (pageIndex + 1 >= totalPage) {
@@ -427,5 +287,11 @@ public class MessageFragment extends Fragment {
         }else{
             simpleAdapter2.notifyDataSetChanged();
         }
+    }
+
+    public void deleteMessage(int index) {
+        dataList.remove(index);
+        simpleAdapter.notifyDataSetChanged();
+        simpleAdapter2.notifyDataSetChanged();
     }
 }

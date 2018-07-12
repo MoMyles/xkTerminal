@@ -23,9 +23,11 @@ import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
 import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.MyApplication;
+import com.cetcme.xkterminal.MyClass.AdminPswUtil;
 import com.cetcme.xkterminal.MyClass.CommonUtil;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
+import com.cetcme.xkterminal.MyClass.widget.PswDialog;
 import com.cetcme.xkterminal.Navigation.SkiaDrawView;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.SelfCheckActivity;
@@ -56,6 +58,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.cetcme.xkterminal.MyClass.CommonUtil.isNumber;
 import static com.cetcme.xkterminal.Navigation.Constant.YIMA_WORK_PATH;
 
 /**
@@ -128,61 +131,40 @@ public class SystemSettingFragment extends Fragment {
             @Override
             public void onClick(View view) {
 
-                final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
-                builder.setTitle("请输入管理密码")
-                        .setInputType(InputType.TYPE_CLASS_TEXT)
-                        .addAction("取消", new QMUIDialogAction.ActionListener() {
-                            @Override
-                            public void onClick(QMUIDialog dialog, int index) {
-                                dialog.dismiss();
-                            }
-                        })
-                        .addAction("确认", new QMUIDialogAction.ActionListener() {
-                            @Override
-                            public void onClick(QMUIDialog dialog, int index) {
-                                CharSequence text = builder.getEditText().getText();
-                                if (text != null && text.length() > 0) {
-                                    if (text.toString().equals(Constant.ADMIN_PASSWORD)) {
-
+                PswDialog pswDialog = new PswDialog(getActivity());
+                pswDialog.setOnPswOkListener(new PswDialog.OnPswOkListener() {
+                    @Override
+                    public void onPswOk() {
+                        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
+                        builder.setTitle("修改WIFI SSID")
+                                .setPlaceholder("在此输入新的WIFI SSID")
+                                .setInputType(InputType.TYPE_CLASS_TEXT)
+                                .addAction("取消", new QMUIDialogAction.ActionListener() {
+                                    @Override
+                                    public void onClick(QMUIDialog dialog, int index) {
                                         dialog.dismiss();
-
-                                        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
-                                        builder.setTitle("修改WIFI SSID")
-                                                .setPlaceholder("在此输入新的WIFI SSID")
-                                                .setInputType(InputType.TYPE_CLASS_TEXT)
-                                                .addAction("取消", new QMUIDialogAction.ActionListener() {
-                                                    @Override
-                                                    public void onClick(QMUIDialog dialog, int index) {
-                                                        dialog.dismiss();
-                                                    }
-                                                })
-                                                .addAction("确定", new QMUIDialogAction.ActionListener() {
-                                                    @Override
-                                                    public void onClick(QMUIDialog dialog, int index) {
-                                                        CharSequence text = builder.getEditText().getText();
-                                                        if (text != null && text.length() > 0) {
-                                                            PreferencesUtils.putString(getActivity(), "wifiSSID", text.toString());
-                                                            wifi_ssid_textView.setText(text);
-                                                            Toast.makeText(getActivity(), "新的WIFI SSID: " + text, Toast.LENGTH_SHORT).show();
-                                                            dialog.dismiss();
-                                                            assert getActivity() != null;
-                                                            ((MainActivity) getActivity()).createWifiHotspot();
-                                                        } else {
-                                                            Toast.makeText(getActivity(), "请输入新的WIFI SSID", Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    }
-                                                })
-                                                .show();
-                                    } else {
-                                        Toast.makeText(getActivity(), "管理密码错误", Toast.LENGTH_SHORT).show();
                                     }
-                                } else {
-                                    Toast.makeText(getActivity(), "请填入内容", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        })
-                        .show();
-
+                                })
+                                .addAction("确定", new QMUIDialogAction.ActionListener() {
+                                    @Override
+                                    public void onClick(QMUIDialog dialog, int index) {
+                                        CharSequence text = builder.getEditText().getText();
+                                        if (text != null && text.length() > 0) {
+                                            PreferencesUtils.putString(getActivity(), "wifiSSID", text.toString());
+                                            wifi_ssid_textView.setText(text);
+                                            Toast.makeText(getActivity(), "新的WIFI SSID: " + text, Toast.LENGTH_SHORT).show();
+                                            dialog.dismiss();
+                                            assert getActivity() != null;
+                                            ((MainActivity) getActivity()).createWifiHotspot();
+                                        } else {
+                                            Toast.makeText(getActivity(), "请输入新的WIFI SSID", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                })
+                                .show();
+                    }
+                });
+                pswDialog.show();
             }
         });
 
@@ -363,93 +345,56 @@ public class SystemSettingFragment extends Fragment {
         tv_device_id.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
-                builder.setTitle("请输入管理密码")
-                        .setInputType(InputType.TYPE_CLASS_TEXT)
-                        .addAction("取消", new QMUIDialogAction.ActionListener() {
-                            @Override
-                            public void onClick(QMUIDialog dialog, int index) {
-                                dialog.dismiss();
-                            }
-                        })
-                        .addAction("确认", new QMUIDialogAction.ActionListener() {
-                            @Override
-                            public void onClick(QMUIDialog dialog, int index) {
-                                CharSequence text = builder.getEditText().getText();
-                                if (text != null && text.length() > 0) {
-                                    if (text.toString().equals(Constant.ADMIN_PASSWORD)) {
 
+                PswDialog pswDialog = new PswDialog(getActivity());
+                pswDialog.setOnPswOkListener(new PswDialog.OnPswOkListener() {
+                    @Override
+                    public void onPswOk() {
+                        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
+                        builder.setTitle("设置终端ID")
+                                .setPlaceholder("请输入新的终端ID")
+                                .setInputType(InputType.TYPE_CLASS_NUMBER)
+                                .addAction("取消", new QMUIDialogAction.ActionListener() {
+                                    @Override
+                                    public void onClick(QMUIDialog dialog, int index) {
                                         dialog.dismiss();
-
-                                        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
-                                        builder.setTitle("设置终端ID")
-                                                .setPlaceholder("请输入新的终端ID")
-                                                .setInputType(InputType.TYPE_CLASS_NUMBER)
-                                                .addAction("取消", new QMUIDialogAction.ActionListener() {
-                                                    @Override
-                                                    public void onClick(QMUIDialog dialog, int index) {
-                                                        dialog.dismiss();
-                                                    }
-                                                })
-                                                .addAction("确认", new QMUIDialogAction.ActionListener() {
-                                                    @Override
-                                                    public void onClick(QMUIDialog dialog, int index) {
-                                                        CharSequence text = builder.getEditText().getText();
-                                                        if (text != null && text.length() > 0) {
-                                                            if (isNumber(text.toString())) {
-                                                                // 发送更改id的bytes
-                                                                MyApplication.getInstance().sendBytes(IDFormat.format(text.toString()));
-                                                                dialog.dismiss();
-                                                            } else {
-                                                                Toast.makeText(getActivity(), "请输入正确的终端ID", Toast.LENGTH_SHORT).show();
-                                                            }
-                                                        } else {
-                                                            Toast.makeText(getActivity(), "请填入内容", Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    }
-                                                })
-                                                .show();
-                                    } else {
-                                        Toast.makeText(getActivity(), "管理密码错误", Toast.LENGTH_SHORT).show();
                                     }
-                                } else {
-                                    Toast.makeText(getActivity(), "请填入内容", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        })
-                        .show();
+                                })
+                                .addAction("确认", new QMUIDialogAction.ActionListener() {
+                                    @Override
+                                    public void onClick(QMUIDialog dialog, int index) {
+                                        CharSequence text = builder.getEditText().getText();
+                                        if (text != null && text.length() > 0) {
+                                            if (isNumber(text.toString())) {
+                                                // 发送更改id的bytes
+                                                MyApplication.getInstance().sendBytes(IDFormat.format(text.toString()));
+                                                dialog.dismiss();
+                                            } else {
+                                                Toast.makeText(getActivity(), "请输入正确的终端ID", Toast.LENGTH_SHORT).show();
+                                            }
+                                        } else {
+                                            Toast.makeText(getActivity(), "请填入内容", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                })
+                                .show();
+                    }
+                });
+                pswDialog.show();
             }
         });
 
         view.findViewById(R.id.btn_finish).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
-                builder.setTitle("请输入管理密码")
-                        .setInputType(InputType.TYPE_CLASS_TEXT)
-                        .addAction("取消", new QMUIDialogAction.ActionListener() {
-                            @Override
-                            public void onClick(QMUIDialog dialog, int index) {
-                                dialog.dismiss();
-                            }
-                        })
-                        .addAction("确认", new QMUIDialogAction.ActionListener() {
-                            @Override
-                            public void onClick(QMUIDialog dialog, int index) {
-                                CharSequence text = builder.getEditText().getText();
-                                if (text != null && text.length() > 0) {
-                                    if (text.toString().equals(Constant.ADMIN_PASSWORD)) {
-//                                        dialog.dismiss();
-                                        System.exit(0);
-                                    } else {
-                                        Toast.makeText(getActivity(), "管理密码错误", Toast.LENGTH_SHORT).show();
-                                    }
-                                } else {
-                                    Toast.makeText(getActivity(), "请填入内容", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        })
-                        .show();
+                PswDialog pswDialog = new PswDialog(getActivity());
+                pswDialog.setOnPswOkListener(new PswDialog.OnPswOkListener() {
+                    @Override
+                    public void onPswOk() {
+                        System.exit(0);
+                    }
+                });
+                pswDialog.show();
             }
         });
 
@@ -459,59 +404,40 @@ public class SystemSettingFragment extends Fragment {
         tv_yima_serial.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
-                builder.setTitle("请输入管理密码")
-                        .setInputType(InputType.TYPE_CLASS_TEXT)
-                        .addAction("取消", new QMUIDialogAction.ActionListener() {
-                            @Override
-                            public void onClick(QMUIDialog dialog, int index) {
-                                dialog.dismiss();
-                            }
-                        })
-                        .addAction("确认", new QMUIDialogAction.ActionListener() {
-                            @Override
-                            public void onClick(QMUIDialog dialog, int index) {
-                                CharSequence text = builder.getEditText().getText();
-                                if (text != null && text.length() > 0) {
-                                    if (text.toString().equals(Constant.ADMIN_PASSWORD)) {
 
+                PswDialog pswDialog = new PswDialog(getActivity());
+                pswDialog.setOnPswOkListener(new PswDialog.OnPswOkListener() {
+                    @Override
+                    public void onPswOk() {
+                        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
+                        builder.setTitle("设置海图序列号")
+                                .setPlaceholder("请输入新的海图序列号")
+                                .setInputType(InputType.TYPE_CLASS_NUMBER)
+                                .addAction("取消", new QMUIDialogAction.ActionListener() {
+                                    @Override
+                                    public void onClick(QMUIDialog dialog, int index) {
                                         dialog.dismiss();
-
-                                        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
-                                        builder.setTitle("设置海图序列号")
-                                                .setPlaceholder("请输入新的海图序列号")
-                                                .setInputType(InputType.TYPE_CLASS_NUMBER)
-                                                .addAction("取消", new QMUIDialogAction.ActionListener() {
-                                                    @Override
-                                                    public void onClick(QMUIDialog dialog, int index) {
-                                                        dialog.dismiss();
-                                                    }
-                                                })
-                                                .addAction("确认", new QMUIDialogAction.ActionListener() {
-                                                    @Override
-                                                    public void onClick(QMUIDialog dialog, int index) {
-                                                        CharSequence text = builder.getEditText().getText();
-                                                        if (text != null && text.length() > 0) {
-                                                            PreferencesUtils.putString(getActivity(), "yimaSerial", text.toString());
-                                                            dialog.dismiss();
-                                                            tv_yima_serial.setText(text.toString());
-                                                            // TODO:
-                                                            SkiaDrawView.mYimaLib.SetLicenceKeyFromSvr(text.toString(), YIMA_WORK_PATH);
-                                                        } else {
-                                                            Toast.makeText(getActivity(), "请填入内容", Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    }
-                                                })
-                                                .show();
-                                    } else {
-                                        Toast.makeText(getActivity(), "管理密码错误", Toast.LENGTH_SHORT).show();
                                     }
-                                } else {
-                                    Toast.makeText(getActivity(), "请填入内容", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        })
-                        .show();
+                                })
+                                .addAction("确认", new QMUIDialogAction.ActionListener() {
+                                    @Override
+                                    public void onClick(QMUIDialog dialog, int index) {
+                                        CharSequence text = builder.getEditText().getText();
+                                        if (text != null && text.length() > 0) {
+                                            PreferencesUtils.putString(getActivity(), "yimaSerial", text.toString());
+                                            dialog.dismiss();
+                                            tv_yima_serial.setText(text.toString());
+                                            // TODO:
+                                            SkiaDrawView.mYimaLib.SetLicenceKeyFromSvr(text.toString(), YIMA_WORK_PATH);
+                                        } else {
+                                            Toast.makeText(getActivity(), "请填入内容", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                })
+                                .show();
+                    }
+                });
+                pswDialog.show();
             }
         });
 

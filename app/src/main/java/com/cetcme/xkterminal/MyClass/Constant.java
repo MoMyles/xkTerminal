@@ -75,7 +75,4 @@ public class Constant {
     public static final int LIMIT_FRIEND = 50;
     public static final int LIMIT_SMS_TEMP = 50;
     public static final int LIMIT_PIN = 50; //?
-
-    // 管理密码 用于设置终端ID 和 退出应用
-    public static final String ADMIN_PASSWORD = "admin";
 }

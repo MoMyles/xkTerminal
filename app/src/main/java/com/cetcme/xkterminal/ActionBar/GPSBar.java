@@ -24,6 +24,8 @@ import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.DateUtil;
 import com.cetcme.xkterminal.MyClass.LunarUtil;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
+import com.cetcme.xkterminal.MyClass.ScreenBrightness;
+import com.cetcme.xkterminal.MyClass.SoundPlay;
 import com.cetcme.xkterminal.MyClass.widget.MyTextView;
 import com.cetcme.xkterminal.R;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
@@ -205,7 +207,7 @@ public class GPSBar extends RelativeLayout {
 //                mainActivity.startActivity(new Intent(mainActivity, SerialPortActivity.class));
 //            }
 //        });
-/*
+
         // for test 测试收到新的短信息
         findViewById(R.id.sms_btn).setOnClickListener(new OnClickListener() {
             @Override
@@ -223,7 +225,7 @@ public class GPSBar extends RelativeLayout {
         findViewById(R.id.sign_btn).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                mainActivity.showIDCardDialog("33028319881122013X", "张三", "汉", "浙江省奉化市锦屏街道凉河路x幢xxx室");
+//                mainActivity.showIDCardDialog("33028319881122013X", "张三", "汉", "浙江省奉化市锦屏街道凉河路x幢xxx室");
             }
         });
 
@@ -253,7 +255,7 @@ public class GPSBar extends RelativeLayout {
             }
         });
 
-        */
+
 
         textViews.add(textView_latitude);
         textViews.add(textView_longitude);

@@ -95,7 +95,7 @@ public class SelfCheckActivity extends Activity {
         super.onStart();
 
         //TODO: test
-        /*
+
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -121,7 +121,6 @@ public class SelfCheckActivity extends Activity {
                 }
             }
         }, 5000);
-        */
 
     }
 
@@ -158,6 +157,7 @@ public class SelfCheckActivity extends Activity {
         tv_result.setVisibility(View.VISIBLE);
         tv_result.setTextColor(success ? successColor : failColor);
         tv_result.setText(success ? "自检成功，点击返回" : "自检失败，点击返回");
+        if (success) EventBus.getDefault().post("check_ok");
     }
 
 

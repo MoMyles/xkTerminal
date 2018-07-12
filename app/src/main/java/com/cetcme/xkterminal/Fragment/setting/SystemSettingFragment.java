@@ -527,6 +527,15 @@ public class SystemSettingFragment extends Fragment {
         }
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(String str) {
+        switch (str) {
+            case "check_ok":
+                tv_self_test.setText("自检成功");
+                break;
+        }
+    }
+
     private void getData() {
 
         String ssid = PreferencesUtils.getString(getActivity(), "wifiSSID");

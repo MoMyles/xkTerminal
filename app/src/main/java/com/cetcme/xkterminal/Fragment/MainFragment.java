@@ -59,6 +59,7 @@ import yimamapapi.skia.AisInfo;
 import yimamapapi.skia.M_POINT;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.cetcme.xkterminal.Navigation.Constant.YIMA_WORK_PATH;
 
 /**
  * Created by qiuhong on 10/01/2018.

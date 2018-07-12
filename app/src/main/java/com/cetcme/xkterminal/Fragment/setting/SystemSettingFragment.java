@@ -412,7 +412,7 @@ public class SystemSettingFragment extends Fragment {
                         final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
                         builder.setTitle("设置海图序列号")
                                 .setPlaceholder("请输入新的海图序列号")
-                                .setInputType(InputType.TYPE_CLASS_NUMBER)
+                                .setInputType(InputType.TYPE_CLASS_TEXT)
                                 .addAction("取消", new QMUIDialogAction.ActionListener() {
                                     @Override
                                     public void onClick(QMUIDialog dialog, int index) {
@@ -426,9 +426,17 @@ public class SystemSettingFragment extends Fragment {
                                         if (text != null && text.length() > 0) {
                                             PreferencesUtils.putString(getActivity(), "yimaSerial", text.toString());
                                             dialog.dismiss();
-                                            tv_yima_serial.setText(text.toString());
-                                            // TODO:
-                                            SkiaDrawView.mYimaLib.SetLicenceKeyFromSvr(text.toString(), YIMA_WORK_PATH);
+                                            // 设置完成后提示 重新进入app
+                                            new QMUIDialog.MessageDialogBuilder(getActivity())
+                                                    .setTitle("提示")
+                                                    .setMessage("海图序列号设置成功，请重新打开app")
+                                                    .addAction("确定", new QMUIDialogAction.ActionListener() {
+                                                        @Override
+                                                        public void onClick(QMUIDialog dialog, int index) {
+                                                            System.exit(0);
+                                                        }
+                                                    })
+                                                    .show();
                                         } else {
                                             Toast.makeText(getActivity(), "请填入内容", Toast.LENGTH_SHORT).show();
                                         }

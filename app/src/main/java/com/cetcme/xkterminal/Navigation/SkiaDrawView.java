@@ -12,6 +12,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
+import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 import com.cetcme.xkterminal.Sqlite.Bean.PinBean;
 
@@ -68,19 +69,37 @@ public class SkiaDrawView extends View {
         super(ctx, attr);
         mYimaLib = new YimaLib();
         mYimaLib.Create();
+        String deviceId = mYimaLib.GetDeviceIDForLicSvr();
+        String licenceKey = PreferencesUtils.getString(ctx, "yimaSerial");
+        if (licenceKey != null) {
+            mYimaLib.SetLicenceKeyFromSvr(licenceKey, Constant.YIMA_WORK_PATH); //"8C58-708D-1865-9674"
+        }
         mYimaLib.Init(Constant.YIMA_WORK_PATH);//初始化，传入WorkDir初始化目录地址
         mYimaLib.SetDrawOwnShipSpecialOptions(false, true, true, 255, 0, 0);
         mContext = ctx;
         bNormalDragMapMode = false;
         mYimaLib.SetIfShowMapFrame(false); // TODO:
+
+        boolean islicenceOk = mYimaLib.GetIfHadSetRightLicenceKey();
+        Log.e("yima", "GetIfHadSetRightLicenceKey: " + islicenceOk);
+
+
+//        String DeviceID = SkiaDrawView.mYimaLib.GetDeviceIDForLicSvr();
+//        int UsrId = SkiaDrawView.mYimaLib.GetUsrID();
+//
+//        Log.e("yima", "onCreateView: " + DeviceID + ", " + UsrId);
+//        SkiaDrawView.mYimaLib.SetLicenceKeyFromSvr("8C58-708D-1865-9674", YIMA_WORK_PATH);
+//
+//        boolean islicenceOk = SkiaDrawView.mYimaLib.GetIfHadSetRightLicenceKey();
+//        Log.e("yima", "islicenceOk: " + islicenceOk);
     }
 
     @Override
     public void onSizeChanged(int w, int h, int oldw, int oldh) {
         fSkiaBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         String strTtfFilePath = Constant.YIMA_WORK_PATH + "/DroidSansFallback.ttf";
-        mYimaLib.SetDisplayCategory(3);
-//        mYimaLib.SetDisplayCategory(0); // TODO：最简单的海图
+//        mYimaLib.SetDisplayCategory(3);
+        mYimaLib.SetDisplayCategory(0); // TODO：最简单的海图
         mYimaLib.RefreshDrawer(fSkiaBitmap, strTtfFilePath);//刷新绘制器，需要传入字体文件地址，用户可以自己修改为别的字体
         mYimaLib.OverViewLibMap(0);//概览第一幅图
     }

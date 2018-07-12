@@ -1,20 +1,24 @@
 package com.cetcme.xkterminal.Fragment.setting;
 
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +30,7 @@ import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.AdminPswUtil;
 import com.cetcme.xkterminal.MyClass.CommonUtil;
 import com.cetcme.xkterminal.MyClass.Constant;
+import com.cetcme.xkterminal.MyClass.DensityUtil;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.MyClass.widget.PswDialog;
 import com.cetcme.xkterminal.Navigation.SkiaDrawView;
@@ -35,9 +40,15 @@ import com.cetcme.xkterminal.Sqlite.Bean.FriendBean;
 import com.cetcme.xkterminal.Sqlite.Bean.GroupBean;
 import com.cetcme.xkterminal.Sqlite.Proxy.FriendProxy;
 import com.cetcme.xkterminal.Sqlite.Proxy.GroupProxy;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
+import com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -49,6 +60,7 @@ import org.xutils.DbManager;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -481,6 +493,12 @@ public class SystemSettingFragment extends Fragment {
 //        tv_rdss.setText(rdssOpen ? "关闭" : "开启");
 
         tv_yima_id.setText(getYimaId());
+        tv_yima_id.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                qecodeDialogShow(getYimaId());
+            }
+        });
     }
 
     private void smsTempAdd() {
@@ -871,15 +889,63 @@ public class SystemSettingFragment extends Fragment {
     }
 
     private String getYimaId() {
-
-        String yimaStr = SkiaDrawView.mYimaLib.GetDeviceIDForLicSvr();
-//        SkiaDrawView.mYimaLib.SetLicenceKeyFromSvr();
-//        Log.e("YIMA", "onCreateView: " + yimaStr);
-
-        return yimaStr;
+        return SkiaDrawView.mYimaLib.GetDeviceIDForLicSvr();
     }
 
     private int getUserId() {
         return SkiaDrawView.mYimaLib.GetUsrID();
     }
+
+    private void qecodeDialogShow(String serial) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+//        LayoutInflater inflater = LayoutInflater.from(getActivity());
+//        View v = inflater.inflate(R.layout.dialog_qrcode, null);
+//        ImageView iv_qrcode = v.findViewById(R.id.iv_qrcode);
+        int width = DensityUtil.dip2px(getActivity(), 200);
+        ImageView iv_qrcode = new ImageView(getActivity());
+//        iv_qrcode.setMinimumWidth(width);
+//        iv_qrcode.setMinimumHeight(width);
+        iv_qrcode.setImageBitmap(createQRImage(serial, width, width));
+        //builer.setView(v);//这里如果使用builer.setView(v)，自定义布局只会覆盖title和button之间的那部分
+        final Dialog dialog = builder.create();
+        dialog.show();
+        dialog.getWindow().setContentView(iv_qrcode);//自定义布局应该在这里添加，要在dialog.show()的后面
+        dialog.getWindow().setGravity(Gravity.CENTER);//可以设置显示的位置
+    }
+
+    //要转换的地址或字符串,可以是中文
+    public static Bitmap createQRImage(String url, int QR_WIDTH, int QR_HEIGHT ) {
+        try {//判断URL合法性
+            if (url == null || "".equals(url) || url.length() < 1) {
+                return null;
+            }
+            Hashtable<EncodeHintType, String> hints = new Hashtable<EncodeHintType, String>();
+            hints.put(EncodeHintType.CHARACTER_SET, "utf-8");
+            //图像数据转换，使用了矩阵转换
+            BitMatrix bitMatrix = null;
+                bitMatrix = new QRCodeWriter().encode(url, BarcodeFormat.QR_CODE, QR_WIDTH, QR_HEIGHT, hints);
+            int[] pixels = new int[QR_WIDTH * QR_HEIGHT];
+            //下面这里按照二维码的算法，逐个生成二维码的图片，
+            //两个for循环是图片横列扫描的结果
+            for (int y = 0; y < QR_HEIGHT; y++) {
+                for (int x = 0; x < QR_WIDTH; x++) {
+                    if (bitMatrix.get(x, y)) {
+                        pixels[y * QR_WIDTH + x] = 0xff000000;
+                    }
+                    else {
+                        pixels[y * QR_HEIGHT + x] = 0xffffffff;
+                    }
+                }
+            }//生成二维码图片的格式，使用ARGB_8888
+            Bitmap bitmap = Bitmap.createBitmap(QR_WIDTH, QR_HEIGHT, Bitmap.Config.ARGB_8888);
+            bitmap.setPixels(pixels, 0, QR_WIDTH, 0, 0, QR_WIDTH, QR_HEIGHT);
+            //显示到一个ImageView上面
+            return bitmap;
+        }
+        catch (WriterException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }

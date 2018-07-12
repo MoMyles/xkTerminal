@@ -325,7 +325,7 @@ public class SystemSettingFragment extends Fragment {
         tv_self_test.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                tv_self_test.setText("开始自检");
                /* PreferencesUtils.putString(getActivity(), "lastSendTime", DateUtil.parseDateToString(Constant.SYSTEM_DATE, DateUtil.DatePattern.YYYYMMDDHHMMSS));
                 tipDialog = new QMUITipDialog.Builder(getContext())
                         .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
@@ -532,6 +532,9 @@ public class SystemSettingFragment extends Fragment {
         switch (str) {
             case "check_ok":
                 tv_self_test.setText("自检成功");
+                break;
+            case "check_fail":
+                tv_self_test.setText("自检失败");
                 break;
         }
     }

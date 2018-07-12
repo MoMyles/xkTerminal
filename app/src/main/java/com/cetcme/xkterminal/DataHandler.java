@@ -186,11 +186,7 @@ public class DataHandler extends Handler {
                         }
                         // 自检OK和海图序列号
                         case MessageFormat.MESSAGE_TYPE_CHECK_AND_MAP: {
-                            if (content.equals("OK")) {
-                                JSONObject jsonObject = new JSONObject();
-                                jsonObject.put("apiType", "self_check_2");
-                                EventBus.getDefault().post(new SmsEvent(jsonObject));
-                            } else {
+                            if (!content.equals("OK")) {
                                 // 注册海图
                                 PreferencesUtils.putString(MyApplication.getInstance().mainActivity, "yimaSerial", content);
                                 // 设置完成后提示 重新进入app
@@ -205,6 +201,11 @@ public class DataHandler extends Handler {
                                         })
                                         .show();
                             }
+
+                            // 自检成功
+                            JSONObject jsonObject = new JSONObject();
+                            jsonObject.put("apiType", "self_check_2");
+                            EventBus.getDefault().post(new SmsEvent(jsonObject));
                             break;
                         }
                         default:

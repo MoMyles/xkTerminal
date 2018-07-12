@@ -819,7 +819,17 @@ public class MyApplication extends Application {
         serialCount++;
         if (serialCount == 3) {
             String head = Util.bytesGetHead(serialBuffer, 3);
-            if (head.equals("$04") || head.equals("$R4") || head.equals("$R1") || head.equals("$R2") || head.equals("$R5") || head.equals("$R0") || head.equals("$R6") || head.equals("$R7") || head.equals("$R8")) {
+            if (head == null) return;
+            if (head.equals("$04") ||
+                head.equals("$R4") ||
+                head.equals("$R1") ||
+                head.equals("$R2") ||
+                head.equals("$R5") ||
+                head.equals("$R0") ||
+                head.equals("$R6") ||
+                head.equals("$R7") ||
+                head.equals("$R8") ||
+                head.equals("$RA")) {
                 hasHead = true;
             } else {
                 Util.bytesRemoveFirst(serialBuffer, serialCount);
@@ -933,6 +943,11 @@ public class MyApplication extends Application {
                             mHandler.sendMessage(message);
                         }
                         break;
+                    case "$RA":
+                        // 自检
+                        message.what = DataHandler.SERIAL_PORT_CHECK;
+                        message.setData(bundle);
+                        mHandler.sendMessage(message);
                     default:
                         hasHead = false;
                         Util.bytesRemoveFirst(serialBuffer, serialCount);

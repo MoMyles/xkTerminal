@@ -2,6 +2,7 @@ package com.cetcme.xkterminal.Fragment.setting;
 
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -23,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.DataFormat.IDFormat;
+import com.cetcme.xkterminal.DataFormat.MessageFormat;
 import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
 import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.MainActivity;
@@ -416,7 +418,51 @@ public class SystemSettingFragment extends Fragment {
         tv_yima_serial.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                PswDialog pswDialog = new PswDialog(getActivity());
+                pswDialog.setOnPswOkListener(new PswDialog.OnPswOkListener() {
+                    @Override
+                    public void onPswOk() {
 
+                        String lastSendTime = PreferencesUtils.getString(getActivity(), "lastSendTime", "");
+                        if (!lastSendTime.isEmpty()) {
+                            Long sendDate = DateUtil.parseStringToDate(lastSendTime, DateUtil.DatePattern.YYYYMMDDHHMMSS).getTime();
+                            Long now = Constant.SYSTEM_DATE.getTime();
+                            if (now - sendDate <= Constant.MESSAGE_SEND_LIMIT_TIME && now - sendDate > 0) {
+                                long remainSecond = (Constant.MESSAGE_SEND_LIMIT_TIME - (now - sendDate)) / 1000;
+                                Toast.makeText(getActivity(), "发送时间间隔不到1分钟，请等待" + remainSecond + "秒", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                        }
+
+                        MainActivity.sendCheckAndMapMessage();
+                        Toast.makeText(getActivity(), "已发送注册短信，请等待", Toast.LENGTH_SHORT).show();
+
+                        // TODO: test
+                        /*
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                // 注册海图
+                                PreferencesUtils.putString(MyApplication.getInstance().mainActivity, "yimaSerial", "8C58-708D-1865-9674");
+                                // 设置完成后提示 重新进入app
+                                new QMUIDialog.MessageDialogBuilder(MyApplication.getInstance().mainActivity)
+                                        .setTitle("提示")
+                                        .setMessage("海图序列号设置成功，请重新打开app")
+                                        .addAction("确定", new QMUIDialogAction.ActionListener() {
+                                            @Override
+                                            public void onClick(QMUIDialog dialog, int index) {
+                                                System.exit(0);
+                                            }
+                                        })
+                                        .show();
+                            }
+                        }, 5000);
+                        */
+                    }
+                });
+                pswDialog.show();
+
+                /*
                 PswDialog pswDialog = new PswDialog(getActivity());
                 pswDialog.setOnPswOkListener(new PswDialog.OnPswOkListener() {
                     @Override
@@ -458,6 +504,7 @@ public class SystemSettingFragment extends Fragment {
                     }
                 });
                 pswDialog.show();
+                */
             }
         });
 

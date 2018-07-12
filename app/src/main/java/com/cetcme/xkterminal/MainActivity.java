@@ -42,6 +42,7 @@ import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.DensityUtil;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.MyClass.SoundPlay;
+import com.cetcme.xkterminal.Navigation.SkiaDrawView;
 import com.cetcme.xkterminal.Socket.SocketServer;
 import com.cetcme.xkterminal.Sqlite.Bean.GPSBean;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
@@ -1591,5 +1592,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                 })
                 .show();
+    }
+
+    public static void sendCheckAndMapMessage() {
+        String deviceID = SkiaDrawView.mYimaLib.GetDeviceIDForLicSvr();
+        MyApplication.getInstance().sendBytes(MessageFormat.format("", deviceID, MessageFormat.MESSAGE_TYPE_CHECK_AND_MAP, 0));
     }
 }

@@ -1,6 +1,8 @@
 package com.cetcme.xkterminal;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -8,8 +10,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.cetcme.xkterminal.DataFormat.MessageFormat;
+import com.cetcme.xkterminal.DataFormat.Util.ByteUtil;
+import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
 import com.cetcme.xkterminal.Event.SmsEvent;
+import com.cetcme.xkterminal.MyClass.Constant;
+import com.cetcme.xkterminal.Navigation.SkiaDrawView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -29,19 +37,11 @@ public class SelfCheckActivity extends Activity {
     TextView tv_circle_1;
     @BindView(R.id.tv_circle_2)
     TextView tv_circle_2;
-    @BindView(R.id.tv_circle_3)
-    TextView tv_circle_3;
-    @BindView(R.id.tv_circle_4)
-    TextView tv_circle_4;
 
     @BindView(R.id.tv_text_1)
     TextView tv_text_1;
     @BindView(R.id.tv_text_2)
     TextView tv_text_2;
-    @BindView(R.id.tv_text_3)
-    TextView tv_text_3;
-    @BindView(R.id.tv_text_4)
-    TextView tv_text_4;
 
     @BindView(R.id.tv_result)
     TextView tv_result;
@@ -52,7 +52,7 @@ public class SelfCheckActivity extends Activity {
     int successColor;
     int failColor;
 
-    int[] checkResultArr = new int[] {0, 0, 0, 0}; // 默认0， 成功1， 不成功2
+    int[] checkResultArr = new int[] {0, 0}; // 默认0， 成功1， 不成功2
     boolean checking = true;
 
     @Override
@@ -71,19 +71,31 @@ public class SelfCheckActivity extends Activity {
                 finish();
             }
         });
+        loading.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
 
-        // 30内没有收到 则显示失败
+        // 3分组内没有收到 则显示失败
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
                 EventBus.getDefault().post("self_check_timeout");
             }
-        }, 10 * 1000);
+        }, 3 * 60 * 1000);
+
+        send0A();
+        send04_12();
     }
 
     @Override
     protected void onStart() {
+        super.onStart();
+
         //TODO: test
+        /*
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -109,34 +121,8 @@ public class SelfCheckActivity extends Activity {
                 }
             }
         }, 5000);
+        */
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("apiType", "self_check_3");
-                    EventBus.getDefault().post(new SmsEvent(jsonObject));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, 12000);
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("apiType", "self_check_4");
-                    EventBus.getDefault().post(new SmsEvent(jsonObject));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, 33000);
-
-        super.onStart();
     }
 
     @Override
@@ -163,14 +149,6 @@ public class SelfCheckActivity extends Activity {
             case 2:
                 setCircleStatus(tv_circle_2, success);
                 setTextStatus(tv_text_2, success);
-                break;
-            case 3:
-                setCircleStatus(tv_circle_3, success);
-                setTextStatus(tv_text_3, success);
-                break;
-            case 4:
-                setCircleStatus(tv_circle_4, success);
-                setTextStatus(tv_text_4, success);
                 break;
         }
     }
@@ -216,18 +194,6 @@ public class SelfCheckActivity extends Activity {
                     checkResultArr[1] = 1;
                     checkResult();
                     break;
-                case "self_check_3":
-                    if (!checking) return;
-                    setStepStatus(3, true);
-                    checkResultArr[2] = 1;
-                    checkResult();
-                    break;
-                case "self_check_4":
-                    if (!checking) return;
-                    setStepStatus(4, true);
-                    checkResultArr[3] = 1;
-                    checkResult();
-                    break;
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -236,7 +202,7 @@ public class SelfCheckActivity extends Activity {
 
     private void checkResult() {
         int resultInt = 0;
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 2; i++) {
             if (checkResultArr[i] == 0) {
                 return;
             } else if (checkResultArr[i] == 1) {
@@ -247,5 +213,30 @@ public class SelfCheckActivity extends Activity {
         }
 
         stopCheck(resultInt == 1);
+    }
+
+    private void send0A() {
+        byte[] bytes = "$0A".getBytes();
+        bytes = ByteUtil.byteMerger(bytes, new byte[] {0x01});
+        bytes = ByteUtil.byteMerger(bytes, "*hh".getBytes());
+        bytes = ByteUtil.byteMerger(bytes, "\r\n".getBytes());
+        MyApplication.getInstance().sendBytes(bytes);
+    }
+
+    private void send04_12() {
+
+        SharedPreferences sharedPreferences = getSharedPreferences("xkTerminal", Context.MODE_PRIVATE); //私有数据
+        String lastSendTime = sharedPreferences.getString("lastSendTime", "");
+        if (!lastSendTime.isEmpty()) {
+            Long sendDate = DateUtil.parseStringToDate(lastSendTime, DateUtil.DatePattern.YYYYMMDDHHMMSS).getTime();
+            Long now = Constant.SYSTEM_DATE.getTime();
+            if (now - sendDate <= Constant.MESSAGE_SEND_LIMIT_TIME && now - sendDate > 0) {
+                long remainSecond = (Constant.MESSAGE_SEND_LIMIT_TIME - (now - sendDate)) / 1000;
+                Toast.makeText(this, "发送时间间隔不到1分钟，请等待" + remainSecond + "秒", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
+        MainActivity.sendCheckAndMapMessage();
     }
 }

@@ -19,6 +19,8 @@ import com.cetcme.xkterminal.MyClass.ScreenBrightness;
 import com.cetcme.xkterminal.MyClass.SoundPlay;
 import com.cetcme.xkterminal.Socket.SocketServer;
 import com.cetcme.xkterminal.Sqlite.Proxy.GroupProxy;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
@@ -46,6 +48,8 @@ public class DataHandler extends Handler {
     public static final int SERIAL_PORT_ALERT_START = 0x10;
     public static final int SERIAL_PORT_ALERT_FAIL = 0x11;
     public static final int SERIAL_PORT_ID_EDIT_OK = 0x12;
+
+    public static final int SERIAL_PORT_CHECK = 0x14;
 
     private MyApplication myApplication;
 
@@ -177,6 +181,29 @@ public class DataHandler extends Handler {
                                 // 添加
                                 myApplication.mainActivity.deleteGroup(value[1]);
                                 Toast.makeText(myApplication.mainActivity, "您已退出分组：" + value[1], Toast.LENGTH_SHORT).show();
+                            }
+                            break;
+                        }
+                        // 自检OK和海图序列号
+                        case MessageFormat.MESSAGE_TYPE_CHECK_AND_MAP: {
+                            if (content.equals("OK")) {
+                                JSONObject jsonObject = new JSONObject();
+                                jsonObject.put("apiType", "self_check_2");
+                                EventBus.getDefault().post(new SmsEvent(jsonObject));
+                            } else {
+                                // 注册海图
+                                PreferencesUtils.putString(MyApplication.getInstance().mainActivity, "yimaSerial", content);
+                                // 设置完成后提示 重新进入app
+                                new QMUIDialog.MessageDialogBuilder(MyApplication.getInstance().mainActivity)
+                                        .setTitle("提示")
+                                        .setMessage("海图序列号设置成功，请重新打开app")
+                                        .addAction("确定", new QMUIDialogAction.ActionListener() {
+                                            @Override
+                                            public void onClick(QMUIDialog dialog, int index) {
+                                                System.exit(0);
+                                            }
+                                        })
+                                        .show();
                             }
                             break;
                         }
@@ -424,6 +451,12 @@ public class DataHandler extends Handler {
                     myApplication.mainActivity.gpsBar.showAlerting(false);
                     myApplication.mainActivity.showAlertFailDialog();
                     break;
+                case SERIAL_PORT_CHECK: {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("apiType", "self_check_1");
+                    EventBus.getDefault().post(new SmsEvent(jsonObject));
+                    break;
+                }
                 default:
                     super.handleMessage(msg);//这里最好对不需要或者不关心的消息抛给父类，避免丢失消息
                     break;

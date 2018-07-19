@@ -37,11 +37,16 @@ public class SelfCheckActivity extends Activity {
     TextView tv_circle_1;
     @BindView(R.id.tv_circle_2)
     TextView tv_circle_2;
+    @BindView(R.id.tv_circle_3)
+    TextView tv_circle_3;
 
     @BindView(R.id.tv_text_1)
     TextView tv_text_1;
     @BindView(R.id.tv_text_2)
     TextView tv_text_2;
+    @BindView(R.id.tv_text_3)
+    TextView tv_text_3;
+
 
     @BindView(R.id.tv_result)
     TextView tv_result;
@@ -52,7 +57,7 @@ public class SelfCheckActivity extends Activity {
     int successColor;
     int failColor;
 
-    int[] checkResultArr = new int[] {0, 0}; // 默认0， 成功1， 不成功2
+    int[] checkResultArr = new int[] {0, 0, 0}; // 默认0， 成功1， 不成功2, 第一位 本机 和 贝贝；第二位 平台短信 命令字 12；第三位 海图是否注册
     boolean checking = true;
 
     @Override
@@ -78,16 +83,23 @@ public class SelfCheckActivity extends Activity {
             }
         });
 
-        // 3分组内没有收到 则显示失败
+        // 没有收到 则显示失败
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
                 EventBus.getDefault().post("self_check_timeout");
             }
-        }, 3 * 60 * 1000);
+        }, 10 * 1000);
 
         send0A();
         send04_12();
+        checkYima();
+    }
+
+    private void checkYima() {
+        boolean licenseOk = SkiaDrawView.mYimaLib.GetIfHadSetRightLicenceKey();
+        setStepStatus(3, licenseOk);
+        checkResultArr[2] = licenseOk ? 1 : 2;
     }
 
     @Override
@@ -95,7 +107,7 @@ public class SelfCheckActivity extends Activity {
         super.onStart();
 
         //TODO: test
-
+        /*
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -121,7 +133,7 @@ public class SelfCheckActivity extends Activity {
                 }
             }
         }, 5000);
-
+        */
     }
 
     @Override
@@ -149,6 +161,10 @@ public class SelfCheckActivity extends Activity {
                 setCircleStatus(tv_circle_2, success);
                 setTextStatus(tv_text_2, success);
                 break;
+            case 3:
+                setCircleStatus(tv_circle_3, success);
+                setTextStatus(tv_text_3, success);
+                break;
         }
     }
 
@@ -157,7 +173,11 @@ public class SelfCheckActivity extends Activity {
         tv_result.setVisibility(View.VISIBLE);
         tv_result.setTextColor(success ? successColor : failColor);
         tv_result.setText(success ? "自检成功，点击返回" : "自检失败，点击返回");
-        if (success) EventBus.getDefault().post("check_ok");
+        if (success) {
+            EventBus.getDefault().post("check_ok");
+        } else {
+            EventBus.getDefault().post("check_fail");
+        }
     }
 
 
@@ -165,12 +185,15 @@ public class SelfCheckActivity extends Activity {
     public void onMessageEvent(String str) {
         switch (str) {
             case "self_check_timeout":
-                for (int i = 0; i < 4; i++) {
-                    if (checkResultArr[i] == 0) {
-                        setStepStatus(i + 1, false);
-                        stopCheck(false);
-                    }
+                if (checkResultArr[0] == 0) {
+                    setStepStatus(1, false);
+                    stopCheck(false);
                 }
+                if (checkResultArr[1] == 0) {
+                    setStepStatus(2, false);
+                    stopCheck(false);
+                }
+
                 checking = false;
                 break;
         }

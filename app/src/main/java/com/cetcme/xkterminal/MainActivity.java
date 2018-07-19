@@ -1598,6 +1598,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void sendCheckAndMapMessage() {
+        // TODO : 平台北斗号
         String deviceID = SkiaDrawView.mYimaLib.GetDeviceIDForLicSvr();
         MyApplication.getInstance().sendBytes(MessageFormat.format("", deviceID, MessageFormat.MESSAGE_TYPE_CHECK_AND_MAP, 0));
     }

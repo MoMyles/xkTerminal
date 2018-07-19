@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="320dp"
+    android:layout_width="460dp"
     android:layout_height="360dp"
     tools:context=".SelfCheckActivity"
     android:orientation="vertical"
@@ -29,7 +29,7 @@
         android:layout_marginLeft="40dp"
         android:layout_marginRight="40dp"
         android:gravity="center_vertical"
-        android:background="@mipmap/icon_check_bg_line">
+        android:background="@mipmap/icon_check_bg_line_half">
 
         <TextView
             android:id="@+id/tv_circle_1"
@@ -50,6 +50,17 @@
             android:background="@mipmap/icon_check_wait"
             android:gravity="center"
             android:text="2"
+            android:textSize="50sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/tv_circle_3"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginLeft="40dp"
+            android:background="@mipmap/icon_check_wait"
+            android:gravity="center"
+            android:text="3"
             android:textSize="50sp"
             android:textStyle="bold"/>
 
@@ -83,6 +94,17 @@
             android:layout_marginLeft="40dp"
             android:gravity="center"
             android:text="平台"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:id="@+id/tv_text_3"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:gravity="center"
+            android:text="海图"
             android:textSize="22sp"
             android:textStyle="bold"
             />

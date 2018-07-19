@@ -8,7 +8,9 @@
     <color name="no_gps">#D0021B</color>
     <color name="red">#D0021B</color>
 
-    <color name="QHTitleColor">#157CFB</color>
+    <color name="QHTitleColor">#334482</color>
+    <!--157CFB-->
+
     <color name="text_clo">#010203</color>
 
     <color name="border_clo">#ccc</color>
@@ -25,4 +27,11 @@
     <color name="check_wait">#D8D8D8</color>
     <color name="check_success">#32C183</color>
     <color name="check_fail">#E66474</color>
+
+    <!--new design-->
+    <color name="barColor">#334482</color>
+    <color name="bottomBtnPressColor">#5565A1</color>
+    <color name="titleColor">#5895F7</color>
+    <color name="bgColor">#EAF2FE</color>
+    <color name="barTextColor">#FFF</color>
 </resources>

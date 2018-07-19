@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#dddddd"
     android:orientation="vertical">
 
     <com.cetcme.xkterminal.ActionBar.TitleBar
@@ -13,11 +12,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginStart="20dp"
-        android:orientation="horizontal">
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:orientation="horizontal"
+        android:background="@color/bgColor">
 
         <TextView
             android:id="@+id/selected_in_message_cell"
@@ -25,7 +23,7 @@
             android:layout_height="match_parent"
             android:gravity="center_vertical"
             android:text="序号"
-            android:textColor="#000000"
+            android:textColor="@color/titleColor"
             android:textSize="20sp" />
 
         <TextView
@@ -34,7 +32,7 @@
             android:layout_height="match_parent"
             android:gravity="center_vertical"
             android:text="时间"
-            android:textColor="#000000"
+            android:textColor="@color/titleColor"
             android:textSize="20sp" />
 
         <TextView
@@ -43,7 +41,7 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="发件人"
-            android:textColor="#000000"
+            android:textColor="@color/titleColor"
             android:textSize="20sp" />
 
         <TextView
@@ -53,7 +51,7 @@
             android:gravity="center_vertical"
             android:text="内容"
             android:layout_marginLeft="5dp"
-            android:textColor="#000000"
+            android:textColor="@color/titleColor"
             android:textSize="20sp" />
 
     </LinearLayout>
@@ -75,12 +73,14 @@
             android:id="@+id/list_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="#fff"
             android:visibility="gone" />
 
         <ListView
             android:id="@+id/list_view2"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="#fff"
             android:visibility="gone" />
 
 

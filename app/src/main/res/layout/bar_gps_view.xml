@@ -1,22 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="60dp">
+    android:layout_height="60dp"
+    android:background="@color/barColor">
 
+    <ImageView
+        android:id="@+id/iv_logo"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@mipmap/icon_logo"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true" />I
+
+    <!--时间-->
     <TextView
         android:id="@+id/textView_time"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginLeft="10dp"
-        android:layout_marginStart="10dp"
         android:gravity="center_vertical"
         android:text="00:00:00"
-        android:textStyle="bold"
-        android:textSize="42sp" />
+        android:textStyle="italic|bold"
+        android:textSize="42sp"
+        android:textColor="@color/barTextColor"
+        android:layout_toRightOf="@+id/iv_logo"
+        />
 
+    <!--日期和农历-->
     <LinearLayout
         android:id="@+id/ly_date"
         android:layout_width="wrap_content"
@@ -33,7 +44,9 @@
             android:text="---"
             android:textSize="15sp"
             android:textStyle="bold"
-            android:gravity="bottom"/>
+            android:gravity="bottom"
+            android:textColor="@color/barTextColor"
+            />
         <TextView
             android:id="@+id/tv_lunar"
             android:layout_width="wrap_content"
@@ -42,70 +55,11 @@
             android:text="---"
             android:textSize="14sp"
             android:textStyle="bold"
+            android:textColor="@color/barTextColor"
             android:gravity="top"/>
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/textView_ais_status"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="20dp"
-        android:layout_toRightOf="@+id/ly_date"
-        android:gravity="center_vertical"
-        android:text="AIS未连接"
-        android:textColor="#ff0000"
-        android:textSize="22sp" />
-
-    <!--经纬度航速航向 -->
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:visibility="gone">
-
-        <TextView
-            android:id="@+id/textView_latitude"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="10dp"
-            android:layout_marginStart="10dp"
-            android:gravity="center_vertical"
-            android:text="---"
-            android:textSize="22sp" />
-
-        <TextView
-            android:id="@+id/textView_longitude"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="20dp"
-            android:layout_marginStart="20dp"
-            android:gravity="center_vertical"
-            android:text="---"
-            android:textSize="22sp" />
-
-        <TextView
-            android:id="@+id/textView_speed"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="20dp"
-            android:layout_marginStart="20dp"
-            android:gravity="center_vertical"
-            android:text="---"
-            android:textSize="22sp" />
-
-        <TextView
-            android:id="@+id/textView_heading"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="20dp"
-            android:layout_marginStart="20dp"
-            android:gravity="center_vertical"
-            android:text="---"
-            android:textSize="22sp" />
-
-    </LinearLayout>
 
     <!--测试用-->
     <LinearLayout
@@ -187,8 +141,6 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:layout_marginEnd="20dp"
-        android:layout_marginRight="20dp"
         android:layout_toLeftOf="@+id/textView_location_status"
         android:layout_toStartOf="@+id/textView_location_status"
         android:gravity="center_vertical"
@@ -197,28 +149,38 @@
         android:textSize="22sp" />
 
     <TextView
-        android:id="@+id/textView_location_status"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:id="@+id/textView_ais_status"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_alignParentTop="true"
-        android:layout_marginEnd="20dp"
-        android:layout_marginRight="20dp"
         android:layout_toLeftOf="@+id/textView_message"
         android:layout_toStartOf="@+id/textView_message"
         android:gravity="center_vertical"
-        android:text="已定位"
+        android:textColor="#ff0000"
+        android:textSize="22sp"
+        android:background="@mipmap/icon_ais_no"/>
+
+    <TextView
+        android:id="@+id/textView_location_status"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/textView_ais_status"
+        android:layout_toStartOf="@+id/textView_ais_status"
+        android:gravity="center_vertical"
+        android:background="@mipmap/icon_s_no"
         android:textSize="22sp" />
 
     <TextView
         android:id="@+id/textView_message"
-        android:layout_width="80dp"
-        android:layout_height="match_parent"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_alignParentTop="true"
         android:layout_marginRight="-10dp"
         android:layout_toLeftOf="@+id/textView_message_number"
         android:layout_toStartOf="@+id/textView_message_number"
         android:gravity="center_vertical|end"
-        android:text="无短信"
+        android:background="@mipmap/icon_sms"
         android:textSize="22sp" />
 
     <TextView

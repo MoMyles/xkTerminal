@@ -166,6 +166,7 @@ public class MyApplication extends Application {
         };
 
         //TODO: test for phone
+        /*
         try {
             mSerialPort = getSerialPort();
             mOutputStream = mSerialPort.getOutputStream();
@@ -186,6 +187,7 @@ public class MyApplication extends Application {
         } catch (InvalidParameterException e) {
             DisplayError(R.string.error_configuration);
         }
+        */
 
         //显示所有path
 //        String[] paths =  mSerialPortFinder.getAllDevicesPath();

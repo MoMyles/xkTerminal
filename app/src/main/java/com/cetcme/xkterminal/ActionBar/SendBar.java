@@ -45,7 +45,7 @@ public class SendBar extends RelativeLayout implements View.OnClickListener {
         buttons.add(button_back);
 
         for (Button button: buttons) {
-            button.setTextColor(0xFF000000);
+            button.setTextColor(0xFFFFFFFF);
             button.setBackgroundResource(R.drawable.button_bg_selector);
             button.setOnClickListener(this);
 //            button.setTextSize(10); //16

@@ -50,10 +50,6 @@ public class GPSBar extends RelativeLayout {
 
     public MainActivity mainActivity;
 
-    private TextView textView_latitude;
-    private TextView textView_longitude;
-    private TextView textView_speed;
-    private TextView textView_heading;
     private TextView textView_location_status;
     private TextView textView_ais_status;
     private TextView textView_message;
@@ -98,7 +94,6 @@ public class GPSBar extends RelativeLayout {
         View view = LayoutInflater.from(context).inflate(R.layout.bar_gps_view, this, true);
 
         bindView(view);
-        setData();
 
         newMsgToast = Toast.makeText(view.getContext(), "您有新的短信", Toast.LENGTH_SHORT);
 
@@ -109,10 +104,6 @@ public class GPSBar extends RelativeLayout {
 
         debug_btn_layout = view.findViewById(R.id.debug_btn_layout);
 
-        textView_latitude = view.findViewById(R.id.textView_latitude);
-        textView_longitude = view.findViewById(R.id.textView_longitude);
-        textView_speed = view.findViewById(R.id.textView_speed);
-        textView_heading = view.findViewById(R.id.textView_heading);
         textView_location_status = view.findViewById(R.id.textView_location_status);
         textView_ais_status = view.findViewById(R.id.textView_ais_status);
         textView_message = view.findViewById(R.id.textView_message);
@@ -255,12 +246,6 @@ public class GPSBar extends RelativeLayout {
             }
         });
 
-
-
-        textViews.add(textView_latitude);
-        textViews.add(textView_longitude);
-        textViews.add(textView_speed);
-        textViews.add(textView_heading);
         textViews.add(textView_location_status);
         textViews.add(textView_message);
         textViews.add(textView_time);
@@ -321,49 +306,13 @@ public class GPSBar extends RelativeLayout {
 
     }
 
-    private void setData() {
-
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("latitude", "N 30°46.225′");
-            jsonObject.put("longitude", "E 120°39.510′");
-            jsonObject.put("speed", "10.3Kt");
-            jsonObject.put("heading", "85°");
-            jsonObject.put("gps", false);
-            jsonObject.put("messageNumber", 3);
-
-            textView_latitude.setText(jsonObject.getString("latitude"));
-            textView_longitude.setText(jsonObject.getString("longitude"));
-            textView_speed.setText(jsonObject.getString("speed"));
-            textView_heading.setText(jsonObject.getString("heading"));
-
-//            if (jsonObject.getBoolean("gps")) {
-//                textView_location_status.setTextColor(0xFF2657EC);
-//                textView_location_status.setText("已定位");
-//                noGps = false;
-//            } else {
-//                textView_location_status.setTextColor(0xFFD0021B);
-//                textView_location_status.setText("未定位");
-//                noGps = true;
-//            }
-
-            setGPSStatus(jsonObject.getBoolean("gps"));
-
-//            int messageNumber = jsonObject.getInt("messageNumber");
-//            setMessageCount(messageNumber);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-    }
-
     private long lastNoGpsReportTime = 0;
     private long noGpsReportPeriod = 1000 * 60 * 10;
 
     public void setGPSStatus(boolean gpsStatus) {
         textView_location_status.setTextColor(gpsStatus ? 0xFF2657EC : 0xFFD0021B);
-        textView_location_status.setText(gpsStatus ? "已定位" : "卫星中断");
+//        textView_location_status.setText(gpsStatus ? "已定位" : "卫星中断");
+        textView_location_status.setBackground(flashTextViewVisible ? getResources().getDrawable(R.mipmap.icon_s_no) : getResources().getDrawable(R.mipmap.icon_s));
         if (gpsStatus) textView_location_status.setVisibility(VISIBLE);
         /*
         if (!gpsStatus && (Constant.SYSTEM_DATE.getTime() - lastNoGpsReportTime) >= noGpsReportPeriod) {
@@ -379,7 +328,8 @@ public class GPSBar extends RelativeLayout {
 
     public void setAisStatus(boolean aisStatus) {
         textView_ais_status.setTextColor(aisStatus ? 0xFF2657EC : 0xFFD0021B);
-        textView_ais_status.setText(aisStatus ? "AIS已连接" : "AIS未连接");
+//        textView_ais_status.setText(aisStatus ? "AIS已连接" : "AIS未连接");
+        textView_alert.setBackground(flashTextViewVisible ? getResources().getDrawable(R.mipmap.icon_ais_no) : getResources().getDrawable(R.mipmap.icon_ais));
         if (aisStatus) textView_ais_status.setVisibility(VISIBLE);
         noAisConnected = !aisStatus;
     }
@@ -482,6 +432,7 @@ public class GPSBar extends RelativeLayout {
                 case FLASH_NO_GPS:
                     if (noGps) {
                         textView_location_status.setVisibility(flashTextViewVisible ? VISIBLE : INVISIBLE);
+//                        textView_location_status.setBackground(flashTextViewVisible ? getResources().getDrawable(R.mipmap.icon_s_no) : getResources().getDrawable(R.mipmap.icon_s));
                     }
                     if (PreferencesUtils.getBoolean(mainActivity, "flashAlert", false)) {
                         textView_alert.setVisibility(flashTextViewVisible ? VISIBLE : INVISIBLE);
@@ -505,17 +456,17 @@ public class GPSBar extends RelativeLayout {
     public void modifyMessageCount(long count) {
         if (count != 0) {
             if (count < 100) {
-                textView_message.setText("短信");
+//                textView_message.setText("短信");
                 textView_message_number.setText(count + "");
                 textView_message_number.setVisibility(VISIBLE);
             } else {
-                textView_message.setText("短信");
+//                textView_message.setText("短信");
                 textView_message_number.setText("..");
                 textView_message_number.setVisibility(VISIBLE);
             }
 
         } else {
-            textView_message.setText("无短信");
+//            textView_message.setText("无短信");
             textView_message_number.setText("-");
             textView_message_number.setVisibility(INVISIBLE);
         }

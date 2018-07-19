@@ -108,6 +108,9 @@ public class PswDialog extends Dialog implements View.OnClickListener{
         tv_9.setOnClickListener(this);
         tv_del.setOnClickListener(this);
         tv_back.setOnClickListener(this);
+
+        setCancelable(true);
+        setCanceledOnTouchOutside(true);
     }
 
     public void setOnPswOkListener(OnPswOkListener onPswOkListener) {

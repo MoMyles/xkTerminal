@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#dddddd"
     android:orientation="vertical">
 
     <com.cetcme.xkterminal.ActionBar.TitleBar
@@ -14,11 +13,10 @@
         android:id="@+id/title_alert_layout"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginStart="20dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
         android:orientation="horizontal"
+        android:background="@color/bgColor"
         android:visibility="gone">
 
         <TextView
@@ -26,15 +24,15 @@
             android:layout_height="match_parent"
             android:gravity="center_vertical"
             android:text="序号"
-            android:textColor="#000000"
-            android:textSize="20sp" />
+            android:textColor="@color/titleColor"
+            android:textSize="20sp"  />
 
         <TextView
             android:layout_width="220dp"
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="遇险类型"
-            android:textColor="#000000"
+            android:textColor="@color/titleColor"
             android:textSize="20sp" />
 
         <TextView
@@ -42,7 +40,7 @@
             android:layout_height="match_parent"
             android:gravity="center_vertical"
             android:text="报警时间"
-            android:textColor="#000000"
+            android:textColor="@color/titleColor"
             android:textSize="20sp" />
     </LinearLayout>
 
@@ -50,11 +48,10 @@
         android:id="@+id/title_sign_layout"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginStart="20dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
         android:orientation="horizontal"
+        android:background="@color/bgColor"
         android:visibility="gone">
 
         <TextView
@@ -62,7 +59,7 @@
             android:layout_height="match_parent"
             android:gravity="center_vertical"
             android:text="序号"
-            android:textColor="#000000"
+            android:textColor="@color/titleColor"
             android:textSize="20sp" />
 
         <TextView
@@ -70,7 +67,7 @@
             android:layout_height="match_parent"
             android:gravity="center_vertical"
             android:text="身份信息"
-            android:textColor="#000000"
+            android:textColor="@color/titleColor"
             android:textSize="20sp" />
 
         <TextView
@@ -78,7 +75,7 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="姓名"
-            android:textColor="#000000"
+            android:textColor="@color/titleColor"
             android:textSize="20sp" />
 
         <TextView
@@ -86,7 +83,7 @@
             android:layout_height="match_parent"
             android:gravity="center_vertical"
             android:text="打卡时间"
-            android:textColor="#000000"
+            android:textColor="@color/titleColor"
             android:textSize="20sp" />
     </LinearLayout>
 
@@ -94,11 +91,10 @@
         android:id="@+id/title_inout_layout"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginStart="20dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
         android:orientation="horizontal"
+        android:background="@color/bgColor"
         android:visibility="gone">
 
         <TextView
@@ -106,7 +102,7 @@
             android:layout_height="match_parent"
             android:gravity="center_vertical"
             android:text="序号"
-            android:textColor="#000000"
+            android:textColor="@color/titleColor"
             android:textSize="20sp" />
 
         <TextView
@@ -114,7 +110,7 @@
             android:layout_height="match_parent"
             android:gravity="center_vertical"
             android:text="类型"
-            android:textColor="#000000"
+            android:textColor="@color/titleColor"
             android:textSize="20sp" />
 
         <TextView
@@ -122,7 +118,7 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="人数"
-            android:textColor="#000000"
+            android:textColor="@color/titleColor"
             android:textSize="20sp" />
 
         <TextView
@@ -130,7 +126,7 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="经度"
-            android:textColor="#000000"
+            android:textColor="@color/titleColor"
             android:textSize="20sp" />
 
         <TextView
@@ -138,7 +134,7 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="纬度"
-            android:textColor="#000000"
+            android:textColor="@color/titleColor"
             android:textSize="20sp" />
 
         <TextView
@@ -146,7 +142,7 @@
             android:layout_height="match_parent"
             android:gravity="center_vertical"
             android:text="申报时间"
-            android:textColor="#000000"
+            android:textColor="@color/titleColor"
             android:textSize="20sp" />
     </LinearLayout>
 
@@ -160,18 +156,21 @@
         android:id="@+id/list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#fff"
         android:visibility="gone" />
 
     <ListView
         android:id="@+id/list_view2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#fff"
         android:visibility="gone" />
 
     <ListView
         android:id="@+id/list_view3"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#fff"
         android:visibility="gone" />
 
 

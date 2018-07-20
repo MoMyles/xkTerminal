@@ -208,6 +208,13 @@ public class DataHandler extends Handler {
                             EventBus.getDefault().post(new SmsEvent(jsonObject));
                             break;
                         }
+                        // 渔货交易数据
+                        case MessageFormat.MESSAGE_TYPE_TRADE: {
+                            // TODO：平台号
+                            final String unique = ConvertUtil.rc4ToHex();
+                            MyApplication.getInstance().sendBytes(MessageFormat.format("", content, MessageFormat.MESSAGE_TYPE_TRADE, 0, unique));
+                            break;
+                        }
                         default:
                             // 判断分组 group -1为非分组短信，其他为组号，
                             if (group == -1 || GroupProxy.hasGroup(db, group)) {

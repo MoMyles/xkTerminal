@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#dddddd"
-    android:orientation="vertical">
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="#dddddd"
+              android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -62,9 +62,8 @@
             android:layout_alignParentRight="true"
             android:layout_marginBottom="8dp"
             android:layout_marginRight="8dp"
-            android:background="@drawable/circle"
-            android:padding="8dp"
-            android:src="@mipmap/gps7" />
+            android:background="@drawable/zoom_circle"
+            android:src="@drawable/circle_location_center" />
 
         <LinearLayout
             android:id="@+id/ll_ship_list"
@@ -103,7 +102,8 @@
             android:layout_marginTop="8dp"
             android:background="#CCFFFFFF"
             android:orientation="vertical"
-            android:padding="10dp">
+            android:padding="10dp"
+            android:visibility="visible">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -192,31 +192,42 @@
 
         <Button
             android:id="@+id/btn1"
-            android:layout_width="40dp"
+            android:layout_width="80dp"
             android:layout_height="40dp"
             android:layout_alignParentRight="true"
-            android:layout_below="@id/ly_status"
+            android:layout_above="@id/iv1"
             android:layout_marginRight="8dp"
+            android:layout_marginBottom="16dp"
             android:text="图例" />
 
         <RelativeLayout
             android:id="@+id/rl1"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/ly_status"
+            android:layout_marginRight="8dp"
             android:layout_toLeftOf="@id/btn1"
+            android:layout_alignTop="@id/btn1"
             android:background="#fff"
-            android:visibility="gone"
-            android:layout_marginTop="8dp">
-
+            android:visibility="gone">
+            <Switch
+                android:id="@+id/switch_map"
+                android:layout_width="wrap_content"
+                android:layout_height="56dp"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="10dp"
+                android:switchMinWidth="24dp"
+                android:text="简单模式"
+                android:checked="true"
+                android:textOff="关"
+                android:textOn="开" />
             <Switch
                 android:id="@+id/switch_yuqu"
                 android:layout_width="wrap_content"
                 android:layout_height="56dp"
                 android:layout_alignParentRight="true"
-
                 android:layout_marginRight="10dp"
                 android:switchMinWidth="24dp"
+                android:layout_below="@id/switch_map"
                 android:text="渔区"
                 android:textOff="关"
                 android:textOn="开" />
@@ -231,7 +242,8 @@
                 android:switchMinWidth="24dp"
                 android:text="区域报警"
                 android:textOff="关"
-                android:textOn="开" />
+                android:textOn="开"
+                android:visibility="gone"/>
 
             <Switch
                 android:id="@+id/switch_pin"
@@ -256,25 +268,23 @@
             android:layout_marginRight="8dp"
             android:orientation="vertical">
 
-            <Button
+            <ImageView
                 android:id="@+id/btn_zoom_out"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginBottom="8dp"
                 android:background="@drawable/zoom_circle"
                 android:gravity="center"
-                android:text="-"
-                android:textColor="#000"
+                android:src="@drawable/circle_zoom_out"
                 android:textSize="30sp" />
 
-            <Button
+            <ImageView
                 android:id="@+id/btn_zoom_in"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:background="@drawable/zoom_circle"
                 android:gravity="center"
-                android:text="+"
-                android:textColor="#000"
+                android:src="@drawable/circle_zoom_in"
                 android:textSize="30sp" />
 
         </LinearLayout>

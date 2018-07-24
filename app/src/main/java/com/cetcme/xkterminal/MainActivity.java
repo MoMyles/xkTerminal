@@ -528,7 +528,7 @@ public class MainActivity extends AppCompatActivity {
                                     e.printStackTrace();
                                 }
                             } else if ("$GPGSV".equals(type)) {
-                                 Log.e("TAG", "gps: " + newStr);
+                                Log.e("TAG", "gps: " + newStr);
                                 try {
                                     newStr = newStr.substring(newStr.indexOf(",") + 1, newStr.lastIndexOf("*"));
                                     boolean isDou = newStr.endsWith(",");
@@ -568,9 +568,6 @@ public class MainActivity extends AppCompatActivity {
                             preRestStr = gpsDataStr.substring((Integer) map.get("index"));
                             // Log.e("TAG", "pre: " + preRestStr);
                         }
-                    } else {
-                        preRestStr = gpsDataStr.substring((Integer) map.get("index"));
-                        // Log.e("TAG", "pre: " + preRestStr);
                     }
                 }
                 aisByts.clear();

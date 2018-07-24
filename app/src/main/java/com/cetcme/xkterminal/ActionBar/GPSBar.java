@@ -22,7 +22,11 @@ import com.cetcme.xkterminal.MessageDialogActivity;
 import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.DateUtil;
+import com.cetcme.xkterminal.MyClass.LunarUtil;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
+import com.cetcme.xkterminal.MyClass.ScreenBrightness;
+import com.cetcme.xkterminal.MyClass.SoundPlay;
+import com.cetcme.xkterminal.MyClass.widget.MyTextView;
 import com.cetcme.xkterminal.R;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
@@ -54,6 +58,9 @@ public class GPSBar extends RelativeLayout {
     private TextView textView_ais_status;
     private TextView textView_message;
     private TextView textView_time;
+
+    private TextView tv_date;
+    private TextView tv_lunar;
 
     private TextView textView_message_number;
     private TextView textView_alert;
@@ -110,6 +117,8 @@ public class GPSBar extends RelativeLayout {
         textView_ais_status = view.findViewById(R.id.textView_ais_status);
         textView_message = view.findViewById(R.id.textView_message);
         textView_time = view.findViewById(R.id.textView_time);
+        tv_date = view.findViewById(R.id.tv_date);
+        tv_lunar = view.findViewById(R.id.tv_lunar);
 
         textView_message_number = view.findViewById(R.id.textView_message_number);
 
@@ -164,6 +173,7 @@ public class GPSBar extends RelativeLayout {
         });
 
         //: for test 多次点击退出app
+        /*
         textView_time.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -186,6 +196,7 @@ public class GPSBar extends RelativeLayout {
 
             }
         });
+        */
 
 
         // for test串口调试界面 看是否通
@@ -196,7 +207,7 @@ public class GPSBar extends RelativeLayout {
 //                mainActivity.startActivity(new Intent(mainActivity, SerialPortActivity.class));
 //            }
 //        });
-/*
+
         // for test 测试收到新的短信息
         findViewById(R.id.sms_btn).setOnClickListener(new OnClickListener() {
             @Override
@@ -214,7 +225,7 @@ public class GPSBar extends RelativeLayout {
         findViewById(R.id.sign_btn).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                mainActivity.showIDCardDialog("33028319881122013X", "张三", "汉", "浙江省奉化市锦屏街道凉河路x幢xxx室");
+//                mainActivity.showIDCardDialog("33028319881122013X", "张三", "汉", "浙江省奉化市锦屏街道凉河路x幢xxx室");
             }
         });
 
@@ -244,7 +255,7 @@ public class GPSBar extends RelativeLayout {
             }
         });
 
-        */
+
 
         textViews.add(textView_latitude);
         textViews.add(textView_longitude);
@@ -254,10 +265,10 @@ public class GPSBar extends RelativeLayout {
         textViews.add(textView_message);
         textViews.add(textView_time);
 
-        for (TextView textview : textViews) {
-            textview.getPaint().setFakeBoldText(true);
-            textview.setTextColor(0xFF000000);
-        }
+//        for (TextView textview : textViews) {
+//            textview.getPaint().setFakeBoldText(true);
+//            textview.setTextColor(0xFF000000);
+//        }
     }
 
     private void screenshot() {
@@ -461,7 +472,12 @@ public class GPSBar extends RelativeLayout {
             super.handleMessage(msg);
             switch (msg.what) {
                 case UPDATE_TIME:
-                    textView_time.setText(DateUtil.Date2String(Constant.SYSTEM_DATE, "yyyy年MM月dd日 HH:mm:ss"));
+                    textView_time.setText(DateUtil.Date2String(Constant.SYSTEM_DATE, "HH:mm:ss"));
+                    tv_date.setText(DateUtil.Date2String(Constant.SYSTEM_DATE, "yyyy-MM-dd"));
+
+                    LunarUtil lunar = new LunarUtil(DateUtil.dataToCalendar(Constant.SYSTEM_DATE));
+                    lunar.toString();//农历的月日
+                    tv_lunar.setText("农历" + lunar.toString());
                     break;
                 case FLASH_NO_GPS:
                     if (noGps) {

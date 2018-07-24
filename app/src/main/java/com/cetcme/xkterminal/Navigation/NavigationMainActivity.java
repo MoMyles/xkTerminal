@@ -25,9 +25,9 @@ import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.MyApplication;
+import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
-import com.joanzapata.iconify.widget.IconTextView;
 import com.qiuhong.qhlibrary.QHTitleView.QHTitleView;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
@@ -112,7 +112,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
                     // 没有位置则固定中心点 121.768783,28.696902
                     fMainView.mYimaLib.CenterMap((int) (121.768783 * 1e7), (int) (28.696902 * 1e7));
                 }
-                fMainView.mYimaLib.SetCurrentScale(8878176.0f);
+                fMainView.mYimaLib.SetCurrentScale(20000.0f);
                 fMainView.postInvalidate();
             }
         }, 200);
@@ -656,8 +656,10 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 fMainView.changeFishState(b);
                 //menu.dismiss();
+                PreferencesUtils.putBoolean(NavigationMainActivity.this, "mainFrgYuqu", b);
             }
         });
+        checkBox.setChecked(PreferencesUtils.getBoolean(NavigationMainActivity.this, "mainFrgYuqu", false));
         final LinearLayout tvRoute = contentView.findViewById(R.id.tv_route);
         tvRoute.setOnClickListener(this);
         final LinearLayout tvNavigator = contentView.findViewById(R.id.tv_navigator);

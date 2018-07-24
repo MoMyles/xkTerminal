@@ -5,6 +5,8 @@ import org.xutils.db.annotation.Table;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Table(name="t_other_ship")
 public class OtherShipBean {
@@ -18,6 +20,94 @@ public class OtherShipBean {
     private String ship_name;
     @Column(name="acq_time")
     private Date acq_time;
+    private int longitude;
+    private int latitude;
+    private float cog;
+    private float sog;
+    private String callsign;
+    private int width;
+    private int lenght;
+    private int shipType;
+
+    private final Map<Integer, String> shipNameMap = new HashMap<>();
+
+    public OtherShipBean() {
+        shipNameMap.put(50, "引航船舶");
+        shipNameMap.put(51, "搜救船舶");
+        shipNameMap.put(52, "拖轮");
+        shipNameMap.put(53, "港口补给船");
+        shipNameMap.put(54, "安装有防污染设施或设备的船舶");
+        shipNameMap.put(55, "执法船舶");
+        shipNameMap.put(50, "引航船舶");
+
+
+        shipNameMap.put(58, "医疗运送船舶");
+        shipNameMap.put(59, "非武装冲突参与国的船舶和航空器");
+    }
+
+    public int getShipType() {
+        return shipType;
+    }
+
+    public void setShipType(int shipType) {
+        this.shipType = shipType;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public int getLenght() {
+        return lenght;
+    }
+
+    public void setLenght(int lenght) {
+        this.lenght = lenght;
+    }
+
+    public String getCallsign() {
+        return callsign;
+    }
+
+    public void setCallsign(String callsign) {
+        this.callsign = callsign;
+    }
+
+    public float getSog() {
+        return sog;
+    }
+
+    public void setSog(float sog) {
+        this.sog = sog;
+    }
+
+    public float getCog() {
+        return cog;
+    }
+
+    public void setCog(float cog) {
+        this.cog = cog;
+    }
+
+    public int getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(int longitude) {
+        this.longitude = longitude;
+    }
+
+    public int getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(int latitude) {
+        this.latitude = latitude;
+    }
 
     private boolean show = false;
 

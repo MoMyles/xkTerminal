@@ -10,9 +10,16 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.MainActivity;
+import com.cetcme.xkterminal.MyApplication;
+import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.NewInoutActivity;
 import com.cetcme.xkterminal.R;
+import com.cetcme.xkterminal.Sqlite.Proxy.FriendProxy;
+import com.cetcme.xkterminal.Sqlite.Proxy.InoutProxy;
+import com.cetcme.xkterminal.Sqlite.Proxy.MessageProxy;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 
 import java.util.ArrayList;
 
@@ -78,6 +85,38 @@ public class MessageBar extends RelativeLayout implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.button_new:
+                if (isInout) {
+                    long count = InoutProxy.getCount(MyApplication.getInstance().getDb());
+                    if (count >= Constant.LIMIT_INOUT) {
+                        new QMUIDialog.MessageDialogBuilder(mainActivity)
+                                .setTitle("提示")
+                                .setMessage("已达到申报最大数量(" + Constant.LIMIT_INOUT+ ")，请删除后再申报。")
+                                .addAction("确定", new QMUIDialogAction.ActionListener() {
+                                    @Override
+                                    public void onClick(QMUIDialog dialog, int index) {
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .show();
+                        return;
+                    }
+                } else {
+                    long count = MessageProxy.getCount(MyApplication.getInstance().getDb());
+                    if (count >= Constant.LIMIT_MESSAGE) {
+                        new QMUIDialog.MessageDialogBuilder(mainActivity)
+                                .setTitle("提示")
+                                .setMessage("已达到短信最大数量(" + Constant.LIMIT_MESSAGE + ")，请删除后再发件。")
+                                .addAction("确定", new QMUIDialogAction.ActionListener() {
+                                    @Override
+                                    public void onClick(QMUIDialog dialog, int index) {
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .show();
+                        return;
+                    }
+                }
+
                 if (isInout) {
                     mainActivity.startActivity(new Intent(mainActivity, NewInoutActivity.class));
                 } else {

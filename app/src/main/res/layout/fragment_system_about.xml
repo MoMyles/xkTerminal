@@ -16,7 +16,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="VR13船用北斗定位终端"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="30dp"
             android:textStyle="bold"
             android:textSize="38sp"/>
 
@@ -80,7 +80,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="20dp">
+            android:layout_marginTop="40dp">
             <ImageView
                 android:layout_width="60dp"
                 android:layout_height="60dp"

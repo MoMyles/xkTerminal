@@ -31,6 +31,7 @@ import com.cetcme.xkterminal.DataFormat.Util.ByteUtil;
 import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
 import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
 import com.cetcme.xkterminal.DataFormat.Util.Util;
+import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.Fragment.AboutFragment;
 import com.cetcme.xkterminal.Fragment.LogFragment;
 import com.cetcme.xkterminal.Fragment.MainFragment;
@@ -1608,5 +1609,33 @@ public class MainActivity extends AppCompatActivity {
         String deviceID = SkiaDrawView.mYimaLib.GetDeviceIDForLicSvr();
         final String unique = ConvertUtil.rc4ToHex();
         MyApplication.getInstance().sendBytes(MessageFormat.format("", deviceID, MessageFormat.MESSAGE_TYPE_CHECK_AND_MAP, 0, unique));
+    }
+
+    public void showPhoneLoginDialog() {
+        new QMUIDialog.MessageDialogBuilder(MainActivity.this)
+                .setTitle("提示")
+                .setMessage("是否允许手机客户端登陆？")
+                .addAction("取消", new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
+                        SocketServer.denyLogin();
+                        dialog.dismiss();
+                    }
+                })
+                .addAction(0, "允许", QMUIDialogAction.ACTION_PROP_NEGATIVE, new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
+                        SocketServer.allowLogin();
+                        try {
+                            JSONObject jsonObject = new JSONObject();
+                            jsonObject.put("apiType", "login");
+                            EventBus.getDefault().post(new SmsEvent(jsonObject));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        dialog.dismiss();
+                    }
+                })
+                .show();
     }
 }

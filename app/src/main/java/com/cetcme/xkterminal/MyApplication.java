@@ -357,6 +357,9 @@ public class MyApplication extends Application {
             String apiType = receiveJson.getString("apiType");
             JSONObject jsonObject = new JSONObject();
             switch (apiType) {
+                case "check_login":
+                    mainActivity.showPhoneLoginDialog();
+                    break;
                 case "login":
                     if (mainActivity != null) {
                         Toast.makeText(mainActivity, "手机客户端登陆成功", Toast.LENGTH_SHORT).show();

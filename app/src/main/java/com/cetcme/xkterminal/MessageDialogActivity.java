@@ -49,6 +49,8 @@ public class MessageDialogActivity extends Activity {
                 finish();
             }
         });
+
+        MyApplication.getInstance().messageDialogActivity = this;
     }
 
     private void initUI() {

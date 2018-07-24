@@ -91,9 +91,7 @@ public class SelfCheckActivity extends Activity {
             }
         }, 10 * 1000);
 
-        send0A();
-        send04_12();
-        checkYima();
+
     }
 
     private void checkYima() {
@@ -105,6 +103,14 @@ public class SelfCheckActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
+        checkYima();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                send0A();
+                send04_12();
+            }
+        }, 1000);
 
         //TODO: test
         /*

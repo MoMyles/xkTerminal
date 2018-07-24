@@ -19,6 +19,7 @@ import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 /**
  * Created by qiuhong on 28/11/2016.
@@ -30,6 +31,9 @@ public class SocketServer {
 //        startService();
 //    }
     private static int BUFFER_SIZE = 1024 * 1024;
+
+    private static ArrayList<Socket> socketArr = new ArrayList<>();
+
 
     /**
      * 启动服务监听，等待客户端连接
@@ -43,9 +47,9 @@ public class SocketServer {
             // 监听端口，等待客户端连接
             while (true) {
                 System.out.println("--等待客户端连接--");
-                if (socket != null) socket.close();
-                socket = serverSocket.accept(); //等待客户端连接
+                Socket socket = serverSocket.accept(); //等待客户端连接
                 System.out.println("得到客户端连接：" + socket);
+                socketArr.add(socket);
                 startReader(socket);
 
                 // 提示登陆
@@ -94,7 +98,9 @@ public class SocketServer {
                             }
 
                         } else {
+                            socketArr.remove(socket);
                             socket.close();
+                            System.out.println("剩余客户端数：" + socketArr.size());
                             return;
                         }
                     }
@@ -107,8 +113,6 @@ public class SocketServer {
 
     }
 
-    static Socket socket;
-
     /**
      * 发送消息
      */
@@ -120,15 +124,17 @@ public class SocketServer {
                 try {
                     System.out.println("*to send*");
                     // socket.getInputStream()
-                    if (socket == null) {
-                        return;
+                    for (Socket socket : socketArr) {
+                        if (socket == null) {
+                            return;
+                        }
+                        OutputStreamWriter writer = new OutputStreamWriter(socket.getOutputStream());
+
+                        writer.write(json.toString());
+                        writer.flush();
+
+                        System.out.println("****send: " + json.toString());
                     }
-                    OutputStreamWriter writer = new OutputStreamWriter(socket.getOutputStream());
-
-                    writer.write(json.toString());
-                    writer.flush();
-
-                    System.out.println("****send: " + json.toString());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

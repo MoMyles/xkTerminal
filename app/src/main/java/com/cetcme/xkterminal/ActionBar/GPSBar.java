@@ -312,7 +312,7 @@ public class GPSBar extends RelativeLayout {
     public void setGPSStatus(boolean gpsStatus) {
         textView_location_status.setTextColor(gpsStatus ? 0xFF2657EC : 0xFFD0021B);
 //        textView_location_status.setText(gpsStatus ? "已定位" : "卫星中断");
-        textView_location_status.setBackground(flashTextViewVisible ? getResources().getDrawable(R.mipmap.icon_s_no) : getResources().getDrawable(R.mipmap.icon_s));
+        textView_location_status.setBackground(!gpsStatus ? getResources().getDrawable(R.mipmap.icon_s_no) : getResources().getDrawable(R.mipmap.icon_s));
         if (gpsStatus) textView_location_status.setVisibility(VISIBLE);
         /*
         if (!gpsStatus && (Constant.SYSTEM_DATE.getTime() - lastNoGpsReportTime) >= noGpsReportPeriod) {
@@ -329,7 +329,7 @@ public class GPSBar extends RelativeLayout {
     public void setAisStatus(boolean aisStatus) {
         textView_ais_status.setTextColor(aisStatus ? 0xFF2657EC : 0xFFD0021B);
 //        textView_ais_status.setText(aisStatus ? "AIS已连接" : "AIS未连接");
-        textView_alert.setBackground(flashTextViewVisible ? getResources().getDrawable(R.mipmap.icon_ais_no) : getResources().getDrawable(R.mipmap.icon_ais));
+        textView_ais_status.setBackground(!aisStatus ? getResources().getDrawable(R.mipmap.icon_ais_no) : getResources().getDrawable(R.mipmap.icon_ais));
         if (aisStatus) textView_ais_status.setVisibility(VISIBLE);
         noAisConnected = !aisStatus;
     }

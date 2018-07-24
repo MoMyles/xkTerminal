@@ -519,6 +519,16 @@ public class SystemSettingFragment extends Fragment {
                 case "device_id":
                     String deviceId = receiveJson.getString("deviceID");
                     tv_device_id.setText(deviceId);
+
+                    String savedDeviceId = PreferencesUtils.getString(getActivity(), "deviceID", "");
+                    if (!deviceId.equals(savedDeviceId)) {
+                        PreferencesUtils.putString(getActivity(), "deviceID", deviceId);
+                        // 更改device_id后 更改wifi ssid
+                        String newSSID = "北斗" + deviceId;
+                        PreferencesUtils.putString(getActivity(), "wifiSSID", newSSID);
+                        MyApplication.getInstance().mainActivity.createWifiHotspot();
+                        wifi_ssid_textView.setText(newSSID);
+                    }
                     break;
             }
 

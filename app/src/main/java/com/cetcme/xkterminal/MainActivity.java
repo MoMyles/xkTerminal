@@ -215,8 +215,6 @@ public class MainActivity extends AppCompatActivity {
         // 设备自检中
         showSelfCheckHud();
 
-        // TODO: test for phone
-        /*
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -238,7 +236,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }).start();
-        */
 
         // 发送启动$01，要求对方发时间
         mHandler.postDelayed(new Runnable() {

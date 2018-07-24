@@ -1,6 +1,7 @@
 package com.cetcme.xkterminal.Socket;
 
 import android.app.Application;
+import android.content.Context;
 
 import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.MyApplication;
@@ -33,7 +34,7 @@ public class SocketServer {
     /**
      * 启动服务监听，等待客户端连接
      */
-    public void startService() {
+    public void startService(Context context) {
         try {
             // 创建ServerSocket
             ServerSocket serverSocket = new ServerSocket(Constant.SOCKET_SERVER_PORT);
@@ -42,10 +43,11 @@ public class SocketServer {
             // 监听端口，等待客户端连接
             while (true) {
                 System.out.println("--等待客户端连接--");
+                if (socket != null) socket.close();
                 socket = serverSocket.accept(); //等待客户端连接
                 System.out.println("得到客户端连接：" + socket);
                 startReader(socket);
-                
+
                 // 提示登陆
                 try {
                     JSONObject jsonObject = new JSONObject();

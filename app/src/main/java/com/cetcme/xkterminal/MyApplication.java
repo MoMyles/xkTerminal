@@ -195,13 +195,6 @@ public class MyApplication extends Application {
 //            Log.i("qh_port", "onCreate: " + path);
 //        }
 
-        new Thread() {
-            @Override
-            public void run() {
-                new SocketServer().startService();
-            }
-        }.start();
-
         tipToast = Toast.makeText(getApplicationContext(), "", Toast.LENGTH_SHORT);
 
         new SocketManager(handler, getApplicationContext());

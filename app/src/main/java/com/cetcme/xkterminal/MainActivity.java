@@ -247,6 +247,15 @@ public class MainActivity extends AppCompatActivity {
                 sendBootData();
             }
         }, 2000);
+
+
+        // 开启手机客户端socket服务
+        new Thread() {
+            @Override
+            public void run() {
+                new SocketServer().startService(MainActivity.this);
+            }
+        }.start();
     }
 
     class AisReadThread extends Thread {

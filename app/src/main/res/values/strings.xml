@@ -40,15 +40,15 @@
 
 
     <!--<string-array name="smsTemplate">-->
-        <!--<item>船1-船2</item>-->
-        <!--<item>船1-船3</item>-->
-        <!--<item>船1-平台</item>-->
-        <!--<item>船1-手机</item>-->
-        <!--<item>船3-船1</item>-->
-        <!--<item>平台-船1</item>-->
-        <!--<item>固定短信模版1</item>-->
-        <!--<item>固定短信模版2</item>-->
-        <!--<item>固定短信模版3</item>-->
+    <!--<item>船1-船2</item>-->
+    <!--<item>船1-船3</item>-->
+    <!--<item>船1-平台</item>-->
+    <!--<item>船1-手机</item>-->
+    <!--<item>船3-船1</item>-->
+    <!--<item>平台-船1</item>-->
+    <!--<item>固定短信模版1</item>-->
+    <!--<item>固定短信模版2</item>-->
+    <!--<item>固定短信模版3</item>-->
     <!--</string-array>-->
 
 

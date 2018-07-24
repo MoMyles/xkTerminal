@@ -35,7 +35,7 @@ public class BackBar extends RelativeLayout implements View.OnClickListener{
     private void bindView(View view) {
         button_back  = view.findViewById(R.id.button_back);
 
-        button_back.setTextColor(0xFF000000);
+        button_back.setTextColor(0xFFFFFFFF);
         button_back.setBackgroundResource(R.drawable.button_bg_selector);
         button_back.setOnClickListener(this);
 

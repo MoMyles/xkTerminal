@@ -19,6 +19,8 @@ import com.cetcme.xkterminal.MyClass.ScreenBrightness;
 import com.cetcme.xkterminal.MyClass.SoundPlay;
 import com.cetcme.xkterminal.Socket.SocketServer;
 import com.cetcme.xkterminal.Sqlite.Proxy.GroupProxy;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
@@ -47,18 +49,20 @@ public class DataHandler extends Handler {
     public static final int SERIAL_PORT_ALERT_FAIL = 0x11;
     public static final int SERIAL_PORT_ID_EDIT_OK = 0x12;
 
+    public static final int SERIAL_PORT_CHECK = 0x14;
+
     private MyApplication myApplication;
 
     private DbManager db;
 
     private Timer timer = null;
+    private Timer timer30 = null;
 
     public DataHandler(MyApplication myApplication) {
         this.myApplication = myApplication;
         this.db = MyApplication.getInstance().getDb();
 
         timer = new Timer();
-
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -67,9 +71,20 @@ public class DataHandler extends Handler {
                 }
                 Looper.prepare();
                 Toast.makeText(MyApplication.getInstance().getApplicationContext(), "自检失败", Toast.LENGTH_SHORT).show();
+                MainActivity.play("卫星中断故障");
                 Looper.loop();
             }
-        }, 2 * 60 * 1000);
+        }, Constant.SELF_CHECK_TIME_OUT);
+
+        timer30 = new Timer();
+        timer30.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (!MyApplication.getInstance().isLocated) {
+                    MyApplication.getInstance().mainActivity.sendBootData();
+                }
+            }
+        }, Constant.SEND_BOOT_DATA_TIME);
     }
 
     String content = "";
@@ -107,8 +122,7 @@ public class DataHandler extends Handler {
                         case MessageFormat.MESSAGE_TYPE_RESCUE:
                             SoundPlay.playMessageSound(myApplication.mainActivity);
                             myApplication.sendLightOn(true);
-                            myApplication.mainActivity.showMessageDialog(content, MessageDialogActivity.TYPE_RESCUE);
-                            myApplication.mainActivity.addMessage(address, content, true);
+                            myApplication.mainActivity.showMessageDialog(address, content, MessageDialogActivity.TYPE_RESCUE);
                             break;
                         // 开启关闭短信功能
                         case MessageFormat.MESSAGE_TYPE_SMS_OPEN:
@@ -117,8 +131,7 @@ public class DataHandler extends Handler {
                         // 报警提醒
                         case MessageFormat.MESSAGE_TYPE_ALERT_REMIND:
                             SoundPlay.playMessageSound(myApplication.mainActivity);
-                            myApplication.mainActivity.showMessageDialog(content, MessageDialogActivity.TYPE_ALERT);
-                            myApplication.mainActivity.addMessage(address, content, true);
+                            myApplication.mainActivity.showMessageDialog(address, content, MessageDialogActivity.TYPE_ALERT);
                             break;
                         // 摇毙功能
                         case MessageFormat.MESSAGE_TYPE_SHUT_DOWN:
@@ -149,13 +162,59 @@ public class DataHandler extends Handler {
                         // 夜间点名
                         case MessageFormat.MESSAGE_TYPE_CALL_THE_ROLL:
                             SoundPlay.playMessageSound(myApplication.mainActivity);
-                            myApplication.mainActivity.showMessageDialog(content, MessageDialogActivity.TYPE_CALL_ROLL);
+                            // TODO:
+                            myApplication.mainActivity.showMessageDialog(address, content, MessageDialogActivity.TYPE_CALL_ROLL);
                             break;
                         // 告警信息，语音播报
                         case MessageFormat.MESSAGE_TYPE_REPORT_ALARM:
-                            myApplication.mainActivity.showMessageDialog(content, MessageDialogActivity.TYPE_ALARM);
+                            myApplication.mainActivity.showMessageDialog(address, content, MessageDialogActivity.TYPE_ALARM);
                             MainActivity.play("告警信息: " + content);
                             break;
+                        // 添加删除组播号
+                        case MessageFormat.MESSAGE_TYPE_GROUP: {
+                            String[] value = content.split(",");
+                            if (value[0].equals("0")) {
+                                // 删除
+                                myApplication.mainActivity.addGroup("group", value[1]);
+                                Toast.makeText(myApplication.mainActivity, "您已加入分组：" + value[1], Toast.LENGTH_SHORT).show();
+                            } else {
+                                // 添加
+                                myApplication.mainActivity.deleteGroup(value[1]);
+                                Toast.makeText(myApplication.mainActivity, "您已退出分组：" + value[1], Toast.LENGTH_SHORT).show();
+                            }
+                            break;
+                        }
+                        // 自检OK和海图序列号
+                        case MessageFormat.MESSAGE_TYPE_CHECK_AND_MAP: {
+                            if (!content.equals("OK")) {
+                                // 注册海图
+                                PreferencesUtils.putString(MyApplication.getInstance().mainActivity, "yimaSerial", content);
+                                // 设置完成后提示 重新进入app
+                                new QMUIDialog.MessageDialogBuilder(MyApplication.getInstance().mainActivity)
+                                        .setTitle("提示")
+                                        .setMessage("海图序列号设置成功，请重新打开app")
+                                        .addAction("确定", new QMUIDialogAction.ActionListener() {
+                                            @Override
+                                            public void onClick(QMUIDialog dialog, int index) {
+                                                System.exit(0);
+                                            }
+                                        })
+                                        .show();
+                            }
+
+                            // 自检成功
+                            JSONObject jsonObject = new JSONObject();
+                            jsonObject.put("apiType", "self_check_2");
+                            EventBus.getDefault().post(new SmsEvent(jsonObject));
+                            break;
+                        }
+                        // 渔货交易数据
+                        case MessageFormat.MESSAGE_TYPE_TRADE: {
+                            // TODO：平台号
+                            final String unique = ConvertUtil.rc4ToHex();
+                            MyApplication.getInstance().sendBytes(MessageFormat.format("", content, MessageFormat.MESSAGE_TYPE_TRADE, 0, unique));
+                            break;
+                        }
                         default:
                             // 判断分组 group -1为非分组短信，其他为组号，
                             if (group == -1 || GroupProxy.hasGroup(db, group)) {
@@ -211,28 +270,37 @@ public class DataHandler extends Handler {
                     // 运行过程中收到 则不显示自检完成
                     if (myApplication.mainActivity != null) {
                         final boolean gpsStatus = status.charAt(7) == '1';
-                        if (!gpsStatus) {
-                            myApplication.mainActivity.showMessageDialog("卫星中断故障", MessageDialogActivity.TYPE_ALARM);
-                            MainActivity.play("卫星中断故障");
-                        }
 
-                        if (myApplication.mainActivity.isSelfCheckLoading) {
-                            new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    myApplication.isLocated = gpsStatus;
-                                    myApplication.mainActivity.gpsBar.setGPSStatus(gpsStatus);
-                                    myApplication.mainActivity.dismissSelfCheckHud();
-                                    if (gpsStatus) {
-                                        Toast.makeText(myApplication.mainActivity, "自检完成", Toast.LENGTH_SHORT).show();
-                                        MainActivity.play("自检完成");
-                                    }
-                                }
-                            }, 5000);
+                        if (!gpsStatus) {
+                            myApplication.mainActivity.showMessageDialog("自身设备", "卫星中断故障", MessageDialogActivity.TYPE_ALARM);
+                            MainActivity.play("卫星中断故障");
+                            myApplication.mainActivity.dismissSelfCheckHud();
                         } else {
-                            myApplication.isLocated = gpsStatus;
-                            myApplication.mainActivity.gpsBar.setGPSStatus(gpsStatus);
+                            if (timer30 != null) {
+                                timer30.cancel();
+                            }
+                            if (myApplication.mainActivity.isSelfCheckLoading) {
+                                Toast.makeText(myApplication.mainActivity, "自检完成", Toast.LENGTH_SHORT).show();
+                                MainActivity.play("自检完成");
+                                myApplication.mainActivity.dismissSelfCheckHud();
+                            }
                         }
+                        myApplication.isLocated = gpsStatus;
+                        myApplication.mainActivity.gpsBar.setGPSStatus(gpsStatus);
+
+//                        if (myApplication.mainActivity.isSelfCheckLoading) {
+//                            new Handler().postDelayed(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    myApplication.isLocated = gpsStatus;
+//                                    myApplication.mainActivity.gpsBar.setGPSStatus(gpsStatus);
+//                                    myApplication.mainActivity.dismissSelfCheckHud();
+//                                    if (gpsStatus) {
+//
+//                                    }
+//                                }
+//                            }, 2000);
+//                        }
 
                         String communication_from = status.charAt(6) == '1' ? "北斗" : "GPRS";
                         PreferencesUtils.putString(myApplication.mainActivity, "communication_from", communication_from);
@@ -279,7 +347,8 @@ public class DataHandler extends Handler {
                         e.printStackTrace();
                     }
                     SocketServer.send(sendJSON);
-                    Toast.makeText(myApplication.mainActivity, "终端ID：" + deviceID, Toast.LENGTH_LONG).show();
+                    EventBus.getDefault().post(new SmsEvent(sendJSON));
+//                    Toast.makeText(myApplication.mainActivity, "终端ID：" + deviceID, Toast.LENGTH_LONG).show();
                     break;
                 case SERIAL_PORT_ALERT_SEND_SUCCESS:
                     if (!MyApplication.isLocated) return;
@@ -390,6 +459,12 @@ public class DataHandler extends Handler {
                     myApplication.mainActivity.gpsBar.showAlerting(false);
                     myApplication.mainActivity.showAlertFailDialog();
                     break;
+                case SERIAL_PORT_CHECK: {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("apiType", "self_check_1");
+                    EventBus.getDefault().post(new SmsEvent(jsonObject));
+                    break;
+                }
                 default:
                     super.handleMessage(msg);//这里最好对不需要或者不关心的消息抛给父类，避免丢失消息
                     break;

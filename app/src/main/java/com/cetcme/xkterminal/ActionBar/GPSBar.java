@@ -22,7 +22,11 @@ import com.cetcme.xkterminal.MessageDialogActivity;
 import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.DateUtil;
+import com.cetcme.xkterminal.MyClass.LunarUtil;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
+import com.cetcme.xkterminal.MyClass.ScreenBrightness;
+import com.cetcme.xkterminal.MyClass.SoundPlay;
+import com.cetcme.xkterminal.MyClass.widget.MyTextView;
 import com.cetcme.xkterminal.R;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
@@ -46,14 +50,13 @@ public class GPSBar extends RelativeLayout {
 
     public MainActivity mainActivity;
 
-    private TextView textView_latitude;
-    private TextView textView_longitude;
-    private TextView textView_speed;
-    private TextView textView_heading;
     private TextView textView_location_status;
     private TextView textView_ais_status;
     private TextView textView_message;
     private TextView textView_time;
+
+    private TextView tv_date;
+    private TextView tv_lunar;
 
     private TextView textView_message_number;
     private TextView textView_alert;
@@ -91,7 +94,6 @@ public class GPSBar extends RelativeLayout {
         View view = LayoutInflater.from(context).inflate(R.layout.bar_gps_view, this, true);
 
         bindView(view);
-        setData();
 
         newMsgToast = Toast.makeText(view.getContext(), "您有新的短信", Toast.LENGTH_SHORT);
 
@@ -102,14 +104,12 @@ public class GPSBar extends RelativeLayout {
 
         debug_btn_layout = view.findViewById(R.id.debug_btn_layout);
 
-        textView_latitude = view.findViewById(R.id.textView_latitude);
-        textView_longitude = view.findViewById(R.id.textView_longitude);
-        textView_speed = view.findViewById(R.id.textView_speed);
-        textView_heading = view.findViewById(R.id.textView_heading);
         textView_location_status = view.findViewById(R.id.textView_location_status);
         textView_ais_status = view.findViewById(R.id.textView_ais_status);
         textView_message = view.findViewById(R.id.textView_message);
         textView_time = view.findViewById(R.id.textView_time);
+        tv_date = view.findViewById(R.id.tv_date);
+        tv_lunar = view.findViewById(R.id.tv_lunar);
 
         textView_message_number = view.findViewById(R.id.textView_message_number);
 
@@ -150,20 +150,19 @@ public class GPSBar extends RelativeLayout {
         textView_message.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!mainActivity.fragmentName.equals("message"))
-                    mainActivity.initMessageFragment("receive");
+                mainActivity.initMessageFragment("receive");
             }
         });
 
         textView_message_number.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!mainActivity.fragmentName.equals("message"))
-                    mainActivity.initMessageFragment("receive");
+                mainActivity.initMessageFragment("receive");
             }
         });
 
         //: for test 多次点击退出app
+        /*
         textView_time.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -186,6 +185,7 @@ public class GPSBar extends RelativeLayout {
 
             }
         });
+        */
 
 
         // for test串口调试界面 看是否通
@@ -196,7 +196,7 @@ public class GPSBar extends RelativeLayout {
 //                mainActivity.startActivity(new Intent(mainActivity, SerialPortActivity.class));
 //            }
 //        });
-/*
+
         // for test 测试收到新的短信息
         findViewById(R.id.sms_btn).setOnClickListener(new OnClickListener() {
             @Override
@@ -214,7 +214,7 @@ public class GPSBar extends RelativeLayout {
         findViewById(R.id.sign_btn).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                mainActivity.showIDCardDialog("33028319881122013X", "张三", "汉", "浙江省奉化市锦屏街道凉河路x幢xxx室");
+//                mainActivity.showIDCardDialog("33028319881122013X", "张三", "汉", "浙江省奉化市锦屏街道凉河路x幢xxx室");
             }
         });
 
@@ -244,20 +244,14 @@ public class GPSBar extends RelativeLayout {
             }
         });
 
-        */
-
-        textViews.add(textView_latitude);
-        textViews.add(textView_longitude);
-        textViews.add(textView_speed);
-        textViews.add(textView_heading);
         textViews.add(textView_location_status);
         textViews.add(textView_message);
         textViews.add(textView_time);
 
-        for (TextView textview : textViews) {
-            textview.getPaint().setFakeBoldText(true);
-            textview.setTextColor(0xFF000000);
-        }
+//        for (TextView textview : textViews) {
+//            textview.getPaint().setFakeBoldText(true);
+//            textview.setTextColor(0xFF000000);
+//        }
     }
 
     private void screenshot() {
@@ -310,49 +304,13 @@ public class GPSBar extends RelativeLayout {
 
     }
 
-    private void setData() {
-
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("latitude", "N 30°46.225′");
-            jsonObject.put("longitude", "E 120°39.510′");
-            jsonObject.put("speed", "10.3Kt");
-            jsonObject.put("heading", "85°");
-            jsonObject.put("gps", false);
-            jsonObject.put("messageNumber", 3);
-
-            textView_latitude.setText(jsonObject.getString("latitude"));
-            textView_longitude.setText(jsonObject.getString("longitude"));
-            textView_speed.setText(jsonObject.getString("speed"));
-            textView_heading.setText(jsonObject.getString("heading"));
-
-//            if (jsonObject.getBoolean("gps")) {
-//                textView_location_status.setTextColor(0xFF2657EC);
-//                textView_location_status.setText("已定位");
-//                noGps = false;
-//            } else {
-//                textView_location_status.setTextColor(0xFFD0021B);
-//                textView_location_status.setText("未定位");
-//                noGps = true;
-//            }
-
-            setGPSStatus(jsonObject.getBoolean("gps"));
-
-//            int messageNumber = jsonObject.getInt("messageNumber");
-//            setMessageCount(messageNumber);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-    }
-
     private long lastNoGpsReportTime = 0;
     private long noGpsReportPeriod = 1000 * 60 * 10;
 
     public void setGPSStatus(boolean gpsStatus) {
         textView_location_status.setTextColor(gpsStatus ? 0xFF2657EC : 0xFFD0021B);
-        textView_location_status.setText(gpsStatus ? "已定位" : "卫星中断");
+//        textView_location_status.setText(gpsStatus ? "已定位" : "卫星中断");
+        textView_location_status.setBackground(!gpsStatus ? getResources().getDrawable(R.mipmap.icon_s_no) : getResources().getDrawable(R.mipmap.icon_s));
         if (gpsStatus) textView_location_status.setVisibility(VISIBLE);
         /*
         if (!gpsStatus && (Constant.SYSTEM_DATE.getTime() - lastNoGpsReportTime) >= noGpsReportPeriod) {
@@ -368,7 +326,8 @@ public class GPSBar extends RelativeLayout {
 
     public void setAisStatus(boolean aisStatus) {
         textView_ais_status.setTextColor(aisStatus ? 0xFF2657EC : 0xFFD0021B);
-        textView_ais_status.setText(aisStatus ? "AIS已连接" : "AIS未连接");
+//        textView_ais_status.setText(aisStatus ? "AIS已连接" : "AIS未连接");
+        textView_ais_status.setBackground(!aisStatus ? getResources().getDrawable(R.mipmap.icon_ais_no) : getResources().getDrawable(R.mipmap.icon_ais));
         if (aisStatus) textView_ais_status.setVisibility(VISIBLE);
         noAisConnected = !aisStatus;
     }
@@ -461,11 +420,17 @@ public class GPSBar extends RelativeLayout {
             super.handleMessage(msg);
             switch (msg.what) {
                 case UPDATE_TIME:
-                    textView_time.setText(DateUtil.Date2String(Constant.SYSTEM_DATE, "yyyy年MM月dd日 HH:mm:ss"));
+                    textView_time.setText(DateUtil.Date2String(Constant.SYSTEM_DATE, "HH:mm:ss"));
+                    tv_date.setText(DateUtil.Date2String(Constant.SYSTEM_DATE, "yyyy-MM-dd"));
+
+                    LunarUtil lunar = new LunarUtil(DateUtil.dataToCalendar(Constant.SYSTEM_DATE));
+                    lunar.toString();//农历的月日
+                    tv_lunar.setText("农历" + lunar.toString());
                     break;
                 case FLASH_NO_GPS:
                     if (noGps) {
                         textView_location_status.setVisibility(flashTextViewVisible ? VISIBLE : INVISIBLE);
+//                        textView_location_status.setBackground(flashTextViewVisible ? getResources().getDrawable(R.mipmap.icon_s_no) : getResources().getDrawable(R.mipmap.icon_s));
                     }
                     if (PreferencesUtils.getBoolean(mainActivity, "flashAlert", false)) {
                         textView_alert.setVisibility(flashTextViewVisible ? VISIBLE : INVISIBLE);
@@ -489,17 +454,17 @@ public class GPSBar extends RelativeLayout {
     public void modifyMessageCount(long count) {
         if (count != 0) {
             if (count < 100) {
-                textView_message.setText("短信");
+//                textView_message.setText("短信");
                 textView_message_number.setText(count + "");
                 textView_message_number.setVisibility(VISIBLE);
             } else {
-                textView_message.setText("短信");
+//                textView_message.setText("短信");
                 textView_message_number.setText("..");
                 textView_message_number.setVisibility(VISIBLE);
             }
 
         } else {
-            textView_message.setText("无短信");
+//            textView_message.setText("无短信");
             textView_message_number.setText("-");
             textView_message_number.setVisibility(INVISIBLE);
         }

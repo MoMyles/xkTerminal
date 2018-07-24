@@ -3,6 +3,7 @@ package com.cetcme.xkterminal.Navigation;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -12,6 +13,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
+import com.cetcme.xkterminal.MyClass.PreferencesUtils;
+import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 import com.cetcme.xkterminal.Sqlite.Bean.PinBean;
 
@@ -68,19 +71,47 @@ public class SkiaDrawView extends View {
         super(ctx, attr);
         mYimaLib = new YimaLib();
         mYimaLib.Create();
+        String deviceId = mYimaLib.GetDeviceIDForLicSvr();
+        String licenceKey = PreferencesUtils.getString(ctx, "yimaSerial");
+        if (licenceKey != null) {
+            mYimaLib.SetLicenceKeyFromSvr(licenceKey, Constant.YIMA_WORK_PATH); //"8C58-708D-1865-9674"
+        }
         mYimaLib.Init(Constant.YIMA_WORK_PATH);//初始化，传入WorkDir初始化目录地址
         mYimaLib.SetDrawOwnShipSpecialOptions(false, true, true, 255, 0, 0);
+        mYimaLib.SetFishAreaLineStyle(0, 0, 250, 2, 1);
         mContext = ctx;
         bNormalDragMapMode = false;
+        mYimaLib.SetIfShowMapFrame(false); // TODO:
+
+        boolean islicenceOk = mYimaLib.GetIfHadSetRightLicenceKey();
+        Log.e("yima", "GetIfHadSetRightLicenceKey: " + islicenceOk);
+
+
+//        String DeviceID = SkiaDrawView.mYimaLib.GetDeviceIDForLicSvr();
+//        int UsrId = SkiaDrawView.mYimaLib.GetUsrID();
+//
+//        Log.e("yima", "onCreateView: " + DeviceID + ", " + UsrId);
+//        SkiaDrawView.mYimaLib.SetLicenceKeyFromSvr("8C58-708D-1865-9674", YIMA_WORK_PATH);
+//
+//        boolean islicenceOk = SkiaDrawView.mYimaLib.GetIfHadSetRightLicenceKey();
+//        Log.e("yima", "islicenceOk: " + islicenceOk);
     }
 
     @Override
     public void onSizeChanged(int w, int h, int oldw, int oldh) {
         fSkiaBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         String strTtfFilePath = Constant.YIMA_WORK_PATH + "/DroidSansFallback.ttf";
-        mYimaLib.SetDisplayCategory(3);
+//        mYimaLib.SetDisplayCategory(3);
+        mYimaLib.SetDisplayCategory(mode);
         mYimaLib.RefreshDrawer(fSkiaBitmap, strTtfFilePath);//刷新绘制器，需要传入字体文件地址，用户可以自己修改为别的字体
         mYimaLib.OverViewLibMap(0);//概览第一幅图
+    }
+
+    private int mode = 0;
+
+    public void changeMap(int mode){
+        mYimaLib.SetDisplayCategory(mode);
+        postInvalidate();
     }
 
     @Override
@@ -106,7 +137,7 @@ public class SkiaDrawView extends View {
             }
             PointArrayInfo arrayInfo = mYimaLib.getScrnPointsFromGeoPoints(arrGeoX, arrGeoY, pinBeans.size());
             if (arrayInfo.arrPoints != null) {
-                for (int i=0;i<arrayInfo.arrPoints.size();i++) {
+                for (int i = 0; i < arrayInfo.arrPoints.size(); i++) {
                     M_POINT point = arrayInfo.arrPoints.get(i);
                     PinBean pb = pinBeans.get(i);
                     Paint mPaint = new Paint();
@@ -114,13 +145,27 @@ public class SkiaDrawView extends View {
                     mPaint.setDither(true);
                     mPaint.setColor(pb.getColor());
                     int radius = 12;
-                    canvas.drawCircle(point.x, point.y, radius, mPaint);
+//                    canvas.drawCircle(point.x, point.y, radius, mPaint);
+
+                    Bitmap bm = null;
+                    if (getResources().getColor(android.R.color.holo_red_dark) == pb.getColor()) {
+                        bm = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.bw_red);
+                    } else if (getResources().getColor(android.R.color.holo_green_dark) == pb.getColor()) {
+                        bm = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.bw_green);
+                    } else if (getResources().getColor(android.R.color.holo_blue_dark) == pb.getColor()) {
+                        bm = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.bw_blue);
+                    } else {
+                        bm = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.bw_yellow);
+                    }
+                    if (bm != null) {
+                        canvas.drawBitmap(bm, point.x - 10, point.y - 15, mPaint);
+                    }
                     mPaint.setColor(Color.BLACK);
                     int textSize = 18;
                     mPaint.setTextSize(textSize);
                     String str = pb.getName();
                     int fontNum = str.length();
-                    canvas.drawText(str, point.x + (radius*2 - fontNum * textSize) / 2 - radius, point.y + (radius*2 - textSize) / 2 + radius, mPaint);
+                    canvas.drawText(str, point.x + (radius * 2 - fontNum * textSize) / 2 - radius, point.y + (radius * 2 - textSize) / 2 + radius, mPaint);
                 }
             }
         }
@@ -467,7 +512,7 @@ public class SkiaDrawView extends View {
 //            mYimaLib.tmDeleteLayer(curLayerPos3);
 //            curLayerPos3 = -1;
 //        }
-        if (pinBeans!=null){
+        if (pinBeans != null) {
             pinBeans.clear();
         }
         postInvalidate();

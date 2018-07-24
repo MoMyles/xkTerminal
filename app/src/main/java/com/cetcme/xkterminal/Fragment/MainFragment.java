@@ -5,18 +5,19 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
@@ -51,15 +52,14 @@ import org.json.JSONObject;
 import org.xutils.DbManager;
 import org.xutils.ex.DbException;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import yimamapapi.skia.AisInfo;
 import yimamapapi.skia.M_POINT;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.cetcme.xkterminal.Navigation.Constant.YIMA_WORK_PATH;
 
 /**
  * Created by qiuhong on 10/01/2018.
@@ -68,15 +68,13 @@ import static android.content.Context.MODE_PRIVATE;
 public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickListener {
 
     private SkiaDrawView skiaDrawView;
-    private ConstraintLayout main_layout;
+    private RelativeLayout main_layout, rl1;
     private LinearLayout alert_layout;
     private LinearLayout ll_ship_list;
     private RecyclerView rv_ships;
-
-    private Switch mSwitchYQ, mSwitchArea, mSwitchPin;
-
-    private Button zoomOut, zoomIn;
-
+    private ImageView zoomOut, zoomIn, iv1;
+    private Switch mSwitchMap, mSwitchYQ, mSwitchArea, mSwitchPin;
+    private Button btn1;
 
     private TextView tv_lon;
     private TextView tv_lat;
@@ -90,13 +88,13 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
     private boolean alert_need_flash = false;
     private boolean warnArea = false;
 
-    private final int[] JIN_YU_AREA_COLOR = new int[]{255, 0, 0};
-    private final int[] JIN_RU_AREA_COLOR = new int[]{0, 255, 0};
-    private final int[] JIN_CHU_AREA_COLOR = new int[]{0, 0, 255};
-
-
-    private final int[] JIN_CHU_AREA_X = new int[]{(int) (122.259983 * 1e7), (int) (122.680821 * 1e7), (int) (122.675072 * 1e7), (int) (122.311725 * 1e7)};
-    private final int[] JIN_CHU_AREA_Y = new int[]{(int) (28.722246 * 1e7), (int) (28.690818 * 1e7), (int) (28.199928 * 1e7), (int) (28.226411 * 1e7)};
+//    private final int[] JIN_YU_AREA_COLOR = new int[]{255, 0, 0};
+//    private final int[] JIN_RU_AREA_COLOR = new int[]{0, 255, 0};
+//    private final int[] JIN_CHU_AREA_COLOR = new int[]{0, 0, 255};
+//
+//
+//    private final int[] JIN_CHU_AREA_X = new int[]{(int) (122.259983 * 1e7), (int) (122.680821 * 1e7), (int) (122.675072 * 1e7), (int) (122.311725 * 1e7)};
+//    private final int[] JIN_CHU_AREA_Y = new int[]{(int) (28.722246 * 1e7), (int) (28.690818 * 1e7), (int) (28.199928 * 1e7), (int) (28.226411 * 1e7)};
 
 //    private final int[] JIN_RU_AREA_X = new int[]{(int) (121.761309 * 1e7), (int) (121.949882 * 1e7), (int) (121.902739 * 1e7), (int) (121.772808 * 1e7)};
 //    private final int[] JIN_RU_AREA_Y = new int[]{(int) (28.651267 * 1e7), (int) (28.660395 * 1e7), (int) (28.530491 * 1e7), (int) (28.517288 * 1e7)};
@@ -111,14 +109,37 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
 //    private ListView mLvAisInfo;
 //    private final List<String> datas = new LinkedList<>();
     private RvShipAdapter rvShipAdapter;
-    private final List<OtherShipBean> datas = new LinkedList<>();
+//    private final List<OtherShipBean> datas = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_main, container, false);
         EventBus.getDefault().register(this);
 
-
+        iv1 = view.findViewById(R.id.iv1);
+        iv1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (MyApplication.currentLocation != null) {
+                    skiaDrawView.mYimaLib.CenterMap(MyApplication.currentLocation.getLongitude(), MyApplication.currentLocation.getLatitude());
+                    skiaDrawView.postInvalidate();
+                } else {
+                    SoundPlay.startAlertSound(getActivity());
+                }
+            }
+        });
+        btn1 = view.findViewById(R.id.btn1);
+        rl1 = view.findViewById(R.id.rl1);
+        btn1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (rl1.getVisibility() == View.GONE) {
+                    rl1.setVisibility(View.VISIBLE);
+                } else {
+                    rl1.setVisibility(View.GONE);
+                }
+            }
+        });
         main_layout = view.findViewById(R.id.main_layout);
         skiaDrawView = view.findViewById(R.id.skiaView);
         skiaDrawView.setOnMapClickListener(this);
@@ -131,8 +152,8 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         rv_ships.setLayoutManager(linearLayoutManager);
         rv_ships.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
-        datas.clear();
-        rvShipAdapter = new RvShipAdapter(getActivity(), datas, skiaDrawView);
+        // datas.clear();
+        rvShipAdapter = new RvShipAdapter(getActivity(), MyApplication.osbDataList, skiaDrawView);
         rv_ships.setAdapter(rvShipAdapter);
 
         tv_lon = view.findViewById(R.id.tv_lon);
@@ -198,7 +219,17 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
         });
 
         mSwitchYQ = view.findViewById(R.id.switch_yuqu);
-        mSwitchYQ.setChecked(PreferencesUtils.getBoolean(getActivity(), "mainFrgYuqu", false));
+        mSwitchMap = view.findViewById(R.id.switch_map);
+        mSwitchMap.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b) {
+                    skiaDrawView.changeMap(0);
+                } else {
+                    skiaDrawView.changeMap(3);
+                }
+            }
+        });
         mSwitchArea = view.findViewById(R.id.switch_warn_area);
         mSwitchArea.setChecked(PreferencesUtils.getBoolean(getActivity(), "mainFrgWarnArea", false));
         mSwitchPin = view.findViewById(R.id.switch_pin);
@@ -206,7 +237,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
         mSwitchPin.setChecked(false);
 
         warnArea = mSwitchArea.isChecked();
-        showWarnAreas();
+//        showWarnAreas();
         mSwitchYQ.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -214,12 +245,12 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                 PreferencesUtils.putBoolean(getActivity(), "mainFrgYuqu", b);
             }
         });
+        mSwitchYQ.setChecked(PreferencesUtils.getBoolean(getActivity(), "mainFrgYuqu", false));
         mSwitchArea.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 PreferencesUtils.putBoolean(getActivity(), "mainFrgWarnArea", b);
                 warnArea = b;
-                showWarnAreas();
                 if (MyApplication.currentLocation != null) {
                     doAreaWarning(MyApplication.currentLocation);
                 }
@@ -229,7 +260,6 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
         mSwitchPin.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-//                PreferencesUtils.putBoolean(getActivity(), "mainFrgPin", b);
                 if (b) {
                     showBiaoweis();
                 } else {
@@ -314,7 +344,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                     // 没有位置则固定中心点 121.768783,28.696902
                     skiaDrawView.mYimaLib.CenterMap((int) (121.768783 * 1e7), (int) (28.696902 * 1e7));
                 }
-                skiaDrawView.mYimaLib.SetCurrentScale(8878176.0f);
+                skiaDrawView.mYimaLib.SetCurrentScale(20000.0f);
                 skiaDrawView.postInvalidate();
             }
         }, 200);
@@ -322,20 +352,11 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
     }
 
     @Override
-    public void onResume() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                skiaDrawView.changeFishState(mSwitchYQ.isChecked());
-                skiaDrawView.postInvalidate();
-                showWarnAreas();
-                if (mSwitchPin.isChecked()) {
-                    showBiaoweis();
-                }
-//                mSwitchPin.setChecked(false);
-            }
-        }, 50);
-        super.onResume();
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden) {
+            mSwitchMap.setChecked(PreferencesUtils.getBoolean(getActivity(), "mainFrgYuqu", false));
+        }
     }
 
     private void showBiaoweis() {
@@ -351,44 +372,44 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
     private int curLayerPos = -1;
 
 
-    private void showWarnAreas() {
-        if (warnArea) {
-            Integer[] geoX = new Integer[JIN_CHU_AREA_X.length];
-            Integer[] geoY = new Integer[JIN_CHU_AREA_Y.length];
-            for (int i = 0; i < JIN_CHU_AREA_X.length; i++) {
-                geoX[i] = JIN_CHU_AREA_X[i];
-                geoY[i] = JIN_CHU_AREA_Y[i];
-            }
-            areas.add(new WarnArea(2, JIN_CHU_AREA_COLOR[0], JIN_CHU_AREA_COLOR[1]
-                    , JIN_CHU_AREA_COLOR[2], geoX, geoY));
-//            geoX = new Integer[JIN_RU_AREA_X.length];
-//            geoY = new Integer[JIN_RU_AREA_Y.length];
-//            for (int i = 0; i < JIN_RU_AREA_X.length; i++) {
-//                geoX[i] = JIN_RU_AREA_X[i];
-//                geoY[i] = JIN_RU_AREA_Y[i];
+//    private void showWarnAreas() {
+//        if (warnArea) {
+//            Integer[] geoX = new Integer[JIN_CHU_AREA_X.length];
+//            Integer[] geoY = new Integer[JIN_CHU_AREA_Y.length];
+//            for (int i = 0; i < JIN_CHU_AREA_X.length; i++) {
+//                geoX[i] = JIN_CHU_AREA_X[i];
+//                geoY[i] = JIN_CHU_AREA_Y[i];
 //            }
-//            areas.add(new WarnArea(1, JIN_RU_AREA_COLOR[0], JIN_RU_AREA_COLOR[1]
-//                    , JIN_RU_AREA_COLOR[2], geoX, geoY));
-//            geoX = new Integer[JIN_YU_AREA_X.length];
-//            geoY = new Integer[JIN_YU_AREA_Y.length];
-//            for (int i = 0; i < JIN_YU_AREA_X.length; i++) {
-//                geoX[i] = JIN_YU_AREA_X[i];
-//                geoY[i] = JIN_YU_AREA_Y[i];
+//            areas.add(new WarnArea(2, JIN_CHU_AREA_COLOR[0], JIN_CHU_AREA_COLOR[1]
+//                    , JIN_CHU_AREA_COLOR[2], geoX, geoY));
+////            geoX = new Integer[JIN_RU_AREA_X.length];
+////            geoY = new Integer[JIN_RU_AREA_Y.length];
+////            for (int i = 0; i < JIN_RU_AREA_X.length; i++) {
+////                geoX[i] = JIN_RU_AREA_X[i];
+////                geoY[i] = JIN_RU_AREA_Y[i];
+////            }
+////            areas.add(new WarnArea(1, JIN_RU_AREA_COLOR[0], JIN_RU_AREA_COLOR[1]
+////                    , JIN_RU_AREA_COLOR[2], geoX, geoY));
+////            geoX = new Integer[JIN_YU_AREA_X.length];
+////            geoY = new Integer[JIN_YU_AREA_Y.length];
+////            for (int i = 0; i < JIN_YU_AREA_X.length; i++) {
+////                geoX[i] = JIN_YU_AREA_X[i];
+////                geoY[i] = JIN_YU_AREA_Y[i];
+////            }
+////            areas.add(new WarnArea(0, JIN_YU_AREA_COLOR[0], JIN_YU_AREA_COLOR[1]
+////                    , JIN_YU_AREA_COLOR[2], geoX, geoY));
+//            curLayerPos = skiaDrawView.drawBanArea(areas);
+//        } else {
+//            for (WarnArea area : areas) {
+//                if (area == null) continue;
+//                skiaDrawView.mYimaLib.tmDeleteGeoObject(curLayerPos, area.getObjCount());
 //            }
-//            areas.add(new WarnArea(0, JIN_YU_AREA_COLOR[0], JIN_YU_AREA_COLOR[1]
-//                    , JIN_YU_AREA_COLOR[2], geoX, geoY));
-            curLayerPos = skiaDrawView.drawBanArea(areas);
-        } else {
-            for (WarnArea area : areas) {
-                if (area == null) continue;
-                skiaDrawView.mYimaLib.tmDeleteGeoObject(curLayerPos, area.getObjCount());
-            }
-            skiaDrawView.mYimaLib.tmClearLayer(curLayerPos);
-            skiaDrawView.mYimaLib.tmDeleteLayer(curLayerPos);
-            skiaDrawView.postInvalidate();
-            areas.clear();
-        }
-    }
+//            skiaDrawView.mYimaLib.tmClearLayer(curLayerPos);
+//            skiaDrawView.mYimaLib.tmDeleteLayer(curLayerPos);
+//            skiaDrawView.postInvalidate();
+//            areas.clear();
+//        }
+//    }
 
     private void loadOwnShipInfo() {
         final SharedPreferences sp = getActivity().getSharedPreferences("xkTerminal", MODE_PRIVATE);
@@ -554,6 +575,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
 
     /**
      * 检测报警
+     *
      * @param lb
      */
     private void doAreaWarning(LocationBean lb) {
@@ -574,21 +596,21 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                     case 0:// 禁渔
                         if (exists) {
                             // 报警
-                            MyApplication.getInstance().mainActivity.showMessageDialog("禁渔区域报警", 1);
+                            MyApplication.getInstance().mainActivity.showMessageDialog("自身设备", "禁渔区域报警", 1);
                             SoundPlay.startAlertSound(MyApplication.getInstance().mainActivity);
                         }
                         break;
                     case 1:// 禁入
                         if (exists) {
                             // 报警
-                            MyApplication.getInstance().mainActivity.showMessageDialog("禁入区域报警", 1);
+                            MyApplication.getInstance().mainActivity.showMessageDialog("自身设备", "禁入区域报警", 1);
                             SoundPlay.startAlertSound(MyApplication.getInstance().mainActivity);
                         }
                         break;
                     case 2:// 禁出
                         if (!exists) {
                             // 报警
-                            MyApplication.getInstance().mainActivity.showMessageDialog("禁出区域报警", 1);
+                            MyApplication.getInstance().mainActivity.showMessageDialog("自身设备", "禁出区域报警", 1);
                             SoundPlay.startAlertSound(MyApplication.getInstance().mainActivity);
                         }
                         break;
@@ -604,44 +626,79 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
     public void onAisEvent(AisInfo aisInfo) {
         if (aisInfo == null) return;
         int mmsi = aisInfo.mmsi;
-        try {
-            OtherShipBean osb = db.selector(OtherShipBean.class).where("mmsi", "=", mmsi).findFirst();
-            int ship_id = 0;
-            if (osb == null) {
-                // 不存在， 新增
-                osb = new OtherShipBean();
-                osb.setMmsi(mmsi);
-                ship_id = skiaDrawView.mYimaLib.AddOtherVessel(true
-                        , aisInfo.longtitude, aisInfo.latititude, aisInfo.COG, aisInfo.COG
-                        , 0, aisInfo.SOG, 0);
-                osb.setShip_id(ship_id);
-                osb.setShip_name(aisInfo.shipName);
-                osb.setAcq_time(Constant.SYSTEM_DATE);
-                db.saveBindingId(osb);
-            } else {
-                osb.setAcq_time(Constant.SYSTEM_DATE);
-                db.saveOrUpdate(osb);
-                // 存在， 更新信息
-                int versselId = skiaDrawView.mYimaLib.GetOtherVesselPosOfID(osb.getShip_id());
-                skiaDrawView.mYimaLib.SetOtherVesselCurrentInfo(versselId
-                        , aisInfo.longtitude, aisInfo.latititude, aisInfo.COG, aisInfo.COG
-                        , 0, aisInfo.SOG, 0);
+//        try {
+        //OtherShipBean osb = db.selector(OtherShipBean.class).where("mmsi", "=", mmsi).findFirst();
+        OtherShipBean osb = null;
+        for (OtherShipBean d : MyApplication.osbDataList) {
+            if (d.getMmsi() == mmsi) {
+                osb = d;
+                break;
             }
-            // 显示所有船
-            skiaDrawView.mYimaLib.SetAllOtherVesselDrawOrNot(true);
-            skiaDrawView.postInvalidate();
+        }
+        if (osb != null) {
+            osb.setAcq_time(Constant.SYSTEM_DATE);
+            osb.setLongitude(aisInfo.longtitude);
+            osb.setLatitude(aisInfo.latititude);
+            osb.setCog(aisInfo.COG);
+            osb.setSog(aisInfo.SOG);
+            osb.setWidth((int) aisInfo.Width);
+            osb.setLenght((int) aisInfo.Length);
+            osb.setShipType(aisInfo.ShipType);
+        } else {
+            // 不存在， 新增
+            osb = new OtherShipBean();
+            osb.setMmsi(mmsi);
+//                ship_id = skiaDrawView.mYimaLib.AddOtherVessel(true
+//                        , aisInfo.longtitude, aisInfo.latititude, aisInfo.COG, aisInfo.COG
+//                        , 0, aisInfo.SOG, 0);
+//                osb.setShip_id(ship_id);
+            osb.setShip_name(aisInfo.shipName);
+            osb.setAcq_time(Constant.SYSTEM_DATE);
+            osb.setLongitude(aisInfo.longtitude);
+            osb.setLatitude(aisInfo.latititude);
+            osb.setCog(aisInfo.COG);
+            osb.setSog(aisInfo.SOG);
+            osb.setWidth((int) aisInfo.Width);
+            osb.setLenght((int) aisInfo.Length);
+            osb.setShipType(aisInfo.ShipType);
+            //db.saveBindingId(osb);
+            MyApplication.osbDataList.add(osb);
+        }
+//            int ship_id = -1;
+//            if (osb == null) {
+//
+//            } else {
+//                int versselId = skiaDrawView.mYimaLib.GetOtherVesselPosOfID(osb.getShip_id());
+//                if (-1 == versselId) {
+//                    ship_id = skiaDrawView.mYimaLib.AddOtherVessel(true
+//                            , aisInfo.longtitude, aisInfo.latititude, aisInfo.COG, aisInfo.COG
+//                            , 0, aisInfo.SOG, 0);
+//                    osb.setShip_id(ship_id);
+//                } else {
+//                    skiaDrawView.mYimaLib.SetOtherVesselCurrentInfo(versselId
+//                            , aisInfo.longtitude, aisInfo.latititude, aisInfo.COG, aisInfo.COG
+//                            , 0, aisInfo.SOG, 0);
+//                }
+//                osb.setAcq_time(Constant.SYSTEM_DATE);
+//                //db.saveOrUpdate(osb);
+//                // 存在， 更新信息
+//                Log.e("TAG", "mmsi: " + aisInfo.mmsi+", ship_id: " + osb.getShip_id()+ ", versselId: " + versselId+ ", old : " + aisInfo.longtitude + ", " + aisInfo.latititude);
+//            }
+//            // 显示所有船
+//            skiaDrawView.mYimaLib.SetAllOtherVesselDrawOrNot(true);
+//            skiaDrawView.postInvalidate();
 
-            if (showOtherShip){
-                updateOtherShipsInfo();
-            }
+        if (showOtherShip) {
+            updateOtherShipsInfo();
+        }
 //            Log.e("TAG", aisInfo.mmsi + ", " + aisInfo.longtitude + ", " + aisInfo.latititude);
 //                String str = String.format("mmsi:{0},msgType:{1},shipName:{2},cog:{3},sog:{4}", aisInfo.mmsi, aisInfo.MsgType,aisInfo.shipName, aisInfo.COG
 //                , aisInfo.SOG);
 //                datas.add(str);
 //                aisInfoAdapter.notifyDataSetChanged();
-        } catch (DbException e) {
-            e.printStackTrace();
-        }
+//        } catch (DbException e) {
+//            e.printStackTrace();
+//        }
     }
 
     private boolean showOtherShip = false;
@@ -656,8 +713,15 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                 ll_ship_list.setVisibility(View.VISIBLE);
                 showOtherShip = true;
             }
+        } else if ("openShip2".equals(action)) {
+            if (showOtherShip) {
+                updateOtherShipsInfo();
+            }
         } else if ("pin_map".equals(action)) {
             doBiaoWei = true;
+            if (!mSwitchPin.isChecked()) {
+                mSwitchPin.setChecked(true);
+            }
             showOtherShip = false;
             Toast.makeText(getActivity(), "请选择标位点", Toast.LENGTH_SHORT).show();
         } else if ("pin_co".equals(action)) {
@@ -666,17 +730,30 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
     }
 
     private void updateOtherShipsInfo() {
-        try {
-            datas.clear();
-            final SharedPreferences sp = getActivity().getSharedPreferences("xkTerminal", MODE_PRIVATE);
-            List<OtherShipBean> list = db.selector(OtherShipBean.class).where("mmsi", "<>", sp.getString("shipNo", "")).findAll();
-            if (list != null && !list.isEmpty()) {
-                datas.addAll(list);
-            }
-            rvShipAdapter.notifyDataSetChanged();
-        } catch (DbException e) {
-            e.printStackTrace();
+//        try {
+//            datas.clear();
+//            final SharedPreferences sp = getActivity().getSharedPreferences("xkTerminal", MODE_PRIVATE);
+//            List<OtherShipBean> list = db.selector(OtherShipBean.class).where("mmsi", "<>", sp.getString("shipNo", "")).findAll();
+//            if (list != null && !list.isEmpty()) {
+//                datas.addAll(list);
+//            }
+        skiaDrawView.mYimaLib.ClearOtherVessels();
+        for (OtherShipBean osb : MyApplication.osbDataList) {
+            int ship_id = skiaDrawView.mYimaLib.AddOtherVessel(true
+                    , osb.getLongitude(), osb.getLatitude(), osb.getCog(), osb.getCog()
+                    , 0, osb.getSog(), 0);
+            osb.setShip_id(ship_id);
         }
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                rvShipAdapter.notifyDataSetChanged();
+            }
+        });
+
+//        } catch (DbException e) {
+//            e.printStackTrace();
+//        }
     }
 
     // 标位操作
@@ -692,6 +769,10 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
         } else if (doBiaoWei) {
             doBiaoWei = false;
             openPinDialog(m_point);
+        }
+
+        if (rl1.getVisibility() == View.VISIBLE) {
+            rl1.setVisibility(View.GONE);
         }
     }
 
@@ -726,15 +807,15 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
             et2.setText(m_point.y / 1e7 + "");
         }
 
-        final TextView tv1 = view.findViewById(R.id.tv1);
-        final TextView tv2 = view.findViewById(R.id.tv2);
-        final TextView tv3 = view.findViewById(R.id.tv3);
-        final TextView tv4 = view.findViewById(R.id.tv4);
+        final ImageView tv1 = view.findViewById(R.id.iv1);
+        final ImageView tv2 = view.findViewById(R.id.iv2);
+        final ImageView tv3 = view.findViewById(R.id.iv3);
+        final ImageView tv4 = view.findViewById(R.id.iv4);
 
         final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(30, 30);
         layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
 
-        final RelativeLayout.LayoutParams layoutParams_big = new RelativeLayout.LayoutParams(40, 40);
+        final RelativeLayout.LayoutParams layoutParams_big = new RelativeLayout.LayoutParams(45, 45);
         layoutParams_big.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
 
         tv1.setOnClickListener(new View.OnClickListener() {

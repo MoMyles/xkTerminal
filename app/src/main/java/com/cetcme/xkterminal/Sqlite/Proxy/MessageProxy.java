@@ -5,6 +5,7 @@ import android.database.Cursor;
 import com.cetcme.xkterminal.MyClass.DateUtil;
 import com.cetcme.xkterminal.Sqlite.Bean.MessageBean;
 
+import org.codice.common.ais.message.Message;
 import org.xutils.DbManager;
 import org.xutils.common.util.KeyValue;
 import org.xutils.db.sqlite.WhereBuilder;
@@ -38,11 +39,27 @@ public class MessageProxy {
         }
     }
 
-    public static void insert(DbManager db, MessageBean message) {
+    public static int insert(DbManager db, MessageBean message) {
         try {
             db.saveBindingId(message);
+            return message.getId();
         } catch (DbException e) {
             e.printStackTrace();
+            return -1;
+        }
+    }
+
+    /**
+     * 获取短信数量
+     * @param db
+     * @return
+     */
+    public static long getCount(DbManager db) {
+        try {
+            return db.selector(MessageBean.class).count();
+        } catch (DbException e) {
+            e.printStackTrace();
+            return 0;
         }
     }
 
@@ -126,7 +143,7 @@ public class MessageProxy {
         long count = 0;
         try {
             count = db.selector(MessageBean.class)
-                    .where("isSend","=", isSend ? 1 : 0)
+                    .where("isSend","=", isSend)
                     .count();
         } catch (DbException e) {
             e.printStackTrace();

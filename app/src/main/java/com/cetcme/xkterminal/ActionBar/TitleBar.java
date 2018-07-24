@@ -35,7 +35,7 @@ public class TitleBar  extends RelativeLayout {
 
         textView_title.getPaint().setFakeBoldText(true);
 //        textView_title.setTextSize(12); //22
-        textView_title.setTextColor(0xFF000000);
+//        textView_title.setTextColor(0xFF000000);
     }
 
     public void setTitle(String title) {

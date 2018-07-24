@@ -14,21 +14,20 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="45dp"
         android:background="@drawable/top_select"
         android:gravity="center_vertical">
 
-        <TextView
-            android:id="@+id/tv_back"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginLeft="5dp"
-            android:padding="5dp"
-            android:background="@mipmap/title_icon_back_2x"/>
+        <ImageView
+            android:id="@+id/iv_back"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:padding="13dp"
+            android:src="@mipmap/title_icon_back_2x"/>
 
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="30dp"
+            android:layout_height="match_parent"
             android:gravity="center"
             android:text="标位列表"
             android:textColor="@android:color/white"
@@ -38,7 +37,7 @@
         <TextView
             android:id="@+id/tv_pin_co"
             android:layout_width="wrap_content"
-            android:layout_height="30dp"
+            android:layout_height="match_parent"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
@@ -47,13 +46,13 @@
             android:gravity="center_vertical"
             android:text="坐标标位"
             android:textColor="@android:color/white"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:textStyle="bold"/>
 
         <TextView
             android:id="@+id/tv_pin_map"
             android:layout_width="wrap_content"
-            android:layout_height="30dp"
+            android:layout_height="match_parent"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
@@ -62,17 +61,17 @@
             android:layout_marginRight="10dp"
             android:text="地图标位"
             android:textColor="@android:color/white"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:textStyle="bold"/>
 
     </RelativeLayout>
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:orientation="horizontal"
-                  android:padding="10dp"
-                  android:background="#fff">
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal"
+      android:padding="10dp"
+      android:background="#fff">
 
         <TextView
             android:id="@+id/tv_name"
@@ -115,6 +114,11 @@
 
 
     </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/separate_clo"/>
 
     <ListView
         android:id="@+id/listView"

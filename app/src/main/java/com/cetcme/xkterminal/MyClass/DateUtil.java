@@ -2,6 +2,7 @@ package com.cetcme.xkterminal.MyClass;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -57,5 +58,11 @@ public class DateUtil {
         }
 
         return  sdf.format(date);
+    }
+
+    public static Calendar dataToCalendar(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        return calendar;
     }
 }

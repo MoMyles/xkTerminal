@@ -42,6 +42,12 @@ public class Constant {
     // 短信发送间隔
     public static final int MESSAGE_SEND_LIMIT_TIME = 60000;
 
+    // 开机自检超时时间
+    public static final int SELF_CHECK_TIME_OUT = 6 * 1000; //2 * 60 * 1000; TODO
+
+    // 开机之后隔多久发开机数据包
+    public static final int SEND_BOOT_DATA_TIME = 30 * 1000;
+
     // 紧急报警闪烁间隔，0为不闪烁，ms
     public static final int ALERT_FLASH_TIME = 500;
 
@@ -50,9 +56,11 @@ public class Constant {
     // gps串口码率
 //    public static final int SERIAL_GPS_PORT_BAUD_RATE = 9600;
     public static final int SERIAL_AIS_PORT_BAUD_RATE = 38400;
+
     // GPS串口路径
 //    public static final String SERIAL_GPS_PORT_PATH = "/dev/ttyS1";
     public static final String SERIAL_AIS_PORT_PATH = "/dev/ttyS1";
+
     // 数据串口路径
     public static final String SERIAL_DATA_PORT_PATH = "/dev/ttyS3";
 
@@ -60,4 +68,11 @@ public class Constant {
     public static final boolean SHOW_NUMBER_MESSAGE_LIST = true;
     public static final boolean SHOW_NUMBER_MSG_TEMP_LIST = true;
     public static final boolean SHOW_NUMBER_FRIEND_LIST = true;
+
+    // 存数据库内容的条数限制 TODO 确定数量
+    public static final int LIMIT_MESSAGE = 2000; //?
+    public static final int LIMIT_INOUT = 50; //?
+    public static final int LIMIT_FRIEND = 50;
+    public static final int LIMIT_SMS_TEMP = 50;
+    public static final int LIMIT_PIN = 50; //?
 }

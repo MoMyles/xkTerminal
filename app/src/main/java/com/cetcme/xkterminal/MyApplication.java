@@ -8,7 +8,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -18,7 +17,6 @@ import com.cetcme.xkterminal.DataFormat.Util.ByteUtil;
 import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
 import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
 import com.cetcme.xkterminal.DataFormat.Util.Util;
-import com.cetcme.xkterminal.DataFormat.WarnFormat;
 import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
@@ -28,7 +26,6 @@ import com.cetcme.xkterminal.Navigation.GpsParse;
 import com.cetcme.xkterminal.Navigation.SkiaDrawView;
 import com.cetcme.xkterminal.Socket.SocketManager;
 import com.cetcme.xkterminal.Socket.SocketServer;
-import com.cetcme.xkterminal.Sqlite.Bean.GPSBean;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 import com.cetcme.xkterminal.Sqlite.Bean.MessageBean;
 import com.cetcme.xkterminal.Sqlite.Bean.OtherShipBean;
@@ -56,18 +53,17 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidParameterException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import android_serialport_api.SerialPort;
 import android_serialport_api.SerialPortFinder;
-import yimamapapi.skia.AisInfo;
 import yimamapapi.skia.M_POINT;
 import yimamapapi.skia.OtherVesselCurrentInfo;
-import yimamapapi.skia.YimaAisParse;
 import yimamapapi.skia.YimaLib;
 
 import static com.cetcme.xkterminal.MainActivity.myNumber;
@@ -79,6 +75,7 @@ import static com.cetcme.xkterminal.MainActivity.myNumber;
 public class MyApplication extends Application {
 
     public MainActivity mainActivity;
+    public MessageDialogActivity messageDialogActivity;
     public IDCardActivity idCardActivity;
 
     private static MyApplication mContext;
@@ -110,7 +107,6 @@ public class MyApplication extends Application {
 
     public long oldAisReceiveTime = System.currentTimeMillis();
 
-    public boolean isAisFirst = true;
     public boolean isAisConnected = false;
 
     private Timer timer;
@@ -119,6 +115,8 @@ public class MyApplication extends Application {
     public static boolean isLocated = false;
     // 电压
     public static String voltage = "-";
+
+    public static final List<OtherShipBean> osbDataList = new ArrayList<>();
 
     /**
      * 加载库文件（只需调用一次）
@@ -167,7 +165,6 @@ public class MyApplication extends Application {
             }
         };
 
-        //TODO: test for phone
         try {
             mSerialPort = getSerialPort();
             mOutputStream = mSerialPort.getOutputStream();
@@ -195,13 +192,6 @@ public class MyApplication extends Application {
 //            Log.i("qh_port", "onCreate: " + path);
 //        }
 
-        new Thread() {
-            @Override
-            public void run() {
-                new SocketServer().startService();
-            }
-        }.start();
-
         tipToast = Toast.makeText(getApplicationContext(), "", Toast.LENGTH_SHORT);
 
         new SocketManager(handler, getApplicationContext());
@@ -213,17 +203,29 @@ public class MyApplication extends Application {
         Iconify.with(new FontAwesomeModule());
 
         StringBuffer param = new StringBuffer();
-        param.append("appid=5b2c638f"); // mao: 5afb90f6, qh: 5b2c61e9, lw: 5b2c638f
+        param.append("appid=5b3985d5"); // mao: 5afb90f6, qh: 5b2c61e9, lw: 5b2c638f, xb: 5b3985d5
         param.append(",");
         // 设置使用v5+
         param.append(SpeechConstant.ENGINE_MODE + "=" + SpeechConstant.MODE_MSC);
         SpeechUtility.createUtility(this, param.toString());
-
-        try {
-            db.delete(OtherShipBean.class);
-        } catch (DbException e) {
-            e.printStackTrace();
-        }
+        // 每隔1分钟 移除5分钟未收到AIS信息的渔船
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (osbDataList != null && !osbDataList.isEmpty()) {
+                    synchronized (osbDataList) {
+                        Iterator<OtherShipBean> it = osbDataList.iterator();
+                        while (it.hasNext()) {
+                            OtherShipBean o = it.next();
+                            if (Constant.SYSTEM_DATE.getTime() - o.getAcq_time().getTime() > (4 * 60 + 59) * 1000) {
+                                it.remove();
+                            }
+                        }
+                    }
+                }
+                new Handler().postDelayed(this, 60 * 1000);
+            }
+        }, 60 * 1000);
         // 距离报警
         warnTimer = new Timer();
         warnTimer.schedule(new TimerTask() {
@@ -272,7 +274,7 @@ public class MyApplication extends Application {
 
                         double curHaili = SkiaDrawView.mYimaLib.GetDistBetwTwoPoint(start.x, start.y, end.x, end.y);
                         if (x_2 < x_ && y_2 < y_ && curHaili <= haili) {
-                            mainActivity.showMessageDialog("您即将撞船", 1);
+                            mainActivity.showMessageDialog("自身设备", "您即将撞船", 1);
                             SoundPlay.startAlertSound(mainActivity);
                         }
                     }
@@ -355,9 +357,12 @@ public class MyApplication extends Application {
             String apiType = receiveJson.getString("apiType");
             JSONObject jsonObject = new JSONObject();
             switch (apiType) {
+                case "check_login":
+                    mainActivity.showPhoneLoginDialog();
+                    break;
                 case "login":
                     if (mainActivity != null) {
-                        Toast.makeText(mainActivity,"手机客户端登陆成功", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mainActivity, "手机客户端登陆成功", Toast.LENGTH_SHORT).show();
                         MainActivity.play("手机客户端登陆成功");
                     }
                     break;
@@ -366,9 +371,9 @@ public class MyApplication extends Application {
                     String newID = data.getString("deviceID");
                     sendBytes(IDFormat.format(newID));
                     break;
-                case "device_id":
-                    sendBytes(IDFormat.getID());
-                    break;
+//                case "device_id":
+//                    sendBytes(IDFormat.getID());
+//                    break;
                 case "sms_list":
                     JSONArray smsList = getSmsList();
 
@@ -653,6 +658,23 @@ public class MyApplication extends Application {
         if (warnTimer != null) {
             warnTimer.cancel();
         }
+        if (mInputStream != null ){
+            try {
+                mInputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (mOutputStream != null) {
+            try {
+                mOutputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (mSerialPort != null) {
+            mSerialPort.close();
+        }
     }
 
 
@@ -782,27 +804,6 @@ public class MyApplication extends Application {
 //        }
 //    }
 
-    private class AisReadThread extends Thread {
-
-        @Override
-        public void run() {
-            super.run();
-            while (!isInterrupted()) {
-                int size;
-                try {
-                    byte[] buffer = new byte[1];
-                    if (aisInputStream == null) return;
-                    size = aisInputStream.read(buffer);
-                    if (size > 0) {
-                        onAisDataReceived(buffer, size);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return;
-                }
-            }
-        }
-    }
 
     byte[] serialBuffer = new byte[100];
     int serialCount = 0;
@@ -813,7 +814,17 @@ public class MyApplication extends Application {
         serialCount++;
         if (serialCount == 3) {
             String head = Util.bytesGetHead(serialBuffer, 3);
-            if (head.equals("$04") || head.equals("$R4") || head.equals("$R1") || head.equals("$R2") || head.equals("$R5") || head.equals("$R0") || head.equals("$R6") || head.equals("$R7") || head.equals("$R8")) {
+            if (head == null) return;
+            if (head.equals("$04") ||
+                head.equals("$R4") ||
+                head.equals("$R1") ||
+                head.equals("$R2") ||
+                head.equals("$R5") ||
+                head.equals("$R0") ||
+                head.equals("$R6") ||
+                head.equals("$R7") ||
+                head.equals("$R8") ||
+                head.equals("$RA")) {
                 hasHead = true;
             } else {
                 Util.bytesRemoveFirst(serialBuffer, serialCount);
@@ -927,6 +938,11 @@ public class MyApplication extends Application {
                             mHandler.sendMessage(message);
                         }
                         break;
+                    case "$RA":
+                        // 自检
+                        message.what = DataHandler.SERIAL_PORT_CHECK;
+                        message.setData(bundle);
+                        mHandler.sendMessage(message);
                     default:
                         hasHead = false;
                         Util.bytesRemoveFirst(serialBuffer, serialCount);
@@ -972,125 +988,6 @@ public class MyApplication extends Application {
 
                 EventBus.getDefault().post(locationBean);
             }
-        }
-    }
-
-    private final List<Byte> aisByts = new LinkedList<>();
-
-    protected void onAisDataReceived(byte[] buffer, int size) {
-//        Log.i(TAG, "16进制：" + ConvertUtil.bytesToHexString(ByteUtil.subBytes(buffer, 0, size)));
-//        AisInfo a = YimaAisParse.mParseAISSentence("!AIVDM,1,1,,A,15MgK45P3@G?fl0E`JbR0OwT0@MS,0*4E");
-
-        if (buffer[0] == 33 || buffer[0] == 36) {
-            // ! 号头
-            if (aisByts.size() > 0) {
-                int len = aisByts.size();
-                // \r\n 结尾
-                Byte[] byts = aisByts.toArray(new Byte[len]);
-                byte[] tmpByts = new byte[len];
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < len; i++) {
-                    tmpByts[i] = byts[i];
-                }
-                sb.append(ConvertUtil.bytesToHexString(tmpByts));
-                String gpsDataStr = new String(tmpByts);
-                if (gpsDataStr.startsWith("!AIVDM")
-                        || gpsDataStr.startsWith("!AIVDO")) {
-//                    Log.e("TAG", "receive: " + gpsDataStr);
-                    oldAisReceiveTime = System.currentTimeMillis();
-                    isAisConnected = true;
-                    if (mainActivity != null) {
-                        mainActivity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mainActivity.gpsBar.setAisStatus(true);
-                            }
-                        });
-                    }
-                    AisInfo aisInfo = YimaAisParse.mParseAISSentence(gpsDataStr);
-                    if (aisInfo != null) {
-                        Log.i(TAG, aisInfo.MsgType + "");
-                        if (14 == aisInfo.MsgType) {
-                            // 报警信息
-                            if (aisInfo.mmsi > 0) {
-                                String message = aisInfo.warnMsgInfo;
-                                if (TextUtils.isEmpty(message)) {
-                                    message = "AIS报警";
-                                }
-                                sendBytes(WarnFormat.format("" + aisInfo.mmsi, message));
-                            }
-                        } else {
-                            int mmsi = -99;
-                            try {
-                                mmsi = Integer.valueOf(PreferencesUtils.getString(mContext, "shipNo", "0")).intValue();
-                            } catch (Exception e) {
-                            }
-                            if (aisInfo.bOwnShip) {
-                                LocationBean locationBean = new LocationBean();
-                                locationBean.setLatitude(aisInfo.latititude);
-                                locationBean.setLongitude(aisInfo.longtitude);
-                                locationBean.setSpeed(aisInfo.SOG);
-                                locationBean.setHeading(aisInfo.COG);
-                                locationBean.setAcqtime(Constant.SYSTEM_DATE);
-                                currentLocation = locationBean;
-                                EventBus.getDefault().post(locationBean);
-                            } else {
-                                if (mmsi == aisInfo.mmsi) {
-                                    LocationBean locationBean = new LocationBean();
-                                    locationBean.setLatitude(aisInfo.latititude);
-                                    locationBean.setLongitude(aisInfo.longtitude);
-                                    locationBean.setSpeed(aisInfo.SOG);
-                                    locationBean.setHeading(aisInfo.COG);
-                                    locationBean.setAcqtime(Constant.SYSTEM_DATE);
-                                    currentLocation = locationBean;
-                                    EventBus.getDefault().post(locationBean);
-                                } else {
-                                    EventBus.getDefault().post(aisInfo);
-                                }
-                            }
-                        }
-                    }
-                } else if (gpsDataStr.startsWith("$GPGSV")) {
-//                    Log.e("TAG", "receive: " + gpsDataStr);
-                    try {
-                        String newStr = gpsDataStr.substring(gpsDataStr.indexOf(",") + 1, gpsDataStr.lastIndexOf("*"));
-                        String[] arr = newStr.split(",");
-                        for (int i = 3; i < arr.length; i += 4) {
-                            int no = Integer.valueOf(arr[i]);
-                            int yangjiao = Integer.valueOf(arr[i + 1]);
-                            int fangwei = Integer.valueOf(arr[i + 2]);
-                            int xinhao = 0;
-                            // xinhao arr[i + 3] 可能为空
-                            xinhao = Integer.valueOf(arr[i + 3].equals("") ? "0" : arr[i + 3]);
-                            GPSBean bean = db.selector(GPSBean.class).where("no", "=", no).findFirst();
-                            if (bean == null) {
-                                // 不存在
-                                bean = new GPSBean();
-                                bean.setNo(no);
-                                bean.setYangjiao(yangjiao);
-                                bean.setFangwei(fangwei);
-                                bean.setXinhao(xinhao);
-                                db.saveBindingId(bean);
-                            } else {
-                                // 存在
-                                bean.setYangjiao(yangjiao);
-                                bean.setFangwei(fangwei);
-                                bean.setXinhao(xinhao);
-                                db.saveOrUpdate(bean);
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-            aisByts.clear();
-            aisByts.add(buffer[0]);
-        } else {
-            aisByts.add(buffer[0]);
-        }
-        if (aisByts.size() > 1024) {
-            aisByts.clear();
         }
     }
 

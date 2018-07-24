@@ -10,9 +10,16 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.MainActivity;
+import com.cetcme.xkterminal.MyApplication;
+import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.NewInoutActivity;
 import com.cetcme.xkterminal.R;
+import com.cetcme.xkterminal.Sqlite.Proxy.FriendProxy;
+import com.cetcme.xkterminal.Sqlite.Proxy.InoutProxy;
+import com.cetcme.xkterminal.Sqlite.Proxy.MessageProxy;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 
 import java.util.ArrayList;
 
@@ -66,7 +73,7 @@ public class MessageBar extends RelativeLayout implements View.OnClickListener {
         button_relay.setVisibility(GONE);
 
         for (Button button: buttons) {
-            button.setTextColor(0xFF000000);
+            button.setTextColor(0xFFFFFFFF);
             button.setBackgroundResource(R.drawable.button_bg_selector);
             button.setOnClickListener(this);
 //            button.setTextSize(10); //16
@@ -78,6 +85,38 @@ public class MessageBar extends RelativeLayout implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.button_new:
+                if (isInout) {
+                    long count = InoutProxy.getCount(MyApplication.getInstance().getDb());
+                    if (count >= Constant.LIMIT_INOUT) {
+                        new QMUIDialog.MessageDialogBuilder(mainActivity)
+                                .setTitle("提示")
+                                .setMessage("已达到申报最大数量(" + Constant.LIMIT_INOUT+ ")，请删除后再申报。")
+                                .addAction("确定", new QMUIDialogAction.ActionListener() {
+                                    @Override
+                                    public void onClick(QMUIDialog dialog, int index) {
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .show();
+                        return;
+                    }
+                } else {
+                    long count = MessageProxy.getCount(MyApplication.getInstance().getDb());
+                    if (count >= Constant.LIMIT_MESSAGE) {
+                        new QMUIDialog.MessageDialogBuilder(mainActivity)
+                                .setTitle("提示")
+                                .setMessage("已达到短信最大数量(" + Constant.LIMIT_MESSAGE + ")，请删除后再发件。")
+                                .addAction("确定", new QMUIDialogAction.ActionListener() {
+                                    @Override
+                                    public void onClick(QMUIDialog dialog, int index) {
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .show();
+                        return;
+                    }
+                }
+
                 if (isInout) {
                     mainActivity.startActivity(new Intent(mainActivity, NewInoutActivity.class));
                 } else {
@@ -113,18 +152,18 @@ public class MessageBar extends RelativeLayout implements View.OnClickListener {
     public void setNextButtonEnable(boolean enable) {
         button_next.setEnabled(enable);
         if (enable) {
-            button_next.setTextColor(0xFF000000);
+            button_next.setTextColor(0xFFFFFFFF);
         } else {
-            button_next.setTextColor(0xFFA8A8A8);
+            button_next.setTextColor(0xFF1D274B);
         }
     }
 
     public void setPrevButtonEnable(boolean enable) {
         button_prev.setEnabled(enable);
         if (enable) {
-            button_prev.setTextColor(0xFF000000);
+            button_prev.setTextColor(0xFFFFFFFF);
         } else {
-            button_prev.setTextColor(0xFFA8A8A8);
+            button_prev.setTextColor(0xFF1D274B);
         }
     }
 
@@ -132,11 +171,11 @@ public class MessageBar extends RelativeLayout implements View.OnClickListener {
         button_detail.setEnabled(enable);
         button_relay.setEnabled(enable);
         if (enable) {
-            button_detail.setTextColor(0xFF000000);
-            button_relay.setTextColor(0xFF000000);
+            button_detail.setTextColor(0xFFFFFFFF);
+            button_relay.setTextColor(0xFFFFFFFF);
         } else {
-            button_detail.setTextColor(0xFFA8A8A8);
-            button_relay.setTextColor(0xFFA8A8A8);
+            button_detail.setTextColor(0xFF1D274B);
+            button_relay.setTextColor(0xFF1D274B);
         }
     }
 

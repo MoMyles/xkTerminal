@@ -48,7 +48,7 @@ public class PageBar extends RelativeLayout implements View.OnClickListener {
         buttons.add(button_back);
 
         for (Button button: buttons) {
-            button.setTextColor(0xFF000000);
+            button.setTextColor(0xFFFFFFFF);
             button.setBackgroundResource(R.drawable.button_bg_selector);
             button.setOnClickListener(this);
 //            button.setTextSize(10); //16
@@ -76,18 +76,18 @@ public class PageBar extends RelativeLayout implements View.OnClickListener {
     public void setNextButtonEnable(boolean enable) {
         button_next.setEnabled(enable);
         if (enable) {
-            button_next.setTextColor(0xFF000000);
+            button_next.setTextColor(0xFFFFFFFF);
         } else {
-            button_next.setTextColor(0xFFA8A8A8);
+            button_next.setTextColor(0xFF1D274B);
         }
     }
 
     public void setPrevButtonEnable(boolean enable) {
         button_prev.setEnabled(enable);
         if (enable) {
-            button_prev.setTextColor(0xFF000000);
+            button_prev.setTextColor(0xFFFFFFFF);
         } else {
-            button_prev.setTextColor(0xFFA8A8A8);
+            button_prev.setTextColor(0xFF1D274B);
         }
     }
 

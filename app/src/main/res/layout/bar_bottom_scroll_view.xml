@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="60dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/barColor">
 
     <TextView
         android:layout_width="match_parent"
@@ -93,7 +94,7 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="8dp"
                 android:gravity="center"
-                android:text="附近渔船"
+                android:text="附近船舶"
                 android:textSize="16sp" />
 
             <Button
@@ -114,11 +115,11 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="8dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
                 android:gravity="center"
                 android:text="系统参数"
                 android:textSize="16sp" />
-
-
 
             <Button
                 android:id="@+id/button_about"
@@ -131,7 +132,8 @@
                 android:layout_marginRight="10dp"
                 android:gravity="center"
                 android:text="关于"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:visibility="gone"/>
 
         </LinearLayout>
     </HorizontalScrollView>

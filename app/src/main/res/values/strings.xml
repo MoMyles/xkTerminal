@@ -35,44 +35,51 @@
     <string name="setting_tab_2">卫星分布</string>
     <string name="setting_tab_3">报警设置</string>
     <string name="setting_tab_4">服务状态</string>
-    <string name="setting_tab_5">气象信息</string>
-    <string name="setting_tab_6">系统设置</string>
+    <string name="setting_tab_5">系统设置</string>
+    <string name="setting_tab_6">关于</string>
+
+
+    <!--<string-array name="smsTemplate">-->
+    <!--<item>船1-船2</item>-->
+    <!--<item>船1-船3</item>-->
+    <!--<item>船1-平台</item>-->
+    <!--<item>船1-手机</item>-->
+    <!--<item>船3-船1</item>-->
+    <!--<item>平台-船1</item>-->
+    <!--<item>固定短信模版1</item>-->
+    <!--<item>固定短信模版2</item>-->
+    <!--<item>固定短信模版3</item>-->
+    <!--</string-array>-->
+
 
     <string-array name="smsTemplate">
-        <item>固定短信模版1</item>
-        <item>固定短信模版2</item>
-        <item>固定短信模版3</item>
-        <item>固定短信模版4</item>
-        <item>固定短信模版5</item>
-        <item>固定短信模版6</item>
-        <item>固定短信模版7</item>
-        <item>固定短信模版8</item>
-        <item>固定短信模版9</item>
-        <item>固定短信模版10</item>
-        <item>固定短信模版11</item>
-        <item>固定短信模版12</item>
-        <item>固定短信模版13</item>
-        <item>固定短信模版14</item>
-        <item>固定短信模版15</item>
-        <item>固定短信模版16</item>
-        <item>固定短信模版17</item>
-        <item>固定短信模版18</item>
-        <item>固定短信模版19</item>
-        <item>固定短信模版20</item>
     </string-array>
 
     <string-array name="friendName">
-        <item>平台</item>
-        <item>设备1</item>
-        <item>设备2</item>
-        <item>设备3</item>
+        <!--<item>船1舱内(28060017)</item>-->
+        <!--<item>船2舱内(28060062)</item>-->
+        <!--<item>船3舱内(28060031)</item>-->
+
+        <!--<item>吴(13732587260)</item>-->
+        <!--<item>徐(13705830170)</item>-->
+
+        <!--TODO 平台北斗卡号-->
+        <item>平台(372741)</item>
+        <!--<item>船载北斗设备(256218)</item>-->
     </string-array>
 
+
     <string-array name="friendNumber">
+        <!--<item>407477</item>-->
+        <!--<item>407479</item>-->
+        <!--<item>407478</item>-->
+
+        <!--<item>13732587260</item>-->
+        <!--<item>13705830170</item>-->
+
+        <!--TODO 平台北斗卡号-->
         <item>372741</item>
-        <item>318219</item>
-        <item>318216</item>
-        <item>344408</item>
+        <!--<item>256218</item>-->
     </string-array>
 
     <!-- TODO: Remove or change this placeholder text -->

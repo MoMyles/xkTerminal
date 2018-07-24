@@ -8,20 +8,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.GPSFormatUtils;
 import com.cetcme.xkterminal.Sqlite.Bean.PinBean;
-import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
-import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
+import com.cetcme.xkterminal.Sqlite.Proxy.PinProxy;
 
 import org.xutils.DbManager;
 import org.xutils.ex.DbException;
 
 import java.util.ArrayList;
-
 import java.util.List;
 
 import butterknife.BindView;
@@ -32,12 +32,13 @@ public class PinActivity extends Activity {
     public static final int RESULT_CODE_NOTHING = 0;
     public static final int RESULT_CODE_MAP = 1;
     public static final int RESULT_CODE_CO = 2;
+    public static final int RESULT_OUT_OF_LIMIT = 3;
 
     @BindView(R.id.listView)
     ListView listView;
 
-    @BindView(R.id.tv_back)
-    TextView tv_back;
+    @BindView(R.id.iv_back)
+    ImageView iv_back;
 
     @BindView(R.id.tv_pin_map)
     TextView tv_pin_map;
@@ -56,20 +57,6 @@ public class PinActivity extends Activity {
         setContentView(R.layout.activity_pin);
         ButterKnife.bind(this);
 
-
-//        PinBean pinBean = new PinBean();
-//        pinBean.setColor(getResources().getColor(android.R.color.black));
-//        pinBean.setLat((int) (31.3 * 1e7));
-//        pinBean.setLon((int) (121.3 * 1e7));
-//        pinBean.setName("123");
-//        try {
-//            db.saveBindingId(pinBean);
-//        } catch (DbException e) {
-//            e.printStackTrace();
-//        }
-//
-//        System.out.println("pin: " + pinBean.toString());
-
         initTitleView();
         initListView();
         getPinData();
@@ -82,7 +69,7 @@ public class PinActivity extends Activity {
     }
 
     private void initTitleView() {
-        tv_back.setOnClickListener(new View.OnClickListener() {
+        iv_back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 setResult(RESULT_CODE_NOTHING);
@@ -93,7 +80,11 @@ public class PinActivity extends Activity {
         tv_pin_map.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setResult(RESULT_CODE_MAP);
+                if (checkCount()) {
+                    setResult(RESULT_OUT_OF_LIMIT);
+                } else {
+                    setResult(RESULT_CODE_MAP);
+                }
                 finish();
             }
         });
@@ -101,11 +92,21 @@ public class PinActivity extends Activity {
         tv_pin_co.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setResult(RESULT_CODE_CO);
+                if (checkCount()) {
+                    setResult(RESULT_OUT_OF_LIMIT);
+                } else {
+                    setResult(RESULT_CODE_CO);
+                }
                 finish();
             }
         });
     }
+
+    private boolean checkCount() {
+        long count = PinProxy.getCount(MyApplication.getInstance().getDb());
+        return count >= Constant.LIMIT_PIN;
+    }
+
 
     private void initListView() {
         testAdapter = new TestAdapter();
@@ -191,7 +192,16 @@ public class PinActivity extends Activity {
                 vh.mTv1.setText(pin.getName());
                 vh.mTv2.setText(GPSFormatUtils.DDtoDMS(pin.getLon() / 10000000d, true));
                 vh.mTv3.setText(GPSFormatUtils.DDtoDMS(pin.getLat() / 10000000d, false));
-                vh.mTv4.setBackgroundColor(pin.getColor());
+                // vh.mTv4.setBackgroundColor(pin.getColor());
+                if (getResources().getColor(android.R.color.holo_red_dark) == pin.getColor()) {
+                    vh.mTv4.setImageResource(R.drawable.bw_red);
+                } else if (getResources().getColor(android.R.color.holo_green_dark) == pin.getColor()) {
+                    vh.mTv4.setImageResource(R.drawable.bw_green);
+                } else if (getResources().getColor(android.R.color.holo_blue_dark) == pin.getColor()) {
+                    vh.mTv4.setImageResource(R.drawable.bw_blue);
+                } else {
+                    vh.mTv4.setImageResource(R.drawable.bw_yellow);
+                }
             } else {
                 vh.mTv1.setText("");
                 vh.mTv2.setText("");
@@ -205,7 +215,7 @@ public class PinActivity extends Activity {
             TextView mTv1;
             TextView mTv2;
             TextView mTv3;
-            TextView mTv4;
+            ImageView mTv4;
         }
     }
 }

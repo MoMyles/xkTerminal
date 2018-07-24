@@ -48,6 +48,7 @@ public class MessageNewFragment extends Fragment{
     private String receive;
     private String content;
     private String time;
+    private int messageId;
 
     private TitleBar titleBar;
 
@@ -63,11 +64,12 @@ public class MessageNewFragment extends Fragment{
 
     private DbManager db;
 
-    public MessageNewFragment(String tg, String receive, String content, String time) {
+    public MessageNewFragment(String tg, String receive, String content, String time, int id) {
         this.tg = tg;
         this.receive = receive;
         this.content = content;
         this.time = time;
+        this.messageId = id;
         Log.e("Main", "MessageFragment: " + tg );
     }
 
@@ -77,6 +79,13 @@ public class MessageNewFragment extends Fragment{
 
         db = ((MyApplication) mainActivity.getApplication()).db;
 
+        initView(view);
+        setTg(tg);
+
+        return view;
+    }
+
+    private void initView(View view) {
         titleBar = view.findViewById(R.id.titleBar);
         receiver_editText = view.findViewById(R.id.receiver_editText);
         content_editText = view.findViewById(R.id.content_editText);
@@ -85,46 +94,6 @@ public class MessageNewFragment extends Fragment{
         last_send_textView = view.findViewById(R.id.last_send_textView);
 
         sender_or_receiver_textView = view.findViewById(R.id.sender_or_receiver_textView);
-
-        if (tg.equals("new")) {
-            titleBar.setTitle("新建短信");
-            text_count_textView.setText(Constant.MESSAGE_CONTENT_MAX_LENGTH + "");
-        }
-
-        if (tg.equals("reply")) {
-            titleBar.setTitle("回复短信");
-            receiver_editText.setText(receive);
-//            content_editText.setText(content);
-            text_count_textView.setText(getRemainContentLength() + "");
-        }
-
-        if (tg.equals("relay")) {
-            titleBar.setTitle("转发短信");
-//            receiver_editText.setText(receive);
-            content_editText.setText(content);
-            text_count_textView.setText(getRemainContentLength() + "");
-        }
-
-        if (tg.equals("resend")) {
-            titleBar.setTitle("重新发送");
-            receiver_editText.setText(receive);
-            content_editText.setText(content);
-            text_count_textView.setText(getRemainContentLength() + "");
-        }
-
-        if (tg.equals("detail")) {
-            titleBar.setTitle("短信详情");
-            receiver_editText.setText(receive);
-            content_editText.setText(content);
-            text_count_textView.setText("");
-            receiver_editText.setEnabled(false);
-            receiver_editText.setTextColor(0xFF000000);
-            content_editText.setEnabled(false);
-            content_editText.setTextColor(0xFF000000);
-            text_count_textView.setText(getRemainContentLength() + "");
-
-            if (mainActivity.messageListStatus.equals("receive")) sender_or_receiver_textView.setText("发件人：");
-        }
 
         last_send_textView.setText(PreferencesUtils.getString(getActivity(),"lastSendTime", ""));
 
@@ -164,14 +133,14 @@ public class MessageNewFragment extends Fragment{
                 }
 
                 new QMUIDialog.CheckableDialogBuilder(getActivity())
-                    .addItems(showItems, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            content_editText.setText(items[which]);
-                            dialog.dismiss();
-                        }
-                    })
-                    .show();
+                        .addItems(showItems, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                content_editText.setText(items[which]);
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
             }
         });
 
@@ -217,13 +186,60 @@ public class MessageNewFragment extends Fragment{
                         .show();
             }
         });
+    }
 
-        if (tg.equals("detail")) {
-            sms_temp_btn.setVisibility(View.GONE);
-            friend_btn.setVisibility(View.GONE);
+    public void setTg(String tg) {
+        if (tg.equals("new")) {
+            titleBar.setTitle("新建短信");
+            receiver_editText.setText("");
+            content_editText.setText("");
+            text_count_textView.setText(Constant.MESSAGE_CONTENT_MAX_LENGTH + "");
+            receiver_editText.setEnabled(true);
+            content_editText.setEnabled(true);
         }
 
-        return view;
+        if (tg.equals("reply")) {
+            titleBar.setTitle("回复短信");
+            receiver_editText.setText(receive);
+            content_editText.setText("");
+            text_count_textView.setText(getRemainContentLength() + "");
+            receiver_editText.setEnabled(true);
+            content_editText.setEnabled(true);
+        }
+
+        if (tg.equals("relay")) {
+            titleBar.setTitle("转发短信");
+            receiver_editText.setText("");
+            content_editText.setText(content);
+            text_count_textView.setText(getRemainContentLength() + "");
+            receiver_editText.setEnabled(true);
+            content_editText.setEnabled(true);
+        }
+
+        if (tg.equals("resend")) {
+            titleBar.setTitle("重新发送");
+            receiver_editText.setText(receive);
+            content_editText.setText(content);
+            text_count_textView.setText(getRemainContentLength() + "");
+            receiver_editText.setEnabled(true);
+            content_editText.setEnabled(true);
+        }
+
+        if (tg.equals("detail")) {
+            titleBar.setTitle("短信详情");
+            receiver_editText.setText(receive);
+            content_editText.setText(content);
+            receiver_editText.setEnabled(false);
+            receiver_editText.setTextColor(0xFF000000);
+            content_editText.setEnabled(false);
+            content_editText.setTextColor(0xFF000000);
+            text_count_textView.setText(getRemainContentLength() + "");
+
+            if (mainActivity.messageListStatus.equals("receive")) sender_or_receiver_textView.setText("发件人：");
+        }
+
+        sms_temp_btn.setVisibility(tg.equals("detail") ? View.GONE : View.VISIBLE);
+        friend_btn.setVisibility(tg.equals("detail") ? View.GONE : View.VISIBLE);
     }
 
     public String getReceiver() {

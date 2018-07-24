@@ -10,6 +10,7 @@ import com.cetcme.xkterminal.DataFormat.AlertFormat;
 import com.cetcme.xkterminal.DataFormat.MessageFormat;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.SoundPlay;
+import com.cetcme.xkterminal.Sqlite.Proxy.MessageProxy;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -27,6 +28,7 @@ public class MessageDialogActivity extends Activity {
 
     int type = -1;
     String content;
+    int id = -1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,9 +37,23 @@ public class MessageDialogActivity extends Activity {
 
         // type 0: 救护, 1: 报警提醒, 2: 夜间点名, 3: 告警信息
         type = getIntent().getIntExtra("type", -1);
-
+        id = getIntent().getIntExtra("id", -1);
         content = getIntent().getStringExtra("content");
 
+        initUI();
+
+        confirm_bt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                confirmRescue();
+                finish();
+            }
+        });
+
+        MyApplication.getInstance().messageDialogActivity = this;
+    }
+
+    private void initUI() {
         switch (type) {
             case TYPE_RESCUE:
                 tv_title.setText("救护短信");
@@ -60,13 +76,7 @@ public class MessageDialogActivity extends Activity {
                 rescue_content_tv.setText(content);
                 break;
         }
-        confirm_bt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                confirmRescue();
-                finish();
-            }
-        });
+
     }
 
     private void confirmRescue() {
@@ -96,6 +106,16 @@ public class MessageDialogActivity extends Activity {
 
     protected void onDestroy() {
         SoundPlay.stopAlertSound();
+        MessageProxy.setMessageReadById(MyApplication.getInstance().getDb(), id);
+        MyApplication.getInstance().mainActivity.modifyGpsBarMessageCount();
+        MyApplication.getInstance().messageDialogActivity = null;
         super.onDestroy();
+    }
+
+    public void updateMessage(int id, String content, int type) {
+        this.id = id;
+        this.content = content;
+        this.type = type;
+        initUI();
     }
 }

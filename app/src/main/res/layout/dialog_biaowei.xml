@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
 
     <com.qiuhong.qhlibrary.QHTitleView.QHTitleView
         android:id="@+id/title"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"></com.qiuhong.qhlibrary.QHTitleView.QHTitleView>
+        android:layout_height="wrap_content" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,8 +18,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:layout_marginRight="10dp"
+            android:gravity="center"
             android:text="经度:"
             android:textSize="24sp" />
 
@@ -29,6 +29,7 @@
             android:layout_height="match_parent"
             android:layout_weight="2"
             android:background="@drawable/border_black"
+            android:maxLines="1"
             android:padding="4dp" />
     </LinearLayout>
 
@@ -52,6 +53,7 @@
             android:layout_height="match_parent"
             android:layout_weight="2"
             android:background="@drawable/border_black"
+            android:maxLines="1"
             android:padding="4dp" />
     </LinearLayout>
 
@@ -75,6 +77,7 @@
             android:layout_height="match_parent"
             android:layout_weight="2"
             android:background="@drawable/border_black"
+            android:maxLines="1"
             android:padding="4dp" />
 
         <EditText
@@ -84,14 +87,14 @@
             android:layout_weight="2"
             android:background="@drawable/border_black"
             android:padding="4dp"
-            android:visibility="gone"/>
+            android:visibility="gone" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:padding="16dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -111,7 +114,16 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_centerInParent="true"
-                android:background="@android:color/holo_red_dark" />
+                android:background="@android:color/holo_red_dark"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/iv1"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_centerInParent="true"
+                android:adjustViewBounds="true"
+                android:src="@drawable/bw_red" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -124,7 +136,16 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_centerInParent="true"
-                android:background="@android:color/holo_green_dark" />
+                android:background="@android:color/holo_green_dark"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/iv2"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_centerInParent="true"
+                android:adjustViewBounds="true"
+                android:src="@drawable/bw_green" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -137,7 +158,16 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_centerInParent="true"
-                android:background="@android:color/holo_blue_dark" />
+                android:background="@android:color/holo_blue_dark"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/iv3"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_centerInParent="true"
+                android:adjustViewBounds="true"
+                android:src="@drawable/bw_blue" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -150,7 +180,16 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_centerInParent="true"
-                android:background="@android:color/holo_orange_dark" />
+                android:background="@android:color/holo_orange_dark"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/iv4"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_centerInParent="true"
+                android:adjustViewBounds="true"
+                android:src="@drawable/bw_yellow" />
         </RelativeLayout>
     </LinearLayout>
 

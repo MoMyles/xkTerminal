@@ -16,16 +16,12 @@ import android.widget.Toast;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.GPSFormatUtils;
 import com.cetcme.xkterminal.Sqlite.Bean.PinBean;
-import com.cetcme.xkterminal.Sqlite.Proxy.FriendProxy;
 import com.cetcme.xkterminal.Sqlite.Proxy.PinProxy;
-import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
-import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 
 import org.xutils.DbManager;
 import org.xutils.ex.DbException;
 
 import java.util.ArrayList;
-
 import java.util.List;
 
 import butterknife.BindView;
@@ -196,7 +192,16 @@ public class PinActivity extends Activity {
                 vh.mTv1.setText(pin.getName());
                 vh.mTv2.setText(GPSFormatUtils.DDtoDMS(pin.getLon() / 10000000d, true));
                 vh.mTv3.setText(GPSFormatUtils.DDtoDMS(pin.getLat() / 10000000d, false));
-                vh.mTv4.setBackgroundColor(pin.getColor());
+                // vh.mTv4.setBackgroundColor(pin.getColor());
+                if (getResources().getColor(android.R.color.holo_red_dark) == pin.getColor()) {
+                    vh.mTv4.setImageResource(R.drawable.bw_red);
+                } else if (getResources().getColor(android.R.color.holo_green_dark) == pin.getColor()) {
+                    vh.mTv4.setImageResource(R.drawable.bw_green);
+                } else if (getResources().getColor(android.R.color.holo_blue_dark) == pin.getColor()) {
+                    vh.mTv4.setImageResource(R.drawable.bw_blue);
+                } else {
+                    vh.mTv4.setImageResource(R.drawable.bw_yellow);
+                }
             } else {
                 vh.mTv1.setText("");
                 vh.mTv2.setText("");
@@ -210,7 +215,7 @@ public class PinActivity extends Activity {
             TextView mTv1;
             TextView mTv2;
             TextView mTv3;
-            TextView mTv4;
+            ImageView mTv4;
         }
     }
 }

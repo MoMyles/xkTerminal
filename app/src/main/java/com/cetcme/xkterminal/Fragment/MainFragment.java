@@ -72,12 +72,9 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
     private LinearLayout alert_layout;
     private LinearLayout ll_ship_list;
     private RecyclerView rv_ships;
-    private ImageView iv1;
-
-    private Switch mSwitchYQ, mSwitchArea, mSwitchPin;
-
-    private Button zoomOut, zoomIn, btn1;
-
+    private ImageView zoomOut, zoomIn, iv1;
+    private Switch mSwitchMap, mSwitchYQ, mSwitchArea, mSwitchPin;
+    private Button btn1;
 
     private TextView tv_lon;
     private TextView tv_lat;
@@ -91,13 +88,13 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
     private boolean alert_need_flash = false;
     private boolean warnArea = false;
 
-    private final int[] JIN_YU_AREA_COLOR = new int[]{255, 0, 0};
-    private final int[] JIN_RU_AREA_COLOR = new int[]{0, 255, 0};
-    private final int[] JIN_CHU_AREA_COLOR = new int[]{0, 0, 255};
-
-
-    private final int[] JIN_CHU_AREA_X = new int[]{(int) (122.259983 * 1e7), (int) (122.680821 * 1e7), (int) (122.675072 * 1e7), (int) (122.311725 * 1e7)};
-    private final int[] JIN_CHU_AREA_Y = new int[]{(int) (28.722246 * 1e7), (int) (28.690818 * 1e7), (int) (28.199928 * 1e7), (int) (28.226411 * 1e7)};
+//    private final int[] JIN_YU_AREA_COLOR = new int[]{255, 0, 0};
+//    private final int[] JIN_RU_AREA_COLOR = new int[]{0, 255, 0};
+//    private final int[] JIN_CHU_AREA_COLOR = new int[]{0, 0, 255};
+//
+//
+//    private final int[] JIN_CHU_AREA_X = new int[]{(int) (122.259983 * 1e7), (int) (122.680821 * 1e7), (int) (122.675072 * 1e7), (int) (122.311725 * 1e7)};
+//    private final int[] JIN_CHU_AREA_Y = new int[]{(int) (28.722246 * 1e7), (int) (28.690818 * 1e7), (int) (28.199928 * 1e7), (int) (28.226411 * 1e7)};
 
 //    private final int[] JIN_RU_AREA_X = new int[]{(int) (121.761309 * 1e7), (int) (121.949882 * 1e7), (int) (121.902739 * 1e7), (int) (121.772808 * 1e7)};
 //    private final int[] JIN_RU_AREA_Y = new int[]{(int) (28.651267 * 1e7), (int) (28.660395 * 1e7), (int) (28.530491 * 1e7), (int) (28.517288 * 1e7)};
@@ -131,7 +128,6 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                 }
             }
         });
-
         btn1 = view.findViewById(R.id.btn1);
         rl1 = view.findViewById(R.id.rl1);
         btn1.setOnClickListener(new View.OnClickListener() {
@@ -223,7 +219,17 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
         });
 
         mSwitchYQ = view.findViewById(R.id.switch_yuqu);
-        mSwitchYQ.setChecked(PreferencesUtils.getBoolean(getActivity(), "mainFrgYuqu", false));
+        mSwitchMap = view.findViewById(R.id.switch_map);
+        mSwitchMap.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b) {
+                    skiaDrawView.changeMap(0);
+                } else {
+                    skiaDrawView.changeMap(3);
+                }
+            }
+        });
         mSwitchArea = view.findViewById(R.id.switch_warn_area);
         mSwitchArea.setChecked(PreferencesUtils.getBoolean(getActivity(), "mainFrgWarnArea", false));
         mSwitchPin = view.findViewById(R.id.switch_pin);
@@ -231,7 +237,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
         mSwitchPin.setChecked(false);
 
         warnArea = mSwitchArea.isChecked();
-        showWarnAreas();
+//        showWarnAreas();
         mSwitchYQ.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -239,12 +245,12 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                 PreferencesUtils.putBoolean(getActivity(), "mainFrgYuqu", b);
             }
         });
+        mSwitchYQ.setChecked(PreferencesUtils.getBoolean(getActivity(), "mainFrgYuqu", false));
         mSwitchArea.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 PreferencesUtils.putBoolean(getActivity(), "mainFrgWarnArea", b);
                 warnArea = b;
-                showWarnAreas();
                 if (MyApplication.currentLocation != null) {
                     doAreaWarning(MyApplication.currentLocation);
                 }
@@ -254,7 +260,6 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
         mSwitchPin.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-//                PreferencesUtils.putBoolean(getActivity(), "mainFrgPin", b);
                 if (b) {
                     showBiaoweis();
                 } else {
@@ -339,7 +344,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                     // 没有位置则固定中心点 121.768783,28.696902
                     skiaDrawView.mYimaLib.CenterMap((int) (121.768783 * 1e7), (int) (28.696902 * 1e7));
                 }
-                skiaDrawView.mYimaLib.SetCurrentScale(8878176.0f);
+                skiaDrawView.mYimaLib.SetCurrentScale(20000.0f);
                 skiaDrawView.postInvalidate();
             }
         }, 200);
@@ -349,6 +354,9 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
+        if (!hidden) {
+            mSwitchMap.setChecked(PreferencesUtils.getBoolean(getActivity(), "mainFrgYuqu", false));
+        }
     }
 
     private void showBiaoweis() {
@@ -364,44 +372,44 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
     private int curLayerPos = -1;
 
 
-    private void showWarnAreas() {
-        if (warnArea) {
-            Integer[] geoX = new Integer[JIN_CHU_AREA_X.length];
-            Integer[] geoY = new Integer[JIN_CHU_AREA_Y.length];
-            for (int i = 0; i < JIN_CHU_AREA_X.length; i++) {
-                geoX[i] = JIN_CHU_AREA_X[i];
-                geoY[i] = JIN_CHU_AREA_Y[i];
-            }
-            areas.add(new WarnArea(2, JIN_CHU_AREA_COLOR[0], JIN_CHU_AREA_COLOR[1]
-                    , JIN_CHU_AREA_COLOR[2], geoX, geoY));
-//            geoX = new Integer[JIN_RU_AREA_X.length];
-//            geoY = new Integer[JIN_RU_AREA_Y.length];
-//            for (int i = 0; i < JIN_RU_AREA_X.length; i++) {
-//                geoX[i] = JIN_RU_AREA_X[i];
-//                geoY[i] = JIN_RU_AREA_Y[i];
+//    private void showWarnAreas() {
+//        if (warnArea) {
+//            Integer[] geoX = new Integer[JIN_CHU_AREA_X.length];
+//            Integer[] geoY = new Integer[JIN_CHU_AREA_Y.length];
+//            for (int i = 0; i < JIN_CHU_AREA_X.length; i++) {
+//                geoX[i] = JIN_CHU_AREA_X[i];
+//                geoY[i] = JIN_CHU_AREA_Y[i];
 //            }
-//            areas.add(new WarnArea(1, JIN_RU_AREA_COLOR[0], JIN_RU_AREA_COLOR[1]
-//                    , JIN_RU_AREA_COLOR[2], geoX, geoY));
-//            geoX = new Integer[JIN_YU_AREA_X.length];
-//            geoY = new Integer[JIN_YU_AREA_Y.length];
-//            for (int i = 0; i < JIN_YU_AREA_X.length; i++) {
-//                geoX[i] = JIN_YU_AREA_X[i];
-//                geoY[i] = JIN_YU_AREA_Y[i];
+//            areas.add(new WarnArea(2, JIN_CHU_AREA_COLOR[0], JIN_CHU_AREA_COLOR[1]
+//                    , JIN_CHU_AREA_COLOR[2], geoX, geoY));
+////            geoX = new Integer[JIN_RU_AREA_X.length];
+////            geoY = new Integer[JIN_RU_AREA_Y.length];
+////            for (int i = 0; i < JIN_RU_AREA_X.length; i++) {
+////                geoX[i] = JIN_RU_AREA_X[i];
+////                geoY[i] = JIN_RU_AREA_Y[i];
+////            }
+////            areas.add(new WarnArea(1, JIN_RU_AREA_COLOR[0], JIN_RU_AREA_COLOR[1]
+////                    , JIN_RU_AREA_COLOR[2], geoX, geoY));
+////            geoX = new Integer[JIN_YU_AREA_X.length];
+////            geoY = new Integer[JIN_YU_AREA_Y.length];
+////            for (int i = 0; i < JIN_YU_AREA_X.length; i++) {
+////                geoX[i] = JIN_YU_AREA_X[i];
+////                geoY[i] = JIN_YU_AREA_Y[i];
+////            }
+////            areas.add(new WarnArea(0, JIN_YU_AREA_COLOR[0], JIN_YU_AREA_COLOR[1]
+////                    , JIN_YU_AREA_COLOR[2], geoX, geoY));
+//            curLayerPos = skiaDrawView.drawBanArea(areas);
+//        } else {
+//            for (WarnArea area : areas) {
+//                if (area == null) continue;
+//                skiaDrawView.mYimaLib.tmDeleteGeoObject(curLayerPos, area.getObjCount());
 //            }
-//            areas.add(new WarnArea(0, JIN_YU_AREA_COLOR[0], JIN_YU_AREA_COLOR[1]
-//                    , JIN_YU_AREA_COLOR[2], geoX, geoY));
-            curLayerPos = skiaDrawView.drawBanArea(areas);
-        } else {
-            for (WarnArea area : areas) {
-                if (area == null) continue;
-                skiaDrawView.mYimaLib.tmDeleteGeoObject(curLayerPos, area.getObjCount());
-            }
-            skiaDrawView.mYimaLib.tmClearLayer(curLayerPos);
-            skiaDrawView.mYimaLib.tmDeleteLayer(curLayerPos);
-            skiaDrawView.postInvalidate();
-            areas.clear();
-        }
-    }
+//            skiaDrawView.mYimaLib.tmClearLayer(curLayerPos);
+//            skiaDrawView.mYimaLib.tmDeleteLayer(curLayerPos);
+//            skiaDrawView.postInvalidate();
+//            areas.clear();
+//        }
+//    }
 
     private void loadOwnShipInfo() {
         final SharedPreferences sp = getActivity().getSharedPreferences("xkTerminal", MODE_PRIVATE);
@@ -588,7 +596,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                     case 0:// 禁渔
                         if (exists) {
                             // 报警
-                            MyApplication.getInstance().mainActivity.showMessageDialog("自身设备","禁渔区域报警", 1);
+                            MyApplication.getInstance().mainActivity.showMessageDialog("自身设备", "禁渔区域报警", 1);
                             SoundPlay.startAlertSound(MyApplication.getInstance().mainActivity);
                         }
                         break;
@@ -711,6 +719,9 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
             }
         } else if ("pin_map".equals(action)) {
             doBiaoWei = true;
+            if (!mSwitchPin.isChecked()) {
+                mSwitchPin.setChecked(true);
+            }
             showOtherShip = false;
             Toast.makeText(getActivity(), "请选择标位点", Toast.LENGTH_SHORT).show();
         } else if ("pin_co".equals(action)) {
@@ -796,15 +807,15 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
             et2.setText(m_point.y / 1e7 + "");
         }
 
-        final TextView tv1 = view.findViewById(R.id.tv1);
-        final TextView tv2 = view.findViewById(R.id.tv2);
-        final TextView tv3 = view.findViewById(R.id.tv3);
-        final TextView tv4 = view.findViewById(R.id.tv4);
+        final ImageView tv1 = view.findViewById(R.id.iv1);
+        final ImageView tv2 = view.findViewById(R.id.iv2);
+        final ImageView tv3 = view.findViewById(R.id.iv3);
+        final ImageView tv4 = view.findViewById(R.id.iv4);
 
         final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(30, 30);
         layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
 
-        final RelativeLayout.LayoutParams layoutParams_big = new RelativeLayout.LayoutParams(40, 40);
+        final RelativeLayout.LayoutParams layoutParams_big = new RelativeLayout.LayoutParams(45, 45);
         layoutParams_big.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
 
         tv1.setOnClickListener(new View.OnClickListener() {

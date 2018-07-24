@@ -141,7 +141,18 @@ public class MessageFragment extends Fragment {
     }
 
     public void setTg(String tg) {
+        if (!tg.equals(this.tg)){
+            pageIndex = 0;
+            totalPage = 1;
+        }
         this.tg = tg;
+        changeTitle();
+        getMessageData();
+        if ("send".equals(tg)) {
+            simpleAdapter.notifyDataSetChanged();
+        }else{
+            simpleAdapter2.notifyDataSetChanged();
+        }
     }
 
     private void changeTitle() {
@@ -163,8 +174,6 @@ public class MessageFragment extends Fragment {
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
-        pageIndex = 0;
-        totalPage = 1;
         if (!hidden) {
             changeTitle();
             getMessageData();

@@ -982,9 +982,6 @@ public class MainActivity extends AppCompatActivity {
         sendBar.setVisibility(View.GONE);
         messageDetailBar.setVisibility(View.GONE);
         if (tg != null) {
-            if (messageFragment != null) {
-                messageFragment.setTg(tg);
-            }
             if (tg.equals("send")) {
                 messageBar.setNewBtnVisible(true);
             } else {
@@ -1060,11 +1057,14 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         if (messageFragment == null) {
             messageFragment = new MessageFragment(tg);
+        } else {
+            messageFragment.setTg(tg);
         }
+        showMessageBar(tg);
+
         if (currentFragment == messageFragment) {
             return;
         }
-        showMessageBar(tg);
         if (currentFragment != null) {
             transaction.hide(currentFragment);
         }
@@ -1196,6 +1196,10 @@ public class MainActivity extends AppCompatActivity {
 
         if (messageFragment.tg.equals("send")) {
             messageFragment.reloadDate();
+        }
+
+        if (messageFragment != null) {
+            messageFragment.setTg(messageFragment.tg);
         }
     }
 

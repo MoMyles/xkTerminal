@@ -150,16 +150,14 @@ public class GPSBar extends RelativeLayout {
         textView_message.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!mainActivity.fragmentName.equals("message"))
-                    mainActivity.initMessageFragment("receive");
+                mainActivity.initMessageFragment("receive");
             }
         });
 
         textView_message_number.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!mainActivity.fragmentName.equals("message"))
-                    mainActivity.initMessageFragment("receive");
+                mainActivity.initMessageFragment("receive");
             }
         });
 

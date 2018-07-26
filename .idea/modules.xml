@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/2018DK02-xkTerminal.iml" filepath="$PROJECT_DIR$/2018DK02-xkTerminal.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/xkTerminal.iml" filepath="$PROJECT_DIR$/xkTerminal.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/xkTerminal-app.iml" filepath="$PROJECT_DIR$/app/xkTerminal-app.iml" />
     </modules>
   </component>
 </project>

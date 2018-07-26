@@ -9,7 +9,8 @@ import android.os.Environment;
 public class Constant {
 
     // yima sdk 文件
-    public static final String YIMA_WORK_PATH = "/data/data/com.cetcme.xkterminal/files/WorkDir";
+//    public static final String YIMA_WORK_PATH = "/data/data/com.cetcme.xkterminal/files/WorkDir";
+    public static final String YIMA_WORK_PATH = Environment.getExternalStorageDirectory() + "/yima/WorkDir";
 
     // 航线文件
     public static final String ROUTE_FILE_PATH = Environment.getExternalStorageDirectory() + "/0yima_routes";

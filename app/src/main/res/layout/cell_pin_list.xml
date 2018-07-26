@@ -34,7 +34,7 @@
         android:textColor="#000"
         android:textSize="20sp" />
 
-    <TextView
+    <ImageView
         android:id="@+id/tv_color"
         android:layout_width="50dp"
         android:layout_height="wrap_content"

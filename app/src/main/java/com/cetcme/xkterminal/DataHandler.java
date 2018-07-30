@@ -34,20 +34,20 @@ import java.util.TimerTask;
 
 public class DataHandler extends Handler {
 
-    public static final int SERIAL_PORT_RECEIVE_NEW_MESSAGE = 0x01;
-    public static final int SERIAL_PORT_MESSAGE_SEND_SUCCESS = 0x02;
-    public static final int SERIAL_PORT_TIME_NUMBER_AND_COMMUNICATION_FROM = 0x03;
-    public static final int SERIAL_PORT_TIME = 0x13;
+    public static final int SERIAL_PORT_RECEIVE_NEW_MESSAGE = 0x01; // 收到信短信
+    public static final int SERIAL_PORT_MESSAGE_SEND_SUCCESS = 0x02; // 发送短信成功
+    public static final int SERIAL_PORT_TIME_NUMBER_AND_COMMUNICATION_FROM = 0x03; // 时间、通信来源
+    public static final int SERIAL_PORT_TIME = 0x13; // 时间
 
-    public static final int SERIAL_PORT_ALERT_SEND_SUCCESS = 0x04;
-    public static final int SERIAL_PORT_SHOW_ALERT_ACTIVITY = 0x05;
-    public static final int SERIAL_PORT_RECEIVE_NEW_SIGN = 0x06;
-    public static final int SERIAL_PORT_RECEIVE_NEW_ALERT = 0x07;
-    public static final int SERIAL_PORT_MODIFY_SCREEN_BRIGHTNESS = 0x08;
-    public static final int SERIAL_PORT_SHUT_DOWN = 0x09;
-    public static final int SERIAL_PORT_ALERT_START = 0x10;
-    public static final int SERIAL_PORT_ALERT_FAIL = 0x11;
-    public static final int SERIAL_PORT_ID_EDIT_OK = 0x12;
+    public static final int SERIAL_PORT_ALERT_SEND_SUCCESS = 0x04; // 报警成功
+    public static final int SERIAL_PORT_SHOW_ALERT_ACTIVITY = 0x05; // 显示报警类型选择框
+    public static final int SERIAL_PORT_RECEIVE_NEW_SIGN = 0x06;  // 收到新打卡
+    public static final int SERIAL_PORT_RECEIVE_NEW_ALERT = 0x07; // 收到新报警
+    public static final int SERIAL_PORT_MODIFY_SCREEN_BRIGHTNESS = 0x08;  // 屏幕亮度
+    public static final int SERIAL_PORT_SHUT_DOWN = 0x09; // 关机
+    public static final int SERIAL_PORT_ALERT_START = 0x10; // 开始报警
+    public static final int SERIAL_PORT_ALERT_FAIL = 0x11; // 报警失败
+    public static final int SERIAL_PORT_ID_EDIT_OK = 0x12; // 终端ID编辑成功
 
     public static final int SERIAL_PORT_CHECK = 0x14;
 

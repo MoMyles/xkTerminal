@@ -89,7 +89,7 @@ public class SelfCheckActivity extends Activity {
             public void run() {
                 EventBus.getDefault().post("self_check_timeout");
             }
-        }, 10 * 1000);
+        }, 60 * 1000);
 
 
     }
@@ -108,7 +108,7 @@ public class SelfCheckActivity extends Activity {
             @Override
             public void run() {
                 send0A();
-                send04_12();
+//                send04_12();
             }
         }, 1000);
 
@@ -199,7 +199,6 @@ public class SelfCheckActivity extends Activity {
                     setStepStatus(2, false);
                     stopCheck(false);
                 }
-
                 checking = false;
                 break;
         }
@@ -216,6 +215,7 @@ public class SelfCheckActivity extends Activity {
                     setStepStatus(1, true);
                     checkResultArr[0] = 1;
                     checkResult();
+                    send04_12();
                     break;
                 case "self_check_2":
                     if (!checking) return;

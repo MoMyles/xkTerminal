@@ -451,7 +451,7 @@ public class DataHandler extends Handler {
                     break;
             }
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
         }
 
     }

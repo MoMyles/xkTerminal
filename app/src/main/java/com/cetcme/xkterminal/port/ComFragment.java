@@ -84,7 +84,7 @@ public class ComFragment extends Fragment implements View.OnClickListener {
     private String oldMsg = "";
     private String hexMsg = "";
     private ArrayAdapter<String> adapter, adapter2, adapter3;
-    private String[] paths = new String[]{"/dev/ttyS1", "/dev/ttyS3"};
+    private String[] paths = new String[]{"/dev/ttyS1"};
     private String[] ports = new String[]{"110",
             "300",
             "600",

@@ -3,15 +3,26 @@ package com.cetcme.xkterminal.port;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,7 +35,6 @@ import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.Sqlite.Bean.GPSBean;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 import com.cetcme.xkterminal.Sqlite.Bean.OtherShipBean;
-import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet;
 
 import org.codice.common.ais.Decoder;
 import org.codice.common.ais.message.Message18;
@@ -42,6 +52,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import aisparser.Message1;
 import aisparser.Message11;
@@ -58,33 +70,66 @@ import yimamapapi.skia.AisInfo;
 
 import static com.cetcme.xkterminal.MainActivity.play;
 
-public class PortFragment extends Fragment implements View.OnClickListener {
+public class ComFragment extends Fragment implements View.OnClickListener {
 
     public static final String MO_GU_TOU = "382570";
 
-    private TextView tv1, tv2, tv3;
-    private Button btn1, btn2;
+    private ScrollView sv1;
+    private TextView tv_receive;
+    private EditText et_send;
+    private Spinner spinner1, spinner2, spinner3;
+    private Button btn1, btn2, btn3, btn4;
+    private CheckBox cb_receive, cb_send;
 
-    private String com1 = "";
-    private int buadRate1 = 38400;
-    private boolean _16Scale1 = false;
+    private String oldMsg = "";
+    private String hexMsg = "";
+    private ArrayAdapter<String> adapter, adapter2, adapter3;
+    private String[] paths = new String[]{"/dev/ttyS1", "/dev/ttyS3"};
+    private String[] ports = new String[]{"110",
+            "300",
+            "600",
+            "1200",
+            "2400",
+            "4800",
+            "9600",
+            "14400",
+            "19200",
+            "38400",
+            "56000",
+            "57600",
+            "115200",
+            "128000",
+            "256000"};
 
-    private boolean open1 = false;
-    private SerialPort port1 = null;
-    private InputStream is1 = null;
-    private OutputStream os1 = null;
-    private AisReadThread aisReadThread;
+    private boolean recive16 = false;
+    private boolean send16 = false;
 
-    private QMUIBottomSheet comSheet, baudRateSheet;
+//    private SerialPort port1 = null;
+//    private InputStream is1 = null;
+//    private OutputStream os1 = null;
+//    private AisReadThread aisReadThread;
 
     private DbManager db;
 
+    private Handler handler;
+    private int messageCount1 = 0;
+    private int messageCount2 = 0;
 
-    public static PortFragment newInstance() {
+    private String currentPath = "";
+    private final Map<String, String> openMap = new HashMap<>();//存储已打开的串口
+    private final ArrayList<String> openPathList = new ArrayList<>();//存储已打开的串口
+    private final Map<String, AisReadThread> openAisRead = new HashMap<>();//存储已打开的串口的读取线程
+    private final Map<String, OutputStream> openOutputStream = new HashMap<>();//存储已打开的串口的输出流
+    private final Map<String, InputStream> openInputStream = new HashMap<>();//存储已打开的串口的输出流
+    private final Map<String, SerialPort> openSeriaPort = new HashMap<>();//存储已打开的串口的输出流
+    private String oldContent = "";// 存储旧内容
+    private String old16Content = "";
+
+    public static ComFragment newInstance() {
 
         Bundle args = new Bundle();
 
-        PortFragment fragment = new PortFragment();
+        ComFragment fragment = new ComFragment();
         fragment.setArguments(args);
         return fragment;
     }
@@ -95,96 +140,297 @@ public class PortFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_ports, container, false);
         db = MyApplication.getInstance().getDb();
-        onBindView(view, savedInstanceState);
+        handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                switch (msg.what) {
+                    case 0x1:
+                        if (msg.obj != null) {
+                            final byte str = (byte) msg.obj;
+                            final byte[] b = new byte[]{str};
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    hexMsg += Utils.byte2HexStr(b) + " ";
+                                    oldMsg += new String(b);
+                                    messageCount1++;
+                                    if (messageCount1 > 80) {
+                                        messageCount1 = 0;
+                                        messageCount2++;
+                                    }
+                                    if (messageCount2 > 20) {
+                                        messageCount2 = 0;
+                                        oldMsg = "";
+                                        hexMsg = "";
+                                    }
+                                    handler.sendEmptyMessage(0x2);
+                                }
+                            });
+                        }
+                        break;
+                    case 0x2:
+                        if (recive16) {
+                            tv_receive.setText(hexMsg);
+                        } else {
+                            tv_receive.setText(oldMsg);
+                        }
+                        sv1.fullScroll(ScrollView.FOCUS_DOWN);
+                        break;
+                }
+            }
+        };
+        onBindView(view);
         return view;
     }
 
-    private void onBindView(View view, Bundle savedInstanceState) {
-        tv1 = view.findViewById(R.id.tv1);
-        tv2 = view.findViewById(R.id.tv2);
-        tv3 = view.findViewById(R.id.tv3);
+    private void onBindView(View view) {
+        tv_receive = view.findViewById(R.id.tv_receive);
+        et_send = view.findViewById(R.id.et_send);
+        et_send.addTextChangedListener(new TextWatcher() {
+            private boolean isHefa = true;
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+//                Log.e("TAG_PORT_SEND", charSequence.toString());
+                if (send16) {
+                    old16Content = charSequence.toString();
+                } else {
+                    oldContent = charSequence.toString();
+                }
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                Pattern pattern = Pattern.compile("[^0-9A-Fa-f\\s]+");
+                String str = charSequence.toString();
+                if (send16) {
+                    Matcher matcher = pattern.matcher(str);
+                    if (matcher.find()) {
+                        // et_send.setText(old16Content);
+                        isHefa = false;
+                        Toast.makeText(getActivity(), "只能输入[0-9A-Fa-f]字符", Toast.LENGTH_SHORT).show();
+                    } else {
+                        isHefa = true;
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if (send16) {
+                    if (isHefa) {
+                        old16Content = editable.toString();
+                    } else {
+                        et_send.setText(old16Content);
+                    }
+                }else {
+                    oldContent = editable.toString();
+                }
+            }
+        });
+        sv1 = view.findViewById(R.id.sv1);
+        spinner1 = view.findViewById(R.id.spinner1);
+        spinner2 = view.findViewById(R.id.spinner2);
+        spinner3 = view.findViewById(R.id.spinner3);
         btn1 = view.findViewById(R.id.btn1);
-        btn2 = view.findViewById(R.id.btn2);
-
-        comSheet = new QMUIBottomSheet.BottomListSheetBuilder(getActivity())
-                .addItem("COM1", "/dev/ttyS1")
-                .addItem("COM2", "/dev/ttyS2")
-                .addItem("COM3", "/dev/ttyS3")
-                .addItem("COM4", "/dev/ttyS4")
-                .setOnSheetItemClickListener(new QMUIBottomSheet.BottomListSheetBuilder.OnSheetItemClickListener() {
-                    @Override
-                    public void onClick(QMUIBottomSheet dialog, View itemView, int position, String tag) {
-                        com1 = tag;
-                        tv1.setText(com1);
-                    }
-                })
-                .build();
-
-        baudRateSheet = new QMUIBottomSheet.BottomListSheetBuilder(getActivity())
-                .addItem("38400", "38400")
-                .addItem("9600", "9600")
-                .addItem("4800", "4800")
-                .setOnSheetItemClickListener(new QMUIBottomSheet.BottomListSheetBuilder.OnSheetItemClickListener() {
-                    @Override
-                    public void onClick(QMUIBottomSheet dialog, View itemView, int position, String tag) {
-                        buadRate1 = Integer.valueOf(tag);
-                        tv2.setText(buadRate1);
-                    }
-                })
-                .build();
-        tv1.setOnClickListener(this);
-        tv2.setOnClickListener(this);
         btn1.setOnClickListener(this);
+        btn2 = view.findViewById(R.id.btn2);
         btn2.setOnClickListener(this);
+        btn3 = view.findViewById(R.id.btn3);
+        btn3.setOnClickListener(this);
+        btn4 = view.findViewById(R.id.btn4);
+        btn4.setOnClickListener(this);
+        cb_receive = view.findViewById(R.id.cb_receive);
+        cb_send = view.findViewById(R.id.cb_send);
+        cb_receive.setChecked(recive16);
+        cb_send.setChecked(send16);
+        cb_receive.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                recive16 = b;
+            }
+        });
+        cb_send.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                send16 = b;
+                if (send16) {
+                    et_send.setText(Utils.str2HexStr(oldContent));
+                } else {
+                    et_send.setText(oldContent);
+                }
+            }
+        });
+
+
+        if (adapter == null) {
+            adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, paths);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        }
+        spinner1.setAdapter(adapter);
+        spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                clearMsg();
+                currentPath = (String) spinner1.getSelectedItem();
+//                Log.e("TAG_PATH", currentPath);
+                if (openMap.containsKey(currentPath)) {
+                    String rate = openMap.get(currentPath);
+                    int position = adapter2.getPosition(rate);
+                    spinner2.setSelection(position);
+//                    aisReadThread = openAisRead.get(currentPath);
+//                    is1 = openInputStream.get(currentPath);
+//                    os1 = openOutputStream.get(currentPath);
+//                    port1 = openSeriaPort.get(currentPath);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+        if (adapter2 == null) {
+            adapter2 = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, ports);
+            adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        }
+        spinner2.setAdapter(adapter2);
+        spinner2.setSelection(6);
+        spinner2.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    final String path = (String) spinner1.getSelectedItem();
+                    if (openMap.containsKey(path)) {
+                        Toast.makeText(getActivity(), "串口" + path + "已打开，请先关闭", Toast.LENGTH_SHORT).show();
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
+        if (adapter3 == null) {
+            adapter3 = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, openPathList);
+            adapter3.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        }
+        spinner3.setAdapter(adapter3);
+        spinner3.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                clearMsg();
+                currentPath = openPathList.get(i);
+//                aisReadThread = openAisRead.get(currentPath);
+//                is1 = openInputStream.get(currentPath);
+//                os1 = openOutputStream.get(currentPath);
+//                port1 = openSeriaPort.get(currentPath);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.tv1:
-                if (comSheet != null && !comSheet.isShowing()) {
-                    comSheet.show();
-                }
-                break;
-            case R.id.tv2:
-                if (baudRateSheet != null && !baudRateSheet.isShowing()) {
-                    baudRateSheet.show();
-                }
-                break;
             case R.id.btn1:
                 // 打开串口
-                if (open1) {
-                    close1();
-                    btn1.setText("打开串口");
-                } else {
+                String path = (String) spinner1.getSelectedItem();
+                String rate = (String) spinner2.getSelectedItem();
+                if (!openMap.containsKey(path)) {
                     try {
-                        if (port1 == null) {
-                            port1 = open(com1, buadRate1);
-                        }
-                        is1 = port1.getInputStream();
-                        os1 = port1.getOutputStream();
-                        aisReadThread = new AisReadThread();
+                        SerialPort port1 = open(path, Integer.valueOf(rate));
+                        InputStream is1 = port1.getInputStream();
+                        OutputStream os1 = port1.getOutputStream();
+                        AisReadThread aisReadThread = new AisReadThread(path);
+                        openMap.put(path, rate);
+                        openAisRead.put(path, aisReadThread);
+                        openOutputStream.put(path, os1);
+                        openInputStream.put(path, is1);
+                        openSeriaPort.put(path, port1);
                         aisReadThread.start();
-                        btn1.setText("关闭串口");
-                    } catch (IOException e) {
+                        currentPath = path;
+                        if (adapter3 != null) {
+                            openPathList.add(path);
+                            adapter3.notifyDataSetChanged();
+                        }
+                        clearMsg();
+                        Toast.makeText(getActivity(), "打开串口" + path + "成功", Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
                         e.printStackTrace();
-                        Toast.makeText(getActivity(), "打开串口失败", Toast.LENGTH_SHORT).show();
-                        close1();
+                        Toast.makeText(getActivity(), "打开串口" + path + "失败", Toast.LENGTH_SHORT).show();
+                        close1(path);
+                        openMap.remove(path);
                     }
+                } else {
+                    Toast.makeText(getActivity(), "串口" + path + "已打开", Toast.LENGTH_SHORT).show();
+                    break;
                 }
                 break;
             case R.id.btn2:
-                if (_16Scale1) {
-                    //16进制
-                    btn2.setText("CHAR");
-                } else {
-                    // 显示结果
-                    btn2.setText("HEX");
+                String path1 = (String) spinner1.getSelectedItem();
+                if (!openMap.containsKey(path1)) {
+                    Toast.makeText(getActivity(), "串口" + path1 + "已关闭", Toast.LENGTH_SHORT).show();
+                    break;
                 }
-                _16Scale1 = !_16Scale1;
+                close1(path1);
+                openMap.remove(path1);
+//                openAisRead.remove(path1);
+//                openSeriaPort.remove(path1);
+//                openInputStream.remove(path1);
+//                openOutputStream.remove(path1);
+//                if (currentPath.equals(path1)) {
+//                    if (adapter3 != null) {
+//                        openPathList.remove(path1);
+//                        adapter3.notifyDataSetChanged();
+//                    }
+                    clearMsg();
+//                }
+                Toast.makeText(getActivity(), "关闭串口" + path1 + "成功", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.btn3:
+                clearMsg();
+                break;
+            case R.id.btn4:// 发送
+                OutputStream os1 = openOutputStream.get(currentPath);
+                if (os1 == null) {
+                    Toast.makeText(getActivity(), "串口未打开，请先打开串口", Toast.LENGTH_SHORT).show();
+                    break;
+                }
+                String content = et_send.getText().toString().trim();
+                if (TextUtils.isEmpty(content)) {
+                    Toast.makeText(getActivity(), "发送内容不能为空", Toast.LENGTH_SHORT).show();
+                    break;
+                }
+                byte[] byts = null;
+                if (send16) {
+                    byts = content.replace(" ", "").getBytes();
+                } else {
+                    byts = content.getBytes();
+                }
+                if (byts!=null && os1 != null) {
+                    try {
+                        os1.write(byts);
+                        Toast.makeText(getActivity(), "发送成功", Toast.LENGTH_SHORT).show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
                 break;
         }
     }
+
+    private void clearMsg() {
+        messageCount1 = 0;
+        messageCount2 = 0;
+        oldMsg = "";
+        hexMsg = "";
+        tv_receive.setText("");
+        et_send.setText("");
+    }
+
 
     private SerialPort open(String com, int buadRate) throws IOException {
         if (TextUtils.isEmpty(com) || (com != null && com.length() == 0) || (buadRate == -1)) {
@@ -193,44 +439,87 @@ public class PortFragment extends Fragment implements View.OnClickListener {
         return new SerialPort(new File(com), buadRate, 0);
     }
 
-    public void close1() {
+    public void close1(String path) {
         try {
-            if (aisReadThread != null) {
-                aisReadThread.interrupt();
+            if (openAisRead.containsKey(path)) {
+                AisReadThread aisReadThread = openAisRead.get(path);
+                if (aisReadThread != null) {
+                    aisReadThread.interrupt();
+                }
+                openAisRead.remove(path);
             }
-            if (is1 != null) {
-                is1.close();
+            if (openInputStream.containsKey(path)) {
+                InputStream is1 = openInputStream.get(path);
+                if (is1 != null) {
+                    is1.close();
+                }
+                openInputStream.remove(is1);
             }
-            if (os1 != null) {
-                os1.close();
+            if (openOutputStream.containsKey(path)) {
+                OutputStream os1 = openOutputStream.get(path);
+                if (os1 != null) {
+                    os1.close();
+                }
+                openOutputStream.remove(os1);
             }
-            if (port1 != null) {
-                port1.close();
+            if (openSeriaPort.containsKey(path)) {
+                SerialPort port1 = openSeriaPort.get(path);
+                if (port1 != null) {
+                    port1.close();
+                }
+                openSeriaPort.remove(path);
             }
+//            if (aisReadThread != null) {
+//                aisReadThread.interrupt();
+//                aisReadThread = null;
+//            }
+//            if (is1 != null) {
+//                is1.close();
+//                is1 = null;
+//            }
+//            if (os1 != null) {
+//                os1.close();
+//                os1 = null;
+//            }
+//            if (port1 != null) {
+//                port1.close();
+//                port1 = null;
+//            }
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            clearMsg();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        is1 = null;
-        os1 = null;
-        port1 = null;
+
     }
 
 
     class AisReadThread extends Thread {
 
+        private String path;
+
+        public AisReadThread(String path) {
+            this.path = path;
+        }
+
         @Override
         public void run() {
-            super.run();
             while (!isInterrupted()) {
                 int size;
                 try {
                     byte[] buffer = new byte[1];
+                    if (openInputStream == null) return;
+                    InputStream is1 = openInputStream.get(path);
                     if (is1 == null) return;
                     size = is1.read(buffer);
                     if (size > 0) {
-                        onAisDataReceived(buffer, size);
+                        onAisDataReceived(buffer, path);
                     }
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     return;
                 }
@@ -244,36 +533,15 @@ public class PortFragment extends Fragment implements View.OnClickListener {
     private final List<Map<String, Object>> headIndex = new ArrayList<>();
     private static final Vdm vdm = new Vdm();
 
-    protected void onAisDataReceived(byte[] buffer, int size) {
-//        Log.i(TAG, "16进制：" + ConvertUtil.bytesToHexString(ByteUtil.subBytes(buffer, 0, size)));
-//        AisInfo a = YimaAisParse.mParseAISSentence("!AIVDM,1,1,,A,15MgK45P3@G?fl0E`JbR0OwT0@MS,0*4E");
+    protected void onAisDataReceived(byte[] buffer, String path) {
+        if (currentPath.equals(path)) {
+            Message msg = Message.obtain();
+            msg.what = 0x1;
+            msg.obj = buffer[0];
+            handler.sendMessage(msg);
+        }
+
         if (buffer[0] == 33 || buffer[0] == 36) {
-            MyApplication.getInstance().oldAisReceiveTime = System.currentTimeMillis();
-            if (!MyApplication.getInstance().isAisConnected) {
-                MyApplication.getInstance().isAisConnected = true;
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                    @Override
-                    public void run() {
-                        MyApplication.getInstance().mainActivity.gpsBar.setAisStatus(true);
-                        play("AIS已连接");
-                    }
-                });
-            }
-            // ! 号头
-//            int len = aisByts.size();
-//            if (len > 0) {
-//                //int len = aisByts.size();
-//                // \r\n 结尾
-//                Byte[] byts = aisByts.toArray(new Byte[len]);
-//                byte[] tmpByts = new byte[len];
-//                StringBuilder sb = new StringBuilder();
-//                for (int i = 0; i < len; i++) {
-//                    tmpByts[i] = byts[i];
-//                }
-//                sb.append(ConvertUtil.bytesToHexString(tmpByts));
-//                String gpsDataStr = new String(tmpByts);
-//
-//            }
             aisByts.clear();
             aisByts.add(buffer[0]);
         } else {
@@ -287,7 +555,6 @@ public class PortFragment extends Fragment implements View.OnClickListener {
                     tmpByts[i] = byts[i];
                 }
                 String gpsDataStr = new String(tmpByts);
-                tv3.setText(tv3.getText() + gpsDataStr);
                 if (gpsDataStr.startsWith("$04")) {
                     String[] messageStrings = MessageFormat.unFormat(tmpByts);
                     String address = messageStrings[0];
@@ -313,6 +580,17 @@ public class PortFragment extends Fragment implements View.OnClickListener {
                         if ("!AIVDM".equals(headStr)
                                 || "!AIVDO".equals(headStr)
                                 || "$GPGSV".equals(headStr)) {
+                            MyApplication.getInstance().oldAisReceiveTime = System.currentTimeMillis();
+                            if (!MyApplication.getInstance().isAisConnected) {
+                                MyApplication.getInstance().isAisConnected = true;
+                                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        MyApplication.getInstance().mainActivity.gpsBar.setAisStatus(true);
+                                        play("AIS已连接");
+                                    }
+                                });
+                            }
                             int end = gpsDataStr.indexOf("\n", i + 1);
                             if (end != -1) {
                                 String str = gpsDataStr.substring(i + 7, end + 1);
@@ -532,7 +810,7 @@ public class PortFragment extends Fragment implements View.OnClickListener {
                 aisByts.clear();
             }
         }
-        if (aisByts.size() > 1024) {
+        if (aisByts.size() > 512) {
             aisByts.clear();
         }
     }

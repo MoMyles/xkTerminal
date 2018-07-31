@@ -1,7 +1,6 @@
 package com.cetcme.xkterminal;
 
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.widget.Toast;
 
@@ -54,28 +53,11 @@ public class DataHandler extends Handler {
     private MyApplication myApplication;
 
     private DbManager db;
-
-    private Timer timer = null;
     private Timer timer30 = null;
 
     public DataHandler(MyApplication myApplication) {
         this.myApplication = myApplication;
         this.db = MyApplication.getInstance().getDb();
-
-        timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if (MyApplication.getInstance().mainActivity != null) {
-                    MyApplication.getInstance().mainActivity.dismissSelfCheckHud();
-                }
-                Looper.prepare();
-                Toast.makeText(MyApplication.getInstance().getApplicationContext(), "自检失败", Toast.LENGTH_SHORT).show();
-                MainActivity.play("卫星中断故障");
-                Looper.loop();
-            }
-        }, Constant.SELF_CHECK_TIME_OUT);
-
         timer30 = new Timer();
         timer30.schedule(new TimerTask() {
             @Override
@@ -255,7 +237,6 @@ public class DataHandler extends Handler {
                     break;
                 case SERIAL_PORT_TIME_NUMBER_AND_COMMUNICATION_FROM:
                     // 先处理后面部分，时间部分由下一个case处理，不加break
-                    timer.cancel();
                     int myNumber = Util.bytesToInt2(ByteUtil.subBytes(bytes, 17, 21), 0);
                     if (myNumber != 0) {
                         PreferencesUtils.putString(myApplication.mainActivity, "myNumber", myNumber + "");

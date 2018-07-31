@@ -34,7 +34,8 @@
     <string name="setting_tab_1">北斗参数</string>
     <string name="setting_tab_2">卫星分布</string>
     <string name="setting_tab_3">报警设置</string>
-    <string name="setting_tab_4">服务状态</string>
+    <!--<string name="setting_tab_4">服务状态</string>-->
+    <string name="setting_tab_4">串口设置</string>
     <string name="setting_tab_5">系统设置</string>
     <string name="setting_tab_6">关于</string>
 

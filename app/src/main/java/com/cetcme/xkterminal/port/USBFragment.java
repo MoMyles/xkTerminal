@@ -46,9 +46,6 @@ import org.codice.common.ais.message.Message19;
 import org.greenrobot.eventbus.EventBus;
 import org.xutils.DbManager;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -67,7 +64,6 @@ import aisparser.Message4;
 import aisparser.Message5;
 import aisparser.Sixbit;
 import aisparser.Vdm;
-import android_serialport_api.SerialPort;
 import yimamapapi.skia.AisInfo;
 
 import static com.cetcme.xkterminal.MainActivity.play;
@@ -77,7 +73,7 @@ public class USBFragment extends Fragment implements View.OnClickListener {
     public static final String MO_GU_TOU = "382570";
 
     private ScrollView sv1;
-    private TextView tv_receive;
+    private TextView tv_receive, tv_status;
     private EditText et_send;
     private Spinner spinner1, spinner2, spinner3;
     private Button btn1, btn2, btn3, btn4;
@@ -106,10 +102,10 @@ public class USBFragment extends Fragment implements View.OnClickListener {
     private boolean recive16 = false;
     private boolean send16 = false;
 
-    private SerialPort port1 = null;
-    private InputStream is1 = null;
-    private OutputStream os1 = null;
-    private AisReadThread aisReadThread;
+//    private SerialPort port1 = null;
+//    private InputStream is1 = null;
+//    private OutputStream os1 = null;
+//    private AisReadThread aisReadThread;
 
     private DbManager db;
 
@@ -156,6 +152,7 @@ public class USBFragment extends Fragment implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         try {
             ftdid2xx = D2xxManager.getInstance(getActivity());
+
         } catch (D2xxManager.D2xxException ex) {
             ex.printStackTrace();
         }
@@ -164,6 +161,9 @@ public class USBFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onStart() {
         super.onStart();
+        if (ftdid2xx != null) {
+            DevCount = ftdid2xx.createDeviceInfoList(getActivity());
+        }
     }
 
     private void SetIO() {
@@ -185,58 +185,67 @@ public class USBFragment extends Fragment implements View.OnClickListener {
     }
 
     public void connectFunction() {
-        String currentPath = (String) spinner1.getSelectedItem();
+        final String currentPath = (String) spinner1.getSelectedItem();
         openIndex = Integer.valueOf(currentPath);
+//        Log.e("TAG_OPEN", openIndex+"");
+
         if (currentIndex != openIndex) {
             if (null == ftDevice) {
-                ftDevice = ftdid2xx.openByIndex(getActivity(), openIndex);
+                ftDevice = ftdid2xx.openByIndex(getActivity(), openIndex - 1);
             } else {
                 synchronized (ftDevice) {
-                    ftDevice = ftdid2xx.openByIndex(getActivity(), openIndex);
+                    ftDevice = ftdid2xx.openByIndex(getActivity(), openIndex - 1);
                 }
             }
         } else {
-            Toast.makeText(getActivity(), "Device port " + openIndex + " is already opened", Toast.LENGTH_LONG).show();
+//            Toast.makeText(getActivity(), "Device port " + openIndex + " is already opened", Toast.LENGTH_LONG).show();
+//            if (openFT_Device.get(currentPath)!=null && openFT_Device.get(currentPath).isOpen()){
+//                Toast.makeText(getActivity(), "串口" + currentPath + "已打开", Toast.LENGTH_SHORT).show();
+//            }
             return;
         }
 
         if (ftDevice == null) {
-            Toast.makeText(getActivity(), "open device port(" + openIndex + ") NG, ftDev == null", Toast.LENGTH_LONG).show();
+//            Toast.makeText(getActivity(), "open device port(" + openIndex + ") NG, ftDev == null", Toast.LENGTH_LONG).show();
             return;
         }
 
         if (true == ftDevice.isOpen()) {
             currentIndex = openIndex;
-            Toast.makeText(getActivity(), "open device port(" + openIndex + ") OK", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getActivity(), "open device port(" + openIndex + ") OK", Toast.LENGTH_SHORT).show();
 
-            ft42Device = new FT_4222_Device(ftDevice);
-            ftGpio = ft42Device.getGpioDevice();
-            if (ftGpio == null) {
-                Toast.makeText(getActivity(), "ftGpio == null", Toast.LENGTH_SHORT).show();
-            }
-            Toast.makeText(getActivity(),
-                    "devCount:" + DevCount + " open index:" + openIndex,
-                    Toast.LENGTH_SHORT).show();
-            SetIO();
-
-            ftDevice.setBitMode((byte) 0, D2xxManager.FT_BITMODE_RESET);
-            ftDevice.setBaudRate(Integer.valueOf(openMap.get(currentPath)));
-            ftDevice.setDataCharacteristics(D2xxManager.FT_DATA_BITS_8, D2xxManager.FT_STOP_BITS_1, D2xxManager.FT_PARITY_NONE);
-            ftDevice.setFlowControl(D2xxManager.FT_FLOW_NONE, (byte) 0x0b, (byte) 0x0d);
-            aisReadThread = new AisReadThread(currentPath);
-            aisReadThread.start();
-
-            openAisRead.put(currentPath, aisReadThread);
+//            ft42Device = new FT_4222_Device(ftDevice);
+//            ftGpio = ft42Device.getGpioDevice();
+//            if (ftGpio == null) {
+//                Toast.makeText(getActivity(), "ftGpio == null", Toast.LENGTH_SHORT).show();
+//            }
+//            Toast.makeText(getActivity(),
+//                    "devCount:" + DevCount + " open index:" + openIndex,
+//                    Toast.LENGTH_SHORT).show();
+//            SetIO();
             openFT_Device.put(currentPath, ftDevice);
 
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    String path = (String) spinner1.getSelectedItem();
+                    ftDevice.setBitMode((byte) 0, D2xxManager.FT_BITMODE_RESET);
+                    ftDevice.setBaudRate(Integer.valueOf(openMap.get(path)));
+                    ftDevice.setDataCharacteristics(D2xxManager.FT_DATA_BITS_8, D2xxManager.FT_STOP_BITS_1, D2xxManager.FT_PARITY_NONE);
+                    ftDevice.setFlowControl(D2xxManager.FT_FLOW_NONE, (byte) 0x0b, (byte) 0x0d);
+                    AisReadThread aisReadThread = new AisReadThread(path);
+                    aisReadThread.start();
+                    openAisRead.put(path, aisReadThread);
+                }
+            }, 1000);
         } else {
-            Toast.makeText(getActivity(), "open device port(" + openIndex + ") NG", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "打开串口" + currentPath + "失败", Toast.LENGTH_SHORT).show();
             //Toast.makeText(DeviceUARTContext, "Need to get permission!", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void disconnectFunction() {
-        // currentIndex = -1;
+        currentIndex = -1;
         try {
             Thread.sleep(50);
         } catch (InterruptedException e) {
@@ -247,8 +256,16 @@ public class USBFragment extends Fragment implements View.OnClickListener {
             synchronized (ftDevice) {
                 if (true == ftDevice.isOpen()) {
                     ftDevice.close();
+                    openFT_Device.remove(currentPath);
                 }
             }
+        }
+        if (openAisRead.containsKey(currentPath)) {
+            AisReadThread aisReadThread = openAisRead.get(currentPath);
+            if (aisReadThread != null) {
+                aisReadThread.interrupt();
+            }
+            openAisRead.remove(currentPath);
         }
     }
 
@@ -265,26 +282,20 @@ public class USBFragment extends Fragment implements View.OnClickListener {
                 switch (msg.what) {
                     case 0x1:
                         if (msg.obj != null) {
-                            final byte str = (byte) msg.obj;
-                            final byte[] b = new byte[]{str};
-                            handler.post(new Runnable() {
+                            final byte[] str = (byte[]) msg.obj;
+//                            final byte[] b = new byte[]{str};
+                            new Thread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    hexMsg += Utils.byte2HexStr(b) + " ";
-                                    oldMsg += new String(b);
-                                    messageCount1++;
-                                    if (messageCount1 > 80) {
-                                        messageCount1 = 0;
-                                        messageCount2++;
-                                    }
-                                    if (messageCount2 > 20) {
-                                        messageCount2 = 0;
+                                    hexMsg += Utils.byte2HexStr(str) + " ";
+                                    oldMsg += new String(str);
+                                    handler.sendEmptyMessage(0x2);
+                                    if (oldMsg.length() > 2000) {
                                         oldMsg = "";
                                         hexMsg = "";
                                     }
-                                    handler.sendEmptyMessage(0x2);
                                 }
-                            });
+                            }).start();
                         }
                         break;
                     case 0x2:
@@ -304,6 +315,7 @@ public class USBFragment extends Fragment implements View.OnClickListener {
 
     private void onBindView(View view) {
         tv_receive = view.findViewById(R.id.tv_receive);
+        tv_status = view.findViewById(R.id.tv_status);
         et_send = view.findViewById(R.id.et_send);
         et_send.addTextChangedListener(new TextWatcher() {
             private boolean isHefa = true;
@@ -367,6 +379,7 @@ public class USBFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 recive16 = b;
+                handler.sendEmptyMessage(0x2);
             }
         });
         cb_send.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -376,7 +389,7 @@ public class USBFragment extends Fragment implements View.OnClickListener {
                 if (send16) {
                     et_send.setText(Utils.str2HexStr(oldContent));
                 } else {
-                    et_send.setText(oldContent);
+                    et_send.setText(Utils.hexStr2Str(old16Content.replace(" ", "").toUpperCase()));
                 }
             }
         });
@@ -387,6 +400,31 @@ public class USBFragment extends Fragment implements View.OnClickListener {
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         }
         spinner1.setAdapter(adapter);
+        spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                clearMsg();
+                currentPath = (String) spinner1.getSelectedItem();
+//                Log.e("TAG_PATH", currentPath);
+                if (openMap.containsKey(currentPath)) {
+                    String rate = openMap.get(currentPath);
+                    int position = adapter2.getPosition(rate);
+                    spinner2.setSelection(position);
+//                    aisReadThread = openAisRead.get(currentPath);
+//                    is1 = openInputStream.get(currentPath);
+//                    os1 = openOutputStream.get(currentPath);
+//                    port1 = openSeriaPort.get(currentPath);
+                    tv_status.setBackgroundResource(R.drawable.circle_green);
+                } else {
+                    tv_status.setBackgroundResource(R.drawable.circle_red);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
         if (adapter2 == null) {
             adapter2 = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, ports);
             adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -414,10 +452,10 @@ public class USBFragment extends Fragment implements View.OnClickListener {
         spinner3.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                clearMsg();
-                currentPath = openPathList.get(i);
-                aisReadThread = openAisRead.get(currentPath);
-                ftDevice = openFT_Device.get(currentPath);
+//                clearMsg();
+//                currentPath = openPathList.get(i);
+//                aisReadThread = openAisRead.get(currentPath);
+//                ftDevice = openFT_Device.get(currentPath);
             }
 
             @Override
@@ -438,6 +476,7 @@ public class USBFragment extends Fragment implements View.OnClickListener {
                     try {
                         currentPath = path;
                         openMap.put(path, rate);
+                        Log.e("TAG_CURRENT", path + "," + rate);
                         connectFunction();
                         if (adapter3 != null) {
                             openPathList.add(path);
@@ -445,6 +484,7 @@ public class USBFragment extends Fragment implements View.OnClickListener {
                         }
                         clearMsg();
                         Toast.makeText(getActivity(), "打开串口" + path + "成功", Toast.LENGTH_SHORT).show();
+                        tv_status.setBackgroundResource(R.drawable.circle_green);
                     } catch (Exception e) {
                         e.printStackTrace();
                         Toast.makeText(getActivity(), "打开串口" + path + "失败", Toast.LENGTH_SHORT).show();
@@ -475,32 +515,35 @@ public class USBFragment extends Fragment implements View.OnClickListener {
                     }
                     clearMsg();
                 }
+                tv_status.setBackgroundResource(R.drawable.circle_red);
                 Toast.makeText(getActivity(), "关闭串口" + path1 + "成功", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.btn3:
                 clearMsg();
                 break;
             case R.id.btn4:// 发送
-                if (os1 == null) {
+                if (TextUtils.isEmpty(currentPath)) {
                     Toast.makeText(getActivity(), "串口未打开，请先打开串口", Toast.LENGTH_SHORT).show();
                     break;
                 }
-                String content = et_send.getText().toString().trim();
+                FT_Device ftDevice = openFT_Device.get(currentPath);
+                String content = et_send.getText().toString();
                 if (TextUtils.isEmpty(content)) {
-                    Toast.makeText(getActivity(), "发送内容不能为空", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getActivity(), "发送内容不能为空", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 byte[] byts = null;
                 if (send16) {
-                    byts = content.replace(" ", "").getBytes();
+                    byts = Utils.hexStr2Bytes(content.replace(" ", "").toUpperCase());
+//                    byts = Utils.hexStr2Str().getBytes();
                 } else {
                     byts = content.getBytes();
                 }
-                if (byts != null && os1 != null) {
+                if (byts != null && ftDevice != null) {
                     try {
-                        os1.write(byts);
-                        Toast.makeText(getActivity(), "发送成功", Toast.LENGTH_SHORT).show();
-                    } catch (IOException e) {
+                        ftDevice.write(byts, byts.length);
+//                        Toast.makeText(getActivity(), "发送成功", Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
@@ -514,7 +557,7 @@ public class USBFragment extends Fragment implements View.OnClickListener {
         oldMsg = "";
         hexMsg = "";
         tv_receive.setText("");
-        et_send.setText("");
+//        et_send.setText("");
     }
 
     private static final int readLength = 512;
@@ -535,25 +578,24 @@ public class USBFragment extends Fragment implements View.OnClickListener {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
                 }
+                FT_Device ftDevice = openFT_Device.get(path);
+                if (ftDevice == null) continue;
+                int iavailable = ftDevice.getQueueStatus();
+                if (iavailable > 0) {
 
-                synchronized (ftDevice) {
-                    int iavailable = ftDevice.getQueueStatus();
-                    if (iavailable > 0) {
+                    if (iavailable > readLength) {
+                        iavailable = readLength;
+                    }
 
-                        if (iavailable > readLength) {
-                            iavailable = readLength;
-                        }
-
-                        ftDevice.read(readData, iavailable);
-                        for (int i = 0; i < iavailable; i++) {
-                            if (currentPath.equals(path)) {
-                                Message message = Message.obtain();
-                                message.what = 0x1;
-                                message.obj = readData[i];
-                                handler.sendMessage(message);
-                            }
-                            formatAis(readData[i]);
-                        }
+                    ftDevice.read(readData, iavailable);
+                    if (currentPath.equals(path)) {
+                        Message message = Message.obtain();
+                        message.what = 0x1;
+                        message.obj = readData;
+                        handler.sendMessage(message);
+                    }
+                    for (int i = 0; i < iavailable; i++) {
+                        formatAis(readData[i]);
                     }
                 }
             }

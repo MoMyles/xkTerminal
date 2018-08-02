@@ -75,7 +75,7 @@ public class ComFragment extends Fragment implements View.OnClickListener {
     public static final String MO_GU_TOU = "382570";
 
     private ScrollView sv1;
-    private TextView tv_receive;
+    private TextView tv_receive, tv_status;
     private EditText et_send;
     private Spinner spinner1, spinner2, spinner3;
     private Button btn1, btn2, btn3, btn4;
@@ -147,24 +147,18 @@ public class ComFragment extends Fragment implements View.OnClickListener {
                 switch (msg.what) {
                     case 0x1:
                         if (msg.obj != null) {
-                            final byte str = (byte) msg.obj;
-                            final byte[] b = new byte[]{str};
+                            final byte[] str = (byte[]) msg.obj;
+//                            final byte[] b = new byte[]{str};
                             handler.post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    hexMsg += Utils.byte2HexStr(b) + " ";
-                                    oldMsg += new String(b);
-                                    messageCount1++;
-                                    if (messageCount1 > 80) {
-                                        messageCount1 = 0;
-                                        messageCount2++;
-                                    }
-                                    if (messageCount2 > 20) {
-                                        messageCount2 = 0;
+                                    hexMsg += Utils.byte2HexStr(str) + " ";
+                                    oldMsg += new String(str);
+                                    handler.sendEmptyMessage(0x2);
+                                    if (oldMsg.length() > 2000) {
                                         oldMsg = "";
                                         hexMsg = "";
                                     }
-                                    handler.sendEmptyMessage(0x2);
                                 }
                             });
                         }
@@ -186,6 +180,7 @@ public class ComFragment extends Fragment implements View.OnClickListener {
 
     private void onBindView(View view) {
         tv_receive = view.findViewById(R.id.tv_receive);
+        tv_status = view.findViewById(R.id.tv_status);
         et_send = view.findViewById(R.id.et_send);
         et_send.addTextChangedListener(new TextWatcher() {
             private boolean isHefa = true;
@@ -248,6 +243,7 @@ public class ComFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 recive16 = b;
+                handler.sendEmptyMessage(0x2);
             }
         });
         cb_send.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -257,7 +253,7 @@ public class ComFragment extends Fragment implements View.OnClickListener {
                 if (send16) {
                     et_send.setText(Utils.str2HexStr(oldContent));
                 } else {
-                    et_send.setText(oldContent);
+                    et_send.setText(Utils.hexStr2Str(old16Content.replace(" ", "").toUpperCase()));
                 }
             }
         });
@@ -282,6 +278,9 @@ public class ComFragment extends Fragment implements View.OnClickListener {
 //                    is1 = openInputStream.get(currentPath);
 //                    os1 = openOutputStream.get(currentPath);
 //                    port1 = openSeriaPort.get(currentPath);
+                    tv_status.setBackgroundResource(R.drawable.circle_green);
+                } else {
+                    tv_status.setBackgroundResource(R.drawable.circle_red);
                 }
             }
 
@@ -330,6 +329,12 @@ public class ComFragment extends Fragment implements View.OnClickListener {
 
             }
         });
+
+        if (openMap.containsKey(currentPath)) {
+            tv_status.setBackgroundResource(R.drawable.circle_green);
+        } else {
+            tv_status.setBackgroundResource(R.drawable.circle_red);
+        }
     }
 
     @Override
@@ -358,6 +363,7 @@ public class ComFragment extends Fragment implements View.OnClickListener {
                         }
                         clearMsg();
                         Toast.makeText(getActivity(), "打开串口" + path + "成功", Toast.LENGTH_SHORT).show();
+                        tv_status.setBackgroundResource(R.drawable.circle_green);
                     } catch (Exception e) {
                         e.printStackTrace();
                         Toast.makeText(getActivity(), "打开串口" + path + "失败", Toast.LENGTH_SHORT).show();
@@ -386,8 +392,9 @@ public class ComFragment extends Fragment implements View.OnClickListener {
 //                        openPathList.remove(path1);
 //                        adapter3.notifyDataSetChanged();
 //                    }
-                    clearMsg();
+//                    clearMsg();
 //                }
+                tv_status.setBackgroundResource(R.drawable.circle_red);
                 Toast.makeText(getActivity(), "关闭串口" + path1 + "成功", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.btn3:
@@ -399,21 +406,22 @@ public class ComFragment extends Fragment implements View.OnClickListener {
                     Toast.makeText(getActivity(), "串口未打开，请先打开串口", Toast.LENGTH_SHORT).show();
                     break;
                 }
-                String content = et_send.getText().toString().trim();
+                String content = et_send.getText().toString();
                 if (TextUtils.isEmpty(content)) {
-                    Toast.makeText(getActivity(), "发送内容不能为空", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getActivity(), "发送内容不能为空", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 byte[] byts = null;
                 if (send16) {
-                    byts = content.replace(" ", "").getBytes();
+                    byts = Utils.hexStr2Bytes(content.replace(" ", "").toUpperCase());
+//                    byts = Utils.hexStr2Str().getBytes();
                 } else {
                     byts = content.getBytes();
                 }
                 if (byts!=null && os1 != null) {
                     try {
                         os1.write(byts);
-                        Toast.makeText(getActivity(), "发送成功", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(getActivity(), "发送成功", Toast.LENGTH_SHORT).show();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -428,7 +436,7 @@ public class ComFragment extends Fragment implements View.OnClickListener {
         oldMsg = "";
         hexMsg = "";
         tv_receive.setText("");
-        et_send.setText("");
+//        et_send.setText("");
     }
 
 
@@ -485,12 +493,12 @@ public class ComFragment extends Fragment implements View.OnClickListener {
 //                port1.close();
 //                port1 = null;
 //            }
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            clearMsg();
+//            try {
+//                Thread.sleep(200);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//            clearMsg();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -509,15 +517,23 @@ public class ComFragment extends Fragment implements View.OnClickListener {
         @Override
         public void run() {
             while (!isInterrupted()) {
-                int size;
                 try {
-                    byte[] buffer = new byte[1];
                     if (openInputStream == null) return;
                     InputStream is1 = openInputStream.get(path);
                     if (is1 == null) return;
-                    size = is1.read(buffer);
+                    int size = is1.available();
+                    byte[] buffer = new byte[size];
+                    is1.read(buffer);
                     if (size > 0) {
-                        onAisDataReceived(buffer, path);
+                        if (currentPath.equals(path)) {
+                            Message msg = Message.obtain();
+                            msg.what = 0x1;
+                            msg.obj = buffer;
+                            handler.sendMessage(msg);
+                        }
+                        for (int i=0;i<size;i++) {
+                            onAisDataReceived(new byte[]{buffer[i]});
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -533,14 +549,7 @@ public class ComFragment extends Fragment implements View.OnClickListener {
     private final List<Map<String, Object>> headIndex = new ArrayList<>();
     private static final Vdm vdm = new Vdm();
 
-    protected void onAisDataReceived(byte[] buffer, String path) {
-        if (currentPath.equals(path)) {
-            Message msg = Message.obtain();
-            msg.what = 0x1;
-            msg.obj = buffer[0];
-            handler.sendMessage(msg);
-        }
-
+    protected void onAisDataReceived(byte[] buffer) {
         if (buffer[0] == 33 || buffer[0] == 36) {
             aisByts.clear();
             aisByts.add(buffer[0]);

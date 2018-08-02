@@ -3,7 +3,7 @@ package com.cetcme.xkterminal.port;
 public class Utils {
     /**
      * 字符串转换成十六进制字符串
-     * @param String str 待转换的ASCII字符串
+     * @param str 待转换的ASCII字符串
      * @return String 每个Byte之间空格分隔，如: [61 6C 6B]
      */
     public static String str2HexStr(String str)
@@ -27,12 +27,13 @@ public class Utils {
 
     /**
      * 十六进制转换字符串
-     * @param String str Byte字符串(Byte之间无分隔符 如:[616C6B])
+     * @param hexStr str Byte字符串(Byte之间无分隔符 如:[616C6B])
      * @return String 对应的字符串
      */
     public static String hexStr2Str(String hexStr)
     {
         String str = "0123456789ABCDEF";
+        hexStr = hexStr.replace(" ", "").toUpperCase();
         char[] hexs = hexStr.toCharArray();
         byte[] bytes = new byte[hexStr.length() / 2];
         int n;
@@ -43,12 +44,51 @@ public class Utils {
             n += str.indexOf(hexs[2 * i + 1]);
             bytes[i] = (byte) (n & 0xff);
         }
-        return new String(bytes);
+//        String ss = "";
+//        if (bytes[0] == 36 && bytes[1] == 48 && bytes[2] == 52) {
+//            // $04
+//            byte[] head = new byte[6];
+//            for (int i=0;i<6;i++){
+//                head[i] = bytes[i];
+//                System.out.print(byte2HexStr(new byte[]{bytes[i]})+" ");
+//            }
+//            System.out.println();
+//            byte[] bcd = new byte[8];
+//            for (int i=0;i<8;i++){
+//                bcd[i] = bytes[i + 6];
+//                System.out.print(byte2HexStr(new byte[]{bytes[i+6]})+" ");
+//            }
+//            System.out.println();
+//            byte[] tail = new byte[bytes.length - 13];
+//            for (int i=0;i<bytes.length - 13;i++){
+//                tail[i] = bytes[i + 13];
+//                System.out.print(byte2HexStr(new byte[]{bytes[i+13]})+" ");
+//            }
+//            System.out.println();
+//            String s = new String(tail);
+//            ss = new String(head) + bcd2Str(bcd) + s;
+//        } else {
+        String ss = new String(bytes);
+//        }
+        return ss;
+    }
+
+    public static String bcd2Str(byte[] bytes) {
+        char temp[] = new char[bytes.length * 2], val;
+
+        for (int i = 0; i < bytes.length; i++) {
+            val = (char) (((bytes[i] & 0xf0) >> 4) & 0x0f);
+            temp[i * 2] = (char) (val > 9 ? val + 'A' - 10 : val + '0');
+
+            val = (char) (bytes[i] & 0x0f);
+            temp[i * 2 + 1] = (char) (val > 9 ? val + 'A' - 10 : val + '0');
+        }
+        return new String(temp);
     }
 
     /**
      * bytes转换成十六进制字符串
-     * @param byte[] b byte数组
+     * @param b byte数组
      * @return String 每个Byte值之间空格分隔
      */
     public static String byte2HexStr(byte[] b)
@@ -66,27 +106,35 @@ public class Utils {
 
     /**
      * bytes字符串转换为Byte值
-     * @param String src Byte字符串，每个Byte之间没有分隔符
+     * @param  hexString Byte字符串，每个Byte之间没有分隔符
      * @return byte[]
      */
-    public static byte[] hexStr2Bytes(String src)
+    public static byte[] hexStr2Bytes(String hexString)
     {
-        int m=0,n=0;
-        int l=src.length()/2;
-        System.out.println(l);
-        byte[] ret = new byte[l];
-        for (int i = 0; i < l; i++)
-        {
-            m=i*2+1;
-            n=m+1;
-            ret[i] = Byte.decode("0x" + src.substring(i*2, m) + src.substring(m,n));
+        if (hexString == null || hexString.equals("")) {
+            return null;
         }
-        return ret;
+        hexString = hexString.toUpperCase();
+        int length = hexString.length() / 2;
+        char[] hexChars = hexString.toCharArray();
+        byte[] d = new byte[length];
+        for (int i = 0; i < length; i++) {
+            int pos = i * 2;
+            d[i] = (byte) (charToByte(hexChars[pos]) << 4 | charToByte(hexChars[pos + 1]));
+        }
+        return d;
     }
-
+    /**
+     * Convert char to byte
+     * @param c char
+     * @return byte
+     */
+    private static byte charToByte(char c) {
+        return (byte) "0123456789ABCDEF".indexOf(c);
+    }
     /**
      * String的字符串转换成unicode的String
-     * @param String strText 全角字符串
+     * @param strText 全角字符串
      * @return String 每个unicode之间无分隔符
      * @throws Exception
      */
@@ -112,7 +160,7 @@ public class Utils {
 
     /**
      * unicode的String转换成String的字符串
-     * @param String hex 16进制值字符串 （一个unicode为2byte）
+     * @param hex 16进制值字符串 （一个unicode为2byte）
      * @return String 全角字符串
      */
     public static String unicodeToString(String hex)

@@ -22,6 +22,7 @@ import com.cetcme.xkterminal.Fragment.setting.SystemSettingFragment;
 import com.cetcme.xkterminal.Fragment.setting.WarningSettingFragment;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.port.ComFragment;
+import com.cetcme.xkterminal.port.USBFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -167,7 +168,7 @@ public class SettingTabFragment extends Fragment {
         fragments.add(new SatelliteFragment());
         fragments.add(new WarningSettingFragment());
 //        fragments.add(new SeriveStatusFragment());
-        fragments.add(ComFragment.newInstance());
+        fragments.add(USBFragment.newInstance());
 //        fragments.add(new WeatherInfoFragment());
         fragments.add(new SystemSettingFragment());
         fragments.add(new SystemAboutFragment());

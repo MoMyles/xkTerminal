@@ -169,21 +169,22 @@ public class DataHandler extends Handler {
                         // 自检OK和海图序列号
                         case MessageFormat.MESSAGE_TYPE_CHECK_AND_MAP: {
                             if (!content.equals("OK")) {
-                                // 注册海图
-                                PreferencesUtils.putString(MyApplication.getInstance().mainActivity, "yimaSerial", content);
-                                // 设置完成后提示 重新进入app
-                                new QMUIDialog.MessageDialogBuilder(MyApplication.getInstance().mainActivity)
-                                        .setTitle("提示")
-                                        .setMessage("海图序列号设置成功，请重新打开app")
-                                        .addAction("确定", new QMUIDialogAction.ActionListener() {
-                                            @Override
-                                            public void onClick(QMUIDialog dialog, int index) {
-                                                System.exit(0);
-                                            }
-                                        })
-                                        .show();
+                                if (!PreferencesUtils.getBoolean(MyApplication.getInstance().getApplicationContext(), "self_check_result", false)) {
+                                    // 注册海图
+                                    PreferencesUtils.putString(MyApplication.getInstance().mainActivity, "yimaSerial", content);
+                                    // 设置完成后提示 重新进入app
+                                    new QMUIDialog.MessageDialogBuilder(MyApplication.getInstance().mainActivity)
+                                            .setTitle("提示")
+                                            .setMessage("海图序列号设置成功，请重新打开app")
+                                            .addAction("确定", new QMUIDialogAction.ActionListener() {
+                                                @Override
+                                                public void onClick(QMUIDialog dialog, int index) {
+                                                    System.exit(0);
+                                                }
+                                            })
+                                            .show();
+                                }
                             }
-
                             // 自检成功
                             JSONObject jsonObject = new JSONObject();
                             jsonObject.put("apiType", "self_check_2");

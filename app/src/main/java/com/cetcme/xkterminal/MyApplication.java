@@ -132,10 +132,10 @@ public class MyApplication extends Application {
 
         mContext = this;
 
-        if (!PreferencesUtils.getBoolean(this, "copiedYimaFile")) {
-            copyYimaFile();
-            PreferencesUtils.putBoolean(this, "copiedYimaFile", true);
-        }
+//        if (!PreferencesUtils.getBoolean(this, "copiedYimaFile")) {
+//            copyYimaFile();
+//            PreferencesUtils.putBoolean(this, "copiedYimaFile", true);
+//        }
 
         x.Ext.init(this);
 //        x.Ext.setDebug(BuildConfig.DEBUG); // 开启debug会影响性能

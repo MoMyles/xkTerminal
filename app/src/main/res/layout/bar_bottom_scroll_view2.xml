@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:orientation="vertical"
+    android:background="@color/barColor">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="#000000" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/button_receive"
+                android:layout_width="120dp"
+                android:layout_height="44dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="短信"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/button_send"
+                android:layout_width="120sp"
+                android:layout_height="44dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="地图"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/button_sign"
+                android:layout_width="120sp"
+                android:layout_height="44dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="系统"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/button_alert"
+                android:layout_width="120sp"
+                android:layout_height="44dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="报警记录"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/button_post"
+                android:layout_width="120sp"
+                android:layout_height="44dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="进出港申报"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/button_navigate"
+                android:layout_width="120sp"
+                android:layout_height="44dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="导航管理"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/button_other_ship"
+                android:layout_width="120sp"
+                android:layout_height="44dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="附近船舶"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/button_pin"
+                android:layout_width="120sp"
+                android:layout_height="44dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="地图标位"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/button_setting"
+                android:layout_width="120sp"
+                android:layout_height="44dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
+                android:gravity="center"
+                android:text="系统参数"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/button_about"
+                android:layout_width="120sp"
+                android:layout_height="44dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
+                android:gravity="center"
+                android:text="关于"
+                android:textSize="16sp"
+                android:visibility="gone"/>
+
+        </LinearLayout>
+    </HorizontalScrollView>
+
+</LinearLayout>

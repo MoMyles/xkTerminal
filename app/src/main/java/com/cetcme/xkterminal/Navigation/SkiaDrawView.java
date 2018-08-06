@@ -72,6 +72,7 @@ public class SkiaDrawView extends View {
         mYimaLib = new YimaLib();
         mYimaLib.Create();
         String deviceId = mYimaLib.GetDeviceIDForLicSvr();
+//        Log.e("TAG_DEVICEID", deviceId);
         String licenceKey = PreferencesUtils.getString(ctx, "yimaSerial");
         if (licenceKey != null) {
             mYimaLib.SetLicenceKeyFromSvr(licenceKey, Constant.YIMA_WORK_PATH); //"8C58-708D-1865-9674"

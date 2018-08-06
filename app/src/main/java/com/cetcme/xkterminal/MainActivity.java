@@ -11,6 +11,7 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -80,7 +81,6 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.xutils.DbManager;
-import org.xutils.ex.DbException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -94,6 +94,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import aisparser.Message1;
 import aisparser.Message11;
@@ -159,6 +161,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private Handler mHandler = null;
 
     private boolean is$04 = false;
+
+    private Timer timer = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -227,31 +231,43 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         // 设备自检中
         showSelfCheckHud();
 
-        // TODO: phone test
-        /*
-        new Thread(new Runnable() {
+
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                while (isSelfCheckLoading) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                dismissSelfCheckHud();
+                if (!MyApplication.getInstance().isLocated) {
+                    Looper.prepare();
+                    Toast.makeText(MyApplication.getInstance().getApplicationContext(), "自检失败", Toast.LENGTH_SHORT).show();
+                    MainActivity.play("卫星中断故障");
+                    Looper.loop();
                 }
-                try {
-                    aisSerialPort = MyApplication.getInstance().getAisSerialPort();
-                    aisOutputStream = aisSerialPort.getOutputStream();
-                    aisInputStream = aisSerialPort.getInputStream();
-                    AisReadThread aisReadThread = new AisReadThread();
-                    aisReadThread.start();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
             }
-        }).start();
-        */
+        }, Constant.SELF_CHECK_TIME_OUT);
+
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                while (isSelfCheckLoading) {
+//                    try {
+//                        Thread.sleep(1000);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//                try {
+//                    aisSerialPort = MyApplication.getInstance().getAisSerialPort();
+//                    aisOutputStream = aisSerialPort.getOutputStream();
+//                    aisInputStream = aisSerialPort.getInputStream();
+//                    AisReadThread aisReadThread = new AisReadThread();
+//                    aisReadThread.start();
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//
+//            }
+//        }).start();
 
         // 发送启动$01，要求对方发时间
         mHandler.postDelayed(new Runnable() {
@@ -374,7 +390,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     tmpByts[i] = byts[i];
                 }
                 String gpsDataStr = new String(tmpByts);
-                if(gpsDataStr.startsWith("$04")) {
+                if (gpsDataStr.startsWith("$04")) {
                     String[] messageStrings = MessageFormat.unFormat(tmpByts);
                     String address = messageStrings[0];
                     String content = messageStrings[1];
@@ -1603,7 +1619,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
     public void dismissSelfCheckHud() {
-        kProgressHUD.dismiss();
+        if (kProgressHUD != null && kProgressHUD.isShowing()) {
+            kProgressHUD.dismiss();
+        }
         isSelfCheckLoading = false;
     }
 

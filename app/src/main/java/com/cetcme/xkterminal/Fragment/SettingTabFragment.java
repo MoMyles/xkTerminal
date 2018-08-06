@@ -17,12 +17,12 @@ import android.widget.TextView;
 
 import com.cetcme.xkterminal.Fragment.setting.DBSettingFragment;
 import com.cetcme.xkterminal.Fragment.setting.SatelliteFragment;
-import com.cetcme.xkterminal.Fragment.setting.SeriveStatusFragment;
 import com.cetcme.xkterminal.Fragment.setting.SystemAboutFragment;
 import com.cetcme.xkterminal.Fragment.setting.SystemSettingFragment;
 import com.cetcme.xkterminal.Fragment.setting.WarningSettingFragment;
-import com.cetcme.xkterminal.Fragment.setting.WeatherInfoFragment;
 import com.cetcme.xkterminal.R;
+import com.cetcme.xkterminal.port.ComFragment;
+import com.cetcme.xkterminal.port.USBFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -167,7 +167,8 @@ public class SettingTabFragment extends Fragment {
         fragments.add(new DBSettingFragment());
         fragments.add(new SatelliteFragment());
         fragments.add(new WarningSettingFragment());
-        fragments.add(new SeriveStatusFragment());
+//        fragments.add(new SeriveStatusFragment());
+        fragments.add(ComFragment.newInstance());
 //        fragments.add(new WeatherInfoFragment());
         fragments.add(new SystemSettingFragment());
         fragments.add(new SystemAboutFragment());

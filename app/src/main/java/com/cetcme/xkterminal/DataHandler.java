@@ -1,8 +1,8 @@
 package com.cetcme.xkterminal;
 
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
+import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.DataFormat.IDFormat;
@@ -18,6 +18,7 @@ import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.MyClass.ScreenBrightness;
 import com.cetcme.xkterminal.MyClass.SoundPlay;
 import com.cetcme.xkterminal.Socket.SocketServer;
+import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 import com.cetcme.xkterminal.Sqlite.Proxy.GroupProxy;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
@@ -54,28 +55,11 @@ public class DataHandler extends Handler {
     private MyApplication myApplication;
 
     private DbManager db;
-
-    private Timer timer = null;
     private Timer timer30 = null;
 
     public DataHandler(MyApplication myApplication) {
         this.myApplication = myApplication;
         this.db = MyApplication.getInstance().getDb();
-
-        timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if (MyApplication.getInstance().mainActivity != null) {
-                    MyApplication.getInstance().mainActivity.dismissSelfCheckHud();
-                }
-                Looper.prepare();
-                Toast.makeText(MyApplication.getInstance().getApplicationContext(), "自检失败", Toast.LENGTH_SHORT).show();
-                MainActivity.play("卫星中断故障");
-                Looper.loop();
-            }
-        }, Constant.SELF_CHECK_TIME_OUT);
-
         timer30 = new Timer();
         timer30.schedule(new TimerTask() {
             @Override
@@ -105,7 +89,42 @@ public class DataHandler extends Handler {
                     String type = messageStrings[2];
                     int group = Integer.parseInt(messageStrings[3]);
                     int frameCount = Integer.parseInt(messageStrings[4]);
-
+                    if (!TextUtils.isEmpty(content) && content.startsWith("$06")){
+                        //建林定位信息
+                        String lat = content.substring(3, 13);
+                        String latDirect = content.substring(13, 14);
+                        String lon = content.substring(14, 25);
+                        String lonDirect = content.substring(25, 26);
+                        String speed = content.substring(26, 31);
+                        String cog = content.substring(31, 36);
+                        String voltage = content.substring(36, 37);
+                        LocationBean lb = null;
+                        if (MyApplication.getInstance().getCurrentLocation() != null) {
+                            lb = MyApplication.getInstance().getCurrentLocation();
+                        } else {
+                            lb = new LocationBean();
+                        }
+                        if (lb != null) {
+                            try {
+                                if ("N".equals(latDirect)) {
+                                    lb.setLatitude((int) (Double.parseDouble(lat) * 1e5));
+                                } else {
+                                    lb.setLatitude((int) (-1 * Double.parseDouble(lat) * 1e5));
+                                }
+                                if ("E".equals(lonDirect)) {
+                                    lb.setLongitude((int) (Double.parseDouble(lon) * 1e5));
+                                } else {
+                                    lb.setLongitude((int) (-1 * Double.parseDouble(lon) * 1e5));
+                                }
+                                lb.setSpeed(Float.parseFloat(speed));
+                                lb.setHeading(Float.parseFloat(cog));
+                            } catch(Exception e){
+                                e.printStackTrace();
+                            }
+                        }
+                        MyApplication.voltage = voltage == null ? "-" : voltage;
+                        break;
+                    }
                     switch (type) {
                         // 普通短信
                         case MessageFormat.MESSAGE_TYPE_NORMAL:
@@ -187,21 +206,22 @@ public class DataHandler extends Handler {
                         // 自检OK和海图序列号
                         case MessageFormat.MESSAGE_TYPE_CHECK_AND_MAP: {
                             if (!content.equals("OK")) {
-                                // 注册海图
-                                PreferencesUtils.putString(MyApplication.getInstance().mainActivity, "yimaSerial", content);
-                                // 设置完成后提示 重新进入app
-                                new QMUIDialog.MessageDialogBuilder(MyApplication.getInstance().mainActivity)
-                                        .setTitle("提示")
-                                        .setMessage("海图序列号设置成功，请重新打开app")
-                                        .addAction("确定", new QMUIDialogAction.ActionListener() {
-                                            @Override
-                                            public void onClick(QMUIDialog dialog, int index) {
-                                                System.exit(0);
-                                            }
-                                        })
-                                        .show();
+                                if (!PreferencesUtils.getBoolean(MyApplication.getInstance().getApplicationContext(), "self_check_result", false)) {
+                                    // 注册海图
+                                    PreferencesUtils.putString(MyApplication.getInstance().mainActivity, "yimaSerial", content);
+                                    // 设置完成后提示 重新进入app
+                                    new QMUIDialog.MessageDialogBuilder(MyApplication.getInstance().mainActivity)
+                                            .setTitle("提示")
+                                            .setMessage("海图序列号设置成功，请重新打开app")
+                                            .addAction("确定", new QMUIDialogAction.ActionListener() {
+                                                @Override
+                                                public void onClick(QMUIDialog dialog, int index) {
+                                                    System.exit(0);
+                                                }
+                                            })
+                                            .show();
+                                }
                             }
-
                             // 自检成功
                             JSONObject jsonObject = new JSONObject();
                             jsonObject.put("apiType", "self_check_2");
@@ -255,7 +275,6 @@ public class DataHandler extends Handler {
                     break;
                 case SERIAL_PORT_TIME_NUMBER_AND_COMMUNICATION_FROM:
                     // 先处理后面部分，时间部分由下一个case处理，不加break
-                    timer.cancel();
                     int myNumber = Util.bytesToInt2(ByteUtil.subBytes(bytes, 17, 21), 0);
                     if (myNumber != 0) {
                         PreferencesUtils.putString(myApplication.mainActivity, "myNumber", myNumber + "");
@@ -470,7 +489,7 @@ public class DataHandler extends Handler {
                     break;
             }
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
         }
 
     }

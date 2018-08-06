@@ -322,6 +322,12 @@ public class SystemSettingFragment extends Fragment {
             }
         });
 
+        if (PreferencesUtils.getBoolean(getActivity(), "self_check_result", false)) {
+            tv_self_test.setText("开始自检(成功)");
+        } else {
+            tv_self_test.setText("开始自检");
+        }
+
         tv_self_test.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -542,9 +548,11 @@ public class SystemSettingFragment extends Fragment {
         switch (str) {
             case "check_ok":
                 tv_self_test.setText("自检成功");
+                PreferencesUtils.putBoolean(getActivity(), "self_check_result", true);
                 break;
             case "check_fail":
                 tv_self_test.setText("自检失败");
+                PreferencesUtils.putBoolean(getActivity(), "self_check_result", false);
                 break;
         }
     }

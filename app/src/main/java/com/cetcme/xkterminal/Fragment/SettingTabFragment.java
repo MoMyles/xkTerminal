@@ -168,7 +168,7 @@ public class SettingTabFragment extends Fragment {
         fragments.add(new SatelliteFragment());
         fragments.add(new WarningSettingFragment());
 //        fragments.add(new SeriveStatusFragment());
-        fragments.add(USBFragment.newInstance());
+        fragments.add(ComFragment.newInstance());
 //        fragments.add(new WeatherInfoFragment());
         fragments.add(new SystemSettingFragment());
         fragments.add(new SystemAboutFragment());

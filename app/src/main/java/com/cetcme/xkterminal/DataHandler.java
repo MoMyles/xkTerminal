@@ -2,6 +2,7 @@ package com.cetcme.xkterminal;
 
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.DataFormat.IDFormat;
@@ -17,6 +18,7 @@ import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.MyClass.ScreenBrightness;
 import com.cetcme.xkterminal.MyClass.SoundPlay;
 import com.cetcme.xkterminal.Socket.SocketServer;
+import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 import com.cetcme.xkterminal.Sqlite.Proxy.GroupProxy;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
@@ -87,7 +89,42 @@ public class DataHandler extends Handler {
                     String type = messageStrings[2];
                     int group = Integer.parseInt(messageStrings[3]);
                     int frameCount = Integer.parseInt(messageStrings[4]);
-
+                    if (!TextUtils.isEmpty(content) && content.startsWith("$06")){
+                        //建林定位信息
+                        String lat = content.substring(3, 13);
+                        String latDirect = content.substring(13, 14);
+                        String lon = content.substring(14, 25);
+                        String lonDirect = content.substring(25, 26);
+                        String speed = content.substring(26, 31);
+                        String cog = content.substring(31, 36);
+                        String voltage = content.substring(36, 37);
+                        LocationBean lb = null;
+                        if (MyApplication.getInstance().getCurrentLocation() != null) {
+                            lb = MyApplication.getInstance().getCurrentLocation();
+                        } else {
+                            lb = new LocationBean();
+                        }
+                        if (lb != null) {
+                            try {
+                                if ("N".equals(latDirect)) {
+                                    lb.setLatitude((int) (Double.parseDouble(lat) * 1e5));
+                                } else {
+                                    lb.setLatitude((int) (-1 * Double.parseDouble(lat) * 1e5));
+                                }
+                                if ("E".equals(lonDirect)) {
+                                    lb.setLongitude((int) (Double.parseDouble(lon) * 1e5));
+                                } else {
+                                    lb.setLongitude((int) (-1 * Double.parseDouble(lon) * 1e5));
+                                }
+                                lb.setSpeed(Float.parseFloat(speed));
+                                lb.setHeading(Float.parseFloat(cog));
+                            } catch(Exception e){
+                                e.printStackTrace();
+                            }
+                        }
+                        MyApplication.voltage = voltage == null ? "-" : voltage;
+                        break;
+                    }
                     switch (type) {
                         // 普通短信
                         case MessageFormat.MESSAGE_TYPE_NORMAL:

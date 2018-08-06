@@ -1,14 +1,18 @@
 package com.cetcme.xkterminal;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -72,6 +76,8 @@ import org.codice.common.ais.Decoder;
 import org.codice.common.ais.message.Message18;
 import org.codice.common.ais.message.Message19;
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.xutils.DbManager;
@@ -102,9 +108,12 @@ import aisparser.Message5;
 import aisparser.Sixbit;
 import aisparser.Vdm;
 import android_serialport_api.SerialPort;
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.EasyPermissions;
+import pub.devrel.easypermissions.PermissionRequest;
 import yimamapapi.skia.AisInfo;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks{
 
     public static String myNumber = "";
 
@@ -222,6 +231,7 @@ public class MainActivity extends AppCompatActivity {
         // 设备自检中
         showSelfCheckHud();
 
+
         timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
@@ -274,6 +284,39 @@ public class MainActivity extends AppCompatActivity {
                 new SocketServer().startService(MainActivity.this);
             }
         }.start();
+
+        toast = Toast.makeText(MainActivity.this, "", Toast.LENGTH_SHORT);
+        // gps定位
+        methodRequiresTwoPermission();
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    final static int RC_CAMERA_AND_LOCATION = 0x01;
+
+    @AfterPermissionGranted(RC_CAMERA_AND_LOCATION)
+    private void methodRequiresTwoPermission() {
+        String[] perms = {Manifest.permission.CAMERA, Manifest.permission.ACCESS_FINE_LOCATION};
+        if (EasyPermissions.hasPermissions(this, perms)) {
+            // Already have permission, do the thing
+            // ...
+            new GPSLocation(MainActivity.this);
+        } else {
+            // Do not have permissions, request them now
+            EasyPermissions.requestPermissions(this, "camera_and_location_rationale",
+                    RC_CAMERA_AND_LOCATION, perms);
+        }
     }
 
     class AisReadThread extends Thread {
@@ -1692,4 +1735,34 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static final String MO_GU_TOU = "382570";
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        // Forward results to EasyPermissions
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, List<String> list) {
+        // Some permissions have been granted
+        // ...
+        new GPSLocation(MainActivity.this);
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, List<String> list) {
+        // Some permissions have been denied
+        // ...
+    }
+
+    Toast toast;
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onLocationEvent(Location location) {
+        toast.setText(location.getLatitude() + ", " + location.getLongitude());
+        toast.show();
+    }
+
 }

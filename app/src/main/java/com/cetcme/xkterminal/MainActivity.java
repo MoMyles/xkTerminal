@@ -198,8 +198,11 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
         modifyGpsBarMessageCount();
 
-        mWifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        createWifiHotspot();
+        if (!Constant.PHONE_TEST) {
+            mWifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            createWifiHotspot();
+        }
+
 
         checkoutShutDown();
 
@@ -286,8 +289,12 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         }.start();
 
         toast = Toast.makeText(MainActivity.this, "", Toast.LENGTH_SHORT);
-        // gps定位
-        methodRequiresTwoPermission();
+
+        if (Constant.PHONE_TEST) {
+            // gps定位
+            methodRequiresTwoPermission();
+        }
+
 
     }
 

@@ -8,6 +8,8 @@ import java.util.Date;
 
 public class Constant {
 
+    public static final Boolean PHONE_TEST = true;
+
     // 服务器北斗地址
     public static final String SERVER_BD_NUMBER = "372741";
 
@@ -43,7 +45,7 @@ public class Constant {
     public static final int MESSAGE_SEND_LIMIT_TIME = 60000;
 
     // 开机自检超时时间
-    public static final int SELF_CHECK_TIME_OUT = 6 * 1000; //2 * 60 * 1000; TODO
+    public static final int SELF_CHECK_TIME_OUT = 2 * 60 * 1000; //TODO
 
     // 开机之后隔多久发开机数据包
     public static final int SEND_BOOT_DATA_TIME = 30 * 1000;

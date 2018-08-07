@@ -27,6 +27,8 @@ public class GPSLocation {
     private Context context;
     private LocationManager locationManager;
     private String locationProvider;
+    private static double lat = 0f;
+    private static double lon = 0f;
 
     public GPSLocation(final Context context) {
         this.context = context;
@@ -57,27 +59,34 @@ public class GPSLocation {
 
 
         Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    return;
-                }
-                Location location = locationManager.getLastKnownLocation(locationProvider);
-                if (location != null) {
-                    //不为空,显示地理位置经纬度
-                    showLocation(location);
-                    EventBus.getDefault().post(location);
-                }
-            }
-        }, 1000, 1000);
+//        timer.schedule(new TimerTask() {
+//            @Override
+//            public void run() {
+//                if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//                    return;
+//                }
+//                Location location = locationManager.getLastKnownLocation(locationProvider);
+//                if (location != null) {
+//                    //不为空,显示地理位置经纬度
+//                    showLocation(location);
+//                    EventBus.getDefault().post(location);
+//                }
+//            }
+//        }, 1000, 1000);
+    }
+
+    public static double getLat() {
+        return lat;
+    }
+
+    public static double getLon() {
+        return lon;
     }
 
     /**
      * LocationListern监听器
      * 参数：地理位置提供器、监听位置变化的时间间隔、位置变化的距离间隔、LocationListener监听器
      */
-
     LocationListener locationListener = new LocationListener() {
 
         @Override
@@ -103,6 +112,8 @@ public class GPSLocation {
     };
 
     private void showLocation(Location location) {
+        lon = location.getLongitude();
+        lat = location.getLatitude();
         Log.i("GPSLocation", "location------>" + "经度为：" + location.getLongitude() + "\n纬度为" + location.getLatitude());
     }
 

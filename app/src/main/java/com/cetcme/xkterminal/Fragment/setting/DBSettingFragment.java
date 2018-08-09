@@ -49,9 +49,9 @@ public class DBSettingFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_setting_db, container, false);
-//        if (!EventBus.getDefault().isRegistered(this)) {
-//            EventBus.getDefault().register(this);
-//        }
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this);
+        }
         Log.e("DBSettingFragment", "onCreateView: ");
         unbinder = ButterKnife.bind(this, view);
         initData(view);
@@ -62,7 +62,9 @@ public class DBSettingFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-//        EventBus.getDefault().unregister(this);
+        if (EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().unregister(this);
+        }
         unbinder.unbind();
     }
 
@@ -177,22 +179,26 @@ public class DBSettingFragment extends Fragment {
         tv_voltage.setText(MyApplication.voltage.equals("-") ? "---" : MyApplication.voltage + "V");
     }
 
-    /*
+
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(SmsEvent smsEvent) {
-        try {
-            String type = smsEvent.getReceiveJson().getString("apiType");
-
-            switch (type) {
-                case "voltage":
-                    double voltage = smsEvent.getReceiveJson().getDouble("voltage");
-                    tv_voltage.setText(String.format("%.2f", voltage));
-                    break;
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
+    public void onMessageEvent(String type) {
+        switch (type){
+            case "voltage":
+                tv_voltage.setText(MyApplication.voltage.equals("-") ? "---" : MyApplication.voltage + "V");
+                break;
         }
+//        try {
+//            String type = smsEvent.getReceiveJson().getString("apiType");
+//
+//            switch (type) {
+//                case "voltage":
+//                    double voltage = smsEvent.getReceiveJson().getDouble("voltage");
+//                    tv_voltage.setText(String.format("%.2f", voltage));
+//                    break;
+//            }
+//
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
     }
-    */
 }

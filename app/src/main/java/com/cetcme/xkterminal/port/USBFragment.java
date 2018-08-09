@@ -70,8 +70,6 @@ import static com.cetcme.xkterminal.MainActivity.play;
 
 public class USBFragment extends Fragment implements View.OnClickListener {
 
-    public static final String MO_GU_TOU = "382570";
-
     private ScrollView sv1;
     private TextView tv_receive, tv_status;
     private EditText et_send;
@@ -632,7 +630,7 @@ public class USBFragment extends Fragment implements View.OnClickListener {
                     int frameCount = Integer.parseInt(messageStrings[4]);
                     final String unique = ConvertUtil.rc4ToHex();
                     if (MessageFormat.MESSAGE_TYPE_TRADE.equals(type)) {
-                        MyApplication.getInstance().sendBytes(MessageFormat.format(MO_GU_TOU// 蘑菇头编号
+                        MyApplication.getInstance().sendBytes(MessageFormat.format(Constant.SERVER_BD_NUMBER// 蘑菇头编号
                                 , content, MessageFormat.MESSAGE_TYPE_TRADE, 0, unique));
                     }
                 } else {

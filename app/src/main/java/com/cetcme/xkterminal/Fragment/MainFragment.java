@@ -10,7 +10,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,7 +58,6 @@ import yimamapapi.skia.AisInfo;
 import yimamapapi.skia.M_POINT;
 
 import static android.content.Context.MODE_PRIVATE;
-import static com.cetcme.xkterminal.Navigation.Constant.YIMA_WORK_PATH;
 
 /**
  * Created by qiuhong on 10/01/2018.
@@ -87,6 +85,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
 
     private boolean alert_need_flash = false;
     private boolean warnArea = false;
+    private boolean isFirst = true;
 
 //    private final int[] JIN_YU_AREA_COLOR = new int[]{255, 0, 0};
 //    private final int[] JIN_RU_AREA_COLOR = new int[]{0, 255, 0};
@@ -937,10 +936,12 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
         skiaDrawView.mYimaLib.SetOwnShipShowSymbol(false, 4, true, 16, 5000000);
         if (!showOtherShip) {
             skiaDrawView.mYimaLib.RotateMapByScrnCenter(rotateScreen ? 0 - heading : 0);
-            skiaDrawView.mYimaLib.CenterMap(myLocation.x, myLocation.y);
+            if (isFirst) {// 第一次定位信息来了居中
+                isFirst = false;
+                skiaDrawView.mYimaLib.CenterMap(myLocation.x, myLocation.y);
+            }
         }
         skiaDrawView.postInvalidate();
-
     }
 
     /**

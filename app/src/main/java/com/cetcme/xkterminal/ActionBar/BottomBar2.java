@@ -11,6 +11,9 @@ import android.widget.RelativeLayout;
 import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.Navigation.NavigationMainActivity;
 import com.cetcme.xkterminal.R;
+import com.zyyoona7.popup.EasyPopup;
+import com.zyyoona7.popup.XGravity;
+import com.zyyoona7.popup.YGravity;
 
 import java.util.ArrayList;
 
@@ -22,17 +25,7 @@ public class BottomBar2 extends RelativeLayout implements View.OnClickListener {
 
     public MainActivity mainActivity;
 
-    private Button button_receive;
-    private Button button_send;
-    private Button button_sign;
-    private Button button_alert;
-    private Button button_setting;
-    private Button button_navigate;
-    private Button button_post;
-    private Button button_about;
-    private Button button_other_ship;
-
-    private Button button_pin;
+    private Button button_message, btn_map, btn_system, btn_alert, btn_post;
 
     private ArrayList<Button> buttons = new ArrayList<>();
 
@@ -48,71 +41,93 @@ public class BottomBar2 extends RelativeLayout implements View.OnClickListener {
     }
 
     private void bindView(View view) {
-        button_receive  = view.findViewById(R.id.button_receive);
-        button_send     = view.findViewById(R.id.button_send);
-        button_sign     = view.findViewById(R.id.button_sign);
-        button_alert    = view.findViewById(R.id.button_alert);
-        button_setting  = view.findViewById(R.id.button_setting);
-        button_navigate = view.findViewById(R.id.button_navigate);
-        button_post     = view.findViewById(R.id.button_post);
-        button_about    = view.findViewById(R.id.button_about);
-        button_other_ship = view.findViewById(R.id.button_other_ship);
-        button_pin      = view.findViewById(R.id.button_pin);
+        button_message = view.findViewById(R.id.btn_message);
+        btn_map = view.findViewById(R.id.btn_map);
+        btn_system = view.findViewById(R.id.btn_system);
+        btn_alert = view.findViewById(R.id.button_alert);
+        btn_post = view.findViewById(R.id.button_post);
+        buttons.add(button_message);
+        buttons.add(btn_map);
+        buttons.add(btn_system);
+        buttons.add(btn_alert);
+        buttons.add(btn_post);
 
-        buttons.add(button_receive);
-        buttons.add(button_send);
-        buttons.add(button_sign);
-        buttons.add(button_alert);
-        buttons.add(button_setting);
-        buttons.add(button_navigate);
-        buttons.add(button_post);
-        buttons.add(button_about);
-        buttons.add(button_other_ship);
-        buttons.add(button_pin);
-
-        for (Button button: buttons) {
+        for (Button button : buttons) {
             button.setTextColor(0xFFFFFFFF);
             button.setBackgroundResource(R.drawable.button_bg_selector);
             button.setOnClickListener(this);
         }
-
     }
+
+    private EasyPopup popup,popup2;
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.button_receive:
-                mainActivity.initMessageFragment("send");
+            case R.id.btn_message:
+                popup = EasyPopup.create()
+                        .setContentView(LayoutInflater.from(getContext()).inflate(R.layout.bar_bottom_item_message, null))
+                        .apply();
+                Button btn1 = popup.findViewById(R.id.btn1);// 新建短信
+                btn1.setOnClickListener(this);
+                Button btn2 = popup.findViewById(R.id.btn2);// 收件箱
+                btn2.setOnClickListener(this);
+                Button btn3 = popup.findViewById(R.id.btn3);// 发件箱
+                btn3.setOnClickListener(this);
+                popup.showAtAnchorView(button_message, XGravity.CENTER,  YGravity.ABOVE, 10, -90);
                 break;
-            case R.id.button_send:
+            case R.id.btn1:
+                dismiss(popup);
+                break;
+            case R.id.btn2:
                 mainActivity.initMessageFragment("receive");
+                dismiss(popup);
                 break;
-            case R.id.button_sign:
-                mainActivity.initLogFragment("sign");
+            case R.id.btn3:
+                mainActivity.initMessageFragment("send");
+                dismiss(popup);
+                break;
+            case R.id.btn_map:
+                popup2 = EasyPopup.create()
+                        .setContentView(LayoutInflater.from(getContext()).inflate(R.layout.bar_bottom_item_map, null))
+                        .apply();
+                Button btn4 = popup2.findViewById(R.id.btn4);// 导航管理
+                btn4.setOnClickListener(this);
+                Button btn5 = popup2.findViewById(R.id.btn5);// 附近船舶
+                btn5.setOnClickListener(this);
+                Button btn6 = popup2.findViewById(R.id.btn6);// 地图标位
+                btn6.setOnClickListener(this);
+                popup2.showAtAnchorView(btn_map, XGravity.CENTER, YGravity.ABOVE, 130, -110);
+                break;
+            case R.id.btn4:
+                mainActivity.startActivity(new Intent(mainActivity, NavigationMainActivity.class));
+                dismiss(popup2);
+                break;
+            case R.id.btn5:
+                mainActivity.openOtherShips();
+                dismiss(popup2);
+                break;
+            case R.id.btn6:
+                mainActivity.openPinList();
+                dismiss(popup2);
+                break;
+            case R.id.btn_system:
+                mainActivity.initSettingFragment();
                 break;
             case R.id.button_alert:
                 mainActivity.initLogFragment("alert");
                 break;
-            case R.id.button_setting:
-                mainActivity.initSettingFragment();
-                break;
-            case R.id.button_navigate:
-                mainActivity.startActivity(new Intent(mainActivity, NavigationMainActivity.class));
-                break;
             case R.id.button_post:
                 mainActivity.initLogFragment("inout");
                 break;
-            case R.id.button_about:
-                mainActivity.initAboutFragment();
-                break;
-            case R.id.button_other_ship:
-                mainActivity.openOtherShips();
-                break;
-            case R.id.button_pin:
-                mainActivity.openPinList();
-                break;
             default:
                 break;
+        }
+    }
+
+    private void dismiss(EasyPopup popup){
+        if (popup != null && popup.isShowing()){
+            popup.dismiss();
         }
     }
 }

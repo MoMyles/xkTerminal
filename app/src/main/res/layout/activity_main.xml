@@ -21,7 +21,7 @@
     </FrameLayout>
 
 
-    <com.cetcme.xkterminal.ActionBar.BottomBar
+    <com.cetcme.xkterminal.ActionBar.BottomBar2
         android:id="@+id/bottomBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>

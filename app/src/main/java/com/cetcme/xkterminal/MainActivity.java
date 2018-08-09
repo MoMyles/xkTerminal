@@ -165,6 +165,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     private Timer timer = null;
 
+    private static Context mContext;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -173,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         int flag = WindowManager.LayoutParams.FLAG_FULLSCREEN;
         window.setFlags(flag, flag);
-
+        mContext = getApplicationContext();
         setContentView(R.layout.activity_main);
         //隐藏动作条
         getSupportActionBar().hide();
@@ -407,7 +409,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     int frameCount = Integer.parseInt(messageStrings[4]);
                     final String unique = ConvertUtil.rc4ToHex();
                     if (MessageFormat.MESSAGE_TYPE_TRADE.equals(type)) {
-                        MyApplication.getInstance().sendBytes(MessageFormat.format(Constant.SERVER_BD_NUMBER// 蘑菇头编号
+                        MyApplication.getInstance().sendBytes(MessageFormat.format(PreferencesUtils.getString(getApplicationContext(), "server_address", Constant.SERVER_BD_NUMBER)// 蘑菇头编号
                                 , content, MessageFormat.MESSAGE_TYPE_TRADE, 0, unique));
                     }
                 } else {
@@ -1739,7 +1741,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     public static void sendCheckAndMapMessage() {
         String deviceID = SkiaDrawView.mYimaLib.GetDeviceIDForLicSvr();
         final String unique = ConvertUtil.rc4ToHex();
-        MyApplication.getInstance().sendBytes(MessageFormat.format(Constant.SERVER_BD_NUMBER, deviceID, MessageFormat.MESSAGE_TYPE_CHECK_AND_MAP, 0, unique));
+        MyApplication.getInstance().sendBytes(MessageFormat.format(PreferencesUtils.getString(mContext, "server_address", Constant.SERVER_BD_NUMBER), deviceID, MessageFormat.MESSAGE_TYPE_CHECK_AND_MAP, 0, unique));
     }
 
     @Override

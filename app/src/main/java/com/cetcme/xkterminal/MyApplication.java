@@ -393,7 +393,7 @@ public class MyApplication extends MultiDexApplication {
                         // 服务器app版本检测
                         Log.i(TAG, "Event: 发送更新检测byte");
                         String unique = ConvertUtil.rc4ToHex();
-                        sendBytes(MessageFormat.format("382570", "1", MessageFormat.MESSAGE_TYPE_APP_VERSION, 0, unique));
+                        sendBytes(MessageFormat.format(PreferencesUtils.getString(MyApplication.getInstance().getApplicationContext(), "server_address", Constants.MUSHROOM_ADDRESS), "1", MessageFormat.MESSAGE_TYPE_APP_VERSION, 0, unique));
                     }
                     break;
                 case "device_info_set":

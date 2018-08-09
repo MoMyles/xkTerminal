@@ -245,7 +245,7 @@ public class DataHandler extends Handler {
                         // 渔货交易数据
                         case MessageFormat.MESSAGE_TYPE_TRADE: {
                             final String unique = ConvertUtil.rc4ToHex();
-                            MyApplication.getInstance().sendBytes(MessageFormat.format(Constants.MUSHROOM_ADDRESS, content, MessageFormat.MESSAGE_TYPE_TRADE, 0, unique));
+                            MyApplication.getInstance().sendBytes(MessageFormat.format(PreferencesUtils.getString(MyApplication.getInstance().getApplicationContext(), "server_address", Constants.MUSHROOM_ADDRESS), content, MessageFormat.MESSAGE_TYPE_TRADE, 0, unique));
                             break;
                         }
                         // app更新

@@ -392,7 +392,7 @@ public class MyApplication extends MultiDexApplication {
                         MainActivity.play("手机客户端登陆成功");
                         // 服务器app版本检测
                         String unique = ConvertUtil.rc4ToHex();
-                        sendBytes(MessageFormat.format(Constants.MUSHROOM_ADDRESS, "1", MessageFormat.MESSAGE_TYPE_APP_VERSION, 0, unique));
+                        sendBytes(MessageFormat.format(PreferencesUtils.getString(MyApplication.getInstance().getApplicationContext(), "server_address", Constants.MUSHROOM_ADDRESS), "1", MessageFormat.MESSAGE_TYPE_APP_VERSION, 0, unique));
                     }
                     break;
                 case "device_info_set":

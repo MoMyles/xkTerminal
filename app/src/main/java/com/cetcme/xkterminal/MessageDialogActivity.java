@@ -9,6 +9,7 @@ import android.widget.TextView;
 import com.cetcme.xkterminal.DataFormat.AlertFormat;
 import com.cetcme.xkterminal.DataFormat.MessageFormat;
 import com.cetcme.xkterminal.MyClass.Constant;
+import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.MyClass.SoundPlay;
 import com.cetcme.xkterminal.Sqlite.Proxy.MessageProxy;
 
@@ -93,7 +94,7 @@ public class MessageDialogActivity extends Activity {
                 // 短信内容 "夜间点名:userid"
                 String[] arr = content.split(":");
                 if (arr.length == 2) {
-                    byte[] bytes = MessageFormat.format(Constant.SERVER_BD_NUMBER, arr[1], MessageFormat.MESSAGE_TYPE_CALL_THE_ROLL, 0);
+                    byte[] bytes = MessageFormat.format(PreferencesUtils.getString(getApplicationContext(), "server_address", Constant.SERVER_BD_NUMBER), arr[1], MessageFormat.MESSAGE_TYPE_CALL_THE_ROLL, 0);
                     MyApplication.getInstance().sendBytes(bytes);
                 }
                 break;

@@ -298,27 +298,63 @@ public class SystemSettingFragment extends Fragment {
                         .show();
             }
         });
-
+        tv_rdss.setText(PreferencesUtils.getString(getActivity(), "server_address", Constant.SERVER_BD_NUMBER));
         tv_rdss.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final boolean rdssOpen = PreferencesUtils.getBoolean(getActivity(), "rdss", false);
-
-                tipDialog = new QMUITipDialog.Builder(getContext())
-                        .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
-                        .setTipWord("发送中")
-                        .create();
-                tipDialog.show();
-
-                new Handler().postDelayed(new Runnable() {
+//                final boolean rdssOpen = PreferencesUtils.getBoolean(getActivity(), "rdss", false);
+//
+//                tipDialog = new QMUITipDialog.Builder(getContext())
+//                        .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
+//                        .setTipWord("发送中")
+//                        .create();
+//                tipDialog.show();
+//
+//                new Handler().postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        PreferencesUtils.putBoolean(getActivity(), "rdss", !rdssOpen);
+//                        tv_rdss.setText("点击发送");
+//                        tipDialog.dismiss();
+//                    }
+//                }, 3000);
+                PswDialog pswDialog = new PswDialog(getActivity());
+                pswDialog.setOnPswOkListener(new PswDialog.OnPswOkListener() {
                     @Override
-                    public void run() {
-                        PreferencesUtils.putBoolean(getActivity(), "rdss", !rdssOpen);
-                        tv_rdss.setText("点击发送");
-                        tipDialog.dismiss();
+                    public void onPswOk() {
+                        final QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
+                        builder.setTitle("设置平台地址")
+                                .setPlaceholder("请输入新的平台地址")
+                                .setInputType(InputType.TYPE_CLASS_NUMBER)
+                                .addAction("取消", new QMUIDialogAction.ActionListener() {
+                                    @Override
+                                    public void onClick(QMUIDialog dialog, int index) {
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .addAction("确认", new QMUIDialogAction.ActionListener() {
+                                    @Override
+                                    public void onClick(QMUIDialog dialog, int index) {
+                                        CharSequence text = builder.getEditText().getText();
+                                        if (text != null && text.length() > 0) {
+                                            if (isNumber(text.toString())) {
+                                                // 发送更改id的bytes
+//                                                MyApplication.getInstance().sendBytes(IDFormat.format(text.toString()));
+                                                PreferencesUtils.putString(getActivity(), "server_address", text.toString().trim());
+                                                dialog.dismiss();
+                                                tv_rdss.setText(PreferencesUtils.getString(getActivity(), "server_address", Constant.SERVER_BD_NUMBER));
+                                            } else {
+                                                Toast.makeText(getActivity(), "请输入正确的平台地址", Toast.LENGTH_SHORT).show();
+                                            }
+                                        } else {
+                                            Toast.makeText(getActivity(), "请填入内容", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                })
+                                .show();
                     }
-                }, 3000);
-
+                });
+                pswDialog.show();
             }
         });
 

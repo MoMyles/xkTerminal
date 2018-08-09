@@ -23,7 +23,7 @@ import io.netty.util.ReferenceCountUtil;
 public class HeartBeatClientHandler extends ChannelInboundHandlerAdapter {
 
     Logger logger = LoggerFactory.getLogger(HeartBeatClientHandler.class);
-    String deviceNo = "66666666";
+    String deviceNo = "66666666"; //"77777777";
 
     @Override
     public void channelActive(final ChannelHandlerContext ctx) throws Exception {

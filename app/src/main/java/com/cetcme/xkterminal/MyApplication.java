@@ -33,6 +33,7 @@ import com.cetcme.xkterminal.Sqlite.Bean.MessageBean;
 import com.cetcme.xkterminal.Sqlite.Bean.OtherShipBean;
 import com.cetcme.xkterminal.Sqlite.Proxy.MessageProxy;
 import com.cetcme.xkterminal.netty.heartbeats.HeartBeatsClient;
+import com.cetcme.xkterminal.netty.utils.Constants;
 import com.cetcme.xkterminal.netty.utils.SendMsg;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
@@ -389,6 +390,9 @@ public class MyApplication extends MultiDexApplication {
                     if (mainActivity != null) {
                         Toast.makeText(mainActivity, "手机客户端登陆成功", Toast.LENGTH_SHORT).show();
                         MainActivity.play("手机客户端登陆成功");
+                        // 服务器app版本检测
+                        String unique = ConvertUtil.rc4ToHex();
+                        sendBytes(MessageFormat.format(Constants.MUSHROOM_ADDRESS, "1", MessageFormat.MESSAGE_TYPE_APP_VERSION, 0, unique));
                     }
                     break;
                 case "device_info_set":

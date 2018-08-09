@@ -13,6 +13,7 @@ import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
 import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
 import com.cetcme.xkterminal.DataFormat.Util.Util;
 import com.cetcme.xkterminal.Event.SmsEvent;
+import com.cetcme.xkterminal.MyClass.APKVersionCodeUtils;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.MyClass.ScreenBrightness;
@@ -20,6 +21,7 @@ import com.cetcme.xkterminal.MyClass.SoundPlay;
 import com.cetcme.xkterminal.Socket.SocketServer;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 import com.cetcme.xkterminal.Sqlite.Proxy.GroupProxy;
+import com.cetcme.xkterminal.netty.utils.Constants;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 
@@ -192,12 +194,12 @@ public class DataHandler extends Handler {
                         // 添加删除组播号
                         case MessageFormat.MESSAGE_TYPE_GROUP: {
                             String[] value = content.split(",");
-                            if (value[0].equals("0")) {
-                                // 删除
+                            if (value[0].equals("1")) {
+                                // 添加
                                 myApplication.mainActivity.addGroup("group", value[1]);
                                 Toast.makeText(myApplication.mainActivity, "您已加入分组：" + value[1], Toast.LENGTH_SHORT).show();
                             } else {
-                                // 添加
+                                // 删除
                                 myApplication.mainActivity.deleteGroup(value[1]);
                                 Toast.makeText(myApplication.mainActivity, "您已退出分组：" + value[1], Toast.LENGTH_SHORT).show();
                             }
@@ -230,9 +232,19 @@ public class DataHandler extends Handler {
                         }
                         // 渔货交易数据
                         case MessageFormat.MESSAGE_TYPE_TRADE: {
-                            // TODO：平台号
                             final String unique = ConvertUtil.rc4ToHex();
-                            MyApplication.getInstance().sendBytes(MessageFormat.format("", content, MessageFormat.MESSAGE_TYPE_TRADE, 0, unique));
+                            MyApplication.getInstance().sendBytes(MessageFormat.format(Constants.MUSHROOM_ADDRESS, content, MessageFormat.MESSAGE_TYPE_TRADE, 0, unique));
+                            break;
+                        }
+                        // app更新
+                        case MessageFormat.MESSAGE_TYPE_APP_VERSION: {
+                            String currentVersion = APKVersionCodeUtils.getVerName(MyApplication.getInstance());
+                            // 版本号不同的时候发送给手机
+                            if (!content.equals(currentVersion)) {
+                                JSONObject jsonObject = new JSONObject();
+                                jsonObject.put("apiType", "app_update");
+                                SocketServer.send(jsonObject);
+                            }
                             break;
                         }
                         default:

@@ -30,6 +30,8 @@ public class MessageFormat {
     public static final String MESSAGE_TYPE_CHECK_AND_MAP       = "12"; // 自检和海图注册
     public static final String MESSAGE_TYPE_TRADE               = "13"; // 渔货交易数据
 
+    public static final String MESSAGE_TYPE_APP_VERSION         = "15"; // 获取服务器app版本号
+
     private static final String messageHead = "$04";
 
     private static final String MESSAGE_END_SYMBOL = "\r\n";

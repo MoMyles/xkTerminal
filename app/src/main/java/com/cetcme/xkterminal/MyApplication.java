@@ -8,6 +8,8 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.multidex.MultiDex;
+import android.support.multidex.MultiDexApplication;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -30,6 +32,9 @@ import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 import com.cetcme.xkterminal.Sqlite.Bean.MessageBean;
 import com.cetcme.xkterminal.Sqlite.Bean.OtherShipBean;
 import com.cetcme.xkterminal.Sqlite.Proxy.MessageProxy;
+import com.cetcme.xkterminal.netty.heartbeats.HeartBeatsClient;
+import com.cetcme.xkterminal.netty.utils.Constants;
+import com.cetcme.xkterminal.netty.utils.SendMsg;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
 import com.joanzapata.iconify.Iconify;
@@ -72,7 +77,7 @@ import static com.cetcme.xkterminal.MainActivity.myNumber;
  * Created by qiuhong on 12/01/2018.
  */
 
-public class MyApplication extends Application {
+public class MyApplication extends MultiDexApplication {
 
     public MainActivity mainActivity;
     public MessageDialogActivity messageDialogActivity;
@@ -82,7 +87,7 @@ public class MyApplication extends Application {
     public static LocationBean currentLocation;
     public DbManager db;
 
-    public DataHandler mHandler;
+    private DataHandler mHandler;
 
     public SerialPortFinder mSerialPortFinder = new SerialPortFinder();
     private SerialPort mSerialPort = null;
@@ -125,6 +130,12 @@ public class MyApplication extends Application {
         YimaLib.LoadLib();
     }
 
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
+    }
+
     @SuppressLint("HandlerLeak")
     @Override
     public void onCreate() {
@@ -165,13 +176,14 @@ public class MyApplication extends Application {
             }
         };
 
-        // TODO: phone test
-        try {
-            mSerialPort = getSerialPort();
-            mOutputStream = mSerialPort.getOutputStream();
-            mInputStream = mSerialPort.getInputStream();
-            ReadThread mReadThread = new ReadThread();
-            mReadThread.start();
+
+        if (!Constant.PHONE_TEST) {
+            try {
+                mSerialPort = getSerialPort();
+                mOutputStream = mSerialPort.getOutputStream();
+                mInputStream = mSerialPort.getInputStream();
+                ReadThread mReadThread = new ReadThread();
+                mReadThread.start();
 
 //            aisSerialPort = getAisSerialPort();
 //            aisOutputStream = aisSerialPort.getOutputStream();
@@ -179,12 +191,24 @@ public class MyApplication extends Application {
 //            AisReadThread aisReadThread = new AisReadThread();
 //            aisReadThread.start();
 
-        } catch (SecurityException e) {
-            DisplayError(R.string.error_security);
-        } catch (IOException e) {
-            DisplayError(R.string.error_unknown);
-        } catch (InvalidParameterException e) {
-            DisplayError(R.string.error_configuration);
+            } catch (SecurityException e) {
+                DisplayError(R.string.error_security);
+            } catch (IOException e) {
+                DisplayError(R.string.error_unknown);
+            } catch (InvalidParameterException e) {
+                DisplayError(R.string.error_configuration);
+            }
+        } else {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        new HeartBeatsClient().connect(3349, "61.164.208.174");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
         }
 
         //显示所有path
@@ -288,6 +312,7 @@ public class MyApplication extends Application {
 
     private Timer warnTimer;
 
+    public DataHandler getHandler() {return mHandler;}
 
     public static MyApplication getInstance() {
         return mContext;
@@ -365,6 +390,9 @@ public class MyApplication extends Application {
                     if (mainActivity != null) {
                         Toast.makeText(mainActivity, "手机客户端登陆成功", Toast.LENGTH_SHORT).show();
                         MainActivity.play("手机客户端登陆成功");
+                        // 服务器app版本检测
+                        String unique = ConvertUtil.rc4ToHex();
+                        sendBytes(MessageFormat.format(Constants.MUSHROOM_ADDRESS, "1", MessageFormat.MESSAGE_TYPE_APP_VERSION, 0, unique));
                     }
                     break;
                 case "device_info_set":
@@ -992,8 +1020,18 @@ public class MyApplication extends Application {
         }
     }
 
-    public synchronized void sendBytes(byte[] buffer) {
-        new SendingThread(buffer).start();
+    public void sendBytes(final byte[] buffer) {
+        if (!Constant.PHONE_TEST) {
+            new SendingThread(buffer).start();
+        } else {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    String nettySendResult = SendMsg.getSendMsg().sendMsg(buffer);
+                    Log.e(TAG, "sendBytes: " + nettySendResult);
+                }
+            }).start();
+        }
         System.out.println("发送包：" + ConvertUtil.bytesToHexString(buffer));
     }
 

@@ -166,7 +166,6 @@ public class MyApplication extends Application {
         };
 
         // TODO: phone test
-        /*
         try {
             mSerialPort = getSerialPort();
             mOutputStream = mSerialPort.getOutputStream();
@@ -187,7 +186,6 @@ public class MyApplication extends Application {
         } catch (InvalidParameterException e) {
             DisplayError(R.string.error_configuration);
         }
-        */
 
         //显示所有path
 //        String[] paths =  mSerialPortFinder.getAllDevicesPath();
@@ -994,7 +992,7 @@ public class MyApplication extends Application {
         }
     }
 
-    public void sendBytes(byte[] buffer) {
+    public synchronized void sendBytes(byte[] buffer) {
         new SendingThread(buffer).start();
         System.out.println("发送包：" + ConvertUtil.bytesToHexString(buffer));
     }

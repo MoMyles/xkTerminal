@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import com.cetcme.xkterminal.ActionBar.BackBar;
 import com.cetcme.xkterminal.ActionBar.BottomBar;
+import com.cetcme.xkterminal.ActionBar.BottomBar2;
 import com.cetcme.xkterminal.ActionBar.GPSBar;
 import com.cetcme.xkterminal.ActionBar.MessageBar;
 import com.cetcme.xkterminal.ActionBar.MessageDetailBar;
@@ -121,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     public GPSBar gpsBar;
 
-    public BottomBar bottomBar;
+    public BottomBar2 bottomBar;
     public MessageBar messageBar;
     public PageBar pageBar;
     public BackBar backBar;
@@ -240,7 +241,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 if (!MyApplication.getInstance().isLocated) {
                     Looper.prepare();
                     Toast.makeText(MyApplication.getInstance().getApplicationContext(), "自检失败", Toast.LENGTH_SHORT).show();
-                    MainActivity.play("卫星中断故障");
+//                    MainActivity.play("卫星中断故障");
                     Looper.loop();
                 }
             }
@@ -399,7 +400,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     int frameCount = Integer.parseInt(messageStrings[4]);
                     final String unique = ConvertUtil.rc4ToHex();
                     if (MessageFormat.MESSAGE_TYPE_TRADE.equals(type)) {
-                        MyApplication.getInstance().sendBytes(MessageFormat.format(MO_GU_TOU// 蘑菇头编号
+                        MyApplication.getInstance().sendBytes(MessageFormat.format(Constant.SERVER_BD_NUMBER// 蘑菇头编号
                                 , content, MessageFormat.MESSAGE_TYPE_TRADE, 0, unique));
                     }
                 } else {
@@ -1731,10 +1732,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     public static void sendCheckAndMapMessage() {
         String deviceID = SkiaDrawView.mYimaLib.GetDeviceIDForLicSvr();
         final String unique = ConvertUtil.rc4ToHex();
-        MyApplication.getInstance().sendBytes(MessageFormat.format(MO_GU_TOU, deviceID, MessageFormat.MESSAGE_TYPE_CHECK_AND_MAP, 0, unique));
+        MyApplication.getInstance().sendBytes(MessageFormat.format(Constant.SERVER_BD_NUMBER, deviceID, MessageFormat.MESSAGE_TYPE_CHECK_AND_MAP, 0, unique));
     }
-
-    public static final String MO_GU_TOU = "382570";
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {

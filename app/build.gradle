@@ -84,4 +84,6 @@ dependencies {
     implementation 'cn.yipianfengye.android:zxing-library:2.2'
     // 动态权限
     implementation 'pub.devrel:easypermissions:1.2.0'
+
+    compile 'com.github.zyyoona7:EasyPopup:1.1.2'
 }

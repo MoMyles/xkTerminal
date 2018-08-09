@@ -3,6 +3,7 @@ package com.cetcme.xkterminal;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.DataFormat.IDFormat;
@@ -251,11 +252,12 @@ public class DataHandler extends Handler {
                         case MessageFormat.MESSAGE_TYPE_APP_VERSION: {
                             String currentVersion = APKVersionCodeUtils.getVerName(MyApplication.getInstance());
                             // 版本号不同的时候发送给手机
-                            if (!content.equals(currentVersion)) {
-                                JSONObject jsonObject = new JSONObject();
-                                jsonObject.put("apiType", "app_update");
-                                SocketServer.send(jsonObject);
-                            }
+                            Log.i("DataHandler", "handleMessage: " + "MESSAGE_TYPE_APP_VERSION：" + content);
+                            JSONObject jsonObject = new JSONObject();
+                            jsonObject.put("apiType", "app_update");
+                            jsonObject.put("version", content);
+                            jsonObject.put("needUpdate", !content.equals(currentVersion));
+                            SocketServer.send(jsonObject);
                             break;
                         }
                         default:

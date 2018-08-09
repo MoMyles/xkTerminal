@@ -1,6 +1,7 @@
 package com.cetcme.xkterminal.Socket;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.MyClass.Constant;
@@ -76,7 +77,11 @@ public class SocketServer {
         try {
             if (socket != null) {
                 System.out.println("关闭老客户端: " + socket);
-                socket.close();
+                Log.i("socket", "allowLogin: socket ip: " + socket.getInetAddress());
+                Log.i("socket", "allowLogin: to con ip: " + waitToLoginSocket.getInetAddress());
+                if (socket.getInetAddress() != waitToLoginSocket.getInetAddress()) {
+                    socket.close();
+                }
             }
             socket = waitToLoginSocket;
             waitToLoginSocket = null;
@@ -136,6 +141,7 @@ public class SocketServer {
         new Thread() {
             @Override
             public void run() {
+                String ip = socket.getInetAddress().toString();
                 try {
                     final InetAddress address = socket.getInetAddress();
                     BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
@@ -156,10 +162,9 @@ public class SocketServer {
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-
                         } else {
                             socket.close();
-                            return;
+                            break;
                         }
                     }
 

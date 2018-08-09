@@ -103,7 +103,7 @@ public class MessageFormat {
 
         bytes = ByteUtil.byteMerger(bytes, toCheckBytes);
         bytes = ByteUtil.byteMerger(bytes, checkSumBytes);
-        log(bytes);
+//        log(bytes);
         return bytes;
     }
 
@@ -133,7 +133,7 @@ public class MessageFormat {
 
         bytes = ByteUtil.byteMerger(bytes, toCheckBytes);
         bytes = ByteUtil.byteMerger(bytes, checkSumBytes);
-        log(bytes);
+//        log(bytes);
         return bytes;
     }
     public static void main(String[] args) {
@@ -150,9 +150,9 @@ public class MessageFormat {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        System.out.println("messageLengthBitStr: " + messageLengthBitStr);
+//        System.out.println("messageLengthBitStr: " + messageLengthBitStr);
         String frameCount = Util.stringAddZero(Integer.toBinaryString(frameCountInt), 2);
-        System.out.println("frameCount: " + frameCount);
+//        System.out.println("frameCount: " + frameCount);
         return Util.BitToByte(frameCount + messageLengthBitStr);
     }
 

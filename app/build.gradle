@@ -91,4 +91,5 @@ dependencies {
     implementation 'com.android.support:multidex:1.0.0'
     implementation files('libs/commons-lang3-3.7.jar')
     implementation files('libs/slf4j-api-1.7.21.jar')
+    implementation 'com.github.zyyoona7:EasyPopup:1.1.2'
 }

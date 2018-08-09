@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/barColor"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <Button
+        android:id="@+id/btn4"
+        android:layout_width="120dp"
+        android:layout_height="44dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:text="导航管理"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/btn5"
+        android:layout_width="120dp"
+        android:layout_height="44dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:text="附近船舶"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/btn6"
+        android:layout_width="120dp"
+        android:layout_height="44dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:text="地图标位"
+        android:textSize="16sp" />
+</LinearLayout>

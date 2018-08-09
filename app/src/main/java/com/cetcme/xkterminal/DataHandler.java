@@ -84,27 +84,27 @@ public class DataHandler extends Handler {
                 case SERIAL_PORT_RECEIVE_NEW_MESSAGE:
                     // 如果卫星中断 则返回 不显示短信
                     if (!MyApplication.isLocated) return;
-                    // 收到新短信
-                    String[] messageStrings = MessageFormat.unFormat(bytes);
-                    String address = messageStrings[0];
-                    String content = messageStrings[1];
-                    String type = messageStrings[2];
-                    int group = Integer.parseInt(messageStrings[3]);
-                    int frameCount = Integer.parseInt(messageStrings[4]);
-                    if (!TextUtils.isEmpty(content) && content.startsWith("$06")){
+//                    Log.e("TAG_$06", new String(bytes));
+                    String arr = new String(bytes);
+                    if (!TextUtils.isEmpty(arr) && arr.startsWith("$04$06")){
                         //建林定位信息
-                        String lat = content.substring(3, 13);
-                        String latDirect = content.substring(13, 14);
-                        String lon = content.substring(14, 25);
-                        String lonDirect = content.substring(25, 26);
-                        String speed = content.substring(26, 31);
-                        String cog = content.substring(31, 36);
-                        String voltage = content.substring(36, 37);
+                        String lat = arr.substring(6, 16);
+                        String latDirect = arr.substring(16, 17);
+                        String lon = arr.substring(17, 28);
+                        String lonDirect = arr.substring(28, 29);
+                        String speed = arr.substring(29, 34);
+                        String cog = arr.substring(34, 39);
+//                        int voltage = bytes[39];
+                        String hexStr = ConvertUtil.bytesToHexString(new byte[]{bytes[39]});
+                        int voltage = Integer.parseInt(hexStr, 16);
+//                        Log.e("TAG_", voltage+"");
+                        String voltageStr = voltage * 0.02 +"";
                         LocationBean lb = null;
                         if (MyApplication.getInstance().getCurrentLocation() != null) {
                             lb = MyApplication.getInstance().getCurrentLocation();
                         } else {
                             lb = new LocationBean();
+                            MyApplication.currentLocation = lb;
                         }
                         if (lb != null) {
                             try {
@@ -124,9 +124,20 @@ public class DataHandler extends Handler {
                                 e.printStackTrace();
                             }
                         }
-                        MyApplication.voltage = voltage == null ? "-" : voltage;
+                        MyApplication.voltage = voltageStr == null ? "-" : voltageStr;
+//                        String str = "$06OK\r\n";
+//                        MyApplication.getInstance().sendBytes(str.getBytes());
+                        EventBus.getDefault().post("voltage");
+                        EventBus.getDefault().post(lb);
                         break;
                     }
+                    // 收到新短信
+                    String[] messageStrings = MessageFormat.unFormat(bytes);
+                    String address = messageStrings[0];
+                    String content = messageStrings[1];
+                    String type = messageStrings[2];
+                    int group = Integer.parseInt(messageStrings[3]);
+                    int frameCount = Integer.parseInt(messageStrings[4]);
                     switch (type) {
                         // 普通短信
                         case MessageFormat.MESSAGE_TYPE_NORMAL:
@@ -304,7 +315,7 @@ public class DataHandler extends Handler {
 
                         if (!gpsStatus) {
                             myApplication.mainActivity.showMessageDialog("自身设备", "卫星中断故障", MessageDialogActivity.TYPE_ALARM);
-                            MainActivity.play("卫星中断故障");
+//                            MainActivity.play("卫星中断故障");
                             myApplication.mainActivity.dismissSelfCheckHud();
                         } else {
                             if (timer30 != null) {

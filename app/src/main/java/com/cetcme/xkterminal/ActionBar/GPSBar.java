@@ -76,7 +76,7 @@ public class GPSBar extends RelativeLayout {
     private static final int FLASH_NO_AIS = 3;
     private static final int UPDATE_GPS_STATUS = 4;
 
-
+    TimeHandler timeHandler;
     // 用于关闭app
     private int clickTime = 0;
 
@@ -97,7 +97,10 @@ public class GPSBar extends RelativeLayout {
 
         newMsgToast = Toast.makeText(view.getContext(), "您有新的短信", Toast.LENGTH_SHORT);
 
-        new TimeHandler().start();
+        if (timeHandler == null) {
+            timeHandler = new TimeHandler();
+            timeHandler.start();
+        }
     }
 
     private void bindView(View view) {

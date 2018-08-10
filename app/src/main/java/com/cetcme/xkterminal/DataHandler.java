@@ -260,6 +260,9 @@ public class DataHandler extends Handler {
                             SocketServer.send(jsonObject);
                             break;
                         }
+                        case MessageFormat.MESSAGE_TYPE_CALLBACK:
+                            //TODO 消息回复处理
+                            break;
                         default:
                             // 判断分组 group -1为非分组短信，其他为组号，
                             if (group == -1 || GroupProxy.hasGroup(db, group)) {

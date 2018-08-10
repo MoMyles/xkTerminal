@@ -29,6 +29,7 @@ public class MessageFormat {
     public static final String MESSAGE_TYPE_GROUP               = "11"; // 组播添加和删除 x,y  x=0 quit x=1 add
     public static final String MESSAGE_TYPE_CHECK_AND_MAP       = "12"; // 自检和海图注册
     public static final String MESSAGE_TYPE_TRADE               = "13"; // 渔货交易数据
+    public static final String MESSAGE_TYPE_CALLBACK               = "14"; // 回复成功状态位
 
     public static final String MESSAGE_TYPE_APP_VERSION         = "15"; // 获取服务器app版本号
 

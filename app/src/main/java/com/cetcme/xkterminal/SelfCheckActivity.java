@@ -30,6 +30,7 @@ import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import yimamapapi.skia.YimaLib;
 
 public class SelfCheckActivity extends Activity {
 
@@ -95,7 +96,7 @@ public class SelfCheckActivity extends Activity {
     }
 
     private void checkYima() {
-        boolean licenseOk = SkiaDrawView.mYimaLib.GetIfHadSetRightLicenceKey();
+        boolean licenseOk = new YimaLib().GetIfHadSetRightLicenceKey();
         setStepStatus(3, licenseOk);
         checkResultArr[2] = licenseOk ? 1 : 2;
     }
@@ -266,6 +267,7 @@ public class SelfCheckActivity extends Activity {
             }
         }
 
-        MainActivity.sendCheckAndMapMessage();
+        EventBus.getDefault().post("selfcheck");
+//        MainActivity.sendCheckAndMapMessage();
     }
 }

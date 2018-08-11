@@ -195,7 +195,6 @@ public class DataHandler extends Handler {
                         // 夜间点名
                         case MessageFormat.MESSAGE_TYPE_CALL_THE_ROLL:
                             SoundPlay.playMessageSound(myApplication.mainActivity);
-                            // TODO:
                             myApplication.mainActivity.showMessageDialog(address, content, MessageDialogActivity.TYPE_CALL_ROLL);
                             break;
                         // 告警信息，语音播报
@@ -208,13 +207,38 @@ public class DataHandler extends Handler {
                             String[] value = content.split(",");
                             if (value[0].equals("1")) {
                                 // 添加
-                                myApplication.mainActivity.addGroup("group", value[1]);
-                                Toast.makeText(myApplication.mainActivity, "您已加入分组：" + value[1], Toast.LENGTH_SHORT).show();
+                                if (!myApplication.mainActivity.isGroupExist(value[1])){
+                                    myApplication.mainActivity.addGroup(value[2], value[1]);
+
+                                    Toast.makeText(myApplication.mainActivity, "您已加入分组：" + value[1], Toast.LENGTH_SHORT).show();
+                                }
                             } else {
                                 // 删除
                                 myApplication.mainActivity.deleteGroup(value[1]);
                                 Toast.makeText(myApplication.mainActivity, "您已退出分组：" + value[1], Toast.LENGTH_SHORT).show();
                             }
+
+                            String msgSon = value[0]+ ","+value[1]+","+address;
+                            byte[] msgSonB = msgSon.getBytes();
+                            int byteLeng = msgSonB.length + 2;
+                            String repairZero ="000000000000";
+                            String beidouNo = PreferencesUtils.getString(myApplication.getApplicationContext(), "server_address",Constant.SERVER_BD_NUMBER);
+                            beidouNo = repairZero.substring(0, 12 - beidouNo.length()) + beidouNo;
+                            String unique = ConvertUtil.rc4ToHex();
+                            String header = "$04";
+                            byte[] bufferHead = ByteUtil.byteMerger(ConvertUtil.str2Bcd(beidouNo), ConvertUtil.str2Bcd(unique));
+                            byte[] bufferPage = {(byte) byteLeng, 0x31, 0x31};
+                            byte[] bufferInfo = ByteUtil.byteMerger(bufferPage, msgSonB);
+                            byte[] bufferMsg = ByteUtil.byteMerger(bufferHead, bufferInfo);
+                            byte[] buffer1 = ByteUtil.byteMerger(header.getBytes(), bufferMsg);
+                            int checkSum = Util.computeCheckSum(buffer1, 3, buffer1.length);
+                            byte[] checkSum1 = new byte[] {(byte) checkSum};
+                            byte[] checkSumA = ByteUtil.byteMerger("*".getBytes(), checkSum1);
+                            byte[] checkSumB = ByteUtil.byteMerger(checkSumA, Constants.MESSAGE_END_SYMBOL.getBytes());
+                            byte[] buffer = ByteUtil.byteMerger(buffer1, checkSumB);
+                            MyApplication.getInstance().sendBytes(buffer);
+//                            final String unique = ConvertUtil.rc4ToHex();
+//                            MyApplication.getInstance().sendBytes(MessageFormat.format(PreferencesUtils.getString(myApplication.getApplicationContext(), "server_address", Constant.SERVER_BD_NUMBER), msgSon, MessageFormat.MESSAGE_TYPE_GROUP, 0, unique));
                             break;
                         }
                         // 自检OK和海图序列号
@@ -279,7 +303,7 @@ public class DataHandler extends Handler {
                     if (!MyApplication.isLocated) return;
 
                     // 短信发送成功
-                    Toast.makeText(myApplication.mainActivity, "短信发送成功", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(myApplication.mainActivity, "短信发送成功", Toast.LENGTH_SHORT).show();
 
                     String lastSendTimeSave = PreferencesUtils.getString(myApplication.mainActivity, "lastSendTimeSave");
                     PreferencesUtils.putString(myApplication.mainActivity, "lastSendTime", lastSendTimeSave);

@@ -10,7 +10,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,8 +21,10 @@ import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
 import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.GPSFormatUtils;
+import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
+import com.cetcme.xkterminal.Sqlite.Bean.PinBean;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -29,6 +34,7 @@ import org.xutils.ex.DbException;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -79,6 +85,10 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
 
     private double endDistToRead = -1;
 
+    private RelativeLayout  rl1;
+    private Switch mSwitchMap, mSwitchYQ, mSwitchArea, mSwitchPin;
+    private Button btn1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,7 +129,70 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                 fMainView.mYimaLib.SetCurrentScale(8878176.0f / 32);
                 fMainView.postInvalidate();
             }
-        }, 10);
+        }, 200);
+
+        btn1 = findViewById(R.id.btn1);
+        rl1 = findViewById(R.id.rl1);
+        btn1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (rl1.getVisibility() == View.GONE) {
+                    rl1.setVisibility(View.VISIBLE);
+                } else {
+                    rl1.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        mSwitchYQ = findViewById(R.id.switch_yuqu);
+        mSwitchMap = findViewById(R.id.switch_map);
+        mSwitchMap.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b) {
+                    fMainView.changeMap(0);
+                } else {
+                    fMainView.changeMap(3);
+                }
+            }
+        });
+//        mSwitchArea = findViewById(R.id.switch_warn_area);
+//        mSwitchArea.setChecked(PreferencesUtils.getBoolean(getApplicationContext(), "mainFrgWarnArea", false));
+        mSwitchPin = findViewById(R.id.switch_pin);
+//        mSwitchPin.setChecked(PreferencesUtils.getBoolean(getActivity(), "mainFrgPin", false));
+        mSwitchPin.setChecked(false);
+
+//        warnArea = mSwitchArea.isChecked();
+//        showWarnAreas();
+        mSwitchYQ.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                fMainView.changeFishState(b);
+                PreferencesUtils.putBoolean(getApplicationContext(), "mainFrgYuqu", b);
+            }
+        });
+        mSwitchYQ.setChecked(PreferencesUtils.getBoolean(getApplicationContext(), "mainFrgYuqu", false));
+//        mSwitchArea.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+//                PreferencesUtils.putBoolean(getApplicationContext(), "mainFrgWarnArea", b);
+//                warnArea = b;
+//                if (MyApplication.currentLocation != null) {
+//                    doAreaWarning(MyApplication.currentLocation);
+//                }
+//            }
+//        });
+
+        mSwitchPin.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b) {
+                    showBiaoweis();
+                } else {
+                    fMainView.clearBiaoWeiTrack();
+                }
+            }
+        });
 
         btn_navigation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -183,6 +256,16 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                     lastReportTime = com.cetcme.xkterminal.MyClass.Constant.SYSTEM_DATE.getTime();
 
                     btn_navigation.setText("结束导航");
+                    double time = endDistToRead / myLocation.getSpeed();// 小时
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.add(Calendar.HOUR_OF_DAY, (int) time);
+                    tv_end_time.setText(DateUtil.parseDateToString(calendar.getTime(), DateUtil.DatePattern.HHMMSS));
+                    M_POINT wpCoor = fMainView.mYimaLib.getWayPointCoor(endWp);
+                    double fangwei = fMainView.mYimaLib.GetBearingBetwTwoPoint(myLocation.getLongitude(), myLocation.getLatitude(),
+                            wpCoor.x, wpCoor.y);//方位
+
+                    tv_fangwei.setText(String.format("%.2f°", fangwei));
+                    tv_dis.setText(String.format("%.2f", endDistToRead) + " nm");
 
                 }
                 fMainView.mYimaLib.CenterMap(myLocation.getLongitude(), myLocation.getLatitude());
@@ -206,6 +289,16 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                 fMainView.postInvalidate();
             }
         }, 200);
+    }
+
+
+    private void showBiaoweis() {
+        try {
+            List<PinBean> list = db.selector(PinBean.class).findAll();
+            if (list != null && !list.isEmpty()) fMainView.showBiaoWei(list);
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
     }
 
     float addOne = 0.003f;
@@ -542,7 +635,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                     wpCoor.x, wpCoor.y);//方位
           
             tv_fangwei.setText(String.format("%.2f°", fangwei));
-            tv_dis.setText(String.format("%.2f", restDis));
+            tv_dis.setText(String.format("%.2f", restDis) + " nm");
 
         }
     }

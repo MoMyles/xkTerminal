@@ -58,7 +58,8 @@
             android:background="#FFFFFF"
             android:gravity="center"
             android:orientation="horizontal"
-            android:padding="10dp" >
+            android:padding="10dp"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/tv_tab3"

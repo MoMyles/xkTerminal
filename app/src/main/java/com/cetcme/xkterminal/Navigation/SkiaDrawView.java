@@ -44,7 +44,7 @@ public class SkiaDrawView extends View {
     private static final String LINE_BLUE2 = "111.288387523593,17.3697313541462;110.917015168613,15.5573409075002;112.788388559325,15.8697329241532;112.84418031168,16;113,16.7772151091301;112.610929327575,17.0872682465386;111.288387523593,17.3697313541462";
 
 
-    public static YimaLib mYimaLib;
+    public YimaLib mYimaLib;
     public Bitmap fSkiaBitmap;
     private int mLastX, mLastY;
     private int mCurrX, mCurrY;
@@ -100,7 +100,7 @@ public class SkiaDrawView extends View {
 
     @Override
     public void onSizeChanged(int w, int h, int oldw, int oldh) {
-        fSkiaBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        fSkiaBitmap = Bitmap.createBitmap(w,h, Bitmap.Config.ARGB_8888);
         String strTtfFilePath = Constant.YIMA_WORK_PATH + "/DroidSansFallback.ttf";
 //        mYimaLib.SetDisplayCategory(3);
         mYimaLib.SetDisplayCategory(mode);

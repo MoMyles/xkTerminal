@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     android:orientation="vertical"
     tools:context=".Fragment.setting.SeriveStatusFragment">
 
@@ -23,44 +25,52 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    style="@style/setting_tv_title"
-                    android:layout_marginLeft="@dimen/setting_padding"
-                    android:layout_marginStart="@dimen/setting_padding"
-                    android:text="距离报警：" />
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginStart="20dp"
+                    android:gravity="center"
+                    android:text="距离报警："
+                    android:textColor="#000"
+                    android:textSize="18sp" />
 
                 <Switch
                     android:id="@+id/switch_warn"
-                    style="@style/setting_tv_title"
+                    android:layout_width="150dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
                     android:textOff="关"
-                    android:textOn="开" />
+                    android:textOn="开"
+                    android:textColor="#000"
+                    android:textSize="18sp" />
 
                 <android.support.v4.widget.Space
                     android:layout_width="50dp"
                     android:layout_height="match_parent" />
 
                 <TextView
-                    style="@style/setting_tv_title"
-                    android:text="报警距离(米)：" />
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="报警距离(米)："
+                    android:textColor="#000"
+                    android:textSize="18sp" />
 
                 <EditText
                     android:id="@+id/et_warn_distance"
-                    style="@style/setting_tv_title"
-                    android:layout_marginEnd="@dimen/setting_padding"
-                    android:layout_marginRight="@dimen/setting_padding"
+                    android:layout_width="150dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginRight="20dp"
+                    android:cursorVisible="true"
                     android:gravity="center"
                     android:inputType="number"
-                    android:text="200" />
+                    android:text="200"
+                    android:textColor="#000"
+                    android:textSize="18sp" />
 
             </LinearLayout>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="1px"
-                android:layout_alignParentBottom="true"
-                android:background="#b7b7b7" />
-
         </LinearLayout>
-
     </ScrollView>
 
 </LinearLayout>

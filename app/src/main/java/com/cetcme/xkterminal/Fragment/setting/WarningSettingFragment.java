@@ -4,6 +4,7 @@ package com.cetcme.xkterminal.Fragment.setting;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,6 +62,7 @@ public class WarningSettingFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (TextUtils.isEmpty(charSequence.toString())) return;
                 PreferencesUtils.putInt(getActivity(), "warn_distance", Integer.valueOf(charSequence.toString()));
             }
 

@@ -70,6 +70,7 @@ import java.util.regex.Pattern;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import yimamapapi.skia.YimaLib;
 
 import static android.content.Context.MODE_PRIVATE;
 import static com.cetcme.xkterminal.MyClass.CommonUtil.isNumber;
@@ -476,7 +477,8 @@ public class SystemSettingFragment extends Fragment {
                             }
                         }
 
-                        MainActivity.sendCheckAndMapMessage();
+                        EventBus.getDefault().post("selfcheck");
+//                        MainActivity.sendCheckAndMapMessage();
                         Toast.makeText(getActivity(), "已发送注册短信，请等待", Toast.LENGTH_SHORT).show();
 
                         // TODO: test
@@ -1002,11 +1004,11 @@ public class SystemSettingFragment extends Fragment {
     }
 
     private String getYimaId() {
-        return SkiaDrawView.mYimaLib.GetDeviceIDForLicSvr();
+        return new YimaLib().GetDeviceIDForLicSvr();
     }
 
     private int getUserId() {
-        return SkiaDrawView.mYimaLib.GetUsrID();
+        return new YimaLib().GetUsrID();
     }
 
     private void qecodeDialogShow(String serial) {

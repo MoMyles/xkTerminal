@@ -359,7 +359,9 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
     }
 
     private void showBiaoweis() {
+        if (!mSwitchPin.isChecked()) return;
         try {
+            skiaDrawView.clearBiaoWeiTrack();
             List<PinBean> list = db.selector(PinBean.class).findAll();
             if (list != null && !list.isEmpty()) skiaDrawView.showBiaoWei(list);
         } catch (DbException e) {
@@ -725,6 +727,8 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
             Toast.makeText(getActivity(), "请选择标位点", Toast.LENGTH_SHORT).show();
         } else if ("pin_co".equals(action)) {
             openPinDialog(null);
+        } else if("update_biaowei_show".equals(action)){
+            showBiaoweis();
         }
     }
 
@@ -804,6 +808,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
         if (m_point != null) {
             et1.setText(m_point.x / 1e7 + "");
             et2.setText(m_point.y / 1e7 + "");
+            et3.requestFocus();
         }
 
         final ImageView tv1 = view.findViewById(R.id.iv1);

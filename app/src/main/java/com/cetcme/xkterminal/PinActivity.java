@@ -18,6 +18,7 @@ import com.cetcme.xkterminal.MyClass.GPSFormatUtils;
 import com.cetcme.xkterminal.Sqlite.Bean.PinBean;
 import com.cetcme.xkterminal.Sqlite.Proxy.PinProxy;
 
+import org.greenrobot.eventbus.EventBus;
 import org.xutils.DbManager;
 import org.xutils.ex.DbException;
 
@@ -127,7 +128,7 @@ public class PinActivity extends Activity {
                                 }
                                 dataList.remove(i);
                                 testAdapter.notifyDataSetChanged();
-
+                                EventBus.getDefault().post("update_biaowei_show");
                                 Toast.makeText(MyApplication.getInstance().mainActivity, "删除成功", Toast.LENGTH_SHORT).show();
                             }
                         });

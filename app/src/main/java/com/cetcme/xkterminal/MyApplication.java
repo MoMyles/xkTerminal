@@ -62,8 +62,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import android_serialport_api.SerialPort;
 import android_serialport_api.SerialPortFinder;
@@ -184,7 +186,7 @@ public class MyApplication extends MultiDexApplication {
                 mInputStream = mSerialPort.getInputStream();
                 ReadThread mReadThread = new ReadThread();
                 mReadThread.start();
-
+                new SendingThread().start();
 //            aisSerialPort = getAisSerialPort();
 //            aisOutputStream = aisSerialPort.getOutputStream();
 //            aisInputStream = aisSerialPort.getInputStream();
@@ -275,21 +277,25 @@ public class MyApplication extends MultiDexApplication {
      * @return
      */
     private void isDangerOfDistance() {
-        if (SkiaDrawView.mYimaLib == null) return;
+        YimaLib mYimaLib = null;
+        if (mainActivity!=null && mainActivity.mainFragment != null && mainActivity.mainFragment.skiaDrawView != null){
+            mYimaLib = mainActivity.mainFragment.skiaDrawView.mYimaLib;
+        }
+        if (mYimaLib == null) return;
         if (PreferencesUtils.getBoolean(this, "warn_switch", false)) {
             LocationBean myself = MyApplication.getInstance().getCurrentLocation();
             if (myself == null) return;
             int distance = PreferencesUtils.getInt(this, "warn_distance", 200);
             double haili = distance * 1.0 / 1852;// 海里
-            M_POINT start = SkiaDrawView.mYimaLib.getDesPointOfCrsAndDist(myself.getLongitude()
+            M_POINT start = mYimaLib.getDesPointOfCrsAndDist(myself.getLongitude()
                     , myself.getLatitude(), haili, myself.getHeading());// 本船报警距离目标点
             try {
                 List<OtherShipBean> list = db.selector(OtherShipBean.class).findAll();
                 if (list != null && !list.isEmpty()) {
                     for (OtherShipBean osb : list) {
-                        int vessel_id = SkiaDrawView.mYimaLib.GetOtherVesselPosOfID(osb.getShip_id());
-                        OtherVesselCurrentInfo ovci = SkiaDrawView.mYimaLib.getOtherVesselCurrentInfo(vessel_id);
-                        M_POINT end = SkiaDrawView.mYimaLib.getDesPointOfCrsAndDist(ovci.currentPoint.x
+                        int vessel_id = mYimaLib.GetOtherVesselPosOfID(osb.getShip_id());
+                        OtherVesselCurrentInfo ovci = mYimaLib.getOtherVesselCurrentInfo(vessel_id);
+                        M_POINT end = mYimaLib.getDesPointOfCrsAndDist(ovci.currentPoint.x
                                 , ovci.currentPoint.y, haili, ovci.fCourseOverGround);
                         int x_ = myself.getLongitude() - ovci.currentPoint.x;
                         int y_ = myself.getLatitude() - ovci.currentPoint.y;
@@ -297,7 +303,7 @@ public class MyApplication extends MultiDexApplication {
                         int x_2 = start.x - end.x;
                         int y_2 = start.y - end.y;
 
-                        double curHaili = SkiaDrawView.mYimaLib.GetDistBetwTwoPoint(start.x, start.y, end.x, end.y);
+                        double curHaili = mYimaLib.GetDistBetwTwoPoint(start.x, start.y, end.x, end.y);
                         if (x_2 < x_ && y_2 < y_ && curHaili <= haili) {
                             mainActivity.showMessageDialog("自身设备", "您即将撞船", 1);
                             SoundPlay.startAlertSound(mainActivity);
@@ -1021,9 +1027,38 @@ public class MyApplication extends MultiDexApplication {
         }
     }
 
+    private static final Queue<com.cetcme.xkterminal.Sqlite.Bean.Message> MESSAGE_QUEUE = new LinkedBlockingQueue<>();
+
     public void sendBytes(final byte[] buffer) {
         if (!Constant.PHONE_TEST) {
-            new SendingThread(buffer).start();
+            String str = new String(buffer);
+            if (str!=null && str.startsWith("$04")) {
+                synchronized (MESSAGE_QUEUE) {
+                    try {
+                        com.cetcme.xkterminal.Sqlite.Bean.Message msg = new com.cetcme.xkterminal.Sqlite.Bean.Message();
+                        msg.setMessage(buffer);
+                        msg.setSend(false);
+                        if(db.saveBindingId(msg)){
+                            MESSAGE_QUEUE.offer(msg);
+                        }
+                    } catch (DbException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } else {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            if (mOutputStream != null) {
+                                mOutputStream.write(buffer);
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+            }
         } else {
             new Thread(new Runnable() {
                 @Override
@@ -1038,19 +1073,38 @@ public class MyApplication extends MultiDexApplication {
 
     private class SendingThread extends Thread {
 
-        private byte[] buffer;
-
-        SendingThread(byte[] buffer) {
-            this.buffer = buffer;
+        SendingThread() {
+            try {
+                List<com.cetcme.xkterminal.Sqlite.Bean.Message> msgs = db.selector(com.cetcme.xkterminal.Sqlite.Bean.Message.class)
+                        .findAll();
+                if (msgs != null && !msgs.isEmpty()){
+                    for (com.cetcme.xkterminal.Sqlite.Bean.Message msg : msgs){
+                        MESSAGE_QUEUE.offer(msg);
+                    }
+                }
+            } catch (DbException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
         public void run() {
             try {
-                if (mOutputStream != null) {
-                    mOutputStream.write(buffer);
+                while(true) {
+                    if (MESSAGE_QUEUE.isEmpty()) continue;
+                    synchronized (MESSAGE_QUEUE) {
+                        com.cetcme.xkterminal.Sqlite.Bean.Message msg = MESSAGE_QUEUE.poll();
+                        if (msg != null && mOutputStream != null) {
+                            mOutputStream.write(msg.getMessage());
+                            db.delete(msg);
+                            if (MESSAGE_QUEUE.size() > 1) {
+                                Thread.sleep(3000);
+                            }
+                        }
+                    }
+                    Thread.sleep(60000);
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

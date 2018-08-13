@@ -60,6 +60,7 @@ import com.cetcme.xkterminal.Sqlite.Proxy.FriendProxy;
 import com.cetcme.xkterminal.Sqlite.Proxy.GroupProxy;
 import com.cetcme.xkterminal.Sqlite.Proxy.MessageProxy;
 import com.cetcme.xkterminal.Sqlite.Proxy.SignProxy;
+import com.cetcme.xkterminal.netty.utils.Constants;
 import com.iflytek.cloud.ErrorCode;
 import com.iflytek.cloud.InitListener;
 import com.iflytek.cloud.SpeechConstant;
@@ -113,6 +114,7 @@ import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 import pub.devrel.easypermissions.PermissionRequest;
 import yimamapapi.skia.AisInfo;
+import yimamapapi.skia.YimaLib;
 
 public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks{
 
@@ -924,6 +926,10 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         GroupProxy.insert(db, name, Integer.parseInt(number));
     }
 
+    public boolean isGroupExist(String number){
+        return GroupProxy.isGropExist(db, number);
+    }
+
     public void deleteGroup(String number) {
         GroupProxy.deleteByNumber(db, number);
     }
@@ -1623,16 +1629,16 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     public boolean isSelfCheckLoading = false;
 
     public void showSelfCheckHud() {
+        isSelfCheckLoading = true;
         kProgressHUD.setLabel("自检中");
         kProgressHUD.show();
-        isSelfCheckLoading = true;
     }
 
     public void dismissSelfCheckHud() {
+        isSelfCheckLoading = false;
         if (kProgressHUD != null && kProgressHUD.isShowing()) {
             kProgressHUD.dismiss();
         }
-        isSelfCheckLoading = false;
     }
 
     public void showAlertFailDialog() {
@@ -1738,10 +1744,12 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 .show();
     }
 
-    public static void sendCheckAndMapMessage() {
-        String deviceID = SkiaDrawView.mYimaLib.GetDeviceIDForLicSvr();
-        final String unique = ConvertUtil.rc4ToHex();
-        MyApplication.getInstance().sendBytes(MessageFormat.format(PreferencesUtils.getString(mContext, "server_address", Constant.SERVER_BD_NUMBER), deviceID, MessageFormat.MESSAGE_TYPE_CHECK_AND_MAP, 0, unique));
+    public void sendCheckAndMapMessage() {
+        if (mainFragment != null && mainFragment.skiaDrawView != null) {
+            String deviceID = mainFragment.skiaDrawView.mYimaLib.GetDeviceIDForLicSvr();
+            final String unique = ConvertUtil.rc4ToHex();
+            MyApplication.getInstance().sendBytes(MessageFormat.format(PreferencesUtils.getString(mContext, "server_address", Constant.SERVER_BD_NUMBER), deviceID, MessageFormat.MESSAGE_TYPE_CHECK_AND_MAP, 0, unique));
+        }
     }
 
     @Override
@@ -1772,5 +1780,10 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         toast.setText(location.getLatitude() + ", " + location.getLongitude());
         toast.show();
     }
-
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onSelfCheck(String type) {
+        if ("selfcheck".equals(type)) {
+            sendCheckAndMapMessage();
+        }
+    }
 }

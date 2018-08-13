@@ -159,14 +159,14 @@ public class SettingTabFragment extends Fragment {
     private void initView(View view) {
         tv_tab1.setOnClickListener(new TabOnClickListener(0));
         tv_tab2.setOnClickListener(new TabOnClickListener(1));
-        tv_tab3.setOnClickListener(new TabOnClickListener(2));
-        tv_tab4.setOnClickListener(new TabOnClickListener(3));
-        tv_tab5.setOnClickListener(new TabOnClickListener(4));
-        tv_tab6.setOnClickListener(new TabOnClickListener(5));
+//        tv_tab3.setOnClickListener(new TabOnClickListener(2));
+        tv_tab4.setOnClickListener(new TabOnClickListener(2));
+        tv_tab5.setOnClickListener(new TabOnClickListener(3));
+        tv_tab6.setOnClickListener(new TabOnClickListener(4));
 
         fragments.add(new DBSettingFragment());
         fragments.add(new SatelliteFragment());
-        fragments.add(new WarningSettingFragment());
+//        fragments.add(new WarningSettingFragment());
 //        fragments.add(new SeriveStatusFragment());
         fragments.add(USBFragment.newInstance());
 //        fragments.add(new WeatherInfoFragment());
@@ -175,10 +175,10 @@ public class SettingTabFragment extends Fragment {
 
         ly_tab1.setOnClickListener(new TabOnClickListener(0));
         ly_tab2.setOnClickListener(new TabOnClickListener(1));
-        ly_tab3.setOnClickListener(new TabOnClickListener(2));
-        ly_tab4.setOnClickListener(new TabOnClickListener(3));
-        ly_tab5.setOnClickListener(new TabOnClickListener(4));
-        ly_tab6.setOnClickListener(new TabOnClickListener(5));
+//        ly_tab3.setOnClickListener(new TabOnClickListener(2));
+        ly_tab4.setOnClickListener(new TabOnClickListener(2));
+        ly_tab5.setOnClickListener(new TabOnClickListener(3));
+        ly_tab6.setOnClickListener(new TabOnClickListener(4));
     }
 
     /**
@@ -186,7 +186,7 @@ public class SettingTabFragment extends Fragment {
      */
     private void resetTextView() {
         tv_tab1.setTextColor(res.getColor(R.color.text_clo));
-        tv_tab2.setTextColor(res.getColor(R.color.text_clo));
+//        tv_tab2.setTextColor(res.getColor(R.color.text_clo));
         tv_tab3.setTextColor(res.getColor(R.color.text_clo));
         tv_tab4.setTextColor(res.getColor(R.color.text_clo));
         tv_tab5.setTextColor(res.getColor(R.color.text_clo));
@@ -238,16 +238,16 @@ public class SettingTabFragment extends Fragment {
                 case 1:
                     tv_tab2.setTextColor(res.getColor(R.color.QHTitleColor));
                     break;
+//                case 2:
+//                    tv_tab3.setTextColor(res.getColor(R.color.QHTitleColor));
+//                    break;
                 case 2:
-                    tv_tab3.setTextColor(res.getColor(R.color.QHTitleColor));
-                    break;
-                case 3:
                     tv_tab4.setTextColor(res.getColor(R.color.QHTitleColor));
                     break;
-                case 4:
+                case 3:
                     tv_tab5.setTextColor(res.getColor(R.color.QHTitleColor));
                     break;
-                case 5:
+                case 4:
                     tv_tab6.setTextColor(res.getColor(R.color.QHTitleColor));
                     break;
             }

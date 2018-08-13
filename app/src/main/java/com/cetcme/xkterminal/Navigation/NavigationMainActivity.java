@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
+import com.cetcme.xkterminal.MyClass.SoundPlay;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 import com.qiuhong.qhlibrary.QHTitleView.QHTitleView;
@@ -163,6 +164,16 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
         System.out.println("缩小");
         fMainView.mYimaLib.SetCurrentScale(fMainView.mYimaLib.GetCurrentScale() * 2);
         fMainView.postInvalidate();//刷新fMainView
+    }
+
+    public void changeMapCenter(View view) {
+        if (MyApplication.currentLocation != null) {
+            fMainView.mYimaLib.SetOwnShipShowSymbol(false, 4, true, 16, 5000000);
+            fMainView.mYimaLib.CenterMap(MyApplication.currentLocation.getLongitude(), MyApplication.currentLocation.getLatitude());
+            fMainView.postInvalidate();
+        } else {
+            SoundPlay.startAlertSound(NavigationMainActivity.this);
+        }
     }
 
     /**

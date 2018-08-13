@@ -19,9 +19,11 @@ import com.cetcme.xkterminal.MyClass.CommonUtil;
 import com.cetcme.xkterminal.MyClass.DateUtil;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.Sqlite.Bean.AlertBean;
+import com.cetcme.xkterminal.Sqlite.Bean.GroupBean;
 import com.cetcme.xkterminal.Sqlite.Bean.InoutBean;
 import com.cetcme.xkterminal.Sqlite.Bean.SignBean;
 import com.cetcme.xkterminal.Sqlite.Proxy.AlertProxy;
+import com.cetcme.xkterminal.Sqlite.Proxy.GroupProxy;
 import com.cetcme.xkterminal.Sqlite.Proxy.InoutProxy;
 import com.cetcme.xkterminal.Sqlite.Proxy.SignProxy;
 
@@ -51,13 +53,16 @@ public class LogFragment extends Fragment {
     private ListView listView;
     private ListView listView2;
     private ListView listView3;
+    private ListView listView4;
     private int logPerPage;
     private SimpleAdapter simpleAdapter;
     private SimpleAdapter simpleAdapter2;
     private SimpleAdapter simpleAdapter3;
+    private SimpleAdapter simpleAdapter4;
     private List<Map<String, Object>> dataList = new ArrayList<>();
     private List<Map<String, Object>> dataList2 = new ArrayList<>();
     private List<Map<String, Object>> dataList3 = new ArrayList<>();
+    private List<Map<String, Object>> dataList4 = new ArrayList<>();
 
     private int pageIndex = 0;
     private int totalPage = 1;
@@ -86,6 +91,7 @@ public class LogFragment extends Fragment {
         listView2 = view.findViewById(R.id.list_view2);
         //设置listView
         listView3 = view.findViewById(R.id.list_view3);
+        listView4 = view.findViewById(R.id.list_view4);
         if (tg.equals("sign")) {
             titleBar.setTitle("打卡记录");
             view.findViewById(R.id.title_sign_layout).setVisibility(View.VISIBLE);
@@ -101,12 +107,31 @@ public class LogFragment extends Fragment {
             view.findViewById(R.id.title_inout_layout).setVisibility(View.VISIBLE);
             listView3.setVisibility(View.VISIBLE);
             createInout();
+        } else if (tg.equals("group")) {
+            titleBar.setTitle("组播列表");
+            view.findViewById(R.id.title_group_layout).setVisibility(View.VISIBLE);
+            listView4.setVisibility(View.VISIBLE);
+            createGroup();
         }
         return view;
     }
 
+    private void createGroup() {
+        if (simpleAdapter4 != null) {
+            getGroupData();
+            return;
+        }
+        simpleAdapter4 = new SimpleAdapter(getActivity(), getGroupData(), R.layout.cell_group_list,
+                new String[]{"number", "group", "name"},
+                new int[]{R.id.number_in_inout_cell, R.id.type_in_inout_cell, R.id.count_in_inout_cell});
+        listView4.setAdapter(simpleAdapter4);
+    }
+
     private void createInout() {
-        if (simpleAdapter3 != null) {getInoutData();return;}
+        if (simpleAdapter3 != null) {
+            getInoutData();
+            return;
+        }
         simpleAdapter3 = new SimpleAdapter(getActivity(), getInoutData(), R.layout.cell_inout_list,
                 new String[]{"number", "type", "count", "lon", "lat", "time"},
                 new int[]{R.id.number_in_inout_cell, R.id.type_in_inout_cell, R.id.count_in_inout_cell, R.id.lon_in_inout_cell, R.id.lat_in_inout_cell, R.id.time_in_inout_cell});
@@ -114,7 +139,10 @@ public class LogFragment extends Fragment {
     }
 
     private void createBaojing() {
-        if (simpleAdapter2 != null) {getAlertData();return;}
+        if (simpleAdapter2 != null) {
+            getAlertData();
+            return;
+        }
         simpleAdapter2 = new SimpleAdapter(getActivity(), getAlertData(), R.layout.cell_alert_list,
                 new String[]{"number", "type", "time"},
                 new int[]{R.id.number_in_alert_cell, R.id.type_in_alert_cell, R.id.time_in_alert_cell});
@@ -122,7 +150,10 @@ public class LogFragment extends Fragment {
     }
 
     private void createDaka() {
-        if (simpleAdapter!=null) {getSignData();return;}
+        if (simpleAdapter != null) {
+            getSignData();
+            return;
+        }
         simpleAdapter = new SimpleAdapter(getActivity(), getSignData(), R.layout.cell_sign_list,
                 new String[]{"number", "idCard", "name", "time"},
                 new int[]{R.id.number_in_sign_cell, R.id.idCard_in_sign_cell, R.id.name_in_sign_cell, R.id.time_in_sign_cell});
@@ -144,11 +175,13 @@ public class LogFragment extends Fragment {
                 view.findViewById(R.id.title_sign_layout).setVisibility(View.VISIBLE);
                 view.findViewById(R.id.title_alert_layout).setVisibility(View.GONE);
                 view.findViewById(R.id.title_inout_layout).setVisibility(View.GONE);
+                view.findViewById(R.id.title_group_layout).setVisibility(View.GONE);
                 createDaka();
                 simpleAdapter.notifyDataSetChanged();
                 listView.setVisibility(View.VISIBLE);
                 listView2.setVisibility(View.GONE);
                 listView3.setVisibility(View.GONE);
+                listView4.setVisibility(View.GONE);
             }
             if (tg.equals("alert")) {
                 titleBar.setTitle("报警记录");
@@ -156,10 +189,12 @@ public class LogFragment extends Fragment {
                 view.findViewById(R.id.title_alert_layout).setVisibility(View.VISIBLE);
                 view.findViewById(R.id.title_sign_layout).setVisibility(View.GONE);
                 view.findViewById(R.id.title_inout_layout).setVisibility(View.GONE);
+                view.findViewById(R.id.title_group_layout).setVisibility(View.GONE);
                 simpleAdapter2.notifyDataSetChanged();
                 listView.setVisibility(View.GONE);
                 listView2.setVisibility(View.VISIBLE);
                 listView3.setVisibility(View.GONE);
+                listView4.setVisibility(View.GONE);
             }
             if (tg.equals("inout")) {
                 titleBar.setTitle("进出港申报");
@@ -167,10 +202,25 @@ public class LogFragment extends Fragment {
                 view.findViewById(R.id.title_inout_layout).setVisibility(View.VISIBLE);
                 view.findViewById(R.id.title_sign_layout).setVisibility(View.GONE);
                 view.findViewById(R.id.title_alert_layout).setVisibility(View.GONE);
+                view.findViewById(R.id.title_group_layout).setVisibility(View.GONE);
                 simpleAdapter3.notifyDataSetChanged();
                 listView.setVisibility(View.GONE);
                 listView2.setVisibility(View.GONE);
                 listView3.setVisibility(View.VISIBLE);
+                listView4.setVisibility(View.GONE);
+            }
+            if (tg.equals("group")) {
+                titleBar.setTitle("组播列表");
+                createGroup();
+                view.findViewById(R.id.title_inout_layout).setVisibility(View.GONE);
+                view.findViewById(R.id.title_sign_layout).setVisibility(View.GONE);
+                view.findViewById(R.id.title_alert_layout).setVisibility(View.GONE);
+                view.findViewById(R.id.title_group_layout).setVisibility(View.VISIBLE);
+                simpleAdapter4.notifyDataSetChanged();
+                listView.setVisibility(View.GONE);
+                listView2.setVisibility(View.GONE);
+                listView3.setVisibility(View.GONE);
+                listView4.setVisibility(View.VISIBLE);
             }
         }
     }
@@ -191,6 +241,9 @@ public class LogFragment extends Fragment {
         if (tg.equals("inout")) {
             getInoutData();
         }
+        if (tg.equals("group")){
+            getGroupData();
+        }
 
         if (tg.equals("sign")) {
             simpleAdapter.notifyDataSetChanged();
@@ -198,6 +251,8 @@ public class LogFragment extends Fragment {
             simpleAdapter2.notifyDataSetChanged();
         } else if (tg.equals("inout")) {
             simpleAdapter3.notifyDataSetChanged();
+        } else if (tg.equals("group")) {
+            simpleAdapter4.notifyDataSetChanged();
         }
 
         modifyPageButton(pageIndex, totalPage);
@@ -215,6 +270,7 @@ public class LogFragment extends Fragment {
         if (tg.equals("sign")) getSignData();
         if (tg.equals("alert")) getAlertData();
         if (tg.equals("inout")) getInoutData();
+        if (tg.equals("group")) getGroupData();
 
         if (tg.equals("sign")) {
             simpleAdapter.notifyDataSetChanged();
@@ -222,10 +278,38 @@ public class LogFragment extends Fragment {
             simpleAdapter2.notifyDataSetChanged();
         } else if (tg.equals("inout")) {
             simpleAdapter3.notifyDataSetChanged();
+        } else if (tg.equals("group")) {
+            simpleAdapter4.notifyDataSetChanged();
         }
         modifyPageButton(pageIndex, totalPage);
 
         Log.e("Main", "MessageFragment: prev");
+    }
+
+    private List<Map<String, Object>> getGroupData() {
+        dataList4.clear();
+        long count = GroupProxy.getCount(db);
+        totalPage = CommonUtil.getTotalPage(count, logPerPage);
+        if (count == 0) {
+            totalPage = 1;
+        }
+        modifyPageButton(pageIndex, totalPage);
+
+        List<GroupBean> list = GroupProxy.getByPage(db, logPerPage, pageIndex);
+        if (list == null) {
+            return dataList4;
+        }
+
+        for (int i = 0; i < list.size(); i++) {
+            GroupBean group = list.get(i);
+            Map<String, Object> map = new HashMap<>();
+            map.put("number", count - pageIndex * logPerPage - i);
+            map.put("group", group.getNumber());
+            map.put("name", group.getName());
+            dataList4.add(map);
+        }
+
+        return dataList4;
     }
 
     private List<Map<String, Object>> getSignData() {

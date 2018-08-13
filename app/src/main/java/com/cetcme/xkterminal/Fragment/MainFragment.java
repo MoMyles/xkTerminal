@@ -65,7 +65,7 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickListener {
 
-    private SkiaDrawView skiaDrawView;
+    public SkiaDrawView skiaDrawView;
     private RelativeLayout main_layout, rl1;
     private LinearLayout alert_layout;
     private LinearLayout ll_ship_list;

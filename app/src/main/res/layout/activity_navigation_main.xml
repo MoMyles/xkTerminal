@@ -61,20 +61,35 @@
             android:textColor="#000"
             android:textSize="14sp"
             android:visibility="gone" />
-
-        <Button
+        <ImageView
+            android:id="@+id/iv1"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="8dp"
+            android:onClick="changeMapCenter"
+            android:background="@drawable/zoom_circle"
+            android:src="@drawable/circle_location_center" />
+        <ImageView
             android:id="@+id/btn_zoom_out"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/zoom_circle"
+            android:gravity="center"
             android:onClick="ZoomOutClick_Event"
-            android:text="-" />
+            android:src="@drawable/circle_zoom_out"
+            android:textSize="30sp" />
 
-        <Button
+        <ImageView
             android:id="@+id/btn_zoom_in"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/zoom_circle"
+            android:gravity="center"
             android:onClick="ZoomInClick_Event"
-            android:text="+" />
+            android:src="@drawable/circle_zoom_in"
+            android:textSize="30sp" />
 
     </LinearLayout>
 

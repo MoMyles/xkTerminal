@@ -13,10 +13,10 @@
         android:id="@+id/title_alert_layout"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:background="@color/bgColor"
+        android:orientation="horizontal"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
-        android:orientation="horizontal"
-        android:background="@color/bgColor"
         android:visibility="gone">
 
         <TextView
@@ -25,7 +25,7 @@
             android:gravity="center_vertical"
             android:text="序号"
             android:textColor="@color/titleColor"
-            android:textSize="20sp"  />
+            android:textSize="20sp" />
 
         <TextView
             android:layout_width="220dp"
@@ -45,13 +45,48 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/title_group_layout"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/bgColor"
+        android:orientation="horizontal"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:text="序号"
+            android:textColor="@color/titleColor"
+            android:textSize="20sp" />
+
+        <TextView
+            android:layout_width="220dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="组播号"
+            android:textColor="@color/titleColor"
+            android:textSize="20sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:text="组播名"
+            android:textColor="@color/titleColor"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/title_sign_layout"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:background="@color/bgColor"
+        android:orientation="horizontal"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
-        android:orientation="horizontal"
-        android:background="@color/bgColor"
         android:visibility="gone">
 
         <TextView
@@ -91,10 +126,10 @@
         android:id="@+id/title_inout_layout"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:background="@color/bgColor"
+        android:orientation="horizontal"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
-        android:orientation="horizontal"
-        android:background="@color/bgColor"
         android:visibility="gone">
 
         <TextView
@@ -173,5 +208,11 @@
         android:background="#fff"
         android:visibility="gone" />
 
+    <ListView
+        android:id="@+id/list_view4"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#fff"
+        android:visibility="gone" />
 
 </LinearLayout>

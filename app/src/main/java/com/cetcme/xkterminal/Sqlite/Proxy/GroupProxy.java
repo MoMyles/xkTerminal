@@ -60,6 +60,19 @@ public class GroupProxy {
         }
     }
 
+    public static boolean isGropExist(DbManager db, String groupId){
+        try {
+            GroupBean gb = db.selector(GroupBean.class).where("number", "=", groupId)
+                    .findFirst();
+            if (gb != null){
+                return true;
+            }
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     /**
      * 删除分组
      * @param db
@@ -87,5 +100,41 @@ public class GroupProxy {
             e.printStackTrace();
             return false;
         }
+    }
+
+    /**
+     * 获取打卡数量
+     * @param db
+     * @return
+     */
+    public static long getCount(DbManager db) {
+        long count = 0;
+        try {
+            count = db.selector(GroupBean.class)
+                    .count();
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+
+    /**
+     * 分页查询打卡
+     * @param db
+     * @param perPage
+     * @param page
+     * @return
+     */
+    public static List<GroupBean> getByPage(DbManager db, int perPage, int page) {
+        List<GroupBean> list = null;
+        try {
+            list = db.selector(GroupBean.class)
+                    .limit(perPage)
+                    .offset(page * perPage)
+                    .findAll();
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 }

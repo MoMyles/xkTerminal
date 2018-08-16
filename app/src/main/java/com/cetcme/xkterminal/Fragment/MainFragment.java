@@ -10,6 +10,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -525,12 +526,15 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                 .addAction(0, "解除", QMUIDialogAction.ACTION_PROP_NEGATIVE, new QMUIDialogAction.ActionListener() {
                     @Override
                     public void onClick(QMUIDialog dialog, int index) {
-
-                        // 解除报警操作
-                        ((MyApplication) getActivity().getApplication()).sendBytes(AlertFormat.format("00010000", "00000000"));
                         PreferencesUtils.putBoolean(getActivity(), "homePageAlertView", false);
-                        showMainLayout();
-
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                // 解除报警操作
+                                ((MyApplication) getActivity().getApplication()).sendBytes(AlertFormat.format("00010000", "00000000"));
+                                showMainLayout();
+                            }
+                        }, 1000);
                         dialog.dismiss();
                     }
                 })

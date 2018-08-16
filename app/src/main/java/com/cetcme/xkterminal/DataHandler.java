@@ -80,7 +80,6 @@ public class DataHandler extends Handler {
     public void handleMessage(Message msg) {
         try {
             byte[] bytes = msg.getData().getByteArray("bytes");
-
             switch (msg.what) {//根据收到的消息的what类型处理
                 case SERIAL_PORT_RECEIVE_NEW_MESSAGE:
                     // 如果卫星中断 则返回 不显示短信
@@ -219,6 +218,7 @@ public class DataHandler extends Handler {
                             }
 
                             String msgSon = value[0]+ ","+value[1]+","+address;
+                            System.out.println("组播内容: " + msgSon);
                             byte[] msgSonB = msgSon.getBytes();
                             int byteLeng = msgSonB.length + 2;
                             String repairZero ="000000000000";
@@ -303,7 +303,7 @@ public class DataHandler extends Handler {
                     if (!MyApplication.isLocated) return;
 
                     // 短信发送成功
-//                    Toast.makeText(myApplication.mainActivity, "短信发送成功", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(myApplication.mainActivity, "短信发送成功", Toast.LENGTH_SHORT).show();
 
                     String lastSendTimeSave = PreferencesUtils.getString(myApplication.mainActivity, "lastSendTimeSave");
                     PreferencesUtils.putString(myApplication.mainActivity, "lastSendTime", lastSendTimeSave);
@@ -400,6 +400,9 @@ public class DataHandler extends Handler {
                         System.out.println("设置系统时间");
                         Constant.SYSTEM_DATE = rightDate;
                     }
+                    if (MyApplication.getInstance() != null) {
+                        MyApplication.getInstance().startSendThread();
+                    }
                     System.out.println(rightDate);
                     break;
                 }
@@ -437,6 +440,7 @@ public class DataHandler extends Handler {
                     // 显示报警activity
                     myApplication.mainActivity.gpsBar.showAlerting(false);
                     myApplication.mainActivity.showDangerDialog();
+                    Log.e("TAG_WARN", "报警了");
                     break;
                 case SERIAL_PORT_RECEIVE_NEW_ALERT:
                     if (!MyApplication.isLocated) return;
@@ -512,7 +516,6 @@ public class DataHandler extends Handler {
                 case SERIAL_PORT_SHUT_DOWN:
                     // 显示关机hud
                     myApplication.mainActivity.showShutDownHud();
-
                     // 发送关机包
                     byte[] sendBytes = "$07".getBytes();
                     byte[] contentBytes = "OK".getBytes();
@@ -522,6 +525,7 @@ public class DataHandler extends Handler {
                     sendBytes = ByteUtil.byteMerger(sendBytes, contentBytes);
                     sendBytes = ByteUtil.byteMerger(sendBytes, checkSumBytes);
                     myApplication.sendBytes(sendBytes);
+
                     break;
                 case SERIAL_PORT_ALERT_START:
                     myApplication.mainActivity.gpsBar.showAlerting(true);

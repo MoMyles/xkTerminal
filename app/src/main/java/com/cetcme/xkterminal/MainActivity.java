@@ -5,14 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
-import android.location.LocationManager;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -25,7 +23,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.ActionBar.BackBar;
-import com.cetcme.xkterminal.ActionBar.BottomBar;
 import com.cetcme.xkterminal.ActionBar.BottomBar2;
 import com.cetcme.xkterminal.ActionBar.GPSBar;
 import com.cetcme.xkterminal.ActionBar.MessageBar;
@@ -49,7 +46,6 @@ import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.DensityUtil;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.MyClass.SoundPlay;
-import com.cetcme.xkterminal.Navigation.SkiaDrawView;
 import com.cetcme.xkterminal.Socket.SocketServer;
 import com.cetcme.xkterminal.Sqlite.Bean.GPSBean;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
@@ -60,7 +56,6 @@ import com.cetcme.xkterminal.Sqlite.Proxy.FriendProxy;
 import com.cetcme.xkterminal.Sqlite.Proxy.GroupProxy;
 import com.cetcme.xkterminal.Sqlite.Proxy.MessageProxy;
 import com.cetcme.xkterminal.Sqlite.Proxy.SignProxy;
-import com.cetcme.xkterminal.netty.utils.Constants;
 import com.iflytek.cloud.ErrorCode;
 import com.iflytek.cloud.InitListener;
 import com.iflytek.cloud.SpeechConstant;
@@ -112,11 +107,9 @@ import aisparser.Vdm;
 import android_serialport_api.SerialPort;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
-import pub.devrel.easypermissions.PermissionRequest;
 import yimamapapi.skia.AisInfo;
-import yimamapapi.skia.YimaLib;
 
-public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks{
+public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
 
     public static String myNumber = "";
 
@@ -926,7 +919,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         GroupProxy.insert(db, name, Integer.parseInt(number));
     }
 
-    public boolean isGroupExist(String number){
+    public boolean isGroupExist(String number) {
         return GroupProxy.isGropExist(db, number);
     }
 
@@ -1131,7 +1124,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
     public void initMessageFragment(String tg) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         if (messageFragment == null) {
             messageFragment = new MessageFragment(tg);
         } else {
@@ -1140,8 +1132,17 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         showMessageBar(tg);
 
         if (currentFragment == messageFragment) {
+            if (messageNewFragment!=null){
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.remove(messageNewFragment);
+                messageNewFragment = null;
+                transaction.show(messageFragment);
+                transaction.commit();
+            }
             return;
         }
+
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         if (currentFragment != null) {
             transaction.hide(currentFragment);
         }
@@ -1245,7 +1246,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 //        transaction.replace(R.id.main_frame_layout, messageNewFragment);
 //        transaction.commit();
         transaction.add(R.id.main_frame_layout, messageNewFragment);
-        transaction.show(messageNewFragment);
+        //transaction.show(messageNewFragment);
         transaction.hide(messageFragment);
         transaction.commit();
 
@@ -1268,16 +1269,18 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         transaction.commit();
 
         showMessageBar(null);
+
         fragmentName = "message";
         backButtonStatus = "backToMain";
-
-        if (messageFragment.tg.equals("send")) {
-            messageFragment.reloadDate();
-        }
 
         if (messageFragment != null) {
             messageFragment.setTg(messageFragment.tg);
         }
+
+//        if (messageFragment.tg.equals("send")) {
+//            messageFragment.reloadDate();
+//        }
+
     }
 
     public void nextPage() {
@@ -1382,7 +1385,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 @Override
                 public void run() {
                     byte[] messageBytes = MessageFormat.format(receiver, secondContent, receiver.length() == 11 ? MessageFormat.MESSAGE_TYPE_CELLPHONE : MessageFormat.MESSAGE_TYPE_NORMAL, 0, unique);
-                    ((MyApplication) getApplication()).sendBytes(messageBytes);
+                    ((MyApplication) getApplication()).sendMessageBytes(messageBytes);
                     System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
                     tipDialog.dismiss();
                     backToMessageFragment();
@@ -1410,7 +1413,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
         } else {
             byte[] messageBytes = MessageFormat.format(receiver, content, receiver.length() == 11 ? MessageFormat.MESSAGE_TYPE_CELLPHONE : MessageFormat.MESSAGE_TYPE_NORMAL, 0);
-            ((MyApplication) getApplication()).sendBytes(messageBytes);
+            ((MyApplication) getApplication()).sendMessageBytes(messageBytes);
             System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
             backToMessageFragment();
 
@@ -1780,6 +1783,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         toast.setText(location.getLatitude() + ", " + location.getLongitude());
         toast.show();
     }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onSelfCheck(String type) {
         if ("selfcheck".equals(type)) {

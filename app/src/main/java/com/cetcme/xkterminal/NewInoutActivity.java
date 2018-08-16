@@ -157,7 +157,7 @@ public class NewInoutActivity extends Activity {
         }
 
         String str = DateUtil.parseDateToString(Constant.SYSTEM_DATE, DateUtil.DatePattern.YYYYMMDDHHMMSS);
-        Log.e("TAG", "postInout: " + PreferencesUtils.putString(NewInoutActivity.this, "lastSendTime", str));
+        PreferencesUtils.putString(NewInoutActivity.this, "lastSendTime", str);
 
         finish();
 

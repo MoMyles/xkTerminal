@@ -19,10 +19,8 @@ import com.cetcme.xkterminal.Fragment.setting.DBSettingFragment;
 import com.cetcme.xkterminal.Fragment.setting.SatelliteFragment;
 import com.cetcme.xkterminal.Fragment.setting.SystemAboutFragment;
 import com.cetcme.xkterminal.Fragment.setting.SystemSettingFragment;
-import com.cetcme.xkterminal.Fragment.setting.WarningSettingFragment;
 import com.cetcme.xkterminal.R;
-import com.cetcme.xkterminal.port.ComFragment;
-import com.cetcme.xkterminal.port.USBFragment;
+import com.cetcme.xkterminal.port.USBFragment2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +49,7 @@ public class SettingTabFragment extends Fragment {
      */
     @BindView(R.id.tv_tab1)  TextView tv_tab1;
     @BindView(R.id.tv_tab2)  TextView tv_tab2;
-    @BindView(R.id.tv_tab3)  TextView tv_tab3;
+//    @BindView(R.id.tv_tab3)  TextView tv_tab3;
     @BindView(R.id.tv_tab4)  TextView tv_tab4;
     @BindView(R.id.tv_tab5)  TextView tv_tab5;
     @BindView(R.id.tv_tab6)  TextView tv_tab6;
@@ -90,7 +88,7 @@ public class SettingTabFragment extends Fragment {
         unbinder = ButterKnife.bind(this, view);
         res = getResources();
         initViewPager(view);
-        
+
         return view;
     }
 
@@ -168,7 +166,7 @@ public class SettingTabFragment extends Fragment {
         fragments.add(new SatelliteFragment());
 //        fragments.add(new WarningSettingFragment());
 //        fragments.add(new SeriveStatusFragment());
-        fragments.add(USBFragment.newInstance());
+        fragments.add(USBFragment2.newInstance());
 //        fragments.add(new WeatherInfoFragment());
         fragments.add(new SystemSettingFragment());
         fragments.add(new SystemAboutFragment());
@@ -186,8 +184,8 @@ public class SettingTabFragment extends Fragment {
      */
     private void resetTextView() {
         tv_tab1.setTextColor(res.getColor(R.color.text_clo));
-//        tv_tab2.setTextColor(res.getColor(R.color.text_clo));
-        tv_tab3.setTextColor(res.getColor(R.color.text_clo));
+        tv_tab2.setTextColor(res.getColor(R.color.text_clo));
+//        tv_tab3.setTextColor(res.getColor(R.color.text_clo));
         tv_tab4.setTextColor(res.getColor(R.color.text_clo));
         tv_tab5.setTextColor(res.getColor(R.color.text_clo));
         tv_tab6.setTextColor(res.getColor(R.color.text_clo));

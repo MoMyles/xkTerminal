@@ -563,7 +563,7 @@ public class SkiaDrawView extends View {
                     typeStr = "禁渔区";
                     break;
                 case 1:
-                    typeStr = "禁入区";
+                    typeStr = "危险区";
                     break;
                 case 2:
                     typeStr = "禁出区";

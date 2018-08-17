@@ -36,7 +36,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Timer;
-import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -66,6 +65,8 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
     TextView tv_fangwei;
     @BindView(R.id.tv_dis)
     TextView tv_dis;
+    @BindView(R.id.switch_rotate)
+    Switch switch_rotate;
 
     private int startWp = -1;
     private int endWp = -1;
@@ -85,7 +86,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
 
     private double endDistToRead = -1;
 
-    private RelativeLayout  rl1;
+    private RelativeLayout rl1;
     private Switch mSwitchMap, mSwitchYQ, mSwitchArea, mSwitchPin;
     private Button btn1;
 
@@ -198,7 +199,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
             @Override
             public void onClick(View view) {
 
-                if (myLocation == null || ( myLocation.getLongitude() == 0 && myLocation.getLatitude() == 0)) {
+                if (myLocation == null || (myLocation.getLongitude() == 0 && myLocation.getLatitude() == 0)) {
                     toast.setText("未获取自身定位");
                     toast.show();
                     MainActivity.play("未获取自身定位");
@@ -458,9 +459,9 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
      */
     private String safetyControl(LocationBean locationBean, float heading, int routeID) {
         String msg = null;
-        boolean approachDanger = fMainView.mYimaLib.IsShipApproachingIsolatedDanger(locationBean.getLongitude(), locationBean.getLatitude(), Constant.NAVIGATION_TO_DANGER_DIST_LIMIT);
-        boolean crossingSafety = fMainView.mYimaLib.IsShipCrossingSafetyContour(locationBean.getLongitude(), locationBean.getLatitude(), heading, Constant.NAVIGATION_APPROACH_DIST_LIMIT);
-        ShipOffRoute offRoute = fMainView.mYimaLib.isShipOffRoute(locationBean.getLongitude(), locationBean.getLatitude(), routeID, Constant.NAVIGATION_OFF_ROUTE_LIMIT);
+        boolean approachDanger = fMainView.mYimaLib.IsShipApproachingIsolatedDanger(locationBean.getLongitude(), locationBean.getLatitude(), PreferencesUtils.getFloat(getApplicationContext(), "yuanmian_distance", Constant.NAVIGATION_TO_DANGER_DIST_LIMIT));
+        boolean crossingSafety = fMainView.mYimaLib.IsShipCrossingSafetyContour(locationBean.getLongitude(), locationBean.getLatitude(), heading, PreferencesUtils.getFloat(getApplicationContext(), "shuishen_distance", Constant.NAVIGATION_APPROACH_DIST_LIMIT));
+        ShipOffRoute offRoute = fMainView.mYimaLib.isShipOffRoute(locationBean.getLongitude(), locationBean.getLatitude(), routeID, PreferencesUtils.getFloat(getApplicationContext(), "pianyi_distance", Constant.NAVIGATION_OFF_ROUTE_LIMIT));
 
         if (approachDanger) {
             msg = "即将进入危险区，距离" + Constant.NAVIGATION_TO_DANGER_DIST_LIMIT + "米";
@@ -475,6 +476,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
             }
 
         }
+        MainActivity.play(msg);
         Log.i(TAG, "航行监控: approachDanger: " + approachDanger + ", crossingSafety: " + crossingSafety
                 + ", ShipOffRoute: " + offRoute.bOffRoute + ", " + offRoute.offDistByMeter);
         return msg;
@@ -564,7 +566,11 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
             fMainView.mYimaLib.SetWayPointCoor(startWp, myLocation.getLongitude(), myLocation.getLatitude());
 
         // 根据每次gps信息更新位置
-        setOwnShip(myLocation, lb.getHeading(), inNavigating);
+        if (switch_rotate.isChecked()) {
+            setOwnShip(myLocation, lb.getHeading(), true);
+        } else {
+            setOwnShip(myLocation, lb.getHeading(), false);
+        }
 
         // 更新框
         updateShipInfo(lb);
@@ -572,6 +578,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
         if (inNavigating) {
             if (navtime == null) navtime = com.cetcme.xkterminal.MyClass.Constant.SYSTEM_DATE;
             myLocation.setNavtime(navtime);
+            myLocation.setAcqtime(com.cetcme.xkterminal.MyClass.Constant.SYSTEM_DATE);
             try {
                 db.saveBindingId(lb);
             } catch (DbException e) {
@@ -633,7 +640,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
             M_POINT wpCoor = fMainView.mYimaLib.getWayPointCoor(endWp);
             double fangwei = fMainView.mYimaLib.GetBearingBetwTwoPoint(myLocation.getLongitude(), myLocation.getLatitude(),
                     wpCoor.x, wpCoor.y);//方位
-          
+
             tv_fangwei.setText(String.format("%.2f°", fangwei));
             tv_dis.setText(String.format("%.2f", restDis) + " nm");
 

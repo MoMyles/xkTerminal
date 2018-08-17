@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
+        android:layout_marginRight="16dp"
         android:gravity="right"
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@id/ly_bottom"
@@ -61,15 +61,17 @@
             android:textColor="#000"
             android:textSize="14sp"
             android:visibility="gone" />
+
         <ImageView
             android:id="@+id/iv1"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_alignParentRight="true"
             android:layout_marginBottom="8dp"
-            android:onClick="changeMapCenter"
             android:background="@drawable/zoom_circle"
+            android:onClick="changeMapCenter"
             android:src="@drawable/circle_location_center" />
+
         <ImageView
             android:id="@+id/btn_zoom_out"
             android:layout_width="40dp"

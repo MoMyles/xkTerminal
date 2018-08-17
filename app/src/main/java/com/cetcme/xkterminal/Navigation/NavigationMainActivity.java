@@ -3,6 +3,7 @@ package com.cetcme.xkterminal.Navigation;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AlertDialog;
@@ -105,6 +106,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+                fMainView.mYimaLib.SetCurrentScale(20000.0f);
                 LocationBean lb = MyApplication.getInstance().getCurrentLocation();
                 if (lb.getLatitude() != 0 && lb.getLongitude() != 0) {
                     setOwnShip(lb, lb.getHeading(), false);
@@ -113,7 +115,6 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
                     // 没有位置则固定中心点 121.768783,28.696902
                     fMainView.mYimaLib.CenterMap((int) (121.768783 * 1e7), (int) (28.696902 * 1e7));
                 }
-                fMainView.mYimaLib.SetCurrentScale(20000.0f);
                 fMainView.postInvalidate();
             }
         }, 200);
@@ -429,7 +430,9 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
                             if (list == null || list.isEmpty()) {
                                 Toast.makeText(NavigationMainActivity.this, "未查询到相关轨迹信息", Toast.LENGTH_SHORT).show();
                             } else {
+                                LocationBean lb = list.get(0);
                                 hangjiList.addAll(list);
+                                fMainView.mYimaLib.CenterMap(lb.getLongitude(), lb.getLatitude());
                                 fMainView.AddLineLayerAndObject(list);
                                 mClearTrack.setVisibility(View.VISIBLE);
                                 mListTrack.setVisibility(View.VISIBLE);

@@ -15,7 +15,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <LinearLayout
@@ -39,9 +39,9 @@
                     android:layout_width="150dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
+                    android:textColor="#000"
                     android:textOff="关"
                     android:textOn="开"
-                    android:textColor="#000"
                     android:textSize="18sp" />
 
                 <android.support.v4.widget.Space
@@ -69,6 +69,87 @@
                     android:textColor="#000"
                     android:textSize="18sp" />
 
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginStart="20dp"
+                    android:gravity="center"
+                    android:text="偏移距离(米)："
+                    android:textColor="#000"
+                    android:textSize="18sp" />
+
+                <EditText
+                    android:id="@+id/et_pianyi"
+                    android:layout_width="150dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginRight="20dp"
+                    android:cursorVisible="true"
+                    android:gravity="center"
+                    android:inputType="numberDecimal"
+                    android:text="200"
+                    android:textColor="#000"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="水深距离(米)："
+                    android:textColor="#000"
+                    android:textSize="18sp" />
+
+                <EditText
+                    android:id="@+id/et_shuishen"
+                    android:layout_width="150dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginRight="20dp"
+                    android:cursorVisible="true"
+                    android:gravity="center"
+                    android:inputType="numberDecimal"
+                    android:text="200"
+                    android:textColor="#000"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginStart="20dp"
+                    android:gravity="center"
+                    android:text="圆面半径(米)："
+                    android:textColor="#000"
+                    android:textSize="18sp" />
+
+                <EditText
+                    android:id="@+id/et_yuanmian"
+                    android:layout_width="150dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginRight="20dp"
+                    android:cursorVisible="true"
+                    android:gravity="center"
+                    android:inputType="numberDecimal"
+                    android:text="200"
+                    android:textColor="#000"
+                    android:textSize="18sp" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.ContactsContract;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
 import android.text.TextUtils;
@@ -39,6 +40,10 @@ import com.cetcme.xkterminal.port.USBEvent;
 import com.cetcme.xkterminal.port.USBInfo;
 import com.ftdi.j2xx.D2xxManager;
 import com.ftdi.j2xx.FT_Device;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
 import com.joanzapata.iconify.Iconify;
@@ -63,6 +68,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.InvalidParameterException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -278,6 +284,604 @@ public class MyApplication extends MultiDexApplication {
         currentLocation.setSpeed(0.0f);
 
         initUSB();
+
+
+        initHangji();
+    }
+
+    private void initHangji() {
+        String data = "{\"list\": [{\n" +
+                "    \"shipNo\": \"3309022010120002\",\n" +
+                "    \"deviceNo\": \"16070721\",\n" +
+                "    \"data\": [\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488211304000,\n" +
+                "            \"latitude\": 29.9245833,\n" +
+                "            \"longitude\": 122.8428833,\n" +
+                "            \"speed\": 2.5,\n" +
+                "            \"tack\": 9.8\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488211424000,\n" +
+                "            \"latitude\": 29.9257,\n" +
+                "            \"longitude\": 122.8428833,\n" +
+                "            \"speed\": 1.3,\n" +
+                "            \"tack\": 26.9\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488211543000,\n" +
+                "            \"latitude\": 29.9267667,\n" +
+                "            \"longitude\": 122.8433833,\n" +
+                "            \"speed\": 2,\n" +
+                "            \"tack\": 18.5\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488211664000,\n" +
+                "            \"latitude\": 29.9278833,\n" +
+                "            \"longitude\": 122.8434333,\n" +
+                "            \"speed\": 2.6,\n" +
+                "            \"tack\": 344.5\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488211783000,\n" +
+                "            \"latitude\": 29.9289333,\n" +
+                "            \"longitude\": 122.84355,\n" +
+                "            \"speed\": 2.1,\n" +
+                "            \"tack\": 344.8\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488211905000,\n" +
+                "            \"latitude\": 29.93,\n" +
+                "            \"longitude\": 122.8434833,\n" +
+                "            \"speed\": 2.1,\n" +
+                "            \"tack\": 9.5\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488212023000,\n" +
+                "            \"latitude\": 29.9310333,\n" +
+                "            \"longitude\": 122.8432667,\n" +
+                "            \"speed\": 2.5,\n" +
+                "            \"tack\": 329\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488212143000,\n" +
+                "            \"latitude\": 29.9321167,\n" +
+                "            \"longitude\": 122.8431333,\n" +
+                "            \"speed\": 1.9,\n" +
+                "            \"tack\": 319.4\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488212384000,\n" +
+                "            \"latitude\": 29.9341833,\n" +
+                "            \"longitude\": 122.8429167,\n" +
+                "            \"speed\": 2,\n" +
+                "            \"tack\": 342\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488212624000,\n" +
+                "            \"latitude\": 29.9362333,\n" +
+                "            \"longitude\": 122.8427833,\n" +
+                "            \"speed\": 1.9,\n" +
+                "            \"tack\": 339.9\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488212745000,\n" +
+                "            \"latitude\": 29.9371,\n" +
+                "            \"longitude\": 122.8423833,\n" +
+                "            \"speed\": 1.1,\n" +
+                "            \"tack\": 265\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488212863000,\n" +
+                "            \"latitude\": 29.9367333,\n" +
+                "            \"longitude\": 122.8429167,\n" +
+                "            \"speed\": 2.4,\n" +
+                "            \"tack\": 161.3\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488212984000,\n" +
+                "            \"latitude\": 29.9359833,\n" +
+                "            \"longitude\": 122.8438833,\n" +
+                "            \"speed\": 3.4,\n" +
+                "            \"tack\": 174\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488213105000,\n" +
+                "            \"latitude\": 29.935,\n" +
+                "            \"longitude\": 122.84475,\n" +
+                "            \"speed\": 2.7,\n" +
+                "            \"tack\": 166.2\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488213225000,\n" +
+                "            \"latitude\": 29.9340333,\n" +
+                "            \"longitude\": 122.84505,\n" +
+                "            \"speed\": 1.4,\n" +
+                "            \"tack\": 334.4\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488213345000,\n" +
+                "            \"latitude\": 29.9350333,\n" +
+                "            \"longitude\": 122.8451,\n" +
+                "            \"speed\": 1.9,\n" +
+                "            \"tack\": 18.8\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488213465000,\n" +
+                "            \"latitude\": 29.9353667,\n" +
+                "            \"longitude\": 122.8463833,\n" +
+                "            \"speed\": 2.3,\n" +
+                "            \"tack\": 124.1\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488213585000,\n" +
+                "            \"latitude\": 29.9348667,\n" +
+                "            \"longitude\": 122.84615,\n" +
+                "            \"speed\": 2.6,\n" +
+                "            \"tack\": 40.6\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488213705000,\n" +
+                "            \"latitude\": 29.9351667,\n" +
+                "            \"longitude\": 122.8464,\n" +
+                "            \"speed\": 2,\n" +
+                "            \"tack\": 45.7\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488213945000,\n" +
+                "            \"latitude\": 29.9353833,\n" +
+                "            \"longitude\": 122.8465167,\n" +
+                "            \"speed\": 0.4,\n" +
+                "            \"tack\": 0\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488214065000,\n" +
+                "            \"latitude\": 29.9354,\n" +
+                "            \"longitude\": 122.8465833,\n" +
+                "            \"speed\": 0.2,\n" +
+                "            \"tack\": 0\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488214185000,\n" +
+                "            \"latitude\": 29.9354167,\n" +
+                "            \"longitude\": 122.8465333,\n" +
+                "            \"speed\": 0.7,\n" +
+                "            \"tack\": 0\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488214306000,\n" +
+                "            \"latitude\": 29.9355,\n" +
+                "            \"longitude\": 122.8465,\n" +
+                "            \"speed\": 0.2,\n" +
+                "            \"tack\": 0\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488214425000,\n" +
+                "            \"latitude\": 29.9361167,\n" +
+                "            \"longitude\": 122.8446833,\n" +
+                "            \"speed\": 4.9,\n" +
+                "            \"tack\": 281.2\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488214545000,\n" +
+                "            \"latitude\": 29.9367667,\n" +
+                "            \"longitude\": 122.8415667,\n" +
+                "            \"speed\": 5.3,\n" +
+                "            \"tack\": 268.6\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488214665000,\n" +
+                "            \"latitude\": 29.9368167,\n" +
+                "            \"longitude\": 122.8378,\n" +
+                "            \"speed\": 6,\n" +
+                "            \"tack\": 264.9\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488214785000,\n" +
+                "            \"latitude\": 29.9371833,\n" +
+                "            \"longitude\": 122.8343167,\n" +
+                "            \"speed\": 3.2,\n" +
+                "            \"tack\": 290.1\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488215026000,\n" +
+                "            \"latitude\": 29.9342833,\n" +
+                "            \"longitude\": 122.8332667,\n" +
+                "            \"speed\": 7.6,\n" +
+                "            \"tack\": 180.2\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488215145000,\n" +
+                "            \"latitude\": 29.9312333,\n" +
+                "            \"longitude\": 122.8325167,\n" +
+                "            \"speed\": 2.7,\n" +
+                "            \"tack\": 147.4\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488215506000,\n" +
+                "            \"latitude\": 29.9287167,\n" +
+                "            \"longitude\": 122.8332833,\n" +
+                "            \"speed\": 1.4,\n" +
+                "            \"tack\": 0\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488215867000,\n" +
+                "            \"latitude\": 29.9263833,\n" +
+                "            \"longitude\": 122.83465,\n" +
+                "            \"speed\": 1.5,\n" +
+                "            \"tack\": 0\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488216467000,\n" +
+                "            \"latitude\": 29.9224,\n" +
+                "            \"longitude\": 122.8368333,\n" +
+                "            \"speed\": 1.6,\n" +
+                "            \"tack\": 0\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488216588000,\n" +
+                "            \"latitude\": 29.9215,\n" +
+                "            \"longitude\": 122.83705,\n" +
+                "            \"speed\": 1.5,\n" +
+                "            \"tack\": 195.8\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488216707000,\n" +
+                "            \"latitude\": 29.9207333,\n" +
+                "            \"longitude\": 122.8373167,\n" +
+                "            \"speed\": 1.5,\n" +
+                "            \"tack\": 0\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488216827000,\n" +
+                "            \"latitude\": 29.9199167,\n" +
+                "            \"longitude\": 122.8376833,\n" +
+                "            \"speed\": 1.6,\n" +
+                "            \"tack\": 177\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488216949000,\n" +
+                "            \"latitude\": 29.91905,\n" +
+                "            \"longitude\": 122.8379833,\n" +
+                "            \"speed\": 1.4,\n" +
+                "            \"tack\": 0\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488217068000,\n" +
+                "            \"latitude\": 29.91815,\n" +
+                "            \"longitude\": 122.83815,\n" +
+                "            \"speed\": 1.5,\n" +
+                "            \"tack\": 193.7\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488217188000,\n" +
+                "            \"latitude\": 29.9173333,\n" +
+                "            \"longitude\": 122.8383833,\n" +
+                "            \"speed\": 1.8,\n" +
+                "            \"tack\": 149.8\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488217429000,\n" +
+                "            \"latitude\": 29.91565,\n" +
+                "            \"longitude\": 122.8391167,\n" +
+                "            \"speed\": 0.7,\n" +
+                "            \"tack\": 188.8\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488217547000,\n" +
+                "            \"latitude\": 29.91465,\n" +
+                "            \"longitude\": 122.8393333,\n" +
+                "            \"speed\": 1.8,\n" +
+                "            \"tack\": 178.5\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488217786000,\n" +
+                "            \"latitude\": 29.9129333,\n" +
+                "            \"longitude\": 122.8398833,\n" +
+                "            \"speed\": 1.4,\n" +
+                "            \"tack\": 159.8\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488217906000,\n" +
+                "            \"latitude\": 29.9120167,\n" +
+                "            \"longitude\": 122.8400667,\n" +
+                "            \"speed\": 1.5,\n" +
+                "            \"tack\": 141.3\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488218029000,\n" +
+                "            \"latitude\": 29.9110167,\n" +
+                "            \"longitude\": 122.8404,\n" +
+                "            \"speed\": 1.8,\n" +
+                "            \"tack\": 151.6\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488218149000,\n" +
+                "            \"latitude\": 29.9101667,\n" +
+                "            \"longitude\": 122.8406167,\n" +
+                "            \"speed\": 2.1,\n" +
+                "            \"tack\": 157.6\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488218406000,\n" +
+                "            \"latitude\": 29.9081333,\n" +
+                "            \"longitude\": 122.8414333,\n" +
+                "            \"speed\": 2.1,\n" +
+                "            \"tack\": 139.3\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488218506000,\n" +
+                "            \"latitude\": 29.9073667,\n" +
+                "            \"longitude\": 122.8418,\n" +
+                "            \"speed\": 1.9,\n" +
+                "            \"tack\": 175\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488218626000,\n" +
+                "            \"latitude\": 29.9064667,\n" +
+                "            \"longitude\": 122.8423,\n" +
+                "            \"speed\": 2,\n" +
+                "            \"tack\": 154.2\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488218746000,\n" +
+                "            \"latitude\": 29.9055,\n" +
+                "            \"longitude\": 122.8427667,\n" +
+                "            \"speed\": 2,\n" +
+                "            \"tack\": 143.5\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488218866000,\n" +
+                "            \"latitude\": 29.9045667,\n" +
+                "            \"longitude\": 122.843,\n" +
+                "            \"speed\": 1.8,\n" +
+                "            \"tack\": 172.1\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488219106000,\n" +
+                "            \"latitude\": 29.9025667,\n" +
+                "            \"longitude\": 122.8431167,\n" +
+                "            \"speed\": 1.9,\n" +
+                "            \"tack\": 0\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488219346000,\n" +
+                "            \"latitude\": 29.9006,\n" +
+                "            \"longitude\": 122.8431,\n" +
+                "            \"speed\": 1.6,\n" +
+                "            \"tack\": 193.4\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488219466000,\n" +
+                "            \"latitude\": 29.8996333,\n" +
+                "            \"longitude\": 122.8431833,\n" +
+                "            \"speed\": 2.2,\n" +
+                "            \"tack\": 141.6\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488219586000,\n" +
+                "            \"latitude\": 29.8986667,\n" +
+                "            \"longitude\": 122.84335,\n" +
+                "            \"speed\": 1.7,\n" +
+                "            \"tack\": 140.2\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488219707000,\n" +
+                "            \"latitude\": 29.8976833,\n" +
+                "            \"longitude\": 122.8434333,\n" +
+                "            \"speed\": 1.8,\n" +
+                "            \"tack\": 190.9\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488219826000,\n" +
+                "            \"latitude\": 29.8966667,\n" +
+                "            \"longitude\": 122.8434333,\n" +
+                "            \"speed\": 1.5,\n" +
+                "            \"tack\": 0\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488220186000,\n" +
+                "            \"latitude\": 29.8937,\n" +
+                "            \"longitude\": 122.84375,\n" +
+                "            \"speed\": 2.1,\n" +
+                "            \"tack\": 158.8\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488220306000,\n" +
+                "            \"latitude\": 29.8926667,\n" +
+                "            \"longitude\": 122.8437333,\n" +
+                "            \"speed\": 1.9,\n" +
+                "            \"tack\": 162\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488220427000,\n" +
+                "            \"latitude\": 29.8916667,\n" +
+                "            \"longitude\": 122.84365,\n" +
+                "            \"speed\": 2,\n" +
+                "            \"tack\": 162.2\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488220546000,\n" +
+                "            \"latitude\": 29.8906667,\n" +
+                "            \"longitude\": 122.8437,\n" +
+                "            \"speed\": 1.8,\n" +
+                "            \"tack\": 216.1\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488220667000,\n" +
+                "            \"latitude\": 29.8896167,\n" +
+                "            \"longitude\": 122.8438,\n" +
+                "            \"speed\": 2,\n" +
+                "            \"tack\": 163.3\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488220786000,\n" +
+                "            \"latitude\": 29.8886167,\n" +
+                "            \"longitude\": 122.8437833,\n" +
+                "            \"speed\": 2.1,\n" +
+                "            \"tack\": 162.8\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488221147000,\n" +
+                "            \"latitude\": 29.8855333,\n" +
+                "            \"longitude\": 122.8439333,\n" +
+                "            \"speed\": 1.8,\n" +
+                "            \"tack\": 177.4\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488221387000,\n" +
+                "            \"latitude\": 29.8834667,\n" +
+                "            \"longitude\": 122.8438333,\n" +
+                "            \"speed\": 1.7,\n" +
+                "            \"tack\": 164.3\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488221508000,\n" +
+                "            \"latitude\": 29.8824167,\n" +
+                "            \"longitude\": 122.8438167,\n" +
+                "            \"speed\": 2.1,\n" +
+                "            \"tack\": 161.8\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488221747000,\n" +
+                "            \"latitude\": 29.88035,\n" +
+                "            \"longitude\": 122.84405,\n" +
+                "            \"speed\": 2.3,\n" +
+                "            \"tack\": 141\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488221868000,\n" +
+                "            \"latitude\": 29.87925,\n" +
+                "            \"longitude\": 122.8441167,\n" +
+                "            \"speed\": 2.2,\n" +
+                "            \"tack\": 158.5\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488222228000,\n" +
+                "            \"latitude\": 29.8760833,\n" +
+                "            \"longitude\": 122.8442167,\n" +
+                "            \"speed\": 2.1,\n" +
+                "            \"tack\": 210.7\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488222827000,\n" +
+                "            \"latitude\": 29.8706667,\n" +
+                "            \"longitude\": 122.8445833,\n" +
+                "            \"speed\": 2.2,\n" +
+                "            \"tack\": 176.3\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488223187000,\n" +
+                "            \"latitude\": 29.8675833,\n" +
+                "            \"longitude\": 122.8443167,\n" +
+                "            \"speed\": 2,\n" +
+                "            \"tack\": 181\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488223307000,\n" +
+                "            \"latitude\": 29.8665,\n" +
+                "            \"longitude\": 122.8444,\n" +
+                "            \"speed\": 2.2,\n" +
+                "            \"tack\": 150.6\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488223428000,\n" +
+                "            \"latitude\": 29.8654,\n" +
+                "            \"longitude\": 122.8444167,\n" +
+                "            \"speed\": 1.9,\n" +
+                "            \"tack\": 162.5\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488223548000,\n" +
+                "            \"latitude\": 29.8643167,\n" +
+                "            \"longitude\": 122.8443667,\n" +
+                "            \"speed\": 2,\n" +
+                "            \"tack\": 164.9\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488223668000,\n" +
+                "            \"latitude\": 29.86325,\n" +
+                "            \"longitude\": 122.8444,\n" +
+                "            \"speed\": 1.9,\n" +
+                "            \"tack\": 190.5\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488223787000,\n" +
+                "            \"latitude\": 29.8621833,\n" +
+                "            \"longitude\": 122.8443667,\n" +
+                "            \"speed\": 1.9,\n" +
+                "            \"tack\": 182.2\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488223911000,\n" +
+                "            \"latitude\": 29.8610833,\n" +
+                "            \"longitude\": 122.8443833,\n" +
+                "            \"speed\": 2.4,\n" +
+                "            \"tack\": 178\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488224027000,\n" +
+                "            \"latitude\": 29.8600333,\n" +
+                "            \"longitude\": 122.8443,\n" +
+                "            \"speed\": 1.9,\n" +
+                "            \"tack\": 187\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488224151000,\n" +
+                "            \"latitude\": 29.8589,\n" +
+                "            \"longitude\": 122.8443,\n" +
+                "            \"speed\": 1.9,\n" +
+                "            \"tack\": 200.5\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"acqTime\": 1488224267000,\n" +
+                "            \"latitude\": 29.8578167,\n" +
+                "            \"longitude\": 122.8443167,\n" +
+                "            \"speed\": 1.9,\n" +
+                "            \"tack\": 164.3\n" +
+                "        }]}]}";
+
+        JsonParser json = new JsonParser();
+        JsonElement element = json.parse(data);
+        JsonObject object = element.getAsJsonObject();
+        JsonArray array = object.get("list").getAsJsonArray();
+        for (JsonElement ele : array){
+            JsonArray dataArr = ele.getAsJsonObject().get("data").getAsJsonArray();
+            long d = dataArr.get(0).getAsJsonObject().get("acqTime").getAsLong();
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(d);
+            calendar.add(Calendar.YEAR, 1);
+            calendar.add(Calendar.MONTH, 5);
+            Date navTime = calendar.getTime();
+            try {
+                LocationBean lb = db.selector(LocationBean.class).where("navtime", "=", navTime)
+                        .orderBy("acqtime")
+                        .findFirst();
+                if (lb == null) {
+                    lb = new LocationBean();
+                    for (JsonElement e : dataArr) {
+                        long acqTime = e.getAsJsonObject().get("acqTime").getAsLong();
+                        double latitude = e.getAsJsonObject().get("latitude").getAsDouble();
+                        double longitude = e.getAsJsonObject().get("longitude").getAsDouble();
+                        float speed = e.getAsJsonObject().get("speed").getAsFloat();
+                        float tack = e.getAsJsonObject().get("tack").getAsFloat();
+                        lb.setNavtime(navTime);
+                        Calendar calendar2 = Calendar.getInstance();
+                        calendar2.setTimeInMillis(acqTime);
+                        calendar2.add(Calendar.YEAR, 1);
+                        calendar2.add(Calendar.MONTH, 5);
+                        lb.setAcqtime(calendar2.getTime());
+                        lb.setLongitude((int)(longitude * 1e7));
+                        lb.setLatitude((int)(latitude * 1e7));
+                        lb.setSpeed(speed);
+                        lb.setHeading(tack);
+                        db.saveBindingId(lb);
+                    }
+                }
+            } catch (DbException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void startSendThread(){

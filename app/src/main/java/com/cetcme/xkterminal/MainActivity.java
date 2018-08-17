@@ -873,8 +873,11 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
     // 收到短信
-    public int addMessage(final String address, final String content, final boolean read) {
+    public int addMessage(String address, final String content, final boolean read) {
         MessageBean message = new MessageBean();
+        if (Constant.GROUP_NO.equals(address)) {
+            address = "通播";
+        }
         message.setSender(address);
         message.setReceiver(myNumber);
         message.setContent(content);

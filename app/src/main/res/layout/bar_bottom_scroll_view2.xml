@@ -68,7 +68,7 @@
             android:layout_marginStart="10dp"
             android:layout_marginTop="8dp"
             android:gravity="center"
-            android:text="进出港申报"
+            android:text="进出港"
             android:textSize="16sp" />
 
         <Button

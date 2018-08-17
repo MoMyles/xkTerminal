@@ -32,6 +32,7 @@ import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.GPSFormatUtils;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.MyClass.SoundPlay;
+import com.cetcme.xkterminal.Navigation.MapUtils;
 import com.cetcme.xkterminal.Navigation.SkiaDrawView;
 import com.cetcme.xkterminal.Navigation.WarnArea;
 import com.cetcme.xkterminal.R;
@@ -88,8 +89,8 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
     private boolean warnArea = false;
     private boolean isFirst = true;
 
-//    private final int[] JIN_YU_AREA_COLOR = new int[]{255, 0, 0};
-//    private final int[] JIN_RU_AREA_COLOR = new int[]{0, 255, 0};
+    private final int[] JIN_YU_AREA_COLOR = new int[]{255, 0, 0};
+    private final int[] JIN_RU_AREA_COLOR = new int[]{0, 255, 0};
 //    private final int[] JIN_CHU_AREA_COLOR = new int[]{0, 0, 255};
 //
 //
@@ -99,8 +100,8 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
 //    private final int[] JIN_RU_AREA_X = new int[]{(int) (121.761309 * 1e7), (int) (121.949882 * 1e7), (int) (121.902739 * 1e7), (int) (121.772808 * 1e7)};
 //    private final int[] JIN_RU_AREA_Y = new int[]{(int) (28.651267 * 1e7), (int) (28.660395 * 1e7), (int) (28.530491 * 1e7), (int) (28.517288 * 1e7)};
 //
-//    private final int[] JIN_YU_AREA_X = new int[]{(int) (121.583086 * 1e7), (int) (121.68887 * 1e7), (int) (121.676222 * 1e7), (int) (121.578486 * 1e7)};
-//    private final int[] JIN_YU_AREA_Y = new int[]{(int) (28.222337 * 1e7), (int) (28.219282 * 1e7), (int) (28.159172 * 1e7), (int) (28.183627 * 1e7)};
+    private final int[] JIN_YU_AREA_X = new int[]{(int) (113.303696 * 1e7), (int) (113.31329 * 1e7), (int) (113.312428 * 1e7), (int) (113.305349 * 1e7)};
+    private final int[] JIN_YU_AREA_Y = new int[]{(int) (23.141351 * 1e7), (int) (23.141085 * 1e7), (int) (23.137064 * 1e7), (int) (23.136798 * 1e7)};
 
 
     private DbManager db;
@@ -237,7 +238,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
         mSwitchPin.setChecked(false);
 
         warnArea = mSwitchArea.isChecked();
-//        showWarnAreas();
+        showWarnAreas();
         mSwitchYQ.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -251,6 +252,11 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 PreferencesUtils.putBoolean(getActivity(), "mainFrgWarnArea", b);
                 warnArea = b;
+                showWarnAreas();
+                LocationBean lb = new LocationBean();
+                lb.setLongitude((int)(113.3066666*1e7));
+                lb.setLatitude((int)(23.14*1e7));
+                doAreaWarning(lb);
                 if (MyApplication.currentLocation != null) {
                     doAreaWarning(MyApplication.currentLocation);
                 }
@@ -277,7 +283,6 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
         }
 
         loadOwnShipInfo();
-
 
 //        LocationBean lb = new LocationBean();
 //        lb.setLongitude((int) (121.768783 * 1e7));
@@ -333,6 +338,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
             @Override
             public void run() {
                 LocationBean lb = MyApplication.getInstance().getCurrentLocation();
+                skiaDrawView.mYimaLib.SetCurrentScale(20000.0f);
                 if (lb.getLatitude() != 0 && lb.getLongitude() != 0) {
                     if (myLocation == null) myLocation = new M_POINT();
                     myLocation.x = lb.getLongitude();
@@ -342,9 +348,10 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
 //                    skiaDrawView.mYimaLib.CenterMap(myLocation.x, myLocation.y);
                 } else {
                     // 没有位置则固定中心点 121.768783,28.696902
-                    skiaDrawView.mYimaLib.CenterMap((int) (121.768783 * 1e7), (int) (28.696902 * 1e7));
+//                    skiaDrawView.mYimaLib.CenterMap((int) (121.768783 * 1e7), (int) (28.696902 * 1e7));
+//                    skiaDrawView.mYimaLib.CenterMap((int) (113.303696 * 1e7), (int) (23.141351 * 1e7));
+                    skiaDrawView.mYimaLib.CenterMap((int) (113.3066666*1e7), (int) (23.14*1e7));
                 }
-                skiaDrawView.mYimaLib.SetCurrentScale(20000.0f);
                 skiaDrawView.postInvalidate();
             }
         }, 200);
@@ -374,8 +381,8 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
     private int curLayerPos = -1;
 
 
-//    private void showWarnAreas() {
-//        if (warnArea) {
+    private void showWarnAreas() {
+        if (warnArea) {
 //            Integer[] geoX = new Integer[JIN_CHU_AREA_X.length];
 //            Integer[] geoY = new Integer[JIN_CHU_AREA_Y.length];
 //            for (int i = 0; i < JIN_CHU_AREA_X.length; i++) {
@@ -384,34 +391,36 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
 //            }
 //            areas.add(new WarnArea(2, JIN_CHU_AREA_COLOR[0], JIN_CHU_AREA_COLOR[1]
 //                    , JIN_CHU_AREA_COLOR[2], geoX, geoY));
-////            geoX = new Integer[JIN_RU_AREA_X.length];
-////            geoY = new Integer[JIN_RU_AREA_Y.length];
-////            for (int i = 0; i < JIN_RU_AREA_X.length; i++) {
-////                geoX[i] = JIN_RU_AREA_X[i];
-////                geoY[i] = JIN_RU_AREA_Y[i];
-////            }
-////            areas.add(new WarnArea(1, JIN_RU_AREA_COLOR[0], JIN_RU_AREA_COLOR[1]
-////                    , JIN_RU_AREA_COLOR[2], geoX, geoY));
-////            geoX = new Integer[JIN_YU_AREA_X.length];
-////            geoY = new Integer[JIN_YU_AREA_Y.length];
-////            for (int i = 0; i < JIN_YU_AREA_X.length; i++) {
-////                geoX[i] = JIN_YU_AREA_X[i];
-////                geoY[i] = JIN_YU_AREA_Y[i];
-////            }
-////            areas.add(new WarnArea(0, JIN_YU_AREA_COLOR[0], JIN_YU_AREA_COLOR[1]
-////                    , JIN_YU_AREA_COLOR[2], geoX, geoY));
-//            curLayerPos = skiaDrawView.drawBanArea(areas);
-//        } else {
-//            for (WarnArea area : areas) {
-//                if (area == null) continue;
-//                skiaDrawView.mYimaLib.tmDeleteGeoObject(curLayerPos, area.getObjCount());
+//            geoX = new Integer[JIN_RU_AREA_X.length];
+//            geoY = new Integer[JIN_RU_AREA_Y.length];
+//            for (int i = 0; i < JIN_RU_AREA_X.length; i++) {
+//                geoX[i] = JIN_RU_AREA_X[i];
+//                geoY[i] = JIN_RU_AREA_Y[i];
 //            }
-//            skiaDrawView.mYimaLib.tmClearLayer(curLayerPos);
-//            skiaDrawView.mYimaLib.tmDeleteLayer(curLayerPos);
-//            skiaDrawView.postInvalidate();
-//            areas.clear();
-//        }
-//    }
+//            areas.add(new WarnArea(1, JIN_RU_AREA_COLOR[0], JIN_RU_AREA_COLOR[1]
+//                    , JIN_RU_AREA_COLOR[2], geoX, geoY));
+            Integer[] geoX = new Integer[JIN_YU_AREA_X.length];
+            Integer[] geoY = new Integer[JIN_YU_AREA_Y.length];
+            for (int i = 0; i < JIN_YU_AREA_X.length; i++) {
+                geoX[i] = JIN_YU_AREA_X[i];
+                geoY[i] = JIN_YU_AREA_Y[i];
+            }
+            areas.add(new WarnArea(0, JIN_YU_AREA_COLOR[0], JIN_YU_AREA_COLOR[1]
+                    , JIN_YU_AREA_COLOR[2], geoX, geoY));
+            areas.add(new WarnArea(2, JIN_YU_AREA_COLOR[0], JIN_YU_AREA_COLOR[1]
+                    , JIN_YU_AREA_COLOR[2], geoX, geoY));
+            curLayerPos = skiaDrawView.drawBanArea(areas);
+        } else {
+            for (WarnArea area : areas) {
+                if (area == null) continue;
+                skiaDrawView.mYimaLib.tmDeleteGeoObject(curLayerPos, area.getObjCount());
+            }
+            skiaDrawView.mYimaLib.tmClearLayer(curLayerPos);
+            skiaDrawView.mYimaLib.tmDeleteLayer(curLayerPos);
+            skiaDrawView.postInvalidate();
+            areas.clear();
+        }
+    }
 
     private void loadOwnShipInfo() {
         final SharedPreferences sp = getActivity().getSharedPreferences("xkTerminal", MODE_PRIVATE);
@@ -595,8 +604,9 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                     arrX[i] = geoX.get(i);
                     arrY[i] = geoY.get(i);
                 }
-                boolean exists = skiaDrawView.mYimaLib.IsPointInFace(lb.getLongitude(), lb.getLatitude(),
-                        arrX, arrY, size);
+                boolean exists = MapUtils.isPtInPoly(lb.getLongitude(), lb.getLatitude(), arrX, arrY);
+//                skiaDrawView.mYimaLib.IsPointInFace(lb.getLongitude(), lb.getLatitude(),
+//                        arrX, arrY, size);
                 switch (area.getType()) {
                     case 0:// 禁渔
                         if (exists) {
@@ -608,7 +618,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                     case 1:// 禁入
                         if (exists) {
                             // 报警
-                            MyApplication.getInstance().mainActivity.showMessageDialog("自身设备", "禁入区域报警", 1);
+                            MyApplication.getInstance().mainActivity.showMessageDialog("自身设备", "危险区域报警", 1);
                             SoundPlay.startAlertSound(MyApplication.getInstance().mainActivity);
                         }
                         break;

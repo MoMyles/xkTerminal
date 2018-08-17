@@ -121,6 +121,7 @@ public class MyApplication extends MultiDexApplication {
     public long oldAisReceiveTime = System.currentTimeMillis();
 
     public boolean isAisConnected = false;
+    public static boolean isSendThreadStart = false;
 
     private Timer timer;
 
@@ -997,6 +998,7 @@ public class MyApplication extends MultiDexApplication {
                 return;
             }
             if (serialBuffer[serialCount - 2] == (byte) 0x0D && serialBuffer[serialCount - 1] == (byte) 0x0A) {
+                serialBuffer = ByteUtil.subBytes(serialBuffer, 0, serialCount);
                 System.out.println("收到包：" + ConvertUtil.bytesToHexString(serialBuffer));
                 Message message = new Message();
                 Bundle bundle = new Bundle();
@@ -1018,6 +1020,7 @@ public class MyApplication extends MultiDexApplication {
                 serialBuffer = new byte[100];
                 serialCount = 0;
             } else if (serialBuffer[serialCount - 1] == (byte) 0x3B) {
+                serialBuffer = ByteUtil.subBytes(serialBuffer, 0, serialCount);
                 System.out.println("收到包：" + ConvertUtil.bytesToHexString(serialBuffer));
                 Message message = new Message();
                 Bundle bundle = new Bundle();

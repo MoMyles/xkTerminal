@@ -86,7 +86,8 @@ public class DataHandler extends Handler {
                     if (!MyApplication.isLocated) return;
 //                    Log.e("TAG_$06", new String(bytes));
                     String arr = new String(bytes);
-                    if (!TextUtils.isEmpty(arr) && arr.startsWith("$04$06")){
+//                    System.out.println(arr);
+                    if (!TextUtils.isEmpty(arr) && arr.startsWith("$04$06")) {
                         //建林定位信息
                         String lat = arr.substring(6, 16);
                         String latDirect = arr.substring(16, 17);
@@ -98,7 +99,7 @@ public class DataHandler extends Handler {
                         String hexStr = ConvertUtil.bytesToHexString(new byte[]{bytes[39]});
                         int voltage = Integer.parseInt(hexStr, 16);
 //                        Log.e("TAG_", voltage+"");
-                        String voltageStr = voltage * 0.02 +"";
+                        String voltageStr = voltage * 0.02 + "";
                         LocationBean lb = null;
                         if (MyApplication.getInstance().getCurrentLocation() != null) {
                             lb = MyApplication.getInstance().getCurrentLocation();
@@ -120,7 +121,7 @@ public class DataHandler extends Handler {
                                 }
                                 lb.setSpeed(Float.parseFloat(speed));
                                 lb.setHeading(Float.parseFloat(cog));
-                            } catch(Exception e){
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
                         }
@@ -129,6 +130,11 @@ public class DataHandler extends Handler {
 //                        MyApplication.getInstance().sendBytes(str.getBytes());
                         EventBus.getDefault().post("voltage");
                         EventBus.getDefault().post(lb);
+                        break;
+                    }
+                    int checkNum = ByteUtil.computeCheckSum(bytes, 3, bytes.length - 4);
+                    Integer.toString(checkNum, 16);
+                    if (!ByteUtil.byte2Str(bytes[bytes.length - 3]).equals(ByteUtil.byte2Str((byte) checkNum))) {
                         break;
                     }
                     // 收到新短信
@@ -206,7 +212,7 @@ public class DataHandler extends Handler {
                             String[] value = content.split(",");
                             if (value[0].equals("1")) {
                                 // 添加
-                                if (!myApplication.mainActivity.isGroupExist(value[1])){
+                                if (!myApplication.mainActivity.isGroupExist(value[1])) {
                                     myApplication.mainActivity.addGroup(value[2], value[1]);
 
                                     Toast.makeText(myApplication.mainActivity, "您已加入分组：" + value[1], Toast.LENGTH_SHORT).show();
@@ -217,12 +223,11 @@ public class DataHandler extends Handler {
                                 Toast.makeText(myApplication.mainActivity, "您已退出分组：" + value[1], Toast.LENGTH_SHORT).show();
                             }
 
-                            String msgSon = value[0]+ ","+value[1]+","+address;
-                            System.out.println("组播内容: " + msgSon);
+                            String msgSon = value[0] + "," + value[1] + "," + address;
                             byte[] msgSonB = msgSon.getBytes();
                             int byteLeng = msgSonB.length + 2;
-                            String repairZero ="000000000000";
-                            String beidouNo = PreferencesUtils.getString(myApplication.getApplicationContext(), "server_address",Constant.SERVER_BD_NUMBER);
+                            String repairZero = "000000000000";
+                            String beidouNo = PreferencesUtils.getString(myApplication.getApplicationContext(), "server_address", Constant.SERVER_BD_NUMBER);
                             beidouNo = repairZero.substring(0, 12 - beidouNo.length()) + beidouNo;
                             String unique = ConvertUtil.rc4ToHex();
                             String header = "$04";
@@ -232,7 +237,7 @@ public class DataHandler extends Handler {
                             byte[] bufferMsg = ByteUtil.byteMerger(bufferHead, bufferInfo);
                             byte[] buffer1 = ByteUtil.byteMerger(header.getBytes(), bufferMsg);
                             int checkSum = Util.computeCheckSum(buffer1, 3, buffer1.length);
-                            byte[] checkSum1 = new byte[] {(byte) checkSum};
+                            byte[] checkSum1 = new byte[]{(byte) checkSum};
                             byte[] checkSumA = ByteUtil.byteMerger("*".getBytes(), checkSum1);
                             byte[] checkSumB = ByteUtil.byteMerger(checkSumA, Constants.MESSAGE_END_SYMBOL.getBytes());
                             byte[] buffer = ByteUtil.byteMerger(buffer1, checkSumB);
@@ -400,8 +405,10 @@ public class DataHandler extends Handler {
                         System.out.println("设置系统时间");
                         Constant.SYSTEM_DATE = rightDate;
                     }
-                    if (MyApplication.getInstance() != null) {
+                    if (!MyApplication.getInstance().isSendThreadStart) {
                         MyApplication.getInstance().startSendThread();
+                        MyApplication.getInstance().isSendThreadStart = true;
+                        Log.e("TAG_CHECK", "启动发送信息线程");
                     }
                     System.out.println(rightDate);
                     break;

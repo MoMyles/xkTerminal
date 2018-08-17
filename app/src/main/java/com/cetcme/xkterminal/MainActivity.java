@@ -1102,6 +1102,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         if (mainFragment == null) {
             mainFragment = new MainFragment();
         }
+        showMainBar();
         if (currentFragment == mainFragment) {
             return;
         }
@@ -1114,7 +1115,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             transaction.show(mainFragment).commit();
         }
         currentFragment = mainFragment;
-        showMainBar();
         fragmentName = "main";
         messageReceiver = "";
         messageContent = "";
@@ -1136,6 +1136,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 transaction.remove(messageNewFragment);
                 messageNewFragment = null;
+                fragmentName = "message";
                 transaction.show(messageFragment);
                 transaction.commit();
             }
@@ -1163,6 +1164,12 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             logFragment = new LogFragment(tg);
         }
         logFragment.setTg(tg);
+        if (tg.equals("inout")) {
+            showMessageBar("send");
+            messageBar.isInout = true;
+        } else {
+            showPageBar();
+        }
         if (currentFragment == logFragment) {
             return;
         }
@@ -1176,23 +1183,18 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         }
         currentFragment = logFragment;
 
-        if (tg.equals("inout")) {
-            showMessageBar("send");
-            messageBar.isInout = true;
-        } else {
-            showPageBar();
-        }
         fragmentName = "log";
     }
 
     public void initSettingFragment() {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         if (settingFragment == null) {
             settingFragment = new SettingTabFragment();
         }
+        showBackBar();
         if (currentFragment == settingFragment) {
             return;
         }
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         if (currentFragment != null) {
             transaction.hide(currentFragment);
         }
@@ -1202,7 +1204,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             transaction.show(settingFragment).commit();
         }
         currentFragment = settingFragment;
-        showBackBar();
         fragmentName = "setting";
     }
 
@@ -1211,6 +1212,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         if (aboutFragment == null) {
             aboutFragment = new AboutFragment();
         }
+        showBackBar();
         if (currentFragment == aboutFragment) {
             return;
         }
@@ -1223,7 +1225,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             transaction.show(aboutFragment).commit();
         }
         currentFragment = aboutFragment;
-        showBackBar();
         fragmentName = "about";
     }
 
@@ -1238,6 +1239,13 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             Toast.makeText(this, "请选择一条短信", Toast.LENGTH_SHORT).show();
             return;
         }
+        if (tg.equals("detail")) {
+            messageFragment.setMessageRead(messageIndex);
+            showMessageDetailBar(messageListStatus);
+            //backButtonStatus = "backToMessageList";
+        } else {
+            showSendBar();
+        }
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 //        if (logFragment == null){
         messageNewFragment = new MessageNewFragment(tg, messageReceiver, messageContent, messageTime, messageId);
@@ -1250,13 +1258,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         transaction.hide(messageFragment);
         transaction.commit();
 
-        if (tg.equals("detail")) {
-            messageFragment.setMessageRead(messageIndex);
-            showMessageDetailBar(messageListStatus);
-            backButtonStatus = "backToMessageList";
-        } else {
-            showSendBar();
-        }
 
         fragmentName = "new";
     }

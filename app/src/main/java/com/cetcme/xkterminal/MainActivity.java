@@ -1388,11 +1388,13 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
+
+                    backToMessageFragment();
+
                     byte[] messageBytes = MessageFormat.format(receiver, secondContent, receiver.length() == 11 ? MessageFormat.MESSAGE_TYPE_CELLPHONE : MessageFormat.MESSAGE_TYPE_NORMAL, 0, unique);
                     ((MyApplication) getApplication()).sendMessageBytes(messageBytes);
                     System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
                     tipDialog.dismiss();
-                    backToMessageFragment();
 
                 }
             }, 10000);
@@ -1416,10 +1418,12 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             }, Constant.MESSAGE_FAIL_TIME + 10000);
 
         } else {
+
+            backToMessageFragment();
+
             byte[] messageBytes = MessageFormat.format(receiver, content, receiver.length() == 11 ? MessageFormat.MESSAGE_TYPE_CELLPHONE : MessageFormat.MESSAGE_TYPE_NORMAL, 0);
             ((MyApplication) getApplication()).sendMessageBytes(messageBytes);
             System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
-            backToMessageFragment();
 
             // 显示短信发送失败
             messageSendFailed = true;

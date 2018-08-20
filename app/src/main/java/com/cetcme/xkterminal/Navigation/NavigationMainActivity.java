@@ -53,7 +53,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
     int routeID = -1;
 
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-    private Button mITVMenu;
+//    private Button mITVMenu;
     private AppCompatButton mClearTrack;
     private AppCompatButton mListTrack;
     private LinearLayout mLlBottom;
@@ -83,8 +83,8 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
         fMainView.setOnMapClickListener(this);
         toast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
 
-        mITVMenu = findViewById(R.id.id_menu);
-        mITVMenu.setOnClickListener(this);
+//        mITVMenu = findViewById(R.id.id_menu);
+//        mITVMenu.setOnClickListener(this);
         mClearTrack = findViewById(R.id.clearTrack);
         mClearTrack.setOnClickListener(this);
         mListTrack = findViewById(R.id.listTrack);
@@ -160,7 +160,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
             case 1: // 航迹
                 switch (resultCode) {
                     case RouteListActivity.ACTIVITY_RESULT_ROUTE_SHOW:
-                        menu.dismiss();
+//                        menu.dismiss();
                         String navtime = getIntent().getStringExtra("navtime");
                         try {
                             List<LocationBean> list = db.selector(LocationBean.class)
@@ -173,7 +173,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
                             } else {
                                 hangjiList.addAll(list);
                                 fMainView.AddLineLayerAndObject(list);
-                                mClearTrack.setVisibility(View.VISIBLE);
+//                                mClearTrack.setVisibility(View.VISIBLE);
                                 mListTrack.setVisibility(View.VISIBLE);
                             }
                         } catch (Exception e) {
@@ -484,7 +484,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
             case 1: // 航迹
                 switch (resultCode) {
                     case RouteListActivity.ACTIVITY_RESULT_ROUTE_SHOW:
-                        menu.dismiss();
+//                        menu.dismiss();
                         String navtime = data.getStringExtra("navtime");
                         try {
                             List<LocationBean> list = db.selector(LocationBean.class)
@@ -535,9 +535,9 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.id_menu:
-                createMenu();
-                break;
+//            case R.id.id_menu:
+//                createMenu();
+//                break;
             case R.id.tv_own_ship_info:// 本船信息
                 final SharedPreferences sp = getSharedPreferences("xkTerminal", MODE_PRIVATE);
                 final View contentView = getLayoutInflater().inflate(R.layout.dialog_own_ship_info, null);
@@ -571,7 +571,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
                         })
                         .setNegativeButton("取消", null)
                         .show();
-                menu.dismiss();
+//                menu.dismiss();
                 break;
             case R.id.tv_ship_track:// 航迹查看
 
@@ -679,7 +679,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
             case R.id.tv_route:
                 type = 1;
                 startActivityForResult(new Intent(this, RouteListActivity.class), REQUSET_CODE_HANGXIAN);
-                menu.dismiss();
+//                menu.dismiss();
                 break;
             case R.id.tv_navigator:
                 // 如果卫星中断 则返回
@@ -688,7 +688,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
                     return;
                 }
                 startActivity(new Intent(this, NavigationActivity.class));
-                menu.dismiss();
+//                menu.dismiss();
                 break;
             case R.id.navi_cancel:
                 llNavigator.setVisibility(View.GONE);
@@ -704,44 +704,44 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
         }
     }
 
-    private PopupWindow menu;
+//    private PopupWindow menu;
 
-    private void createMenu() {
-        menu = new PopupWindow(this);
-        final View contentView = getLayoutInflater().inflate(R.layout.popup_menu, null);
-        buildFunction(contentView);
-        menu.setOutsideTouchable(true);
-        menu.setContentView(contentView);
-        menu.setHeight(QMUIDisplayHelper.getScreenHeight(this));
-        menu.setWidth(QMUIDisplayHelper.getScreenWidth(this) * 3 / 10);
-        final View rootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
-        menu.showAtLocation(rootView, Gravity.LEFT, 0, 0);
-    }
+//    private void createMenu() {
+//        menu = new PopupWindow(this);
+//        final View contentView = getLayoutInflater().inflate(R.layout.popup_menu, null);
+//        buildFunction(contentView);
+//        menu.setOutsideTouchable(true);
+//        menu.setContentView(contentView);
+//        menu.setHeight(QMUIDisplayHelper.getScreenHeight(this));
+//        menu.setWidth(QMUIDisplayHelper.getScreenWidth(this) * 3 / 10);
+//        final View rootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
+//        menu.showAtLocation(rootView, Gravity.LEFT, 0, 0);
+//    }
 
-    private void buildFunction(View contentView) {
-        // 本船信息
-        final LinearLayout tvOwnShipInfo = contentView.findViewById(R.id.tv_own_ship_info);
-        tvOwnShipInfo.setOnClickListener(this);
-        // 航迹
-        final LinearLayout tvShipTrack = contentView.findViewById(R.id.tv_ship_track);
-        tvShipTrack.setOnClickListener(this);
-        // 渔区控制
-        final CheckBox checkBox = contentView.findViewById(R.id.id_enable_fish_area);
-        checkBox.setChecked(fMainView.getFishState());
-        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                fMainView.changeFishState(b);
-                //menu.dismiss();
-                PreferencesUtils.putBoolean(NavigationMainActivity.this, "mainFrgYuqu", b);
-            }
-        });
-        checkBox.setChecked(PreferencesUtils.getBoolean(NavigationMainActivity.this, "mainFrgYuqu", false));
-        final LinearLayout tvRoute = contentView.findViewById(R.id.tv_route);
-        tvRoute.setOnClickListener(this);
-        final LinearLayout tvNavigator = contentView.findViewById(R.id.tv_navigator);
-        tvNavigator.setOnClickListener(this);
-    }
+//    private void buildFunction(View contentView) {
+//        // 本船信息
+//        final LinearLayout tvOwnShipInfo = contentView.findViewById(R.id.tv_own_ship_info);
+//        tvOwnShipInfo.setOnClickListener(this);
+//        // 航迹
+//        final LinearLayout tvShipTrack = contentView.findViewById(R.id.tv_ship_track);
+//        tvShipTrack.setOnClickListener(this);
+//        // 渔区控制
+//        final CheckBox checkBox = contentView.findViewById(R.id.id_enable_fish_area);
+//        checkBox.setChecked(fMainView.getFishState());
+//        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+//                fMainView.changeFishState(b);
+//                //menu.dismiss();
+//                PreferencesUtils.putBoolean(NavigationMainActivity.this, "mainFrgYuqu", b);
+//            }
+//        });
+//        checkBox.setChecked(PreferencesUtils.getBoolean(NavigationMainActivity.this, "mainFrgYuqu", false));
+//        final LinearLayout tvRoute = contentView.findViewById(R.id.tv_route);
+//        tvRoute.setOnClickListener(this);
+//        final LinearLayout tvNavigator = contentView.findViewById(R.id.tv_navigator);
+//        tvNavigator.setOnClickListener(this);
+//    }
 
     public void Back_Event(View view) {
         finish();

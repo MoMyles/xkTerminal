@@ -1696,14 +1696,14 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                         EventBus.getDefault().post("pin_co");
                         break;
                     case PinActivity.RESULT_OUT_OF_LIMIT:
-                        showInoutOutOfLimitDialog();
+                        showPinOutOfLimitDialog();
                         break;
                 }
                 break;
         }
     }
 
-    private void showInoutOutOfLimitDialog() {
+    private void showPinOutOfLimitDialog() {
         new QMUIDialog.MessageDialogBuilder(MainActivity.this)
                 .setTitle("提示")
                 .setMessage("已达到标位最大数量(" + Constant.LIMIT_PIN + ")，请删除后再添加。")

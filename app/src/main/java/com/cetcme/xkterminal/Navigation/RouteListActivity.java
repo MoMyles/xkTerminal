@@ -104,14 +104,19 @@ public class RouteListActivity extends Activity {
         qhTitleView.setClickCallback(new QHTitleView.ClickCallback() {
             @Override
             public void onBackClick() {
-                setResult(ACTIVITY_RESULT_ROUTE_NOTHING);
+                // setResult(ACTIVITY_RESULT_ROUTE_NOTHING);
                 finish();
             }
 
             @Override
             public void onRightClick() {
                 if (tag.equals("航线")) {
-                    setResult(ACTIVITY_RESULT_ROUTE_ADD);
+                    // setResult(ACTIVITY_RESULT_ROUTE_ADD);
+                    Intent intent = new Intent();
+                    intent.setClass(RouteListActivity.this, NavigationMainActivity.class);
+                    intent.putExtra("requestCode", 0);
+                    intent.putExtra("resultCode", ACTIVITY_RESULT_ROUTE_ADD);
+                    startActivity(intent);
                     finish();
                 }
             }
@@ -129,11 +134,18 @@ public class RouteListActivity extends Activity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent();
                 if (tag.equals("航线")) {
+                    intent.setClass(RouteListActivity.this, NavigationMainActivity.class);
+                    intent.putExtra("requestCode", 0);
+                    intent.putExtra("resultCode", ACTIVITY_RESULT_ROUTE_SHOW);
                     intent.putExtra("fileName", dataList.get(i).get("fileName").toString());
                 } else {
+                    intent.setClass(RouteListActivity.this, NavigationMainActivity.class);
+                    intent.putExtra("requestCode", 1);
+                    intent.putExtra("resultCode", ACTIVITY_RESULT_ROUTE_SHOW);
                     intent.putExtra("navtime", dataList.get(i).get("navtime").toString());
                 }
-                setResult(ACTIVITY_RESULT_ROUTE_SHOW, intent);
+                startActivity(intent);
+//                setResult(ACTIVITY_RESULT_ROUTE_SHOW, intent);
                 finish();
             }
         });

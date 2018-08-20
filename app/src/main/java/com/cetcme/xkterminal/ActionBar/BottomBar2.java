@@ -7,11 +7,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.cetcme.xkterminal.AisSetActivity;
 import com.cetcme.xkterminal.MainActivity;
+import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.Navigation.NavigationActivity;
 import com.cetcme.xkterminal.Navigation.NavigationMainActivity;
+import com.cetcme.xkterminal.Navigation.RouteListActivity;
 import com.cetcme.xkterminal.R;
 import com.zyyoona7.popup.EasyPopup;
 import com.zyyoona7.popup.XGravity;
@@ -129,8 +132,14 @@ public class BottomBar2 extends RelativeLayout implements View.OnClickListener {
                 btn11.setOnClickListener(this);
                 popup2.showAtAnchorView(btn_map, XGravity.CENTER, YGravity.ABOVE, 130, -140);
                 break;
-            case R.id.btn4:// 导航
-                mainActivity.startActivity(new Intent(mainActivity, NavigationMainActivity.class));
+            case R.id.btn4: // 导航
+                // mainActivity.startActivity(new Intent(mainActivity, NavigationMainActivity.class));
+                // 如果卫星中断 则返回
+                if (!MyApplication.isLocated) {
+                    Toast.makeText(mainActivity, "卫星已中断，无法导航", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                mainActivity.startActivity(new Intent(mainActivity, NavigationActivity.class));
                 dismiss(popup2);
                 break;
             case R.id.btn5:
@@ -151,12 +160,18 @@ public class BottomBar2 extends RelativeLayout implements View.OnClickListener {
                 mainActivity.initLogFragment("group");
                 dismiss(popup);
                 break;
-            case R.id.btn10:// 航线
+            case R.id.btn10: // 航线
                 //TODO 航线操作
+                Intent hangjiIntent = new Intent(mainActivity, RouteListActivity.class);
+                hangjiIntent.putExtra("tag", "航线");
+                mainActivity.startActivity(hangjiIntent);
                 dismiss(popup2);
                 break;
-            case R.id.btn11:// 航迹
+            case R.id.btn11: // 航迹
                 //TODO 航迹操作
+                Intent hangxianIntent = new Intent(mainActivity, RouteListActivity.class);
+                hangxianIntent.putExtra("tag", "航迹");
+                mainActivity.startActivity(hangxianIntent);
                 dismiss(popup2);
                 break;
             case R.id.button_post:

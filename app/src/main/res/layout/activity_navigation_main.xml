@@ -114,7 +114,8 @@
             android:id="@+id/navi_cancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="取消" />
+            android:text="取消"
+            android:visibility="gone"/>
 
         <Button
             android:id="@+id/navi_go"

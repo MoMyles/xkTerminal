@@ -99,8 +99,8 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
         btnNaviGo.setOnClickListener(this);
 
         // 显示本船位置
-        LocationBean currentLocation = MyApplication.getInstance().getCurrentLocation();
-        setOwnShip(currentLocation, currentLocation.getHeading(), false);
+//        LocationBean currentLocation = MyApplication.getInstance().getCurrentLocation();
+//        setOwnShip(currentLocation, currentLocation.getHeading(), false);
 
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -115,11 +115,10 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
                 }
                 fMainView.mYimaLib.SetCurrentScale(20000.0f);
                 fMainView.postInvalidate();
+                // 更改了bottombar之后的改动
+                onOpen();
             }
         }, 200);
-
-        // 更改了bottombar之后的改动
-        onOpen();
     }
 
     /**
@@ -133,7 +132,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
                 switch (resultCode) {
                     case RouteListActivity.ACTIVITY_RESULT_ROUTE_SHOW:
                         type = 0;
-                        llNavigator.setVisibility(View.VISIBLE);
+
                         clearRoute();
                         routeFileName = getIntent().getStringExtra("fileName");
                         Log.i(TAG, "load file: start");
@@ -142,6 +141,11 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
                         int routeCount = fMainView.mYimaLib.GetRoutesCount();
                         routeID = fMainView.mYimaLib.GetRouteIDFromPos(routeCount - 1);
 
+                        int[] ids = fMainView.mYimaLib.GetRouteWayPointsID(routeID);
+                        M_POINT point = fMainView.mYimaLib.getWayPointCoor(ids[0]);
+                        fMainView.mYimaLib.CenterMap(point.x, point.y);
+                        fMainView.postInvalidate();
+                        llNavigator.setVisibility(View.VISIBLE);
                         Log.i(TAG, "GetRoutesCount: " + fMainView.mYimaLib.GetRoutesCount());
                         Log.i(TAG, "routeID: " + routeID);
                         Log.i(TAG, "load file: end");
@@ -171,6 +175,8 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
                             if (list == null || list.isEmpty()) {
                                 Toast.makeText(NavigationMainActivity.this, "未查询到相关轨迹信息", Toast.LENGTH_SHORT).show();
                             } else {
+                                LocationBean lb = list.get(0);
+                                fMainView.mYimaLib.CenterMap(lb.getLongitude(), lb.getLatitude());
                                 hangjiList.addAll(list);
                                 fMainView.AddLineLayerAndObject(list);
 //                                mClearTrack.setVisibility(View.VISIBLE);
@@ -289,6 +295,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
             mLlBottom.setVisibility(View.GONE);
             clearRoute();
             startActivityForResult(new Intent(this, RouteListActivity.class), REQUSET_CODE_HANGXIAN);
+            finish();
         }
     }
 
@@ -495,6 +502,8 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
                             if (list == null || list.isEmpty()) {
                                 Toast.makeText(NavigationMainActivity.this, "未查询到相关轨迹信息", Toast.LENGTH_SHORT).show();
                             } else {
+                                LocationBean lb = list.get(0);
+                                fMainView.mYimaLib.CenterMap(lb.getLongitude(), lb.getLatitude());
                                 hangjiList.addAll(list);
                                 fMainView.AddLineLayerAndObject(list);
                                 mClearTrack.setVisibility(View.VISIBLE);
@@ -699,6 +708,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
                 Intent intent = new Intent(this, NavigationActivity.class);
                 intent.putExtra("routeFileName", routeFileName);
                 startActivity(intent);
+                finish();
                 break;
             default:
         }

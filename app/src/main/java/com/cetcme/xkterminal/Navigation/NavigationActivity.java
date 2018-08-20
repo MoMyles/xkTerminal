@@ -36,7 +36,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Timer;
-import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -85,7 +84,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
 
     private double endDistToRead = -1;
 
-    private RelativeLayout  rl1;
+    private RelativeLayout rl1;
     private Switch mSwitchMap, mSwitchYQ, mSwitchArea, mSwitchPin;
     private Button btn1;
 
@@ -105,19 +104,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
 
         // 如果是从航线文件进入导航界面
         routeFileName = getIntent().getStringExtra("routeFileName");
-        if (routeFileName != null) {
-            fMainView.mYimaLib.AddRoutesFromFile(Constant.ROUTE_FILE_PATH + "/" + routeFileName);
-            int routeCount = fMainView.mYimaLib.GetRoutesCount();
-            routeID = fMainView.mYimaLib.GetRouteIDFromPos(routeCount - 1);
-            int[] wpids = fMainView.mYimaLib.GetRouteWayPointsID(routeID);
 
-            endDistToRead = 0.0;
-            for (int i = 0; i < wpids.length - 1; i++) {
-                M_POINT startPoint = fMainView.mYimaLib.getWayPointCoor(wpids[i]);
-                M_POINT endPoint = fMainView.mYimaLib.getWayPointCoor(wpids[i + 1]);
-                endDistToRead += fMainView.mYimaLib.GetDistBetwTwoPoint(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
-            }
-        }
 
         fMainView.setOnMapClickListener(this);
 
@@ -126,8 +113,32 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
             public void run() {
                 //121.768783,28.696902
                 fMainView.mYimaLib.CenterMap((int) (121.768783 * 1e7), (int) (28.696902 * 1e7));
-                fMainView.mYimaLib.SetCurrentScale(8878176.0f / 32);
+                fMainView.mYimaLib.SetCurrentScale(2000.0f);
                 fMainView.postInvalidate();
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (routeFileName != null) {
+                            fMainView.mYimaLib.AddRoutesFromFile(Constant.ROUTE_FILE_PATH + "/" + routeFileName);
+                            int routeCount = fMainView.mYimaLib.GetRoutesCount();
+                            routeID = fMainView.mYimaLib.GetRouteIDFromPos(routeCount - 1);
+                            int[] wpids = fMainView.mYimaLib.GetRouteWayPointsID(routeID);
+
+                            endDistToRead = 0.0;
+                            for (int i = 0; i < wpids.length - 1; i++) {
+                                M_POINT startPoint = fMainView.mYimaLib.getWayPointCoor(wpids[i]);
+                                M_POINT endPoint = fMainView.mYimaLib.getWayPointCoor(wpids[i + 1]);
+                                endDistToRead += fMainView.mYimaLib.GetDistBetwTwoPoint(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+                            }
+
+                            M_POINT point = fMainView.mYimaLib.getWayPointCoor(wpids[0]);
+                            fMainView.mYimaLib.CenterMap(point.x, point.y);
+                            fMainView.postInvalidate();
+                        }
+                    }
+                }, 200);
+
             }
         }, 200);
 
@@ -198,7 +209,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
             @Override
             public void onClick(View view) {
 
-                if (myLocation == null || ( myLocation.getLongitude() == 0 && myLocation.getLatitude() == 0)) {
+                if (myLocation == null || (myLocation.getLongitude() == 0 && myLocation.getLatitude() == 0)) {
                     toast.setText("未获取自身定位");
                     toast.show();
                     MainActivity.play("未获取自身定位");
@@ -285,7 +296,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                     // 没有位置则固定中心点 121.768783,28.696902
                     fMainView.mYimaLib.CenterMap((int) (121.768783 * 1e7), (int) (28.696902 * 1e7));
                 }
-                fMainView.mYimaLib.SetCurrentScale(8878176.0f);
+                fMainView.mYimaLib.SetCurrentScale(2000f);
                 fMainView.postInvalidate();
             }
         }, 200);
@@ -633,7 +644,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
             M_POINT wpCoor = fMainView.mYimaLib.getWayPointCoor(endWp);
             double fangwei = fMainView.mYimaLib.GetBearingBetwTwoPoint(myLocation.getLongitude(), myLocation.getLatitude(),
                     wpCoor.x, wpCoor.y);//方位
-          
+
             tv_fangwei.setText(String.format("%.2f°", fangwei));
             tv_dis.setText(String.format("%.2f", restDis) + " nm");
 

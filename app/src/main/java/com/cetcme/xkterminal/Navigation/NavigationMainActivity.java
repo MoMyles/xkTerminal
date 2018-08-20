@@ -117,8 +117,74 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
                 fMainView.postInvalidate();
             }
         }, 200);
+
+        // 更改了bottombar之后的改动
+        onOpen();
     }
 
+    /**
+     * 应对打开方式变化的操作,原本onActivityResult的操作移动到了这里
+     */
+    private void onOpen() {
+        int requestCode = getIntent().getIntExtra("requestCode", -1);
+        int resultCode = getIntent().getIntExtra("resultCode", -1);
+        switch (requestCode) {
+            case 0: // 航线
+                switch (resultCode) {
+                    case RouteListActivity.ACTIVITY_RESULT_ROUTE_SHOW:
+                        type = 0;
+                        llNavigator.setVisibility(View.VISIBLE);
+                        clearRoute();
+                        routeFileName = getIntent().getStringExtra("fileName");
+                        Log.i(TAG, "load file: start");
+
+                        fMainView.mYimaLib.AddRoutesFromFile(Constant.ROUTE_FILE_PATH + "/" + routeFileName);
+                        int routeCount = fMainView.mYimaLib.GetRoutesCount();
+                        routeID = fMainView.mYimaLib.GetRouteIDFromPos(routeCount - 1);
+
+                        Log.i(TAG, "GetRoutesCount: " + fMainView.mYimaLib.GetRoutesCount());
+                        Log.i(TAG, "routeID: " + routeID);
+                        Log.i(TAG, "load file: end");
+                        Log.i(TAG, "==========================");
+                        break;
+                    case RouteListActivity.ACTIVITY_RESULT_ROUTE_ADD:
+                        type = 1;
+                        clearRoute();
+                        mLlBottom.setVisibility(View.VISIBLE);
+                        break;
+                    case RouteListActivity.ACTIVITY_RESULT_ROUTE_NOTHING:
+                        type = 0;
+                        break;
+                }
+                break;
+            case 1: // 航迹
+                switch (resultCode) {
+                    case RouteListActivity.ACTIVITY_RESULT_ROUTE_SHOW:
+                        menu.dismiss();
+                        String navtime = getIntent().getStringExtra("navtime");
+                        try {
+                            List<LocationBean> list = db.selector(LocationBean.class)
+                                    .where("navtime", "=", navtime)
+                                    .orderBy("acqtime")
+                                    .findAll();
+                            hangjiList.clear();
+                            if (list == null || list.isEmpty()) {
+                                Toast.makeText(NavigationMainActivity.this, "未查询到相关轨迹信息", Toast.LENGTH_SHORT).show();
+                            } else {
+                                hangjiList.addAll(list);
+                                fMainView.AddLineLayerAndObject(list);
+                                mClearTrack.setVisibility(View.VISIBLE);
+                                mListTrack.setVisibility(View.VISIBLE);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Toast.makeText(NavigationMainActivity.this, "未查询到相关轨迹信息", Toast.LENGTH_SHORT).show();
+                        }
+                        break;
+                }
+                break;
+        }
+    }
     @Override
     protected void onResume() {
         new Handler().postDelayed(new Runnable() {

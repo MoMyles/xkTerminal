@@ -8,7 +8,7 @@ import java.util.Date;
 
 public class Constant {
 
-    public static final Boolean PHONE_TEST = false;
+    public static final Boolean PHONE_TEST = true;
 
     // 服务器北斗地址
     public static final String SERVER_BD_NUMBER = "372741";

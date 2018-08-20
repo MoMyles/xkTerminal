@@ -13,8 +13,8 @@
         android:layout_height="44dp"
         android:layout_marginTop="8dp"
         android:gravity="center"
-        android:text="目的地导航"
-        android:textSize="16sp" />
+        android:text="导航"
+        android:textSize="16sp"/>
 
     <Button
         android:id="@+id/btn10"
@@ -23,7 +23,8 @@
         android:layout_marginTop="8dp"
         android:gravity="center"
         android:text="航线导航"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:visibility="gone"/>
 
     <Button
         android:id="@+id/btn11"
@@ -32,7 +33,8 @@
         android:layout_marginTop="8dp"
         android:gravity="center"
         android:text="历史轨迹"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:visibility="gone"/>
 
     <Button
         android:id="@+id/btn5"

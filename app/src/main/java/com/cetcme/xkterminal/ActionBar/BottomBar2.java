@@ -10,7 +10,7 @@ import android.widget.RelativeLayout;
 
 import com.cetcme.xkterminal.AisSetActivity;
 import com.cetcme.xkterminal.MainActivity;
-import com.cetcme.xkterminal.Navigation.NavigationActivity;
+import com.cetcme.xkterminal.Navigation.NavigationMainActivity;
 import com.cetcme.xkterminal.R;
 import com.zyyoona7.popup.EasyPopup;
 import com.zyyoona7.popup.XGravity;
@@ -126,10 +126,10 @@ public class BottomBar2 extends RelativeLayout implements View.OnClickListener {
                 btn10.setOnClickListener(this);
                 Button btn11 = popup2.findViewById(R.id.btn11);// 航迹
                 btn11.setOnClickListener(this);
-                popup2.showAtAnchorView(btn_map, XGravity.CENTER, YGravity.ABOVE, 130, -140);
+                popup2.showAtAnchorView(btn_map, XGravity.CENTER, YGravity.ABOVE, 130, -90);
                 break;
             case R.id.btn4:// 导航
-                mainActivity.startActivity(new Intent(mainActivity, NavigationActivity.class));
+                mainActivity.startActivity(new Intent(mainActivity, NavigationMainActivity.class));
                 dismiss(popup2);
                 break;
             case R.id.btn5:

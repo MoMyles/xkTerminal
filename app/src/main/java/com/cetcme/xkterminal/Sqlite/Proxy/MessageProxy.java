@@ -54,7 +54,7 @@ public class MessageProxy {
      * @param db
      * @return
      */
-    public static long getCount(DbManager db) {
+    public static long  getCount(DbManager db) {
         try {
             return db.selector(MessageBean.class).count();
         } catch (DbException e) {

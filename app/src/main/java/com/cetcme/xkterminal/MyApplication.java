@@ -927,10 +927,7 @@ public class MyApplication extends MultiDexApplication {
                     if (size > 0) {
                         onDataReceived(buffer, size);
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return;
-                } catch (InterruptedException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }

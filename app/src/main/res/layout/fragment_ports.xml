@@ -172,7 +172,7 @@
 
         </LinearLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -182,13 +182,14 @@
 
             <EditText
                 android:id="@+id/et_send"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_toLeftOf="@+id/btn4"
                 android:background="@drawable/border_black"
                 android:gravity="top|left"
                 android:inputType="textMultiLine"
                 android:padding="4dp"
+                android:layout_centerVertical="true"
                 android:singleLine="false"
                 android:textColor="#555"
                 android:textSize="14sp" />
@@ -197,9 +198,11 @@
                 android:id="@+id/btn4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
                 android:background="#fff"
                 android:text="发送"
                 android:textColor="#000" />
-        </LinearLayout>
+        </RelativeLayout>
     </LinearLayout>
 </LinearLayout>

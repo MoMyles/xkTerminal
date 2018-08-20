@@ -10,6 +10,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -359,7 +360,9 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
     }
 
     private void showBiaoweis() {
+        if (!mSwitchPin.isChecked()) return;
         try {
+            skiaDrawView.clearBiaoWeiTrack();
             List<PinBean> list = db.selector(PinBean.class).findAll();
             if (list != null && !list.isEmpty()) skiaDrawView.showBiaoWei(list);
         } catch (DbException e) {
@@ -523,12 +526,15 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                 .addAction(0, "解除", QMUIDialogAction.ACTION_PROP_NEGATIVE, new QMUIDialogAction.ActionListener() {
                     @Override
                     public void onClick(QMUIDialog dialog, int index) {
-
-                        // 解除报警操作
-                        ((MyApplication) getActivity().getApplication()).sendBytes(AlertFormat.format("00010000", "00000000"));
                         PreferencesUtils.putBoolean(getActivity(), "homePageAlertView", false);
-                        showMainLayout();
-
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                // 解除报警操作
+                                ((MyApplication) getActivity().getApplication()).sendBytes(AlertFormat.format("00010000", "00000000"));
+                                showMainLayout();
+                            }
+                        }, 1000);
                         dialog.dismiss();
                     }
                 })
@@ -725,6 +731,8 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
             Toast.makeText(getActivity(), "请选择标位点", Toast.LENGTH_SHORT).show();
         } else if ("pin_co".equals(action)) {
             openPinDialog(null);
+        } else if("update_biaowei_show".equals(action)){
+            showBiaoweis();
         }
     }
 
@@ -804,6 +812,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
         if (m_point != null) {
             et1.setText(m_point.x / 1e7 + "");
             et2.setText(m_point.y / 1e7 + "");
+            et3.requestFocus();
         }
 
         final ImageView tv1 = view.findViewById(R.id.iv1);

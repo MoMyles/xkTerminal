@@ -1,7 +1,6 @@
 package com.cetcme.xkterminal;
 
 import android.annotation.SuppressLint;
-import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -10,6 +9,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -25,7 +25,6 @@ import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.MyClass.SoundPlay;
 import com.cetcme.xkterminal.Navigation.GpsInfo;
 import com.cetcme.xkterminal.Navigation.GpsParse;
-import com.cetcme.xkterminal.Navigation.SkiaDrawView;
 import com.cetcme.xkterminal.Socket.SocketManager;
 import com.cetcme.xkterminal.Socket.SocketServer;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
@@ -35,6 +34,11 @@ import com.cetcme.xkterminal.Sqlite.Proxy.MessageProxy;
 import com.cetcme.xkterminal.netty.heartbeats.HeartBeatsClient;
 import com.cetcme.xkterminal.netty.utils.Constants;
 import com.cetcme.xkterminal.netty.utils.SendMsg;
+import com.cetcme.xkterminal.port.AisReadThread;
+import com.cetcme.xkterminal.port.USBEvent;
+import com.cetcme.xkterminal.port.USBInfo;
+import com.ftdi.j2xx.D2xxManager;
+import com.ftdi.j2xx.FT_Device;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
 import com.joanzapata.iconify.Iconify;
@@ -60,8 +64,10 @@ import java.security.InvalidParameterException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -115,6 +121,7 @@ public class MyApplication extends MultiDexApplication {
     public long oldAisReceiveTime = System.currentTimeMillis();
 
     public boolean isAisConnected = false;
+    public static boolean isSendThreadStart = false;
 
     private Timer timer;
 
@@ -186,7 +193,7 @@ public class MyApplication extends MultiDexApplication {
                 mInputStream = mSerialPort.getInputStream();
                 ReadThread mReadThread = new ReadThread();
                 mReadThread.start();
-                new SendingThread().start();
+
 //            aisSerialPort = getAisSerialPort();
 //            aisOutputStream = aisSerialPort.getOutputStream();
 //            aisInputStream = aisSerialPort.getInputStream();
@@ -269,6 +276,119 @@ public class MyApplication extends MultiDexApplication {
         currentLocation.setHeading(0.0f);
         currentLocation.setAcqtime(new Date(Constant.SYSTEM_DATE.getTime() - 10 * 60 * 1000));
         currentLocation.setSpeed(0.0f);
+
+        initUSB();
+    }
+
+    public void startSendThread(){
+        new SendingThread().start();
+    }
+
+    public D2xxManager ftdid2xx;
+    public final Map<String, USBInfo> openMap = new HashMap<>();
+    public Handler usbHandler;
+
+    private void initUSB() {
+        try {
+            ftdid2xx = D2xxManager.getInstance(this);
+
+            if (ftdid2xx != null) {
+                ftdid2xx.createDeviceInfoList(this);
+            }
+            usbHandler = new Handler() {
+                @Override
+                public void handleMessage(Message msg) {
+                    USBEvent usbEvent = new USBEvent();
+                    switch (msg.what) {
+                        case 0x1:
+                            usbEvent.setWhat(0x1);
+                            usbEvent.setMessage((byte[]) msg.obj);
+                            break;
+                        case 0x2:
+                            usbEvent.setWhat(0x2);
+                            usbEvent.setMessage((byte[]) msg.obj);
+                            break;
+                    }
+                    EventBus.getDefault().post(usbEvent);
+                }
+            };
+            String str = PreferencesUtils.getString(getApplicationContext(), "usb_path", "");
+            if (!TextUtils.isEmpty(str)) {
+                String[] paths = str.split(",");
+                for (int i = 0; i < paths.length; i++) {
+                    String[] arr = paths[i].split(":");
+                    connectFunction(arr[0], arr[1]);
+                }
+            }
+        } catch (D2xxManager.D2xxException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void connectFunction(final String path, final String baudRate) {
+        if (openMap.containsKey(path)) return;
+        final USBInfo usbInfo = new USBInfo();
+        openMap.put(path, usbInfo);
+        usbInfo.setPath(path);
+        usbInfo.setBaudrate(baudRate);
+        int openIndex = Integer.parseInt(path);
+        final FT_Device ftDevice = ftdid2xx.openByIndex(this, openIndex - 1);
+        if (ftDevice == null) {
+            return;
+        }
+        if (true == ftDevice.isOpen()) {
+            usbInfo.setFtDevice(ftDevice);
+            usbHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ftDevice.setBitMode((byte) 0, D2xxManager.FT_BITMODE_RESET);
+                    ftDevice.setBaudRate(Integer.parseInt(baudRate));
+                    ftDevice.setDataCharacteristics(D2xxManager.FT_DATA_BITS_8, D2xxManager.FT_STOP_BITS_1, D2xxManager.FT_PARITY_NONE);
+                    ftDevice.setFlowControl(D2xxManager.FT_FLOW_NONE, (byte) 0x0b, (byte) 0x0d);
+                    AisReadThread aisReadThread = new AisReadThread(path, ftDevice, usbHandler);
+                    usbInfo.setReadThread(aisReadThread);
+                    aisReadThread.start();
+                }
+            }, 1000);
+            String str = PreferencesUtils.getString(getApplicationContext(), "usb_path", "");
+            PreferencesUtils.putString(getApplicationContext(), "usb_path", str + path + ":" + baudRate + ",");
+        } else {
+            Toast.makeText(this, "打开串口" + path + "失败", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void disconnectFunction(String currentPath) {
+        if (!openMap.containsKey(currentPath)) return;
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        USBInfo usb = openMap.get(currentPath);
+        FT_Device ftDevice = usb.getFtDevice();
+        if (ftDevice != null) {
+            synchronized (ftDevice) {
+                if (true == ftDevice.isOpen()) {
+                    ftDevice.close();
+                }
+            }
+        }
+        AisReadThread aisReadThread = usb.getReadThread();
+        if (aisReadThread != null) {
+            aisReadThread.interrupt();
+        }
+        openMap.remove(currentPath);
+        String str = PreferencesUtils.getString(getApplicationContext(), "usb_path", "");
+        if (!TextUtils.isEmpty(str)) {
+            String[] paths = str.split(",");
+            StringBuffer sb = new StringBuffer();
+            for (int i = 0; i < paths.length; i++) {
+                String[] arr = paths[i].split(":");
+                if (arr[0].equals(currentPath)) continue;
+                sb.append(paths[i] + ",");
+            }
+            PreferencesUtils.putString(getApplicationContext(), "usb_path", sb.toString());
+        }
     }
 
     /**
@@ -278,7 +398,7 @@ public class MyApplication extends MultiDexApplication {
      */
     private void isDangerOfDistance() {
         YimaLib mYimaLib = null;
-        if (mainActivity!=null && mainActivity.mainFragment != null && mainActivity.mainFragment.skiaDrawView != null){
+        if (mainActivity != null && mainActivity.mainFragment != null && mainActivity.mainFragment.skiaDrawView != null) {
             mYimaLib = mainActivity.mainFragment.skiaDrawView.mYimaLib;
         }
         if (mYimaLib == null) return;
@@ -318,7 +438,9 @@ public class MyApplication extends MultiDexApplication {
 
     private Timer warnTimer;
 
-    public DataHandler getHandler() {return mHandler;}
+    public DataHandler getHandler() {
+        return mHandler;
+    }
 
     public static MyApplication getInstance() {
         return mContext;
@@ -694,7 +816,7 @@ public class MyApplication extends MultiDexApplication {
         if (warnTimer != null) {
             warnTimer.cancel();
         }
-        if (mInputStream != null ){
+        if (mInputStream != null) {
             try {
                 mInputStream.close();
             } catch (IOException e) {
@@ -724,12 +846,12 @@ public class MyApplication extends MultiDexApplication {
             String path = Constant.SERIAL_DATA_PORT_PATH;
             int baudrate = Constant.SERIAL_DATA_PORT_BAUD_RATE;
 
-			/* Check parameters */
+            /* Check parameters */
             if ((path.length() == 0) || (baudrate == -1)) {
                 throw new InvalidParameterException();
             }
 
-			/* Open the serial port */
+            /* Open the serial port */
             mSerialPort = new SerialPort(new File(path), baudrate, 0);
         }
         return mSerialPort;
@@ -753,16 +875,16 @@ public class MyApplication extends MultiDexApplication {
 //    }
     public SerialPort getAisSerialPort() throws SecurityException, IOException, InvalidParameterException {
         if (aisSerialPort == null) {
-                /* Read serial port parameters */
+            /* Read serial port parameters */
             String path = Constant.SERIAL_AIS_PORT_PATH;
             int baudrate = Constant.SERIAL_AIS_PORT_BAUD_RATE;
 
-                /* Check parameters */
+            /* Check parameters */
             if ((path.length() == 0) || (baudrate == -1)) {
                 throw new InvalidParameterException();
             }
 
-                /* Open the serial port */
+            /* Open the serial port */
             aisSerialPort = new SerialPort(new File(path), baudrate, 0);
         }
         return aisSerialPort;
@@ -852,15 +974,15 @@ public class MyApplication extends MultiDexApplication {
             String head = Util.bytesGetHead(serialBuffer, 3);
             if (head == null) return;
             if (head.equals("$04") ||
-                head.equals("$R4") ||
-                head.equals("$R1") ||
-                head.equals("$R2") ||
-                head.equals("$R5") ||
-                head.equals("$R0") ||
-                head.equals("$R6") ||
-                head.equals("$R7") ||
-                head.equals("$R8") ||
-                head.equals("$RA")) {
+                    head.equals("$R4") ||
+                    head.equals("$R1") ||
+                    head.equals("$R2") ||
+                    head.equals("$R5") ||
+                    head.equals("$R0") ||
+                    head.equals("$R6") ||
+                    head.equals("$R7") ||
+                    head.equals("$R8") ||
+                    head.equals("$RA")) {
                 hasHead = true;
             } else {
                 Util.bytesRemoveFirst(serialBuffer, serialCount);
@@ -876,6 +998,7 @@ public class MyApplication extends MultiDexApplication {
                 return;
             }
             if (serialBuffer[serialCount - 2] == (byte) 0x0D && serialBuffer[serialCount - 1] == (byte) 0x0A) {
+                serialBuffer = ByteUtil.subBytes(serialBuffer, 0, serialCount);
                 System.out.println("收到包：" + ConvertUtil.bytesToHexString(serialBuffer));
                 Message message = new Message();
                 Bundle bundle = new Bundle();
@@ -897,6 +1020,7 @@ public class MyApplication extends MultiDexApplication {
                 serialBuffer = new byte[100];
                 serialCount = 0;
             } else if (serialBuffer[serialCount - 1] == (byte) 0x3B) {
+                serialBuffer = ByteUtil.subBytes(serialBuffer, 0, serialCount);
                 System.out.println("收到包：" + ConvertUtil.bytesToHexString(serialBuffer));
                 Message message = new Message();
                 Bundle bundle = new Bundle();
@@ -1028,23 +1152,50 @@ public class MyApplication extends MultiDexApplication {
     }
 
     private static final Queue<com.cetcme.xkterminal.Sqlite.Bean.Message> MESSAGE_QUEUE = new LinkedBlockingQueue<>();
+    private static final Queue<com.cetcme.xkterminal.Sqlite.Bean.Message> MESSAGE_BACK_QUEUE = new LinkedBlockingQueue<>();
+
+
+    public void sendMessageBytes(final byte[] buffer) {
+        if (!Constant.PHONE_TEST) {
+            try {
+                com.cetcme.xkterminal.Sqlite.Bean.Message msg = new com.cetcme.xkterminal.Sqlite.Bean.Message();
+                msg.setId(0);
+                msg.setMessage(buffer);
+                msg.setSend(false);
+                //if (db.saveBindingId(msg)) {
+                MESSAGE_QUEUE.offer(msg);
+                //}
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    String nettySendResult = SendMsg.getSendMsg().sendMsg(buffer);
+                    Log.e(TAG, "sendBytes: " + nettySendResult);
+                }
+            }).start();
+        }
+    }
+
 
     public void sendBytes(final byte[] buffer) {
         if (!Constant.PHONE_TEST) {
             String str = new String(buffer);
-            if (str!=null && str.startsWith("$04")) {
-                synchronized (MESSAGE_QUEUE) {
-                    try {
-                        com.cetcme.xkterminal.Sqlite.Bean.Message msg = new com.cetcme.xkterminal.Sqlite.Bean.Message();
-                        msg.setMessage(buffer);
-                        msg.setSend(false);
-                        if(db.saveBindingId(msg)){
-                            MESSAGE_QUEUE.offer(msg);
-                        }
-                    } catch (DbException e) {
-                        e.printStackTrace();
+            if (str != null && str.startsWith("$04")) {
+//                synchronized (MESSAGE_QUEUE) {
+                try {
+                    com.cetcme.xkterminal.Sqlite.Bean.Message msg = new com.cetcme.xkterminal.Sqlite.Bean.Message();
+                    msg.setMessage(buffer);
+                    msg.setSend(false);
+                    if (db.saveBindingId(msg)) {
+                        MESSAGE_BACK_QUEUE.offer(msg);
                     }
+                } catch (DbException e) {
+                    e.printStackTrace();
                 }
+//                }
             } else {
                 new Thread(new Runnable() {
                     @Override
@@ -1068,7 +1219,7 @@ public class MyApplication extends MultiDexApplication {
                 }
             }).start();
         }
-        System.out.println("发送包：" + ConvertUtil.bytesToHexString(buffer));
+//        System.out.println("发送包：" + ConvertUtil.bytesToHexString(buffer));
     }
 
     private class SendingThread extends Thread {
@@ -1077,9 +1228,9 @@ public class MyApplication extends MultiDexApplication {
             try {
                 List<com.cetcme.xkterminal.Sqlite.Bean.Message> msgs = db.selector(com.cetcme.xkterminal.Sqlite.Bean.Message.class)
                         .findAll();
-                if (msgs != null && !msgs.isEmpty()){
-                    for (com.cetcme.xkterminal.Sqlite.Bean.Message msg : msgs){
-                        MESSAGE_QUEUE.offer(msg);
+                if (msgs != null && !msgs.isEmpty()) {
+                    for (com.cetcme.xkterminal.Sqlite.Bean.Message msg : msgs) {
+                        MESSAGE_BACK_QUEUE.offer(msg);
                     }
                 }
             } catch (DbException e) {
@@ -1090,19 +1241,27 @@ public class MyApplication extends MultiDexApplication {
         @Override
         public void run() {
             try {
-                while(true) {
-                    if (MESSAGE_QUEUE.isEmpty()) continue;
-                    synchronized (MESSAGE_QUEUE) {
-                        com.cetcme.xkterminal.Sqlite.Bean.Message msg = MESSAGE_QUEUE.poll();
-                        if (msg != null && mOutputStream != null) {
-                            mOutputStream.write(msg.getMessage());
-                            db.delete(msg);
-                            if (MESSAGE_QUEUE.size() > 1) {
-                                Thread.sleep(3000);
-                            }
-                        }
+                while (true) {
+                    com.cetcme.xkterminal.Sqlite.Bean.Message msg = null;
+                    boolean flag = true;
+                    if (MESSAGE_QUEUE.isEmpty()) {
+                        if (MESSAGE_BACK_QUEUE.isEmpty()) continue;
+                        msg = MESSAGE_BACK_QUEUE.poll();
+                    } else {
+                        msg = MESSAGE_QUEUE.poll();
+                        flag = false;
                     }
-                    Thread.sleep(60000);
+                    if (msg != null && mOutputStream != null) {
+                        mOutputStream.write(msg.getMessage());
+                        mOutputStream.flush();
+                        if (flag) {
+                            db.delete(msg);
+                        }
+                        String str = DateUtil.parseDateToString(Constant.SYSTEM_DATE, DateUtil.DatePattern.YYYYMMDDHHMMSS);
+                        PreferencesUtils.putString(getApplicationContext(), "lastSendTime", str);
+                        Thread.sleep(3000);
+                        Thread.sleep(60000);
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();

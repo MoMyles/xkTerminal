@@ -47,11 +47,11 @@ public class BackBar extends RelativeLayout implements View.OnClickListener{
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.button_back:
-                if (mainActivity.backButtonStatus.equals("backToMain")) {
                     mainActivity.initMainFragment();
-                } else if (mainActivity.backButtonStatus.equals("backToMessageList")) {
-                    mainActivity.backToMessageFragment();
-                }
+//                if (mainActivity.backButtonStatus.equals("backToMain")) {
+//                } else if (mainActivity.backButtonStatus.equals("backToMessageList")) {
+//                    mainActivity.backToMessageFragment();
+//                }
 
                 break;
             default:

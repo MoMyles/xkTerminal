@@ -586,14 +586,18 @@ public class USBFragment extends Fragment implements View.OnClickListener {
                     }
 
                     ftDevice.read(readData, iavailable);
+
+                    byte[] byts = new byte[iavailable];
+
+                    for (int i = 0; i < iavailable; i++) {
+                        byts[i] = readData[i];
+                        formatAis(readData[i]);
+                    }
                     if (currentPath.equals(path)) {
                         Message message = Message.obtain();
                         message.what = 0x1;
-                        message.obj = readData;
+                        message.obj = byts;
                         handler.sendMessage(message);
-                    }
-                    for (int i = 0; i < iavailable; i++) {
-                        formatAis(readData[i]);
                     }
                 }
             }

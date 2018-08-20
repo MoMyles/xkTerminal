@@ -36,6 +36,14 @@ public class ByteUtil {
 		return result;
 	}
 
+	public static int computeCheckSum(byte[] buf, int start, int end) {
+		int sum = 0;
+		for (int i = start; i < end; i++) {
+			sum += (buf[i] + 256) % 256;
+		}
+		return (sum & 0xFF);
+	}
+
 	/**
 	 * @功能: BCD码转为10进制串(阿拉伯数据)
 	 * @参数: BCD码
@@ -48,5 +56,15 @@ public class ByteUtil {
 			temp.append((byte) (bytes[i] & 0x0f));
 		}
 		return temp.toString().substring(0, 1).equalsIgnoreCase("0") ? temp.toString().substring(1) : temp.toString();
+	}
+
+	public static String byte2Str(byte b) {
+		String hexStr = Integer.toString(b, 16);
+		if (hexStr.length() == 1) {
+			hexStr = "0" + hexStr;
+		} else if (hexStr.length() > 2) {
+			hexStr = hexStr.substring(hexStr.length() - 2);
+		}
+		return hexStr;
 	}
 }

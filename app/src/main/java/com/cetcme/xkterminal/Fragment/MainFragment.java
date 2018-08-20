@@ -355,6 +355,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                 skiaDrawView.postInvalidate();
             }
         }, 200);
+
         return view;
     }
 
@@ -604,9 +605,9 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                     arrX[i] = geoX.get(i);
                     arrY[i] = geoY.get(i);
                 }
-                boolean exists = MapUtils.isPtInPoly(lb.getLongitude(), lb.getLatitude(), arrX, arrY);
-//                skiaDrawView.mYimaLib.IsPointInFace(lb.getLongitude(), lb.getLatitude(),
-//                        arrX, arrY, size);
+                boolean exists = //MapUtils.isPtInPoly(lb.getLongitude(), lb.getLatitude(), arrX, arrY);
+                skiaDrawView.mYimaLib.IsPointInFace(lb.getLongitude(), lb.getLatitude(),
+                        arrX, arrY, size);
                 switch (area.getType()) {
                     case 0:// 禁渔
                         if (exists) {

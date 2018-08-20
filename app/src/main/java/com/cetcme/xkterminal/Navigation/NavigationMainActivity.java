@@ -10,22 +10,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.text.InputType;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.MyApplication;
-import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.MyClass.SoundPlay;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
@@ -53,7 +48,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
     int routeID = -1;
 
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-//    private Button mITVMenu;
+    //    private Button mITVMenu;
     private AppCompatButton mClearTrack;
     private AppCompatButton mListTrack;
     private LinearLayout mLlBottom;
@@ -115,8 +110,13 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
                 }
                 fMainView.mYimaLib.SetCurrentScale(20000.0f);
                 fMainView.postInvalidate();
-                // 更改了bottombar之后的改动
-                onOpen();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        // 更改了bottombar之后的改动
+                        onOpen();
+                    }
+                }, 200);
             }
         }, 200);
     }
@@ -191,6 +191,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
                 break;
         }
     }
+
     @Override
     protected void onResume() {
         new Handler().postDelayed(new Runnable() {

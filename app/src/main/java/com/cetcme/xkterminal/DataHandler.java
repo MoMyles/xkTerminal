@@ -23,6 +23,8 @@ import com.cetcme.xkterminal.Socket.SocketServer;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 import com.cetcme.xkterminal.Sqlite.Proxy.GroupProxy;
 import com.cetcme.xkterminal.netty.utils.Constants;
+import com.cetcme.xkterminal.port.USBInfo;
+import com.ftdi.j2xx.FT_Device;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 
@@ -33,6 +35,8 @@ import org.xutils.DbManager;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -145,6 +149,23 @@ public class DataHandler extends Handler {
                     int group = Integer.parseInt(messageStrings[3]);
                     int frameCount = Integer.parseInt(messageStrings[4]);
                     switch (type) {
+                        case MessageFormat.MESSAGE_TYPE_BROADCASTING:// 电台信息
+                            Map<String, USBInfo> map = MyApplication.getInstance().openMap;
+                            if (map != null && !map.isEmpty()) {
+                                Set<Map.Entry<String, USBInfo>> entry = map.entrySet();
+                                for (Map.Entry<String, USBInfo> e : entry) {
+                                    if (e != null) {
+                                        USBInfo usbInfo = e.getValue();
+                                        if (usbInfo != null) {
+                                            FT_Device device = usbInfo.getFtDevice();
+                                            if (device != null) {
+                                                device.write(content.getBytes());
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            break;
                         // 普通短信
                         case MessageFormat.MESSAGE_TYPE_NORMAL:
                             this.content += content;

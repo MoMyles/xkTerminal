@@ -32,6 +32,7 @@ public class MessageFormat {
     public static final String MESSAGE_TYPE_CALLBACK               = "14"; // 回复成功状态位
 
     public static final String MESSAGE_TYPE_APP_VERSION         = "15"; // 获取服务器app版本号
+    public static final String MESSAGE_TYPE_BROADCASTING        = "16"; // 电台信息
 
     private static final String messageHead = "$04";
 

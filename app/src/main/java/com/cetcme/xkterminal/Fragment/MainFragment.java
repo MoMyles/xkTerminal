@@ -10,16 +10,18 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -166,7 +168,36 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
 //        aisInfoAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, datas);
 //        mLvAisInfo.setAdapter(aisInfoAdapter);
 
+        final Spinner sp_blendent = view.findViewById(R.id.sp_blendent);
+        final String[] blendentList = new String[]{"自动", "白天", "夜间"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, blendentList);
+        sp_blendent.setAdapter(adapter);
+        sp_blendent.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                PreferencesUtils.putString(getActivity(), "map_color_mode", blendentList[position]);
+                skiaDrawView.changeMapColorMode();
+            }
 
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        int selection = 0;
+        String colorModeType = PreferencesUtils.getString(getActivity(), "map_color_mode", "自动");
+        switch (colorModeType){
+            case "自动":
+                selection = 0;
+                break;
+            case "白天":
+                selection = 1;
+                break;
+            case "夜间":
+                selection = 2;
+                break;
+        }
+        sp_blendent.setSelection(selection);
         alert_confirm_btn = view.findViewById(R.id.alert_confirm_btn);
         alert_confirm_btn.setOnClickListener(new View.OnClickListener() {
             @Override

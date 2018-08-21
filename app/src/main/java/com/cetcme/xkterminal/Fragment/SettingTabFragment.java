@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.cetcme.xkterminal.Fragment.setting.DBSettingFragment;
+import com.cetcme.xkterminal.Fragment.setting.Satellite2Fragment;
 import com.cetcme.xkterminal.Fragment.setting.SatelliteFragment;
 import com.cetcme.xkterminal.Fragment.setting.SystemAboutFragment;
 import com.cetcme.xkterminal.Fragment.setting.SystemSettingFragment;
@@ -163,7 +164,7 @@ public class SettingTabFragment extends Fragment {
         tv_tab6.setOnClickListener(new TabOnClickListener(4));
 
         fragments.add(new DBSettingFragment());
-        fragments.add(new SatelliteFragment());
+        fragments.add(Satellite2Fragment.newInstance());
 //        fragments.add(new WarningSettingFragment());
 //        fragments.add(new SeriveStatusFragment());
         fragments.add(USBFragment2.newInstance());

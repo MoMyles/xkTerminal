@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -21,6 +22,7 @@ import com.cetcme.xkterminal.Sqlite.Bean.PinBean;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -67,6 +69,13 @@ public class SkiaDrawView extends View {
 
     private final List<PinBean> pinBeans = new ArrayList<>();
 
+    private int currentColorMode = 2;
+    private String currentColorModeType = "自动";
+    private boolean isAuto = true;
+
+    private final Handler timerHandler = new Handler();
+    private Runnable currentRunnable = null;
+
     public SkiaDrawView(Context ctx, AttributeSet attr) {
         super(ctx, attr);
         mYimaLib = new YimaLib();
@@ -86,8 +95,6 @@ public class SkiaDrawView extends View {
 
         boolean islicenceOk = mYimaLib.GetIfHadSetRightLicenceKey();
         Log.e("yima", "GetIfHadSetRightLicenceKey: " + islicenceOk);
-
-
 //        String DeviceID = SkiaDrawView.mYimaLib.GetDeviceIDForLicSvr();
 //        int UsrId = SkiaDrawView.mYimaLib.GetUsrID();
 //
@@ -96,11 +103,12 @@ public class SkiaDrawView extends View {
 //
 //        boolean islicenceOk = SkiaDrawView.mYimaLib.GetIfHadSetRightLicenceKey();
 //        Log.e("yima", "islicenceOk: " + islicenceOk);
+        changeMapColorMode();
     }
 
     @Override
     public void onSizeChanged(int w, int h, int oldw, int oldh) {
-        fSkiaBitmap = Bitmap.createBitmap(w,h, Bitmap.Config.ARGB_8888);
+        fSkiaBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         String strTtfFilePath = Constant.YIMA_WORK_PATH + "/DroidSansFallback.ttf";
 //        mYimaLib.SetDisplayCategory(3);
         mYimaLib.SetDisplayCategory(mode);
@@ -110,7 +118,7 @@ public class SkiaDrawView extends View {
 
     private int mode = 0;
 
-    public void changeMap(int mode){
+    public void changeMap(int mode) {
         mYimaLib.SetDisplayCategory(mode);
         postInvalidate();
     }
@@ -371,6 +379,70 @@ public class SkiaDrawView extends View {
 
     public void setOnMapClickListener(OnMapClickListener onMapClickListener) {
         this.onMapClickListener = onMapClickListener;
+    }
+
+    public void changeMapColorMode() {
+        String modeType = PreferencesUtils.getString(mContext, "map_color_mode", "自动");
+        switch (modeType) {
+            case "自动":
+                isAuto = true;
+                if ("自动".equals(currentColorModeType)) {
+                    break;
+                }
+                currentColorModeType = "自动";
+                timerHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (!isAuto) return;
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTime(com.cetcme.xkterminal.MyClass.Constant.SYSTEM_DATE);
+                        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+                        if (hour >= 6 && hour < 19) {
+                            if (currentColorMode != 2 && mYimaLib != null) {
+                                currentColorMode = 2;
+                                mYimaLib.SetColorModel(2);
+                            }
+                        } else {
+                            if (currentColorMode != 4 && mYimaLib != null) {
+                                currentColorMode = 4;
+                                mYimaLib.SetColorModel(4);
+                            }
+                        }
+                        currentRunnable = this;
+                        timerHandler.postDelayed(this, 30 * 60 * 1000);
+                    }
+                }, 0);
+                break;
+            case "白天":
+                isAuto = false;
+                if ("白天".equals(currentColorModeType)) {
+                    break;
+                }
+                currentColorModeType = "白天";
+                if (mYimaLib != null) {
+                    currentColorMode = 2;
+                    mYimaLib.SetColorModel(2);
+                }
+                if (currentRunnable != null) {
+                    timerHandler.removeCallbacks(currentRunnable);
+                }
+                break;
+            case "夜间":
+                isAuto = false;
+                if ("夜间".equals(currentColorModeType)) {
+                    break;
+                }
+                currentColorModeType = "夜间";
+                if (mYimaLib != null) {
+                    currentColorMode = 4;
+                    mYimaLib.SetColorModel(4);
+                }
+                if (currentRunnable != null) {
+                    timerHandler.removeCallbacks(currentRunnable);
+                }
+                break;
+        }
+        postInvalidate();
     }
 
     public interface OnMapClickListener {

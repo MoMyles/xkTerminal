@@ -145,10 +145,12 @@ public class SatelliteView extends View {
         double y = cy + Math.sin(radian) * r2;
         if ("GPS".equals(type)) {
             canvas.drawCircle((float) x, (float) y, 10, mGPSPaint);
-        } else if ("BD".equals(type)) {
+        } else if ("BD2".equals(type)) {
             canvas.drawCircle((float) x, (float) y, 10, mBDPaint);
+        } else {
+            return;
         }
-        canvas.drawText(satellite.getNo()+"", (float)x, (float)y + 5,mNoPaint);
+        canvas.drawText(ltTen(satellite.getNo()), (float)x, (float)y + 5,mNoPaint);
     }
 
     /**
@@ -164,5 +166,10 @@ public class SatelliteView extends View {
     public void setDatas(List<Satellite> mDatas) {
         this.datas = mDatas;
         postInvalidate();
+    }
+
+    private String ltTen(int i){
+        if (i < 10) return "0" + i;
+        return "" + i;
     }
 }

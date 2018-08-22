@@ -6,10 +6,19 @@
 
     <LinearLayout
         android:id="@+id/ll_column_charts"
-        android:layout_width="300dp"
+        android:layout_width="400dp"
         android:layout_height="match_parent"
         android:layout_alignParentRight="true"
         android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:text="GPS" />
 
         <lecho.lib.hellocharts.view.ColumnChartView
             android:id="@+id/chart1"
@@ -17,11 +26,31 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:text="北斗2号" />
+
         <lecho.lib.hellocharts.view.ColumnChartView
             android:id="@+id/chart2"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:text="北斗1号" />
 
         <lecho.lib.hellocharts.view.ColumnChartView
             android:id="@+id/chart3"
@@ -31,10 +60,61 @@
 
     </LinearLayout>
 
-    <com.cetcme.xkterminal.Fragment.setting.SatelliteView
-        android:id="@+id/satellites"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_toLeftOf="@id/ll_column_charts" />
+        android:layout_toLeftOf="@id/ll_column_charts">
 
+        <com.cetcme.xkterminal.Fragment.setting.SatelliteView
+            android:id="@+id/satellites"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:orientation="vertical"
+            android:gravity="right"
+            android:layout_marginRight="4dp"
+            android:layout_marginBottom="4dp">
+
+            <LinearLayout
+                android:id="@+id/ll_gps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="GPS:" />
+
+                <ImageView
+                    android:layout_width="12px"
+                    android:layout_height="12px"
+                    android:src="@drawable/circle_green" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_bd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="北斗2号:" />
+
+                <ImageView
+                    android:layout_width="12px"
+                    android:layout_height="12px"
+                    android:src="@drawable/circle_red" />
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
 </RelativeLayout>

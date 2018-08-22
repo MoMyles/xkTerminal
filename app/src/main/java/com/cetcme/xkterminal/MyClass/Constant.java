@@ -29,7 +29,7 @@ public class Constant {
     public static final int MESSAGE_CONTENT_MAX_LENGTH = 64; // 54; TODO: fake
 
     // 短信发送失败等待时间
-    public static final int MESSAGE_FAIL_TIME = 5000;
+    public static final int MESSAGE_FAIL_TIME = 7000;
 
     // 打卡对话框自动关闭时间，0为不关闭，ms
     public static final int IDCARD_REMAIN_TIME = 5000;

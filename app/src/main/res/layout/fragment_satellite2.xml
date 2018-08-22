@@ -20,7 +20,7 @@
             android:layout_marginTop="8dp"
             android:text="GPS" />
 
-        <lecho.lib.hellocharts.view.ColumnChartView
+        <com.github.mikephil.charting.charts.BarChart
             android:id="@+id/chart1"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -36,7 +36,7 @@
             android:layout_marginTop="8dp"
             android:text="北斗2号" />
 
-        <lecho.lib.hellocharts.view.ColumnChartView
+        <com.github.mikephil.charting.charts.BarChart
             android:id="@+id/chart2"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -52,7 +52,7 @@
             android:layout_marginTop="8dp"
             android:text="北斗1号" />
 
-        <lecho.lib.hellocharts.view.ColumnChartView
+        <com.github.mikephil.charting.charts.BarChart
             android:id="@+id/chart3"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -75,10 +75,10 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
-            android:orientation="vertical"
-            android:gravity="right"
+            android:layout_marginBottom="4dp"
             android:layout_marginRight="4dp"
-            android:layout_marginBottom="4dp">
+            android:gravity="right"
+            android:orientation="vertical">
 
             <LinearLayout
                 android:id="@+id/ll_gps"

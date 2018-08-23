@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
@@ -63,6 +64,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.InvalidParameterException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -1151,17 +1153,21 @@ public class MyApplication extends MultiDexApplication {
     private static final Queue<com.cetcme.xkterminal.Sqlite.Bean.Message> MESSAGE_QUEUE = new LinkedBlockingQueue<>();
     private static final Queue<com.cetcme.xkterminal.Sqlite.Bean.Message> MESSAGE_BACK_QUEUE = new LinkedBlockingQueue<>();
 
+    private static final ArrayList<com.cetcme.xkterminal.Sqlite.Bean.Message> WAIT_MESSAGE = new ArrayList();
 
-    public void sendMessageBytes(final byte[] buffer) {
+    public void sendMessageBytes(int msgId, final byte[] buffer, boolean longPackage) {
         if (!Constant.PHONE_TEST) {
             try {
                 com.cetcme.xkterminal.Sqlite.Bean.Message msg = new com.cetcme.xkterminal.Sqlite.Bean.Message();
                 msg.setId(0);
+                msg.setMessageId(msgId);
                 msg.setMessage(buffer);
                 msg.setSend(false);
-                //if (db.saveBindingId(msg)) {
-                MESSAGE_QUEUE.offer(msg);
-                //}
+                if (longPackage) {
+                    WAIT_MESSAGE.add(msg);
+                } else {
+                    MESSAGE_QUEUE.offer(msg);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1250,23 +1256,64 @@ public class MyApplication extends MultiDexApplication {
                     }
                     if (msg != null && mOutputStream != null) {
                         messageSendFailed = true;
-                        mOutputStream.write(msg.getMessage());
-                        Log.e("TAG", "=================================================================");
+                        byte[] content = msg.getMessage();
+                        mOutputStream.write(content);
 //                        mOutputStream.flush();
                         if (flag) {
                             db.delete(msg);
                         } else {
+                            String str = DateUtil.parseDateToString(Constant.SYSTEM_DATE, DateUtil.DatePattern.YYYYMMDDHHMMSS);
+                            PreferencesUtils.putString(getApplicationContext(), "lastSendTime", str);
                             //超时时间 过了
-                            Thread.sleep(Constant.MESSAGE_FAIL_TIME + 1000);
+                            Thread.sleep(Constant.MESSAGE_FAIL_TIME + 2000);
                             if (messageSendFailed) {
+                                Calendar calendar = Calendar.getInstance();
+                                calendar.setTime(Constant.SYSTEM_DATE);
+                                calendar.add(Calendar.SECOND, -61);
+                                str = DateUtil.parseDateToString(calendar.getTime(), DateUtil.DatePattern.YYYYMMDDHHMMSS);
+                                PreferencesUtils.putString(getApplicationContext(), "lastSendTime", str);
                                 //失败
+                                if (msg.getMessageId() != 0) {
+                                    MessageProxy.setMessageFailed(db, failedMessageId);
+                                    if (mainActivity != null && mainActivity.fragmentName != null && mainActivity.messageFragment != null) {
+                                        if (mainActivity.fragmentName.equals("message") && mainActivity.messageFragment.tg.equals("send")) {
+                                            mainActivity.messageFragment.reloadDate();
+                                        }
+                                    }
+                                    if (Looper.myLooper() != Looper.getMainLooper()) {
+                                        Looper.prepare();
+                                        Toast.makeText(getApplicationContext(), "发送失败", Toast.LENGTH_SHORT).show();
+                                        Looper.loop();
+                                    } else {
+                                        Toast.makeText(getApplicationContext(), "发送失败", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                                if (!WAIT_MESSAGE.isEmpty()) {
+                                    Iterator<com.cetcme.xkterminal.Sqlite.Bean.Message> iterator = WAIT_MESSAGE.iterator();
+                                    while (iterator.hasNext()) {
+                                        com.cetcme.xkterminal.Sqlite.Bean.Message m = iterator.next();
+                                        if (m.getMessageId() == msg.getMessageId()) {
+                                            iterator.remove();
+                                            break;
+                                        }
+                                    }
+                                }
                                 continue;
                             } else {
-                                Thread.sleep(55000);
+                                if (!WAIT_MESSAGE.isEmpty()) {
+                                    Iterator<com.cetcme.xkterminal.Sqlite.Bean.Message> iterator = WAIT_MESSAGE.iterator();
+                                    while (iterator.hasNext()) {
+                                        com.cetcme.xkterminal.Sqlite.Bean.Message m = iterator.next();
+                                        if (m.getMessageId() == msg.getMessageId()) {
+                                            MESSAGE_QUEUE.offer(m);
+                                            iterator.remove();
+                                            break;
+                                        }
+                                    }
+                                }
+                                Thread.sleep(51000);
                             }
                         }
-                        String str = DateUtil.parseDateToString(Constant.SYSTEM_DATE, DateUtil.DatePattern.YYYYMMDDHHMMSS);
-                        PreferencesUtils.putString(getApplicationContext(), "lastSendTime", str);
                     }
                 }
             } catch (Exception e) {

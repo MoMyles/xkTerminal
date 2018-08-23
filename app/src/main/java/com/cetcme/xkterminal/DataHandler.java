@@ -170,7 +170,8 @@ public class DataHandler extends Handler {
                         case MessageFormat.MESSAGE_TYPE_NORMAL:
                             this.content += content;
                             if (frameCount == 0) {
-                                SoundPlay.playMessageSound(myApplication.mainActivity);
+//                                SoundPlay.playMessageSound(myApplication.mainActivity);
+                                MainActivity.play("您有新的短信");
                                 myApplication.mainActivity.addMessage(address, this.content, false);
                                 myApplication.mainActivity.modifyGpsBarMessageCount();
                                 Toast.makeText(myApplication.mainActivity, "您有新的短信", Toast.LENGTH_SHORT).show();
@@ -370,7 +371,7 @@ public class DataHandler extends Handler {
                         final boolean gpsStatus = status.charAt(7) == '1';
                         Log.e("TAG", status+","+status2);
                         if (status.charAt(5) == '1'){
-                            MyApplication.powerFrom = "船位供电";
+                            MyApplication.powerFrom = "船舶供电";
                         } else {
                             MyApplication.powerFrom = "电池供电";
                         }

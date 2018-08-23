@@ -1252,7 +1252,6 @@ public class MyApplication extends MultiDexApplication {
                     }
                     if (msg != null && mOutputStream != null) {
                         mOutputStream.write(msg.getMessage());
-                        mOutputStream.flush();
                         if (flag) {
                             db.delete(msg);
                         }

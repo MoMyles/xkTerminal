@@ -41,6 +41,7 @@ public class DBSettingFragment extends Fragment {
 
     @BindView(R.id.tv_address) TextView tv_address;
     @BindView(R.id.tv_voltage) TextView tv_voltage;
+    @BindView(R.id.tv_power) TextView tv_power;
 
     Unbinder unbinder;
 
@@ -177,6 +178,7 @@ public class DBSettingFragment extends Fragment {
         */
 
         tv_voltage.setText(MyApplication.voltage.equals("-") ? "---" : MyApplication.voltage + "V");
+        tv_power.setText(MyApplication.powerFrom.equals("-") ? "---" : MyApplication.powerFrom);
     }
 
 
@@ -185,6 +187,7 @@ public class DBSettingFragment extends Fragment {
         switch (type){
             case "voltage":
                 tv_voltage.setText(MyApplication.voltage.equals("-") ? "---" : MyApplication.voltage + "V");
+                tv_power.setText(MyApplication.powerFrom.equals("-") ? "---" : MyApplication.powerFrom);
                 break;
         }
 //        try {

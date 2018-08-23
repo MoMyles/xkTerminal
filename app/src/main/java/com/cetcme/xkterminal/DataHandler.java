@@ -361,13 +361,19 @@ public class DataHandler extends Handler {
                     }
 
                     String status = Util.byteToBit(ByteUtil.subBytes(bytes, 21, 22)[0]);
+                    String status2 = Util.byteToBit(ByteUtil.subBytes(bytes, 22, 23)[0]);
 
                     // 重新启用 来自数据串口的是否定位信息
                     // 开机显示自检中loading 1 toast自检完成 如果0 弹窗 dismiss loading
                     // 运行过程中收到 则不显示自检完成
                     if (myApplication.mainActivity != null) {
                         final boolean gpsStatus = status.charAt(7) == '1';
-
+                        Log.e("TAG", status+","+status2);
+                        if (status.charAt(5) == '1'){
+                            MyApplication.powerFrom = "船位供电";
+                        } else {
+                            MyApplication.powerFrom = "电池供电";
+                        }
                         if (!gpsStatus) {
                             myApplication.mainActivity.showMessageDialog("自身设备", "卫星中断故障", MessageDialogActivity.TYPE_ALARM);
 //                            MainActivity.play("卫星中断故障");

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-              android:orientation="vertical"
-             tools:context=".Fragment.setting.DBSettingFragment">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".Fragment.setting.DBSettingFragment">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -19,35 +19,35 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <TextView
                     style="@style/setting_tv_title"
                     android:layout_marginLeft="@dimen/setting_padding"
                     android:layout_marginStart="@dimen/setting_padding"
-                    android:text="用户地址："/>
+                    android:text="用户地址：" />
 
                 <TextView
                     android:id="@+id/tv_address"
                     style="@style/setting_tv_title"
                     android:gravity="center"
-                    android:text="---"/>
+                    android:text="---" />
 
                 <android.support.v4.widget.Space
                     android:layout_width="50dp"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent" />
 
                 <TextView
                     style="@style/setting_tv_title"
-                    android:text="入站频率："/>
+                    android:text="入站频率：" />
 
                 <TextView
                     style="@style/setting_tv_title"
-                    android:gravity="center"
-                    android:layout_marginRight="@dimen/setting_padding"
                     android:layout_marginEnd="@dimen/setting_padding"
-                    android:text="---"/>
+                    android:layout_marginRight="@dimen/setting_padding"
+                    android:gravity="center"
+                    android:text="60s" />
 
             </LinearLayout>
 
@@ -60,34 +60,34 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <TextView
                     style="@style/setting_tv_title"
                     android:layout_marginLeft="@dimen/setting_padding"
                     android:layout_marginStart="@dimen/setting_padding"
-                    android:text="位置数据报告："/>
+                    android:text="位置数据报告：" />
 
                 <TextView
                     style="@style/setting_tv_title"
                     android:gravity="center"
-                    android:text="---"/>
+                    android:text="是" />
 
                 <android.support.v4.widget.Space
                     android:layout_width="50dp"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent" />
 
                 <TextView
                     style="@style/setting_tv_title"
-                    android:text="航线记录频度："/>
+                    android:text="航线记录频度：" />
 
                 <TextView
                     style="@style/setting_tv_title"
-                    android:gravity="center"
-                    android:layout_marginRight="@dimen/setting_padding"
                     android:layout_marginEnd="@dimen/setting_padding"
-                    android:text="---"/>
+                    android:layout_marginRight="@dimen/setting_padding"
+                    android:gravity="center"
+                    android:text="120s" />
 
             </LinearLayout>
 
@@ -100,34 +100,34 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <TextView
                     style="@style/setting_tv_title"
                     android:layout_marginLeft="@dimen/setting_padding"
                     android:layout_marginStart="@dimen/setting_padding"
-                    android:text="GPS定位频度："/>
+                    android:text="GPS定位频度：" />
 
                 <TextView
                     style="@style/setting_tv_title"
                     android:gravity="center"
-                    android:text="---"/>
+                    android:text="1s" />
 
                 <android.support.v4.widget.Space
                     android:layout_width="50dp"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent" />
 
                 <TextView
                     style="@style/setting_tv_title"
-                    android:text="航向改变门限："/>
+                    android:text="航向改变门限：" />
 
                 <TextView
                     style="@style/setting_tv_title"
-                    android:gravity="center"
-                    android:layout_marginRight="@dimen/setting_padding"
                     android:layout_marginEnd="@dimen/setting_padding"
-                    android:text="---"/>
+                    android:layout_marginRight="@dimen/setting_padding"
+                    android:gravity="center"
+                    android:text="3°" />
 
             </LinearLayout>
 
@@ -140,34 +140,34 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <TextView
                     style="@style/setting_tv_title"
                     android:layout_marginLeft="@dimen/setting_padding"
                     android:layout_marginStart="@dimen/setting_padding"
-                    android:text="速度零值门限："/>
+                    android:text="速度零值门限：" />
 
                 <TextView
                     style="@style/setting_tv_title"
                     android:gravity="center"
-                    android:text="---"/>
+                    android:text="0.5 nm/h" />
 
                 <android.support.v4.widget.Space
                     android:layout_width="50dp"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent" />
 
                 <TextView
                     style="@style/setting_tv_title"
-                    android:text="航速门限："/>
+                    android:text="航速门限：" />
 
                 <TextView
                     style="@style/setting_tv_title"
-                    android:gravity="center"
-                    android:layout_marginRight="@dimen/setting_padding"
                     android:layout_marginEnd="@dimen/setting_padding"
-                    android:text="---"/>
+                    android:layout_marginRight="@dimen/setting_padding"
+                    android:gravity="center"
+                    android:text="15 nm/h" />
 
             </LinearLayout>
 
@@ -180,34 +180,34 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <TextView
                     style="@style/setting_tv_title"
                     android:layout_marginLeft="@dimen/setting_padding"
                     android:layout_marginStart="@dimen/setting_padding"
-                    android:text="定位区分门限："/>
+                    android:text="定位区分门限：" />
 
                 <TextView
                     style="@style/setting_tv_title"
                     android:gravity="center"
-                    android:text="---"/>
+                    android:text="20 m" />
 
                 <android.support.v4.widget.Space
                     android:layout_width="50dp"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent" />
 
                 <TextView
                     style="@style/setting_tv_title"
-                    android:text="组通播应答门限："/>
+                    android:text="组通播应答门限：" />
 
                 <TextView
                     style="@style/setting_tv_title"
-                    android:gravity="center"
-                    android:layout_marginRight="@dimen/setting_padding"
                     android:layout_marginEnd="@dimen/setting_padding"
-                    android:text="---"/>
+                    android:layout_marginRight="@dimen/setting_padding"
+                    android:gravity="center"
+                    android:text="3" />
 
             </LinearLayout>
 
@@ -220,35 +220,36 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <TextView
                     style="@style/setting_tv_title"
                     android:layout_marginLeft="@dimen/setting_padding"
                     android:layout_marginStart="@dimen/setting_padding"
-                    android:text="供电电压："/>
+                    android:text="供电电压：" />
 
                 <TextView
                     android:id="@+id/tv_voltage"
                     style="@style/setting_tv_title"
                     android:gravity="center"
-                    android:text="---"/>
+                    android:text="---" />
 
                 <android.support.v4.widget.Space
                     android:layout_width="50dp"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent" />
 
                 <TextView
                     style="@style/setting_tv_title"
-                    android:text=""/>
+                    android:text="供电来源：" />
 
                 <TextView
+                    android:id="@+id/tv_power"
                     style="@style/setting_tv_title"
-                    android:gravity="center"
-                    android:layout_marginRight="@dimen/setting_padding"
                     android:layout_marginEnd="@dimen/setting_padding"
-                    android:text=""/>
+                    android:layout_marginRight="@dimen/setting_padding"
+                    android:gravity="center"
+                    android:text="船位供电" />
 
             </LinearLayout>
 

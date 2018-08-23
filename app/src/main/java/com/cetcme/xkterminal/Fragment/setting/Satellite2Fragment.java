@@ -60,16 +60,6 @@ public class Satellite2Fragment extends Fragment {
         }
     };
 
-    private Timer timer = null;
-
-    private final TimerTask timerTask = new TimerTask() {
-        @Override
-        public void run() {
-            initData();
-            loadData();
-        }
-    };
-
 
     public static Satellite2Fragment newInstance() {
         Bundle args = new Bundle();
@@ -135,10 +125,10 @@ public class Satellite2Fragment extends Fragment {
             bd = reBuild(noIndex, bd);
         }
 
-        for (int i = 1; i <= 6; i++) {
+        for (int i = 1; i <= 10; i++) {
             Satellite s = new Satellite();
             s.setNo(i);
-            if (i == 3 || i == 4 || i == 6) {
+            if (i == 3 || i == 4 || i == 6 || i == 9) {
                 s.setNum(1);
             } else {
                 s.setNum(bdXin[random.nextInt(bdXin.length)]);

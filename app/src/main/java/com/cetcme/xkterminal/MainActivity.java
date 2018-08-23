@@ -1132,7 +1132,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         showMessageBar(tg);
 
         if (currentFragment == messageFragment) {
-            if (messageNewFragment!=null){
+            if (messageNewFragment != null) {
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 transaction.remove(messageNewFragment);
                 messageNewFragment = null;
@@ -1379,62 +1379,65 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             final String unique = ConvertUtil.rc4ToHex();
             String firstContent = MessageFormat.shortcutMessage(content);
             final String secondContent = content.replace(firstContent, "");
-            byte[] messageBytes = MessageFormat.format(receiver, firstContent, receiver.length() == 11 ? MessageFormat.MESSAGE_TYPE_CELLPHONE : MessageFormat.MESSAGE_TYPE_NORMAL, 1, unique);
-            ((MyApplication) getApplication()).sendBytes(messageBytes);
-            System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    byte[] messageBytes = MessageFormat.format(receiver, secondContent, receiver.length() == 11 ? MessageFormat.MESSAGE_TYPE_CELLPHONE : MessageFormat.MESSAGE_TYPE_NORMAL, 0, unique);
-                    ((MyApplication) getApplication()).sendMessageBytes(messageBytes);
-                    System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
-                    tipDialog.dismiss();
-                    backToMessageFragment();
 
-                }
-            }, 10000);
+            byte[] messageBytes2 = MessageFormat.format(receiver, secondContent, receiver.length() == 11 ? MessageFormat.MESSAGE_TYPE_CELLPHONE : MessageFormat.MESSAGE_TYPE_NORMAL, 0, unique);
+            ((MyApplication) getApplication()).sendMessageBytes(failedMessageId, messageBytes2, true);
+
+            byte[] messageBytes = MessageFormat.format(receiver, firstContent, receiver.length() == 11 ? MessageFormat.MESSAGE_TYPE_CELLPHONE : MessageFormat.MESSAGE_TYPE_NORMAL, 1, unique);
+            ((MyApplication) getApplication()).sendMessageBytes(failedMessageId, messageBytes, false);
+            backToMessageFragment();
+//            System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
+//            new Handler().postDelayed(new Runnable() {
+//                @Override
+//                public void run() {
+//                    System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
+//                    tipDialog.dismiss();
+//
+//
+//                }
+//            }, 10000);
 
             // 显示短信发送失败
-            messageSendFailed = true;
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (messageSendFailed) {
-                        Toast.makeText(MainActivity.this, "发送失败", Toast.LENGTH_SHORT).show();
-                        if (failedMessageId != 0) {
-                            MessageProxy.setMessageFailed(db, failedMessageId);
-                            if (fragmentName.equals("message") && messageFragment.tg.equals("send")) {
-                                messageFragment.reloadDate();
-                            }
-                            failedMessageId = 0;
-                        }
-                    }
-                }
-            }, Constant.MESSAGE_FAIL_TIME + 10000);
+//            messageSendFailed = true;
+//            new Handler().postDelayed(new Runnable() {
+//                @Override
+//                public void run() {
+//                    if (messageSendFailed) {
+//                        Toast.makeText(MainActivity.this, "发送失败", Toast.LENGTH_SHORT).show();
+//                        if (failedMessageId != 0) {
+//                            MessageProxy.setMessageFailed(db, failedMessageId);
+//                            if (fragmentName.equals("message") && messageFragment.tg.equals("send")) {
+//                                messageFragment.reloadDate();
+//                            }
+//                            failedMessageId = 0;
+//                        }
+//                    }
+//                }
+//            }, Constant.MESSAGE_FAIL_TIME + 10000);
 
         } else {
             byte[] messageBytes = MessageFormat.format(receiver, content, receiver.length() == 11 ? MessageFormat.MESSAGE_TYPE_CELLPHONE : MessageFormat.MESSAGE_TYPE_NORMAL, 0);
-            ((MyApplication) getApplication()).sendMessageBytes(messageBytes);
+            ((MyApplication) getApplication()).sendMessageBytes(failedMessageId, messageBytes, false);
             System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
             backToMessageFragment();
 
             // 显示短信发送失败
-            messageSendFailed = true;
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (messageSendFailed) {
-                        Toast.makeText(MainActivity.this, "发送失败", Toast.LENGTH_SHORT).show();
-                        if (failedMessageId != 0) {
-                            MessageProxy.setMessageFailed(db, failedMessageId);
-                            if (fragmentName.equals("message") && messageFragment.tg.equals("send")) {
-                                messageFragment.reloadDate();
-                            }
-                            failedMessageId = 0;
-                        }
-                    }
-                }
-            }, Constant.MESSAGE_FAIL_TIME);
+//            messageSendFailed = true;
+//            new Handler().postDelayed(new Runnable() {
+//                @Override
+//                public void run() {
+//                    if (messageSendFailed) {
+//                        Toast.makeText(MainActivity.this, "发送失败", Toast.LENGTH_SHORT).show();
+//                        if (failedMessageId != 0) {
+//                            MessageProxy.setMessageFailed(db, failedMessageId);
+//                            if (fragmentName.equals("message") && messageFragment.tg.equals("send")) {
+//                                messageFragment.reloadDate();
+//                            }
+//                            failedMessageId = 0;
+//                        }
+//                    }
+//                }
+//            }, Constant.MESSAGE_FAIL_TIME);
         }
 
         // 短信推送

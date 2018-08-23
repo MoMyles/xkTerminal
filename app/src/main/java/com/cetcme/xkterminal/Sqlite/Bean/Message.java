@@ -9,11 +9,22 @@ public class Message {
     @Column(name = "id", isId = true, autoGen = true)
     private int id;
 
+    @Column(name = "messageId")
+    private int messageId;
+
     @Column(name = "message")
     private byte[] message;
 
     @Column(name = "send")
     private boolean send = false;
+
+    public int getMessageId() {
+        return messageId;
+    }
+
+    public void setMessageId(int messageId) {
+        this.messageId = messageId;
+    }
 
     public int getId() {
         return id;

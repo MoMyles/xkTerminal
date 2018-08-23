@@ -280,7 +280,7 @@ public class MyApplication extends MultiDexApplication {
         initUSB();
     }
 
-    public void startSendThread(){
+    public void startSendThread() {
         new SendingThread().start();
     }
 
@@ -1249,15 +1249,24 @@ public class MyApplication extends MultiDexApplication {
                         flag = false;
                     }
                     if (msg != null && mOutputStream != null) {
+                        messageSendFailed = true;
                         mOutputStream.write(msg.getMessage());
                         Log.e("TAG", "=================================================================");
 //                        mOutputStream.flush();
                         if (flag) {
                             db.delete(msg);
+                        } else {
+                            //超时时间 过了
+                            Thread.sleep(Constant.MESSAGE_FAIL_TIME + 1000);
+                            if (messageSendFailed) {
+                                //失败
+                                continue;
+                            } else {
+                                Thread.sleep(55000);
+                            }
                         }
                         String str = DateUtil.parseDateToString(Constant.SYSTEM_DATE, DateUtil.DatePattern.YYYYMMDDHHMMSS);
                         PreferencesUtils.putString(getApplicationContext(), "lastSendTime", str);
-                        Thread.sleep(63000);
                     }
                 }
             } catch (Exception e) {

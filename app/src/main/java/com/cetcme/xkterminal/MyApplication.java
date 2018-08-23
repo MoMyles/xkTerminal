@@ -1238,8 +1238,8 @@ public class MyApplication extends MultiDexApplication {
         @Override
         public void run() {
             try {
+                com.cetcme.xkterminal.Sqlite.Bean.Message msg = null;
                 while (true) {
-                    com.cetcme.xkterminal.Sqlite.Bean.Message msg = null;
                     boolean flag = true;
                     if (MESSAGE_QUEUE.isEmpty()) {
                         if (MESSAGE_BACK_QUEUE.isEmpty()) continue;
@@ -1250,14 +1250,14 @@ public class MyApplication extends MultiDexApplication {
                     }
                     if (msg != null && mOutputStream != null) {
                         mOutputStream.write(msg.getMessage());
-                        mOutputStream.flush();
+                        Log.e("TAG", "=================================================================");
+//                        mOutputStream.flush();
                         if (flag) {
                             db.delete(msg);
                         }
                         String str = DateUtil.parseDateToString(Constant.SYSTEM_DATE, DateUtil.DatePattern.YYYYMMDDHHMMSS);
                         PreferencesUtils.putString(getApplicationContext(), "lastSendTime", str);
-                        Thread.sleep(3000);
-                        Thread.sleep(60000);
+                        Thread.sleep(63000);
                     }
                 }
             } catch (Exception e) {

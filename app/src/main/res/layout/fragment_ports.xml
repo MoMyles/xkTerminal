@@ -110,7 +110,7 @@
                     android:id="@+id/tv_receive"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textMultiLine"
+                    android:inputType="textMultiLine|textNoSuggestions"
                     android:singleLine="false"
                     android:textColor="#555"
                     android:textSize="12sp" />

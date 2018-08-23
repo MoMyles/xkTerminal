@@ -163,6 +163,7 @@ public class USBFragment2 extends Fragment implements View.OnClickListener {
 
     private void onBindView(View view) {
         tv_receive = view.findViewById(R.id.tv_receive);
+        tv_receive.getPaint().setFlags(0); // 取消设置的的中划线
         tv_status = view.findViewById(R.id.tv_status);
         et_send = view.findViewById(R.id.et_send);
         et_send.addTextChangedListener(new TextWatcher() {

@@ -113,7 +113,7 @@ public class Util {
      * byte[]去掉第一位
      */
     public static  void bytesRemoveFirst(byte[] bytes, int count) {
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < count - 1; i++) {
             bytes[i] = bytes[i + 1];
         }
     }

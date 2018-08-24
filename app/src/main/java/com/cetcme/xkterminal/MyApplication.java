@@ -185,6 +185,17 @@ public class MyApplication extends MultiDexApplication {
                     case 2:
                         Toast.makeText(getApplicationContext(), msg.obj.toString(), Toast.LENGTH_SHORT).show();
                         break;
+                    case 3:
+                        if (mainActivity != null && mainActivity.fragmentName != null && mainActivity.messageFragment != null) {
+                            if (mainActivity.fragmentName.equals("message") && mainActivity.messageFragment.tg.equals("send")) {
+                                mainActivity.messageFragment.reloadDate();
+                            }
+                        }
+                        Toast.makeText(getApplicationContext(), "发送失败", Toast.LENGTH_SHORT).show();
+                        break;
+                    case 4:
+                        Toast.makeText(getApplicationContext(), "短信发送成功", Toast.LENGTH_SHORT).show();
+                        break;
                 }
             }
         };
@@ -1000,7 +1011,7 @@ public class MyApplication extends MultiDexApplication {
             }
             if (serialBuffer[serialCount - 2] == (byte) 0x0D && serialBuffer[serialCount - 1] == (byte) 0x0A) {
                 serialBuffer = ByteUtil.subBytes(serialBuffer, 0, serialCount);
-                //System.out.println("收到包：" + ConvertUtil.bytesToHexString(serialBuffer));
+                System.out.println("收到包：" + ConvertUtil.bytesToHexString(serialBuffer));
                 Message message = new Message();
                 Bundle bundle = new Bundle();
                 bundle.putByteArray("bytes", serialBuffer);
@@ -1022,7 +1033,7 @@ public class MyApplication extends MultiDexApplication {
                 serialCount = 0;
             } else if (serialBuffer[serialCount - 1] == (byte) 0x3B) {
                 serialBuffer = ByteUtil.subBytes(serialBuffer, 0, serialCount);
-                //System.out.println("收到包：" + ConvertUtil.bytesToHexString(serialBuffer));
+                System.out.println("收到包：" + ConvertUtil.bytesToHexString(serialBuffer));
                 Message message = new Message();
                 Bundle bundle = new Bundle();
                 bundle.putByteArray("bytes", serialBuffer);
@@ -1279,8 +1290,10 @@ public class MyApplication extends MultiDexApplication {
                         byte[] content = msg.getMessage();
                         mOutputStream.write(content);
 //                        mOutputStream.flush();
+                        System.out.println("发送包======================================");
                         if (flag) {
                             db.delete(msg);
+                            Thread.sleep(61000);
                         } else {
                             String str = DateUtil.parseDateToString(Constant.SYSTEM_DATE, DateUtil.DatePattern.YYYYMMDDHHMMSS);
                             PreferencesUtils.putString(getApplicationContext(), "lastSendTime", str);
@@ -1295,18 +1308,7 @@ public class MyApplication extends MultiDexApplication {
                                 //失败
                                 if (msg.getMessageId() != 0) {
                                     MessageProxy.setMessageFailed(db, msg.getMessageId());
-                                    if (mainActivity != null && mainActivity.fragmentName != null && mainActivity.messageFragment != null) {
-                                        if (mainActivity.fragmentName.equals("message") && mainActivity.messageFragment.tg.equals("send")) {
-                                            mainActivity.messageFragment.reloadDate();
-                                        }
-                                    }
-                                    if (Looper.myLooper() != Looper.getMainLooper()) {
-                                        Looper.prepare();
-                                        Toast.makeText(getApplicationContext(), "发送失败", Toast.LENGTH_SHORT).show();
-                                        Looper.loop();
-                                    } else {
-                                        Toast.makeText(getApplicationContext(), "发送失败", Toast.LENGTH_SHORT).show();
-                                    }
+                                    handler.sendEmptyMessage(3);
                                 }
                                 if (!WAIT_MESSAGE.isEmpty()) {
                                     Iterator<com.cetcme.xkterminal.Sqlite.Bean.Message> iterator = WAIT_MESSAGE.iterator();
@@ -1318,8 +1320,8 @@ public class MyApplication extends MultiDexApplication {
                                         }
                                     }
                                 }
-                                continue;
                             } else {
+                                handler.sendEmptyMessage(4);
                                 if (!WAIT_MESSAGE.isEmpty()) {
                                     Iterator<com.cetcme.xkterminal.Sqlite.Bean.Message> iterator = WAIT_MESSAGE.iterator();
                                     while (iterator.hasNext()) {

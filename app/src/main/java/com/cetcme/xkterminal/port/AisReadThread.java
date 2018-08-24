@@ -127,7 +127,7 @@ public class AisReadThread extends Thread {
                                 , content, MessageFormat.MESSAGE_TYPE_TRADE, 0, unique));
                     } else if (MessageFormat.MESSAGE_TYPE_BROADCASTING.equals(type)) {
                         Log.e("TAG_DIANTAI", "-------------");
-                        MyApplication.getInstance().sendBytes(MessageFormat.format("382570"//PreferencesUtils.getString(MyApplication.getInstance().getApplicationContext(), "server_address", Constant.SERVER_BD_NUMBER)// 蘑菇头编号
+                        MyApplication.getInstance().sendBytes(MessageFormat.format("420426"//"382570"//PreferencesUtils.getString(MyApplication.getInstance().getApplicationContext(), "server_address", Constant.SERVER_BD_NUMBER)// 蘑菇头编号
                                 , content, MessageFormat.MESSAGE_TYPE_BROADCASTING, 0, unique));
                     }
                 }

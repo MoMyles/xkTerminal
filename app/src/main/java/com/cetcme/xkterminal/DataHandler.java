@@ -330,7 +330,7 @@ public class DataHandler extends Handler {
                     if (!MyApplication.isLocated) return;
 
                     // 短信发送成功
-                    Toast.makeText(myApplication.mainActivity, "短信发送成功", Toast.LENGTH_SHORT).show();
+                    // Toast.makeText(myApplication.mainActivity, "短信发送成功", Toast.LENGTH_SHORT).show();
 
                     String lastSendTimeSave = PreferencesUtils.getString(myApplication.mainActivity, "lastSendTimeSave");
                     PreferencesUtils.putString(myApplication.mainActivity, "lastSendTime", lastSendTimeSave);

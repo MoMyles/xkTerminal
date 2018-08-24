@@ -191,6 +191,9 @@ public class MyApplication extends MultiDexApplication {
                         }
                         Toast.makeText(getApplicationContext(), "发送失败", Toast.LENGTH_SHORT).show();
                         break;
+                    case 4:
+                        Toast.makeText(getApplicationContext(), "短信发送成功", Toast.LENGTH_SHORT).show();
+                        break;
                 }
             }
         };
@@ -1287,6 +1290,7 @@ public class MyApplication extends MultiDexApplication {
 //                        mOutputStream.flush();
                         if (flag) {
                             db.delete(msg);
+                            Thread.sleep(61000);
                         } else {
                             String str = DateUtil.parseDateToString(Constant.SYSTEM_DATE, DateUtil.DatePattern.YYYYMMDDHHMMSS);
                             PreferencesUtils.putString(getApplicationContext(), "lastSendTime", str);
@@ -1321,6 +1325,7 @@ public class MyApplication extends MultiDexApplication {
                                     }
                                 }
                             } else {
+                                handler.sendEmptyMessage(4);
                                 if (!WAIT_MESSAGE.isEmpty()) {
                                     Iterator<com.cetcme.xkterminal.Sqlite.Bean.Message> iterator = WAIT_MESSAGE.iterator();
                                     while (iterator.hasNext()) {

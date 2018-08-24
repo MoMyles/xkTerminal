@@ -1371,11 +1371,11 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         failedMessageId = newMessage.getId();
 
         if (length > 54) {
-            final QMUITipDialog tipDialog = new QMUITipDialog.Builder(MainActivity.this)
-                    .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
-                    .setTipWord("发送中")
-                    .create();
-            tipDialog.show();
+//            final QMUITipDialog tipDialog = new QMUITipDialog.Builder(MainActivity.this)
+//                    .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
+//                    .setTipWord("发送中")
+//                    .create();
+//            tipDialog.show();
             final String unique = ConvertUtil.rc4ToHex();
             String firstContent = MessageFormat.shortcutMessage(content);
             final String secondContent = content.replace(firstContent, "");

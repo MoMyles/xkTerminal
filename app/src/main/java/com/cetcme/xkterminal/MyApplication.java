@@ -1159,6 +1159,24 @@ public class MyApplication extends MultiDexApplication {
 
     public void sendMessageBytes(int msgId, final byte[] buffer, boolean longPackage) {
         if (!Constant.PHONE_TEST) {
+            if (!isSendThreadStart) {
+                if (msgId != 0) {
+                    MessageProxy.setMessageFailed(db, msgId);
+                    if (mainActivity != null && mainActivity.fragmentName != null && mainActivity.messageFragment != null) {
+                        if (mainActivity.fragmentName.equals("message") && mainActivity.messageFragment.tg.equals("send")) {
+                            mainActivity.messageFragment.reloadDate();
+                        }
+                    }
+                    if (Looper.myLooper() != Looper.getMainLooper()) {
+                        Looper.prepare();
+                        Toast.makeText(getApplicationContext(), "发送失败", Toast.LENGTH_SHORT).show();
+                        Looper.loop();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "发送失败", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                return;
+            }
             try {
                 com.cetcme.xkterminal.Sqlite.Bean.Message msg = new com.cetcme.xkterminal.Sqlite.Bean.Message();
                 msg.setId(0);
@@ -1276,7 +1294,7 @@ public class MyApplication extends MultiDexApplication {
                                 PreferencesUtils.putString(getApplicationContext(), "lastSendTime", str);
                                 //失败
                                 if (msg.getMessageId() != 0) {
-                                    MessageProxy.setMessageFailed(db, failedMessageId);
+                                    MessageProxy.setMessageFailed(db, msg.getMessageId());
                                     if (mainActivity != null && mainActivity.fragmentName != null && mainActivity.messageFragment != null) {
                                         if (mainActivity.fragmentName.equals("message") && mainActivity.messageFragment.tg.equals("send")) {
                                             mainActivity.messageFragment.reloadDate();

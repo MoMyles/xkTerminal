@@ -7,7 +7,9 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.cetcme.xkterminal.DataFormat.MessageFormat;
+import com.cetcme.xkterminal.DataFormat.Util.ByteUtil;
 import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
+import com.cetcme.xkterminal.DataFormat.Util.Util;
 import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
@@ -67,47 +69,52 @@ public class AisReadThread extends Thread {
     public void run() {
         while (!isInterrupted()) {
             if (ftDevice == null) continue;
-            int iavailable = ftDevice.getQueueStatus();
-            if (iavailable > 0) {
+            try {
+                int iavailable = ftDevice.getQueueStatus();
+                if (iavailable > 0) {
 
-                if (iavailable > readLength) {
-                    iavailable = readLength;
+                    if (iavailable > readLength) {
+                        iavailable = readLength;
+                    }
+
+                    ftDevice.read(readData, iavailable);
+
+                    byte[] byts = new byte[iavailable];
+
+                    for (int i = 0; i < iavailable; i++) {
+                        byts[i] = readData[i];
+                        formatAis(readData[i]);
+                    }
+                    if (USBFragment2.currentPath.equals(path)) {
+                        Message message = Message.obtain();
+                        message.what = 0x1;
+                        message.obj = byts;
+                        handler.sendMessage(message);
+                    }
                 }
-
-                ftDevice.read(readData, iavailable);
-
-                byte[] byts = new byte[iavailable];
-
-                for (int i = 0; i < iavailable; i++) {
-                    byts[i] = readData[i];
-                    formatAis(readData[i]);
-                }
-                if (USBFragment2.currentPath.equals(path)) {
-                    Message message = Message.obtain();
-                    message.what = 0x1;
-                    message.obj = byts;
-                    handler.sendMessage(message);
-                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
 
     private void formatAis(byte b) {
-        if (b == 33 || b == 36) {
-            aisByts.clear();
-            aisByts.add(b);
-        } else {
-            aisByts.add(b);
-            int len = aisByts.size();
-            if (len > 5 && aisByts.get(len - 2) == 13 && aisByts.get(len - 1) == 10) {
-                // \r\n 结尾
-                Byte[] byts = aisByts.toArray(new Byte[len]);
-                byte[] tmpByts = new byte[len];
-                for (int i = 0; i < len; i++) {
-                    tmpByts[i] = byts[i];
-                }
-                String gpsDataStr = new String(tmpByts);
-                if (gpsDataStr.startsWith("$04")) {
+        aisByts.add(b);
+        int len = aisByts.size();
+        if (len > 5 && len < 1024) {
+            Byte[] byts = aisByts.toArray(new Byte[len]);
+            byte[] tmpByts = new byte[len];
+            for (int i = 0; i < len; i++) {
+                tmpByts[i] = byts[i];
+            }
+            String tmp = new String(tmpByts);
+            // 有正确的头
+            if (tmp.startsWith("$04")){
+                if (aisByts.get(len -2) == 13 && aisByts.get(len - 1) == 10) {
+                    StringBuffer sb = new StringBuffer();
+                    for (byte bb : tmpByts) {
+                        sb.append(ByteUtil.byte2Str(bb) + ",");
+                    }
                     String[] messageStrings = MessageFormat.unFormat(tmpByts);
                     String address = messageStrings[0];
                     String content = messageStrings[1];
@@ -118,20 +125,25 @@ public class AisReadThread extends Thread {
                     if (MessageFormat.MESSAGE_TYPE_TRADE.equals(type)) {
                         MyApplication.getInstance().sendBytes(MessageFormat.format(PreferencesUtils.getString(MyApplication.getInstance().getApplicationContext(), "server_address", Constant.SERVER_BD_NUMBER)// 蘑菇头编号
                                 , content, MessageFormat.MESSAGE_TYPE_TRADE, 0, unique));
-                    } else if (MessageFormat.MESSAGE_TYPE_BROADCASTING.equals(type)){
-                        MyApplication.getInstance().sendBytes(MessageFormat.format(PreferencesUtils.getString(MyApplication.getInstance().getApplicationContext(), "server_address", Constant.SERVER_BD_NUMBER)// 蘑菇头编号
+                    } else if (MessageFormat.MESSAGE_TYPE_BROADCASTING.equals(type)) {
+                        Log.e("TAG_DIANTAI", "-------------");
+                        MyApplication.getInstance().sendBytes(MessageFormat.format("382570"//PreferencesUtils.getString(MyApplication.getInstance().getApplicationContext(), "server_address", Constant.SERVER_BD_NUMBER)// 蘑菇头编号
                                 , content, MessageFormat.MESSAGE_TYPE_BROADCASTING, 0, unique));
                     }
-                } else {
+                }
+            } else if (tmp.startsWith("!AIVDO")
+                    || tmp.startsWith("!AIVDM")
+                    || tmp.startsWith("$GPGSV")) {
+                if (aisByts.get(len -2) == 13 && aisByts.get(len - 1) == 10) {
                     headIndex.clear();
-                    gpsDataStr = preRestStr + gpsDataStr;
-                    len = gpsDataStr.length();
+                    tmp = preRestStr + tmp;
+                    len = tmp.length();
                     if (len <= 6) {
-                        preRestStr = gpsDataStr;
+                        preRestStr = tmp;
                         return;
                     }
                     for (int i = 0; i < len - 6; i++) {
-                        String headStr = gpsDataStr.substring(i, i + 6);
+                        String headStr = tmp.substring(i, i + 6);
                         if ("!AIVDM".equals(headStr)
                                 || "!AIVDO".equals(headStr)
                                 || "$GPGSV".equals(headStr)) {
@@ -146,9 +158,9 @@ public class AisReadThread extends Thread {
                                     }
                                 });
                             }
-                            int end = gpsDataStr.indexOf("\n", i + 1);
+                            int end = tmp.indexOf("\n", i + 1);
                             if (end != -1) {
-                                String str = gpsDataStr.substring(i + 7, end + 1);
+                                String str = tmp.substring(i + 7, end + 1);
                                 if (str.contains("$") || str.contains("!")) {
                                     continue;
                                 }
@@ -158,19 +170,19 @@ public class AisReadThread extends Thread {
                                 map.put("index", i);
                                 headIndex.add(map);
                             } else {
-                                preRestStr = gpsDataStr.substring(i);
+                                preRestStr = tmp.substring(i);
                             }
                         } else {
                             if (len - i < 6) {
-                                preRestStr = gpsDataStr.substring(i + 1);
+                                preRestStr = tmp.substring(i + 1);
                             }
                         }
                     }
                     for (int i = 0; i < headIndex.size(); i++) {
                         Map<String, Object> map = headIndex.get(i);
-                        int end = gpsDataStr.indexOf("\n", (Integer) map.get("index") + 1);
+                        int end = tmp.indexOf("\n", (Integer) map.get("index") + 1);
                         if (end != -1) {
-                            String newStr = gpsDataStr.substring((Integer) map.get("index"), end + 1);
+                            String newStr = tmp.substring((Integer) map.get("index"), end + 1);
                             preRestStr = "";
                             String type = (String) map.get("type");
                             if ("!AIVDM".equals(type)
@@ -320,7 +332,6 @@ public class AisReadThread extends Thread {
                                     e.printStackTrace();
                                 }
                             } else if ("$GPGSV".equals(type)) {
-                                Log.e("TAG", "gps: " + newStr);
                                 try {
                                     newStr = newStr.substring(newStr.indexOf(",") + 1, newStr.lastIndexOf("*"));
                                     boolean isDou = newStr.endsWith(",");
@@ -357,17 +368,61 @@ public class AisReadThread extends Thread {
                                 }
                             }
                         } else {
-                            preRestStr = gpsDataStr.substring((Integer) map.get("index"));
-                            // Log.e("TAG", "pre: " + preRestStr);
+                            preRestStr = tmp.substring((Integer) map.get("index"));
                         }
                     }
                 }
-                aisByts.clear();
+            } else {
+                aisByts.remove(0);
             }
-        }
-        if (aisByts.size() > 512) {
+        } else if (len >= 1024) {
             aisByts.clear();
         }
+//        if (b == 33 || b == 36) {
+//            aisByts.clear();
+//            aisByts.add(b);
+//        } else {
+//            aisByts.add(b);
+//            int len = aisByts.size();
+//            System.out.print(ByteUtil.byte2Str(b));
+//            if (len > 5 && aisByts.get(len - 2) == 13 && aisByts.get(len - 1) == 10) {
+//                // \r\n 结尾
+//                Byte[] byts = aisByts.toArray(new Byte[len]);
+//                byte[] tmpByts = new byte[len];
+//                for (int i = 0; i < len; i++) {
+//                    tmpByts[i] = byts[i];
+//                }
+//                String gpsDataStr = new String(tmpByts);
+//                Log.e("TAG_AisRead", gpsDataStr);
+//                if (gpsDataStr.startsWith("$04")) {
+//                    StringBuffer sb = new StringBuffer();
+//                    for (byte bb : tmpByts){
+//                        sb.append(ByteUtil.byte2Str(bb)+",");
+//                    }
+//                    String[] messageStrings = MessageFormat.unFormat(tmpByts);
+//                    String address = messageStrings[0];
+//                    String content = messageStrings[1];
+//                    String type = messageStrings[2];
+//                    int group = Integer.parseInt(messageStrings[3]);
+//                    int frameCount = Integer.parseInt(messageStrings[4]);
+//                    final String unique = ConvertUtil.rc4ToHex();
+//                    if (MessageFormat.MESSAGE_TYPE_TRADE.equals(type)) {
+//                        MyApplication.getInstance().sendBytes(MessageFormat.format(PreferencesUtils.getString(MyApplication.getInstance().getApplicationContext(), "server_address", Constant.SERVER_BD_NUMBER)// 蘑菇头编号
+//                                , content, MessageFormat.MESSAGE_TYPE_TRADE, 0, unique));
+//                    } else if (MessageFormat.MESSAGE_TYPE_BROADCASTING.equals(type)) {
+//                        Log.e("TAG_DIANTAI", "-------------");
+//                        MyApplication.getInstance().sendBytes(MessageFormat.format("382570"//PreferencesUtils.getString(MyApplication.getInstance().getApplicationContext(), "server_address", Constant.SERVER_BD_NUMBER)// 蘑菇头编号
+//                                , content, MessageFormat.MESSAGE_TYPE_BROADCASTING, 0, unique));
+//                    }
+//                } else {
+//
+//                }
+//                aisByts.clear();
+//            }
+//        }
+//        if (aisByts.size() > 512) {
+//            aisByts.clear();
+//        }
     }
 
     private void judge18(String newStr, AisInfo aisInfo) {

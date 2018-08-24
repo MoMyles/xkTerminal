@@ -1000,7 +1000,7 @@ public class MyApplication extends MultiDexApplication {
             }
             if (serialBuffer[serialCount - 2] == (byte) 0x0D && serialBuffer[serialCount - 1] == (byte) 0x0A) {
                 serialBuffer = ByteUtil.subBytes(serialBuffer, 0, serialCount);
-                System.out.println("收到包：" + ConvertUtil.bytesToHexString(serialBuffer));
+                //System.out.println("收到包：" + ConvertUtil.bytesToHexString(serialBuffer));
                 Message message = new Message();
                 Bundle bundle = new Bundle();
                 bundle.putByteArray("bytes", serialBuffer);
@@ -1022,7 +1022,7 @@ public class MyApplication extends MultiDexApplication {
                 serialCount = 0;
             } else if (serialBuffer[serialCount - 1] == (byte) 0x3B) {
                 serialBuffer = ByteUtil.subBytes(serialBuffer, 0, serialCount);
-                System.out.println("收到包：" + ConvertUtil.bytesToHexString(serialBuffer));
+                //System.out.println("收到包：" + ConvertUtil.bytesToHexString(serialBuffer));
                 Message message = new Message();
                 Bundle bundle = new Bundle();
                 bundle.putByteArray("bytes", serialBuffer);

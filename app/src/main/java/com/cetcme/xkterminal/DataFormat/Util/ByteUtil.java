@@ -60,6 +60,7 @@ public class ByteUtil {
 
 	public static String byte2Str(byte b) {
 		String hexStr = Integer.toString(b, 16);
+		hexStr = hexStr.toUpperCase();
 		if (hexStr.length() == 1) {
 			hexStr = "0" + hexStr;
 		} else if (hexStr.length() > 2) {

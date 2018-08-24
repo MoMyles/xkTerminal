@@ -50,11 +50,28 @@ public class Satellite2Fragment extends Fragment {
     private SatelliteView satellites;
     private BarChart chart1, chart2, chart3;
 
+    private final Random random = new Random();
+
     private final Handler handler = new Handler();
     private final Runnable runnable = new Runnable() {
         @Override
         public void run() {
-            initData();
+            for (int i=0;i<gpsDatas.size();i++){
+                gpsDatas.get(i).setNum(gpsXin[random.nextInt(gpsXin.length)]);
+            }
+
+            for (int i=0;i<bd1Datas.size();i++){
+                if (i == 2 || i == 3 || i == 5 || i == 8) {
+                    bd1Datas.get(i).setNum(1);
+                } else {
+                    bd1Datas.get(i).setNum(bdXin[random.nextInt(bdXin.length)]);
+                }
+            }
+
+            for (int i=0;i<bd2Datas.size();i++){
+                bd2Datas.get(i).setNum(bd2Xin[random.nextInt(bd2Xin.length)]);
+            }
+
             loadData();
             handler.postDelayed(this, 30 * 1000);
         }
@@ -69,12 +86,19 @@ public class Satellite2Fragment extends Fragment {
     }
 
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        initData();
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_satellite2, container, false);
         onBindView(view);
-        handler.postDelayed(runnable, 10);
+        loadData();
+        handler.postDelayed(runnable, 30 * 1000);
         return view;
     }
 
@@ -85,19 +109,7 @@ public class Satellite2Fragment extends Fragment {
         gpsDatas.clear();
         bd1Datas.clear();
         bd2Datas.clear();
-    }
 
-    private void onBindView(View view) {
-        satellites = view.findViewById(R.id.satellites);
-
-        chart1 = view.findViewById(R.id.chart1);
-        chart2 = view.findViewById(R.id.chart2);
-        chart3 = view.findViewById(R.id.chart3);
-
-    }
-
-    private void loadData() {
-        Random random = new Random();
         int len = random.nextInt(6) + 6;
         for (int i = 0; i < len; i++) {
             int noIndex = random.nextInt(gps.length);
@@ -139,9 +151,23 @@ public class Satellite2Fragment extends Fragment {
             bd1Datas.add(s);
             datas.add(s);
         }
+    }
+
+    private void onBindView(View view) {
+
+        satellites = view.findViewById(R.id.satellites);
+
+        chart1 = view.findViewById(R.id.chart1);
+        chart2 = view.findViewById(R.id.chart2);
+        chart3 = view.findViewById(R.id.chart3);
+
+    }
+
+
+    private void loadData() {
+
 
         satellites.setDatas(datas);
-
 
         Collections.sort(bd2Datas, new Comparator<Satellite>() {
             @Override

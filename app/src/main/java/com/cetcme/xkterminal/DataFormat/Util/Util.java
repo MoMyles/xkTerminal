@@ -140,7 +140,7 @@ public class Util {
      * 字符串去掉前面的0
      */
     public static String stringRemoveZero(String str) {
-        while (str.charAt(0) == '0') {
+        while (str.charAt(0) == '0' && str.length() > 1) {
             str = str.substring(1, str.length());
         }
         return str;

@@ -183,6 +183,14 @@ public class MyApplication extends MultiDexApplication {
                     case 2:
                         Toast.makeText(getApplicationContext(), msg.obj.toString(), Toast.LENGTH_SHORT).show();
                         break;
+                    case 3:
+                        if (mainActivity != null && mainActivity.fragmentName != null && mainActivity.messageFragment != null) {
+                            if (mainActivity.fragmentName.equals("message") && mainActivity.messageFragment.tg.equals("send")) {
+                                mainActivity.messageFragment.reloadDate();
+                            }
+                        }
+                        Toast.makeText(getApplicationContext(), "发送失败", Toast.LENGTH_SHORT).show();
+                        break;
                 }
             }
         };
@@ -1261,9 +1269,9 @@ public class MyApplication extends MultiDexApplication {
 
         @Override
         public void run() {
-            try {
-                com.cetcme.xkterminal.Sqlite.Bean.Message msg = null;
-                while (true) {
+            com.cetcme.xkterminal.Sqlite.Bean.Message msg = null;
+            while (true) {
+                try {
                     boolean flag = true;
                     if (MESSAGE_QUEUE.isEmpty()) {
                         if (MESSAGE_BACK_QUEUE.isEmpty()) continue;
@@ -1293,18 +1301,14 @@ public class MyApplication extends MultiDexApplication {
                                 //失败
                                 if (msg.getMessageId() != 0) {
                                     MessageProxy.setMessageFailed(db, msg.getMessageId());
-                                    if (mainActivity != null && mainActivity.fragmentName != null && mainActivity.messageFragment != null) {
-                                        if (mainActivity.fragmentName.equals("message") && mainActivity.messageFragment.tg.equals("send")) {
-                                            mainActivity.messageFragment.reloadDate();
-                                        }
-                                    }
-                                    if (Looper.myLooper() != Looper.getMainLooper()) {
-                                        Looper.prepare();
-                                        Toast.makeText(getApplicationContext(), "发送失败", Toast.LENGTH_SHORT).show();
-                                        Looper.loop();
-                                    } else {
-                                        Toast.makeText(getApplicationContext(), "发送失败", Toast.LENGTH_SHORT).show();
-                                    }
+                                    handler.sendEmptyMessage(3);
+//                                    if (Looper.myLooper() != Looper.getMainLooper()) {
+//                                        Looper.prepare();
+//                                        Toast.makeText(getApplicationContext(), "发送失败", Toast.LENGTH_SHORT).show();
+//                                        Looper.loop();
+//                                    } else {
+//                                        Toast.makeText(getApplicationContext(), "发送失败", Toast.LENGTH_SHORT).show();
+//                                    }
                                 }
                                 if (!WAIT_MESSAGE.isEmpty()) {
                                     Iterator<com.cetcme.xkterminal.Sqlite.Bean.Message> iterator = WAIT_MESSAGE.iterator();
@@ -1316,7 +1320,6 @@ public class MyApplication extends MultiDexApplication {
                                         }
                                     }
                                 }
-                                continue;
                             } else {
                                 if (!WAIT_MESSAGE.isEmpty()) {
                                     Iterator<com.cetcme.xkterminal.Sqlite.Bean.Message> iterator = WAIT_MESSAGE.iterator();
@@ -1333,9 +1336,9 @@ public class MyApplication extends MultiDexApplication {
                             }
                         }
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         }
     }

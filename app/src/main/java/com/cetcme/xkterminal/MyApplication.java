@@ -194,6 +194,17 @@ public class MyApplication extends MultiDexApplication {
                     case 4:
                         Toast.makeText(getApplicationContext(), "短信发送成功", Toast.LENGTH_SHORT).show();
                         break;
+                    case 5:
+                        String str2 = DateUtil.parseDateToString(Constant.SYSTEM_DATE, DateUtil.DatePattern.YYYYMMDDHHMMSS);
+                        PreferencesUtils.putString(getApplicationContext(), "lastSendTime", str2);
+                        break;
+                    case 6:
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTime(Constant.SYSTEM_DATE);
+                        calendar.add(Calendar.SECOND, -61);
+                        String str3 = DateUtil.parseDateToString(calendar.getTime(), DateUtil.DatePattern.YYYYMMDDHHMMSS);
+                        PreferencesUtils.putString(getApplicationContext(), "lastSendTime", str3);
+                        break;
                 }
             }
         };
@@ -1292,16 +1303,11 @@ public class MyApplication extends MultiDexApplication {
                             db.delete(msg);
                             Thread.sleep(61000);
                         } else {
-                            String str = DateUtil.parseDateToString(Constant.SYSTEM_DATE, DateUtil.DatePattern.YYYYMMDDHHMMSS);
-                            PreferencesUtils.putString(getApplicationContext(), "lastSendTime", str);
+                            handler.sendEmptyMessage(5);
                             //超时时间 过了
                             Thread.sleep(Constant.MESSAGE_FAIL_TIME + 2000);
                             if (messageSendFailed) {
-                                Calendar calendar = Calendar.getInstance();
-                                calendar.setTime(Constant.SYSTEM_DATE);
-                                calendar.add(Calendar.SECOND, -61);
-                                str = DateUtil.parseDateToString(calendar.getTime(), DateUtil.DatePattern.YYYYMMDDHHMMSS);
-                                PreferencesUtils.putString(getApplicationContext(), "lastSendTime", str);
+                                handler.sendEmptyMessage(6);
                                 //失败
                                 if (msg.getMessageId() != 0) {
                                     MessageProxy.setMessageFailed(db, msg.getMessageId());

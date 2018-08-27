@@ -88,7 +88,7 @@ public class DataHandler extends Handler {
                 case SERIAL_PORT_RECEIVE_NEW_MESSAGE:
                     // 如果卫星中断 则返回 不显示短信
                     if (!MyApplication.isLocated) return;
-//                    Log.e("TAG_$06", new String(bytes));
+                    Log.e("TAG_$06", new String(bytes));
                     String arr = new String(bytes);
 //                    System.out.println(arr);
                     if (!TextUtils.isEmpty(arr) && arr.startsWith("$04$06")) {
@@ -159,6 +159,7 @@ public class DataHandler extends Handler {
                                         if (usbInfo != null) {
                                             FT_Device device = usbInfo.getFtDevice();
                                             if (device != null) {
+                                                Log.e("TAG_MESSAGE", content);
                                                 device.write(content.getBytes());
                                             }
                                         }
@@ -332,8 +333,8 @@ public class DataHandler extends Handler {
                     // 短信发送成功
                     // Toast.makeText(myApplication.mainActivity, "短信发送成功", Toast.LENGTH_SHORT).show();
 
-                    String lastSendTimeSave = PreferencesUtils.getString(myApplication.mainActivity, "lastSendTimeSave");
-                    PreferencesUtils.putString(myApplication.mainActivity, "lastSendTime", lastSendTimeSave);
+//                    String lastSendTimeSave = PreferencesUtils.getString(myApplication.mainActivity, "lastSendTimeSave");
+//                    PreferencesUtils.putString(myApplication.mainActivity, "lastSendTime", lastSendTimeSave);
 
                     // 用于去掉2秒后显示发送失败提示
                     myApplication.mainActivity.messageSendFailed = false;

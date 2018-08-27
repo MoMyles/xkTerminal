@@ -125,8 +125,6 @@ public class MyApplication extends MultiDexApplication {
     public boolean isAisConnected = false;
     public static boolean isSendThreadStart = false;
 
-    private Timer timer;
-
     // 是否已定位, fake，收短信不处理， sendByte不处理，导航不处理，申报不处理
     public static boolean isLocated = false;
     // 电压
@@ -284,6 +282,7 @@ public class MyApplication extends MultiDexApplication {
                 new Handler().postDelayed(this, 60 * 1000);
             }
         }, 60 * 1000);
+
         // 距离报警
         warnTimer = new Timer();
         warnTimer.schedule(new TimerTask() {
@@ -631,9 +630,9 @@ public class MyApplication extends MultiDexApplication {
                         return;
                     }
 
-                    SharedPreferences.Editor editor = sharedPreferences.edit();//获取编辑器
-                    editor.putString("lastSendTimeSave", DateUtil.parseDateToString(Constant.SYSTEM_DATE, DateUtil.DatePattern.YYYYMMDDHHMMSS));
-                    editor.apply(); //提交修改
+//                    SharedPreferences.Editor editor = sharedPreferences.edit();//获取编辑器
+//                    editor.putString("lastSendTimeSave", DateUtil.parseDateToString(Constant.SYSTEM_DATE, DateUtil.DatePattern.YYYYMMDDHHMMSS));
+//                    editor.apply(); //提交修改
 
                     MessageProxy.insert(db, message);
                     failedMessageId = message.getId();
@@ -1286,70 +1285,109 @@ public class MyApplication extends MultiDexApplication {
             com.cetcme.xkterminal.Sqlite.Bean.Message msg = null;
             while (true) {
                 try {
-                    boolean flag = true;
-                    if (MESSAGE_QUEUE.isEmpty()) {
-                        if (MESSAGE_BACK_QUEUE.isEmpty()) continue;
-                        msg = MESSAGE_BACK_QUEUE.poll();
-                    } else {
-                        msg = MESSAGE_QUEUE.poll();
-                        flag = false;
-                    }
-                    if (msg != null && mOutputStream != null) {
-                        messageSendFailed = true;
-                        byte[] content = msg.getMessage();
-                        mOutputStream.write(content);
-//                        mOutputStream.flush();
-                        if (flag) {
-                            db.delete(msg);
-                            Thread.sleep(61000);
+                    if (canSend) {
+                        boolean flag = true;
+                        if (MESSAGE_QUEUE.isEmpty()) {
+                            if (MESSAGE_BACK_QUEUE.isEmpty()) continue;
+                            msg = MESSAGE_BACK_QUEUE.poll();
                         } else {
-                            handler.sendEmptyMessage(5);
-                            //超时时间 过了
-                            Thread.sleep(Constant.MESSAGE_FAIL_TIME + 2000);
-                            if (messageSendFailed) {
-                                handler.sendEmptyMessage(6);
-                                //失败
-                                if (msg.getMessageId() != 0) {
-                                    MessageProxy.setMessageFailed(db, msg.getMessageId());
-                                    handler.sendEmptyMessage(3);
-//                                    if (Looper.myLooper() != Looper.getMainLooper()) {
-//                                        Looper.prepare();
-//                                        Toast.makeText(getApplicationContext(), "发送失败", Toast.LENGTH_SHORT).show();
-//                                        Looper.loop();
-//                                    } else {
-//                                        Toast.makeText(getApplicationContext(), "发送失败", Toast.LENGTH_SHORT).show();
-//                                    }
-                                }
-                                if (!WAIT_MESSAGE.isEmpty()) {
-                                    Iterator<com.cetcme.xkterminal.Sqlite.Bean.Message> iterator = WAIT_MESSAGE.iterator();
-                                    while (iterator.hasNext()) {
-                                        com.cetcme.xkterminal.Sqlite.Bean.Message m = iterator.next();
-                                        if (m.getMessageId() == msg.getMessageId()) {
-                                            iterator.remove();
-                                            break;
-                                        }
-                                    }
-                                }
-                            } else {
-                                handler.sendEmptyMessage(4);
-                                if (!WAIT_MESSAGE.isEmpty()) {
-                                    Iterator<com.cetcme.xkterminal.Sqlite.Bean.Message> iterator = WAIT_MESSAGE.iterator();
-                                    while (iterator.hasNext()) {
-                                        com.cetcme.xkterminal.Sqlite.Bean.Message m = iterator.next();
-                                        if (m.getMessageId() == msg.getMessageId()) {
-                                            MESSAGE_QUEUE.offer(m);
-                                            iterator.remove();
-                                            break;
-                                        }
-                                    }
-                                }
-                                Thread.sleep(51000);
-                            }
+                            msg = MESSAGE_QUEUE.poll();
+                            flag = false;
                         }
+                        if (msg != null && mOutputStream != null) {
+                            canSend = false;
+                            messageSendFailed = true;
+                            byte[] content = msg.getMessage();
+                            mOutputStream.write(content);
+                            handler.sendEmptyMessage(5);
+                            if (flag) {
+                                db.delete(msg);
+                            } else {
+                                //超时时间 过了
+//                            Thread.sleep(Constant.MESSAGE_FAIL_TIME + 2000);
+                                timer = new Timer();
+                                timer.schedule(new SendTimeOutTask(msg), 1000, 1000);
+                            }
+                            currentTimeoutRunnable = new TimeoutRunnable();
+                            handler.postDelayed(currentTimeoutRunnable, 60 * 1000);
+                        }
+                        Thread.sleep(500);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+            }
+        }
+    }
+
+    private Timer timer;
+    private int timeCount = 0;
+    private boolean canSend = true;
+    private TimeoutRunnable currentTimeoutRunnable;
+
+    private class TimeoutRunnable implements Runnable {
+        @Override
+        public void run() {
+            if (!canSend) {
+                canSend = true;
+            }
+        }
+    }
+
+    private class SendTimeOutTask extends TimerTask {
+        private com.cetcme.xkterminal.Sqlite.Bean.Message msg;
+
+        private SendTimeOutTask(com.cetcme.xkterminal.Sqlite.Bean.Message msg) {
+            timeCount = 0;
+            this.msg = msg;
+        }
+
+        @Override
+        public void run() {
+            if (!messageSendFailed && timer != null) {
+                timer.cancel();
+            }
+            timeCount++;
+            if (messageSendFailed){
+                return;
+            }
+            if (timeCount > Constant.MESSAGE_FAIL_TIME / 1000) {
+                // 发送超时
+                handler.sendEmptyMessage(6);
+                //失败
+                if (msg.getMessageId() != 0) {
+                    MessageProxy.setMessageFailed(db, msg.getMessageId());
+                    handler.sendEmptyMessage(3);
+                }
+                if (!WAIT_MESSAGE.isEmpty()) {
+                    Iterator<com.cetcme.xkterminal.Sqlite.Bean.Message> iterator = WAIT_MESSAGE.iterator();
+                    while (iterator.hasNext()) {
+                        com.cetcme.xkterminal.Sqlite.Bean.Message m = iterator.next();
+                        if (m.getMessageId() == msg.getMessageId()) {
+                            iterator.remove();
+                            break;
+                        }
+                    }
+                }
+                if (handler != null && currentTimeoutRunnable != null) {
+                    handler.removeCallbacks(currentTimeoutRunnable);
+                }
+                canSend = true;
+            } else {
+                // 发送成功
+                handler.sendEmptyMessage(4);
+                if (!WAIT_MESSAGE.isEmpty()) {
+                    Iterator<com.cetcme.xkterminal.Sqlite.Bean.Message> iterator = WAIT_MESSAGE.iterator();
+                    while (iterator.hasNext()) {
+                        com.cetcme.xkterminal.Sqlite.Bean.Message m = iterator.next();
+                        if (m.getMessageId() == msg.getMessageId()) {
+                            MESSAGE_QUEUE.offer(m);
+                            iterator.remove();
+                            break;
+                        }
+                    }
+                }
+                canSend = false;
             }
         }
     }

@@ -331,8 +331,8 @@ public class DataHandler extends Handler {
                     // 短信发送成功
 //                    Toast.makeText(myApplication.mainActivity, "短信发送成功", Toast.LENGTH_SHORT).show();
 
-                    String lastSendTimeSave = PreferencesUtils.getString(myApplication.mainActivity, "lastSendTimeSave");
-                    PreferencesUtils.putString(myApplication.mainActivity, "lastSendTime", lastSendTimeSave);
+//                    String lastSendTimeSave = PreferencesUtils.getString(myApplication.mainActivity, "lastSendTimeSave");
+//                    PreferencesUtils.putString(myApplication.mainActivity, "lastSendTime", lastSendTimeSave);
 
                     // 用于去掉2秒后显示发送失败提示
                     myApplication.mainActivity.messageSendFailed = false;

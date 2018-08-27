@@ -1302,7 +1302,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     // 分包发送短信
     public void sendMessage() {
-
+        //xkTerminal
         SharedPreferences sharedPreferences = getSharedPreferences("xkTerminal", Context.MODE_PRIVATE); //私有数据
         String lastSendTime = sharedPreferences.getString("lastSendTime", "");
         if (!lastSendTime.isEmpty()) {
@@ -1353,9 +1353,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             return;
         }
 
-        SharedPreferences.Editor editor = sharedPreferences.edit();//获取编辑器
-        editor.putString("lastSendTimeSave", DateUtil.parseDateToString(Constant.SYSTEM_DATE, DateUtil.DatePattern.YYYYMMDDHHMMSS));
-        editor.apply(); //提交修改
+//        SharedPreferences.Editor editor = sharedPreferences.edit();//获取编辑器
+//        editor.putString("lastSendTimeSave", DateUtil.parseDateToString(Constant.SYSTEM_DATE, DateUtil.DatePattern.YYYYMMDDHHMMSS));
+//        editor.apply(); //提交修改
 
         final MessageBean newMessage = new MessageBean();
         newMessage.setSender(myNumber);

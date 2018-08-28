@@ -939,11 +939,9 @@ public class MyApplication extends MultiDexApplication {
 
         @Override
         public void run() {
-            super.run();
             while (!isInterrupted()) {
                 int size;
                 try {
-                    Thread.sleep(10);
                     byte[] buffer = new byte[1];
                     if (mInputStream == null) return;
                     size = mInputStream.read(buffer);
@@ -1344,37 +1342,40 @@ public class MyApplication extends MultiDexApplication {
 
         @Override
         public void run() {
-            if (!messageSendFailed && timer != null) {
-                timer.cancel();
-            }
             timeCount++;
-            if (messageSendFailed){
-                return;
-            }
-            if (timeCount > Constant.MESSAGE_FAIL_TIME / 1000) {
-                // 发送超时
-                handler.sendEmptyMessage(6);
-                //失败
-                if (msg.getMessageId() != 0) {
-                    MessageProxy.setMessageFailed(db, msg.getMessageId());
-                    handler.sendEmptyMessage(3);
-                }
-                if (!WAIT_MESSAGE.isEmpty()) {
-                    Iterator<com.cetcme.xkterminal.Sqlite.Bean.Message> iterator = WAIT_MESSAGE.iterator();
-                    while (iterator.hasNext()) {
-                        com.cetcme.xkterminal.Sqlite.Bean.Message m = iterator.next();
-                        if (m.getMessageId() == msg.getMessageId()) {
-                            iterator.remove();
-                            break;
+            if (messageSendFailed) {
+                //发送超时
+                if (timeCount > Constant.MESSAGE_FAIL_TIME / 1000) {
+                    if (timer != null) {
+                        timer.cancel();
+                    }
+                    // 发送超时
+                    handler.sendEmptyMessage(6);
+                    //失败
+                    if (msg.getMessageId() != 0) {
+                        MessageProxy.setMessageFailed(db, msg.getMessageId());
+                        handler.sendEmptyMessage(3);
+                    }
+                    if (!WAIT_MESSAGE.isEmpty()) {
+                        Iterator<com.cetcme.xkterminal.Sqlite.Bean.Message> iterator = WAIT_MESSAGE.iterator();
+                        while (iterator.hasNext()) {
+                            com.cetcme.xkterminal.Sqlite.Bean.Message m = iterator.next();
+                            if (m.getMessageId() == msg.getMessageId()) {
+                                iterator.remove();
+                                break;
+                            }
                         }
                     }
+                    if (handler != null && currentTimeoutRunnable != null) {
+                        handler.removeCallbacks(currentTimeoutRunnable);
+                    }
+                    canSend = true;
                 }
-                if (handler != null && currentTimeoutRunnable != null) {
-                    handler.removeCallbacks(currentTimeoutRunnable);
-                }
-                canSend = true;
             } else {
                 // 发送成功
+                if (timer != null) {
+                    timer.cancel();
+                }
                 handler.sendEmptyMessage(4);
                 if (!WAIT_MESSAGE.isEmpty()) {
                     Iterator<com.cetcme.xkterminal.Sqlite.Bean.Message> iterator = WAIT_MESSAGE.iterator();

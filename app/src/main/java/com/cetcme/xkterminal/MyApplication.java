@@ -103,6 +103,7 @@ public class MyApplication extends MultiDexApplication {
     private SerialPort mSerialPort = null;
     private OutputStream mOutputStream;
     private InputStream mInputStream;
+    private ReadThread mReadThread;
 
     //    private SerialPort gpsSerialPort = null;
 //    private OutputStream gpsOutputStream;
@@ -121,6 +122,10 @@ public class MyApplication extends MultiDexApplication {
     private int failedMessageId = 0;
 
     public long oldAisReceiveTime = System.currentTimeMillis();
+
+    public long oldComTime = System.currentTimeMillis();
+    public int oldComTimeCounter = 0;
+
 
     public boolean isAisConnected = false;
     public static boolean isSendThreadStart = false;
@@ -209,26 +214,7 @@ public class MyApplication extends MultiDexApplication {
 
 
         if (!Constant.PHONE_TEST) {
-            try {
-                mSerialPort = getSerialPort();
-                mOutputStream = mSerialPort.getOutputStream();
-                mInputStream = mSerialPort.getInputStream();
-                ReadThread mReadThread = new ReadThread();
-                mReadThread.start();
-
-//            aisSerialPort = getAisSerialPort();
-//            aisOutputStream = aisSerialPort.getOutputStream();
-//            aisInputStream = aisSerialPort.getInputStream();
-//            AisReadThread aisReadThread = new AisReadThread();
-//            aisReadThread.start();
-
-            } catch (SecurityException e) {
-                DisplayError(R.string.error_security);
-            } catch (IOException e) {
-                DisplayError(R.string.error_unknown);
-            } catch (InvalidParameterException e) {
-                DisplayError(R.string.error_configuration);
-            }
+            startSerialPort();
         } else {
             new Thread(new Runnable() {
                 @Override
@@ -301,6 +287,19 @@ public class MyApplication extends MultiDexApplication {
         currentLocation.setSpeed(0.0f);
 
         initUSB();
+    }
+
+    public void startSerialPort() {
+        try {
+            mSerialPort = getSerialPort();
+            mOutputStream = mSerialPort.getOutputStream();
+            mInputStream = mSerialPort.getInputStream();
+            mReadThread = new ReadThread();
+            mReadThread.start();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void startSendThread() {
@@ -914,9 +913,30 @@ public class MyApplication extends MultiDexApplication {
     }
 
     public void closeSerialPort() {
-        if (mSerialPort != null) {
-            mSerialPort.close();
-            mSerialPort = null;
+        try {
+            if (mReadThread != null) {
+                mReadThread.interrupt();
+            }
+        } catch (Exception e) {
+        }
+        try {
+            if (mInputStream != null) {
+                mInputStream.close();
+            }
+        } catch (Exception e) {
+        }
+        try {
+            if (mOutputStream != null) {
+                mOutputStream.close();
+            }
+        } catch (Exception e) {
+        }
+        try {
+            if (mSerialPort != null) {
+                mSerialPort.close();
+                mSerialPort = null;
+            }
+        } catch (Exception e) {
         }
     }
 
@@ -948,6 +968,7 @@ public class MyApplication extends MultiDexApplication {
                     if (size > 0) {
                         onDataReceived(buffer, size);
                     }
+                    oldComTime = System.currentTimeMillis();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

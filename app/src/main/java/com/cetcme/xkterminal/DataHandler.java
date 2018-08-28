@@ -159,7 +159,7 @@ public class DataHandler extends Handler {
                                         if (usbInfo != null) {
                                             FT_Device device = usbInfo.getFtDevice();
                                             if (device != null) {
-                                                device.write(content.getBytes());
+                                                device.write(bytes);
                                             }
                                         }
                                     }

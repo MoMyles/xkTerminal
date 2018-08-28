@@ -67,7 +67,6 @@ import com.kaopiz.kprogresshud.KProgressHUD;
 import com.qiuhong.qhlibrary.Dialog.QHDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
-import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
 
 import org.codice.common.ais.Decoder;
 import org.codice.common.ais.message.Message18;
@@ -972,47 +971,58 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         }
     }
 
+    @Override
     public void onBackPressed() {
 
-        if (backBar.getVisibility() == View.VISIBLE) {
-            backBar.button_back.performClick();
-            return;
-        }
-
-        if (messageBar.getVisibility() == View.VISIBLE) {
-            messageBar.button_back.performClick();
-            return;
-        }
-
-        if (pageBar.getVisibility() == View.VISIBLE) {
-            pageBar.button_back.performClick();
-            return;
-        }
-
-        if (sendBar.getVisibility() == View.VISIBLE) {
-            sendBar.button_back.performClick();
-            return;
-        }
-
-        if (messageDetailBar.getVisibility() == View.VISIBLE) {
-            messageDetailBar.button_back.performClick();
-            return;
-        }
-
-        if (!hasPressedBackOnce) {
-            backToast = Toast.makeText(this, "再按一次返回键退出程序", Toast.LENGTH_SHORT);
-            backToast.show();
-            hasPressedBackOnce = true;
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    hasPressedBackOnce = false;
-                }
-            }, 2500);
-        } else {
-            backToast.cancel();
-            super.onBackPressed();
-        }
+//        if (backBar.getVisibility() == View.VISIBLE) {
+//            backBar.button_back.performClick();
+//            return;
+//        }
+//
+//        if (messageBar.getVisibility() == View.VISIBLE) {
+//            messageBar.button_back.performClick();
+//            return;
+//        }
+//
+//        if (pageBar.getVisibility() == View.VISIBLE) {
+//            pageBar.button_back.performClick();
+//            return;
+//        }
+//
+//        if (sendBar.getVisibility() == View.VISIBLE) {
+//            sendBar.button_back.performClick();
+//            return;
+//        }
+//
+//        if (messageDetailBar.getVisibility() == View.VISIBLE) {
+//            messageDetailBar.button_back.performClick();
+//            return;
+//        }
+//
+//        if (messageNewFragment != null) {
+//            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//            transaction.remove(messageNewFragment);
+//            messageNewFragment = null;
+//            fragmentName = "message";
+//            transaction.show(messageFragment);
+//            transaction.commit();
+//            return;
+//        }
+//
+//        if (!hasPressedBackOnce) {
+//            backToast = Toast.makeText(this, "再按一次返回键退出程序", Toast.LENGTH_SHORT);
+//            backToast.show();
+//            hasPressedBackOnce = true;
+//            new Handler().postDelayed(new Runnable() {
+//                @Override
+//                public void run() {
+//                    hasPressedBackOnce = false;
+//                }
+//            }, 2500);
+//        } else {
+//            backToast.cancel();
+//            super.onBackPressed();
+//        }
     }
 
     private void bindView() {

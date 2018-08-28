@@ -962,6 +962,7 @@ public class MyApplication extends MultiDexApplication {
             while (!isInterrupted()) {
                 int size;
                 try {
+                    Thread.sleep(1);
                     byte[] buffer = new byte[1];
                     if (mInputStream == null) return;
                     size = mInputStream.read(buffer);

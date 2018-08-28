@@ -1,11 +1,13 @@
 package com.cetcme.xkterminal.DataFormat;
 
 import android.telephony.PhoneNumberUtils;
+import android.util.Log;
 
 import com.cetcme.xkterminal.DataFormat.Util.ByteUtil;
 import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
 import com.cetcme.xkterminal.DataFormat.Util.Util;
 import com.cetcme.xkterminal.MyClass.Constant;
+import com.cetcme.xkterminal.port.Utils;
 
 import java.io.UnsupportedEncodingException;
 

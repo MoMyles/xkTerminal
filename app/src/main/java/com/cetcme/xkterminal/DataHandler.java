@@ -24,6 +24,7 @@ import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 import com.cetcme.xkterminal.Sqlite.Proxy.GroupProxy;
 import com.cetcme.xkterminal.netty.utils.Constants;
 import com.cetcme.xkterminal.port.USBInfo;
+import com.cetcme.xkterminal.port.Utils;
 import com.ftdi.j2xx.FT_Device;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
@@ -160,6 +161,8 @@ public class DataHandler extends Handler {
                                             FT_Device device = usbInfo.getFtDevice();
                                             if (device != null) {
 //                                                device.write(content.getBytes());
+                                                Log.e("TAG_DIANTAI", content);
+                                                Log.e("TAG_DIANTAI", Utils.byte2HexStr(bytes));
                                                 device.write(bytes);
                                             }
                                         }

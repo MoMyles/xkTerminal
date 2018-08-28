@@ -126,8 +126,23 @@ public class AisReadThread extends Thread {
                         MyApplication.getInstance().sendBytes(MessageFormat.format(PreferencesUtils.getString(MyApplication.getInstance().getApplicationContext(), "server_address", Constant.SERVER_BD_NUMBER)// 蘑菇头编号
                                 , content, MessageFormat.MESSAGE_TYPE_TRADE, 0, unique));
                     } else if (MessageFormat.MESSAGE_TYPE_BROADCASTING.equals(type)) {
-                        MyApplication.getInstance().sendBytes(MessageFormat.format("382570"//PreferencesUtils.getString(MyApplication.getInstance().getApplicationContext(), "server_address", Constant.SERVER_BD_NUMBER)// 蘑菇头编号
-                                , content, MessageFormat.MESSAGE_TYPE_BROADCASTING, 0, unique));
+                        Log.e("TAG_DIANTAI_1", Utils.byte2HexStr(tmpByts));
+//                        byte[] bdNo = ByteUtil.subBytes(tmpByts, 3, 9);
+                        byte[] bdNo = new byte[]{0x00, 0x00 ,0x00 ,0x38 ,0x25 ,0x70};
+                        byte[] byt1 = ByteUtil.byteMerger(ByteUtil.subBytes(tmpByts, 0,3), bdNo);
+                        byte[] byt2 = ByteUtil.subBytes(tmpByts, 9, tmpByts.length - 4);
+                        byte[] finalByt = ByteUtil.byteMerger(byt1, byt2);
+                        int a = finalByt[1];
+                        for (int i=2;i<finalByt.length;i++){
+                            a += finalByt[i];
+                        }
+//                        ByteUtil.computeCheckSum(finalByt, 1, finalByt.length);
+                        byte[] tail = new byte[]{0x2A, (byte) (a & 0xFF), 0x0D, 0x0A};
+                        byte[] finalB = ByteUtil.byteMerger(finalByt, tail);
+//                        MyApplication.getInstance().sendBytes(MessageFormat.format("382570"//PreferencesUtils.getString(MyApplication.getInstance().getApplicationContext(), "server_address", Constant.SERVER_BD_NUMBER)// 蘑菇头编号
+//                                , content, MessageFormat.MESSAGE_TYPE_BROADCASTING, 0, unique));
+                        Log.e("TAG_DIANTAI_2", Utils.byte2HexStr(finalB));
+                        MyApplication.getInstance().sendBytes(finalB);
                     }
                 }
             } else if (tmp.startsWith("!AIVDO")

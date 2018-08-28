@@ -38,6 +38,7 @@ import com.cetcme.xkterminal.netty.utils.SendMsg;
 import com.cetcme.xkterminal.port.AisReadThread;
 import com.cetcme.xkterminal.port.USBEvent;
 import com.cetcme.xkterminal.port.USBInfo;
+import com.cetcme.xkterminal.port.Utils;
 import com.ftdi.j2xx.D2xxManager;
 import com.ftdi.j2xx.FT_Device;
 import com.iflytek.cloud.SpeechConstant;
@@ -223,6 +224,7 @@ public class MyApplication extends MultiDexApplication {
 //            aisInputStream = aisSerialPort.getInputStream();
 //            AisReadThread aisReadThread = new AisReadThread();
 //            aisReadThread.start();
+                db.delete(com.cetcme.xkterminal.Sqlite.Bean.Message.class);
 
             } catch (SecurityException e) {
                 DisplayError(R.string.error_security);
@@ -1232,10 +1234,10 @@ public class MyApplication extends MultiDexApplication {
                     com.cetcme.xkterminal.Sqlite.Bean.Message msg = new com.cetcme.xkterminal.Sqlite.Bean.Message();
                     msg.setMessage(buffer);
                     msg.setSend(false);
-                    if (db.saveBindingId(msg)) {
-                        MESSAGE_BACK_QUEUE.offer(msg);
-                    }
-                } catch (DbException e) {
+//                    if (db.saveBindingId(msg)) {
+                    MESSAGE_BACK_QUEUE.offer(msg);
+//                    }
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 //                }
@@ -1275,6 +1277,7 @@ public class MyApplication extends MultiDexApplication {
                     for (com.cetcme.xkterminal.Sqlite.Bean.Message msg : msgs) {
                         MESSAGE_BACK_QUEUE.offer(msg);
                     }
+                    Log.e("TAG_DIANTAI", "以保存的size"+MESSAGE_BACK_QUEUE.size());
                 }
             } catch (DbException e) {
                 e.printStackTrace();
@@ -1299,6 +1302,7 @@ public class MyApplication extends MultiDexApplication {
                             canSend = false;
                             messageSendFailed = true;
                             byte[] content = msg.getMessage();
+                            Log.e("TAG_DIANTAI_3", Utils.byte2HexStr(content));
                             mOutputStream.write(content);
                             handler.sendEmptyMessage(5);
                             if (flag) {

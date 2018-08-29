@@ -123,6 +123,11 @@ public class AisReadThread extends Thread {
                     int frameCount = Integer.parseInt(messageStrings[4]);
                     final String unique = ConvertUtil.rc4ToHex();
                     if (MessageFormat.MESSAGE_TYPE_TRADE.equals(type)) {
+                        try {
+                            Thread.sleep(3000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                         MyApplication.getInstance().sendBytes(MessageFormat.format(PreferencesUtils.getString(MyApplication.getInstance().getApplicationContext(), "server_address", Constant.SERVER_BD_NUMBER)// 蘑菇头编号
                                 , content, MessageFormat.MESSAGE_TYPE_TRADE, 0, unique));
                     } else if (MessageFormat.MESSAGE_TYPE_BROADCASTING.equals(type)) {
@@ -141,7 +146,11 @@ public class AisReadThread extends Thread {
                         byte[] finalB = ByteUtil.byteMerger(finalByt, tail);
 //                        MyApplication.getInstance().sendBytes(MessageFormat.format("382570"//PreferencesUtils.getString(MyApplication.getInstance().getApplicationContext(), "server_address", Constant.SERVER_BD_NUMBER)// 蘑菇头编号
 //                                , content, MessageFormat.MESSAGE_TYPE_BROADCASTING, 0, unique));
-                        Log.e("TAG_DIANTAI_2", Utils.byte2HexStr(finalB));
+                        try {
+                            Thread.sleep(3000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                         MyApplication.getInstance().sendBytes(finalB);
                     }
                 }

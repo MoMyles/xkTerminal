@@ -1643,6 +1643,14 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         kProgressHUD.show();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (isSelfCheckLoading) {
+            dismissSelfCheckHud();
+        }
+    }
+
     public boolean isSelfCheckLoading = false;
 
     public void showSelfCheckHud() {

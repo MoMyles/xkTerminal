@@ -1140,6 +1140,7 @@ public class MyApplication extends MultiDexApplication {
         }
 
         if (serialCount >= 81) {
+            Log.e("TAG_ERROR", Utils.byte2HexStr(serialBuffer));
             serialBuffer = new byte[100];
             serialCount = 0;
             hasHead = false;
@@ -1284,7 +1285,7 @@ public class MyApplication extends MultiDexApplication {
                     for (com.cetcme.xkterminal.Sqlite.Bean.Message msg : msgs) {
                         MESSAGE_BACK_QUEUE.offer(msg);
                     }
-                    Log.e("TAG_DIANTAI", "以保存的size"+MESSAGE_BACK_QUEUE.size());
+                    Log.e("TAG_DIANTAI", "以保存的size" + MESSAGE_BACK_QUEUE.size());
                 }
             } catch (DbException e) {
                 e.printStackTrace();
@@ -1311,10 +1312,10 @@ public class MyApplication extends MultiDexApplication {
                             byte[] content = msg.getMessage();
                             Log.e("TAG_DIANTAI_3", Utils.byte2HexStr(content));
                             mOutputStream.write(content);
-                            handler.sendEmptyMessage(5);
                             if (flag) {
                                 db.delete(msg);
                             } else {
+                                handler.sendEmptyMessage(5);
                                 //超时时间 过了
 //                            Thread.sleep(Constant.MESSAGE_FAIL_TIME + 2000);
                                 timer = new Timer();
@@ -1323,8 +1324,8 @@ public class MyApplication extends MultiDexApplication {
                             currentTimeoutRunnable = new TimeoutRunnable();
                             handler.postDelayed(currentTimeoutRunnable, 60 * 1000);
                         }
-                        Thread.sleep(500);
                     }
+                    Thread.sleep(500);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

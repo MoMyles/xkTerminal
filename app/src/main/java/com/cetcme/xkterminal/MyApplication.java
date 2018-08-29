@@ -212,7 +212,12 @@ public class MyApplication extends MultiDexApplication {
             }
         };
 
-
+        if (db != null) {
+            try {
+                db.delete(com.cetcme.xkterminal.Sqlite.Bean.Message.class);
+            } catch (DbException e) {
+            }
+        }
         if (!Constant.PHONE_TEST) {
             startSerialPort();
         } else {

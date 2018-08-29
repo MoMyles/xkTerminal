@@ -565,45 +565,45 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     public void onBackPressed() {
 
-        if (backBar.getVisibility() == View.VISIBLE) {
-            backBar.button_back.performClick();
-            return;
-        }
-
-        if (messageBar.getVisibility() == View.VISIBLE) {
-            messageBar.button_back.performClick();
-            return;
-        }
-
-        if (pageBar.getVisibility() == View.VISIBLE) {
-            pageBar.button_back.performClick();
-            return;
-        }
-
-        if (sendBar.getVisibility() == View.VISIBLE) {
-            sendBar.button_back.performClick();
-            return;
-        }
-
-        if (messageDetailBar.getVisibility() == View.VISIBLE) {
-            messageDetailBar.button_back.performClick();
-            return;
-        }
-
-        if (!hasPressedBackOnce) {
-            backToast = Toast.makeText(this, "再按一次返回键退出程序", Toast.LENGTH_SHORT);
-            backToast.show();
-            hasPressedBackOnce = true;
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    hasPressedBackOnce = false;
-                }
-            }, 2500);
-        } else {
-            backToast.cancel();
-            super.onBackPressed();
-        }
+//        if (backBar.getVisibility() == View.VISIBLE) {
+//            backBar.button_back.performClick();
+//            return;
+//        }
+//
+//        if (messageBar.getVisibility() == View.VISIBLE) {
+//            messageBar.button_back.performClick();
+//            return;
+//        }
+//
+//        if (pageBar.getVisibility() == View.VISIBLE) {
+//            pageBar.button_back.performClick();
+//            return;
+//        }
+//
+//        if (sendBar.getVisibility() == View.VISIBLE) {
+//            sendBar.button_back.performClick();
+//            return;
+//        }
+//
+//        if (messageDetailBar.getVisibility() == View.VISIBLE) {
+//            messageDetailBar.button_back.performClick();
+//            return;
+//        }
+//
+//        if (!hasPressedBackOnce) {
+//            backToast = Toast.makeText(this, "再按一次返回键退出程序", Toast.LENGTH_SHORT);
+//            backToast.show();
+//            hasPressedBackOnce = true;
+//            new Handler().postDelayed(new Runnable() {
+//                @Override
+//                public void run() {
+//                    hasPressedBackOnce = false;
+//                }
+//            }, 2500);
+//        } else {
+//            backToast.cancel();
+//            super.onBackPressed();
+//        }
     }
 
     private void bindView() {

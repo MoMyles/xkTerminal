@@ -150,21 +150,21 @@ public class DataHandler extends Handler {
                     int frameCount = Integer.parseInt(messageStrings[4]);
                     switch (type) {
                         case MessageFormat.MESSAGE_TYPE_BROADCASTING:// 电台信息
-                            Map<String, USBInfo> map = MyApplication.getInstance().openMap;
-                            if (map != null && !map.isEmpty()) {
-                                Set<Map.Entry<String, USBInfo>> entry = map.entrySet();
-                                for (Map.Entry<String, USBInfo> e : entry) {
-                                    if (e != null) {
-                                        USBInfo usbInfo = e.getValue();
-                                        if (usbInfo != null) {
-                                            FT_Device device = usbInfo.getFtDevice();
-                                            if (device != null) {
-                                                device.write(bytes);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+//                            Map<String, USBInfo> map = MyApplication.getInstance().openMap;
+//                            if (map != null && !map.isEmpty()) {
+//                                Set<Map.Entry<String, USBInfo>> entry = map.entrySet();
+//                                for (Map.Entry<String, USBInfo> e : entry) {
+//                                    if (e != null) {
+//                                        USBInfo usbInfo = e.getValue();
+//                                        if (usbInfo != null) {
+//                                            FT_Device device = usbInfo.getFtDevice();
+//                                            if (device != null) {
+//                                                device.write(bytes);
+//                                            }
+//                                        }
+//                                    }
+//                                }
+//                            }
                             break;
                         // 普通短信
                         case MessageFormat.MESSAGE_TYPE_NORMAL:

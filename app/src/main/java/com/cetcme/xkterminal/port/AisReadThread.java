@@ -116,8 +116,8 @@ public class AisReadThread extends Thread {
                         MyApplication.getInstance().sendBytes(MessageFormat.format(PreferencesUtils.getString(MyApplication.getInstance().getApplicationContext(), "server_address", Constant.SERVER_BD_NUMBER)// 蘑菇头编号
                                 , content, MessageFormat.MESSAGE_TYPE_TRADE, 0, unique));
                     } else if (MessageFormat.MESSAGE_TYPE_BROADCASTING.equals(type)) {
-                        MyApplication.getInstance().sendBytes(MessageFormat.format(PreferencesUtils.getString(MyApplication.getInstance().getApplicationContext(), "server_address", Constant.SERVER_BD_NUMBER)// 蘑菇头编号
-                                , content, MessageFormat.MESSAGE_TYPE_BROADCASTING, 0, unique));
+//                        MyApplication.getInstance().sendBytes(MessageFormat.format(PreferencesUtils.getString(MyApplication.getInstance().getApplicationContext(), "server_address", Constant.SERVER_BD_NUMBER)// 蘑菇头编号
+//                                , content, MessageFormat.MESSAGE_TYPE_BROADCASTING, 0, unique));
                     }
                 }
             } else if (tmp.startsWith("!AIVDO")

@@ -38,6 +38,7 @@ import com.cetcme.xkterminal.netty.utils.SendMsg;
 import com.cetcme.xkterminal.port.AisReadThread;
 import com.cetcme.xkterminal.port.USBEvent;
 import com.cetcme.xkterminal.port.USBInfo;
+import com.cetcme.xkterminal.port.Utils;
 import com.ftdi.j2xx.D2xxManager;
 import com.ftdi.j2xx.FT_Device;
 import com.iflytek.cloud.SpeechConstant;
@@ -993,6 +994,10 @@ public class MyApplication extends MultiDexApplication {
                     oldComTime = System.currentTimeMillis();
                 } catch (Exception e) {
                     e.printStackTrace();
+                    Log.e("TAG_ERROR", Utils.byte2HexStr(serialBuffer)+", "+serialBuffer.length);
+                    serialBuffer = new byte[100];
+                    serialCount = 0;
+                    hasHead = false;
                 }
             }
         }

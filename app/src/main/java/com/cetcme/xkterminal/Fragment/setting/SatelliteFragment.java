@@ -188,7 +188,14 @@ public class SatelliteFragment extends Fragment {
                     str += g.getNo() + ",";
                 }
             }
-            mSatellite.setText("" + mSatelliteList.size());
+            if (getActivity()!=null) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mSatellite.setText("" + mSatelliteList.size());
+                    }
+                });
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

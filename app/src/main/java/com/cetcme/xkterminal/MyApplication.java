@@ -1268,6 +1268,33 @@ public class MyApplication extends MultiDexApplication {
     }
 
 
+    public void sendBytes2(final byte[] buffer) {
+        if (!Constant.PHONE_TEST) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        if (mOutputStream != null) {
+                            mOutputStream.write(buffer);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        } else {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    String nettySendResult = SendMsg.getSendMsg().sendMsg(buffer);
+                    Log.e(TAG, "sendBytes: " + nettySendResult);
+                }
+            }).start();
+        }
+//        System.out.println("发送包：" + ConvertUtil.bytesToHexString(buffer));
+    }
+
+
     public void sendBytes(final byte[] buffer) {
         if (!Constant.PHONE_TEST) {
             String str = new String(buffer);

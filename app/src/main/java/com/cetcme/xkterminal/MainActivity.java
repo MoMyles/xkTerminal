@@ -1232,6 +1232,15 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         kProgressHUD.show();
     }
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (isSelfCheckLoading){
+            dismissSelfCheckHud();
+        }
+    }
+
     public boolean isSelfCheckLoading = false;
 
     public void showSelfCheckHud() {
@@ -1354,8 +1363,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         if (mainFragment != null && mainFragment.skiaDrawView != null) {
             try {
                 String deviceID = mainFragment.skiaDrawView.mYimaLib.GetDeviceIDForLicSvr();
-                final String unique = ConvertUtil.rc4ToHex();
-                MyApplication.getInstance().sendBytes(MessageFormat.format(PreferencesUtils.getString(mContext, "server_address", Constant.SERVER_BD_NUMBER)
+//                final String unique = ConvertUtil.rc4ToHex();
+                MyApplication.getInstance().sendBytes2(MessageFormat.format(PreferencesUtils.getString(mContext, "server_address", Constant.SERVER_BD_NUMBER)
                         , deviceID.getBytes("GB2312"), MessageFormat.MESSAGE_TYPE_CHECK_AND_MAP, 0));
             } catch (Exception e) {
 

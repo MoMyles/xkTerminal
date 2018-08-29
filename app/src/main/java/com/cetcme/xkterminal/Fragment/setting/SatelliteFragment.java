@@ -171,13 +171,14 @@ public class SatelliteFragment extends Fragment {
 
     private void refreshSatellite() {
         mSatelliteList.clear();
-        Random random = new Random();
+//        Random random = new Random();
         DbManager db = MyApplication.getInstance().getDb();
         String str = ",";
         try {
             List<GPSBean> list = db.selector(GPSBean.class).findAll();
             if (list != null && !list.isEmpty()) {
                 for (GPSBean g : list) {
+                    if (System.currentTimeMillis() - g.getCreated() > 24 * 60 * 60 * 1000) continue;
                     Satellite satellite = new Satellite();
                     satellite.setNo(g.getXinhao());
                     satellite.setNum(g.getNo());
@@ -187,36 +188,11 @@ public class SatelliteFragment extends Fragment {
                     str += g.getNo() + ",";
                 }
             }
-
-//            int count = mSatelliteList.size();
-//            for (int i = 0, k = 0; i < 15 - count; k++) {
-//                Satellite satellite1 = new Satellite();
-//                int j = random.nextInt(50);
-//                if (k == 100) {
-//                    break;
-//                }
-//                if (str.indexOf("," + j + ",") >= 0) {
-//                    continue;
-//                }
-//                i++;
-//                satellite1.setNum(j);
-//                int kk = random.nextInt(359);
-//                satellite1.setAzimuth(kk);
-//                int l = random.nextInt(90);
-//                satellite1.setElevationAngle(l);
-//                satellite1.setNo(random.nextInt(90));
-//                mSatelliteList.add(satellite1);
-//            }
-//            if (count > 15) {
-//                for (int i=15;i<count;i++){
-//                    mSatelliteList.remove(i);
-//                }
-//            }
-
+            mSatellite.setText("" + mSatelliteList.size());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (!MyApplication.isLocated){
+        if (!MyApplication.isLocated) {
             mSatelliteList.clear();
         }
         satelliteView.postInvalidate();

@@ -27,7 +27,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.DataFormat.MessageFormat;
-import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
 import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
@@ -627,15 +626,9 @@ public class USBFragment extends Fragment implements View.OnClickListener {
                 String gpsDataStr = new String(tmpByts);
                 if (gpsDataStr.startsWith("$04")) {
                     String[] messageStrings = MessageFormat.unFormat(tmpByts);
-                    String address = messageStrings[0];
-                    String content = messageStrings[1];
                     String type = messageStrings[2];
-                    int group = Integer.parseInt(messageStrings[3]);
-                    int frameCount = Integer.parseInt(messageStrings[4]);
-                    final String unique = ConvertUtil.rc4ToHex();
                     if (MessageFormat.MESSAGE_TYPE_TRADE.equals(type)) {
-                        MyApplication.getInstance().sendBytes(MessageFormat.format(PreferencesUtils.getString(getActivity(), "server_address", Constant.SERVER_BD_NUMBER)// 蘑菇头编号
-                                , content, MessageFormat.MESSAGE_TYPE_TRADE, 0, unique));
+                        MyApplication.getInstance().sendBytes(tmpByts);
                     }
                 } else {
                     headIndex.clear();

@@ -3,6 +3,8 @@ package com.cetcme.xkterminal.Sqlite.Bean;
 import org.xutils.db.annotation.Column;
 import org.xutils.db.annotation.Table;
 
+import java.util.Date;
+
 /**
  * Created by dell on 2018/6/1.
  */
@@ -18,6 +20,17 @@ public class GPSBean {
     private int fangwei;
     @Column(name = "xinhao")
     private int xinhao;
+    @Column(name="created")
+    private long created;
+
+
+    public long getCreated() {
+        return created;
+    }
+
+    public void setCreated(long created) {
+        this.created = created;
+    }
 
     public int getXinhao() {
         return xinhao;

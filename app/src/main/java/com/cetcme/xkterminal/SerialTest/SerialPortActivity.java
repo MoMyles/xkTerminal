@@ -140,7 +140,7 @@ public class SerialPortActivity extends Activity {
 		mApplication = (MyApplication) getApplication();
 		try {
 //			mSerialPort = mApplication.getGpsSerialPort();
-			mSerialPort = mApplication.getAisSerialPort();
+//			mSerialPort = mApplication.getAisSerialPort();
 			mOutputStream = mSerialPort.getOutputStream();
 			mInputStream = mSerialPort.getInputStream();
 
@@ -149,10 +149,8 @@ public class SerialPortActivity extends Activity {
 			mReadThread.start();
 		} catch (SecurityException e) {
 			DisplayError(R.string.error_security);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			DisplayError(R.string.error_unknown);
-		} catch (InvalidParameterException e) {
-			DisplayError(R.string.error_configuration);
 		}
 
 		mTextViewOutgoing = findViewById(R.id.TextViewOutgoingValue);

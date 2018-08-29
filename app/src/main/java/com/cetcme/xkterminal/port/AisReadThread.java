@@ -7,7 +7,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.cetcme.xkterminal.DataFormat.MessageFormat;
-import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
 import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
@@ -55,6 +54,7 @@ public class AisReadThread extends Thread {
     private DbManager db;
     private FT_Device ftDevice;
     private Handler handler;
+    private boolean canRead = true;
 
     public AisReadThread(String path, FT_Device ftDevice, Handler handler) {
         this.path = path;
@@ -63,9 +63,13 @@ public class AisReadThread extends Thread {
         db = MyApplication.getInstance().getDb();
     }
 
+    public void stopRead() {
+        canRead = false;
+    }
+
     @Override
     public void run() {
-        while (!isInterrupted()) {
+        while (canRead) {
             if (ftDevice == null) continue;
             int iavailable = ftDevice.getQueueStatus();
             if (iavailable > 0) {
@@ -106,15 +110,14 @@ public class AisReadThread extends Thread {
             if (tmp.startsWith("$04")) {
                 if (aisByts.get(len - 2) == 13 && aisByts.get(len - 1) == 10) {
                     String[] messageStrings = MessageFormat.unFormat(tmpByts);
-                    String address = messageStrings[0];
-                    String content = messageStrings[1];
+//                    String address = messageStrings[0];
+//                    String content = messageStrings[1];
                     String type = messageStrings[2];
-                    int group = Integer.parseInt(messageStrings[3]);
-                    int frameCount = Integer.parseInt(messageStrings[4]);
-                    final String unique = ConvertUtil.rc4ToHex();
+//                    int group = Integer.parseInt(messageStrings[3]);
+//                    int frameCount = Integer.parseInt(messageStrings[4]);
+//                    final String unique = ConvertUtil.rc4ToHex();
                     if (MessageFormat.MESSAGE_TYPE_TRADE.equals(type)) {
-                        MyApplication.getInstance().sendBytes(MessageFormat.format(PreferencesUtils.getString(MyApplication.getInstance().getApplicationContext(), "server_address", Constant.SERVER_BD_NUMBER)// 蘑菇头编号
-                                , content, MessageFormat.MESSAGE_TYPE_TRADE, 0, unique));
+                        MyApplication.getInstance().sendBytes(tmpByts);
                     } else if (MessageFormat.MESSAGE_TYPE_BROADCASTING.equals(type)) {
 //                        MyApplication.getInstance().sendBytes(MessageFormat.format(PreferencesUtils.getString(MyApplication.getInstance().getApplicationContext(), "server_address", Constant.SERVER_BD_NUMBER)// 蘑菇头编号
 //                                , content, MessageFormat.MESSAGE_TYPE_BROADCASTING, 0, unique));
@@ -343,12 +346,14 @@ public class AisReadThread extends Thread {
                                             bean.setYangjiao(yangjiao);
                                             bean.setFangwei(fangwei);
                                             bean.setXinhao(xinhao);
+                                            bean.setCreated(System.currentTimeMillis());
                                             db.saveBindingId(bean);
                                         } else {
                                             // 存在
                                             bean.setYangjiao(yangjiao);
                                             bean.setFangwei(fangwei);
                                             bean.setXinhao(xinhao);
+                                            bean.setCreated(System.currentTimeMillis());
                                             db.update(bean, "yangjiao", "fangwei", "xinhao");
                                         }
                                     }

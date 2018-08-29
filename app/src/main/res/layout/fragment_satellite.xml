@@ -40,7 +40,7 @@
                     android:button="@null"
                     android:checked="true"
                     android:gravity="center"
-                    android:text="GPS"
+                    android:text="定位卫星"
                     android:textColor="@color/selector_satellite_select"
                     android:textSize="20sp" />
 
@@ -53,7 +53,8 @@
                     android:gravity="center"
                     android:text="BD"
                     android:textColor="@color/selector_satellite_select"
-                    android:textSize="20sp" />
+                    android:textSize="20sp"
+                    android:visibility="gone" />
             </RadioGroup>
 
         </LinearLayout>
@@ -118,26 +119,6 @@
                             android:text="E 0.0"
                             android:textSize="20sp" />
                     </LinearLayout>
-                    <!-- 海拔 -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1.0"
-                        android:gravity="center"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="海拔："
-                            android:textSize="20sp" />
-
-                        <TextView
-                            android:id="@+id/height_tv"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textSize="20sp" />
-                    </LinearLayout>
                     <!-- 卫星 -->
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -157,6 +138,27 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="0"
+                            android:textSize="20sp" />
+                    </LinearLayout>
+                    <!-- 海拔 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1.0"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:visibility="invisible">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="海拔："
+                            android:textSize="20sp" />
+
+                        <TextView
+                            android:id="@+id/height_tv"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
                             android:textSize="20sp" />
                     </LinearLayout>
                     <!-- 卫星状态 -->

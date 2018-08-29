@@ -108,9 +108,9 @@ public class MyApplication extends MultiDexApplication {
     //    private SerialPort gpsSerialPort = null;
 //    private OutputStream gpsOutputStream;
 //    private InputStream gpsInputStream;
-    private SerialPort aisSerialPort = null;
-    private OutputStream aisOutputStream;
-    private InputStream aisInputStream;
+//    private SerialPort aisSerialPort = null;
+//    private OutputStream aisOutputStream;
+//    private InputStream aisInputStream;
 
     public boolean messageSendFailed = true;
 
@@ -299,9 +299,9 @@ public class MyApplication extends MultiDexApplication {
             mSerialPort = getSerialPort();
             mOutputStream = mSerialPort.getOutputStream();
             mInputStream = mSerialPort.getInputStream();
+            canRead = true;
             mReadThread = new ReadThread();
             mReadThread.start();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -402,7 +402,8 @@ public class MyApplication extends MultiDexApplication {
         }
         AisReadThread aisReadThread = usb.getReadThread();
         if (aisReadThread != null) {
-            aisReadThread.interrupt();
+            aisReadThread.stopRead();
+//            aisReadThread.interrupt();
         }
         openMap.remove(currentPath);
         String str = PreferencesUtils.getString(getApplicationContext(), "usb_path", "");
@@ -547,8 +548,12 @@ public class MyApplication extends MultiDexApplication {
                         MainActivity.play("手机客户端登陆成功");
                         // 服务器app版本检测
                         Log.i(TAG, "Event: 发送更新检测byte");
-                        String unique = ConvertUtil.rc4ToHex();
-                        sendBytes(MessageFormat.format(PreferencesUtils.getString(MyApplication.getInstance().getApplicationContext(), "server_address", Constants.MUSHROOM_ADDRESS), "1", MessageFormat.MESSAGE_TYPE_APP_VERSION, 0, unique));
+                        try {
+                            sendBytes(MessageFormat.format(PreferencesUtils.getString(MyApplication.getInstance().getApplicationContext(), "server_address"
+                                    , Constants.MUSHROOM_ADDRESS), "1".getBytes("GB2312"), MessageFormat.MESSAGE_TYPE_APP_VERSION, 0));
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
                     }
                     break;
                 case "device_info_set":
@@ -641,9 +646,14 @@ public class MyApplication extends MultiDexApplication {
                     MessageProxy.insert(db, message);
                     failedMessageId = message.getId();
 
-                    byte[] messageBytes = MessageFormat.format(message.getReceiver(), message.getContent(), message.getReceiver().length() == 11 ? MessageFormat.MESSAGE_TYPE_CELLPHONE : MessageFormat.MESSAGE_TYPE_NORMAL, 0);
-                    sendBytes(messageBytes);
-                    System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
+                    try {
+                        byte[] messageBytes = MessageFormat.format(message.getReceiver(), message.getContent().getBytes("GB2312")
+                                , message.getReceiver().length() == 11 ? MessageFormat.MESSAGE_TYPE_CELLPHONE : MessageFormat.MESSAGE_TYPE_NORMAL, 0);
+                        sendBytes(messageBytes);
+                        System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
 
                     messageSendFailed = true;
                     new Handler().postDelayed(new Runnable() {
@@ -900,30 +910,25 @@ public class MyApplication extends MultiDexApplication {
 //        }
 //        return gpsSerialPort;
 //    }
-    public SerialPort getAisSerialPort() throws SecurityException, IOException, InvalidParameterException {
-        if (aisSerialPort == null) {
-            /* Read serial port parameters */
-            String path = Constant.SERIAL_AIS_PORT_PATH;
-            int baudrate = Constant.SERIAL_AIS_PORT_BAUD_RATE;
-
-            /* Check parameters */
-            if ((path.length() == 0) || (baudrate == -1)) {
-                throw new InvalidParameterException();
-            }
-
-            /* Open the serial port */
-            aisSerialPort = new SerialPort(new File(path), baudrate, 0);
-        }
-        return aisSerialPort;
-    }
+//    public SerialPort getAisSerialPort() throws SecurityException, IOException, InvalidParameterException {
+//        if (aisSerialPort == null) {
+//            /* Read serial port parameters */
+//            String path = Constant.SERIAL_AIS_PORT_PATH;
+//            int baudrate = Constant.SERIAL_AIS_PORT_BAUD_RATE;
+//
+//            /* Check parameters */
+//            if ((path.length() == 0) || (baudrate == -1)) {
+//                throw new InvalidParameterException();
+//            }
+//
+//            /* Open the serial port */
+//            aisSerialPort = new SerialPort(new File(path), baudrate, 0);
+//        }
+//        return aisSerialPort;
+//    }
 
     public void closeSerialPort() {
-        try {
-            if (mReadThread != null) {
-                mReadThread.interrupt();
-            }
-        } catch (Exception e) {
-        }
+        canRead = false;
         try {
             if (mInputStream != null) {
                 mInputStream.close();
@@ -960,16 +965,27 @@ public class MyApplication extends MultiDexApplication {
         */
     }
 
+    private boolean canRead = true;
+
     private class ReadThread extends Thread {
 
         @Override
         public void run() {
-            while (!isInterrupted()) {
+            while (canRead) {
                 int size;
                 try {
                     Thread.sleep(1);
                     byte[] buffer = new byte[1];
-                    if (mInputStream == null) return;
+                    if (mInputStream == null) {
+                        if (mSerialPort != null) {
+                            mInputStream = mSerialPort.getInputStream();
+                        } else {
+                            closeSerialPort();
+                            mSerialPort = getSerialPort();
+                            mInputStream = mSerialPort.getInputStream();
+                            mOutputStream = mSerialPort.getOutputStream();
+                        }
+                    }
                     size = mInputStream.read(buffer);
                     if (size > 0) {
                         onDataReceived(buffer, size);

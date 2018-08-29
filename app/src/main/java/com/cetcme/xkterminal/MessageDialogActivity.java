@@ -23,13 +23,17 @@ public class MessageDialogActivity extends Activity {
     public static final int TYPE_CALL_ROLL = 2;
     public static final int TYPE_ALARM = 3;
 
-    @BindView(R.id.rescue_content_tv) TextView rescue_content_tv;
-    @BindView(R.id.confirm_button) Button confirm_bt;
-    @BindView(R.id.tv_title) TextView tv_title;
+    @BindView(R.id.rescue_content_tv)
+    TextView rescue_content_tv;
+    @BindView(R.id.confirm_button)
+    Button confirm_bt;
+    @BindView(R.id.tv_title)
+    TextView tv_title;
 
     int type = -1;
     String content;
     int id = -1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,8 +98,12 @@ public class MessageDialogActivity extends Activity {
                 // 短信内容 "夜间点名:userid"
                 String[] arr = content.split(":");
                 if (arr.length == 2) {
-                    byte[] bytes = MessageFormat.format(PreferencesUtils.getString(getApplicationContext(), "server_address", Constant.SERVER_BD_NUMBER), arr[1], MessageFormat.MESSAGE_TYPE_CALL_THE_ROLL, 0);
-                    MyApplication.getInstance().sendBytes(bytes);
+                    try {
+                        byte[] bytes = MessageFormat.format(PreferencesUtils.getString(getApplicationContext(), "server_address", Constant.SERVER_BD_NUMBER)
+                                , arr[1].getBytes("GB2312"), MessageFormat.MESSAGE_TYPE_CALL_THE_ROLL, 0);
+                        MyApplication.getInstance().sendBytes(bytes);
+                    } catch (Exception e) {
+                    }
                 }
                 break;
         }

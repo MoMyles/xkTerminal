@@ -571,8 +571,7 @@ public class ComFragment extends Fragment implements View.OnClickListener {
                     int frameCount = Integer.parseInt(messageStrings[4]);
                     final String unique = ConvertUtil.rc4ToHex();
                     if (MessageFormat.MESSAGE_TYPE_TRADE.equals(type)) {
-                        MyApplication.getInstance().sendBytes(MessageFormat.format(PreferencesUtils.getString(getActivity(), "server_address", Constant.SERVER_BD_NUMBER)// 蘑菇头编号
-                                , content, MessageFormat.MESSAGE_TYPE_TRADE, 0, unique));
+                        MyApplication.getInstance().sendBytes(tmpByts);
                     }
                 } else {
                     headIndex.clear();

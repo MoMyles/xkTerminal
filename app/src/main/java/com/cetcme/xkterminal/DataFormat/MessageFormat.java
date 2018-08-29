@@ -79,65 +79,37 @@ public class MessageFormat {
         return new String[]{targetAddress, messageContent, typeString, groupId + "", frameCount + ""};
     }
 
-    public static byte[] format(String targetAddress, String message, String type, int frameCount, String unique) {
-        message = shortcutMessage(message); // 裁剪内容到限制54字节内
-
-        message = type + message;
-        targetAddress = Util.stringAddZero(targetAddress, 12);
-        System.out.println(targetAddress);
-        byte[] bytes = messageHead.getBytes();
-        if (unique == null) ConvertUtil.rc4ToHex();
-        byte[] addressBytes = ByteUtil.byteMerger(ConvertUtil.str2Bcd(targetAddress), ConvertUtil.str2Bcd(unique));
-        byte[] lengthBytes = new byte[]{getDataLengthByte(message, frameCount)};
-        byte[] messageBytes = new byte[0];
+    public static byte[] format(String targetAddress, byte[] messageBytes, String type, int frameCount) {
         try {
-            messageBytes = message.getBytes("GB2312");
-        } catch (UnsupportedEncodingException e) {
+            // 裁剪内容到限制54字节内
+            if (messageBytes.length > 54) {
+                messageBytes = ByteUtil.subBytes(messageBytes, 0, 54);
+            }
+
+            messageBytes = ByteUtil.byteMerger(type.getBytes("GB2312"), messageBytes);
+            targetAddress = Util.stringAddZero(targetAddress, 12);
+            System.out.println(targetAddress);
+            byte[] bytes = messageHead.getBytes();
+            String unique = ConvertUtil.rc4ToHex();
+            byte[] addressBytes = ByteUtil.byteMerger(ConvertUtil.str2Bcd(targetAddress), ConvertUtil.str2Bcd(unique));
+            byte[] lengthBytes = new byte[]{getDataLengthByte(messageBytes, frameCount)};
+
+            byte[] toCheckBytes = ByteUtil.byteMerger(addressBytes, lengthBytes);
+            toCheckBytes = ByteUtil.byteMerger(toCheckBytes, messageBytes);
+
+            int checkSum = Util.computeCheckSum(toCheckBytes, 0, toCheckBytes.length);
+            byte[] checkSumBytes = ByteUtil.byteMerger("*".getBytes(), new byte[]{(byte) checkSum});
+            checkSumBytes = ByteUtil.byteMerger(checkSumBytes, MESSAGE_END_SYMBOL.getBytes());
+
+            bytes = ByteUtil.byteMerger(bytes, toCheckBytes);
+            bytes = ByteUtil.byteMerger(bytes, checkSumBytes);
+            return bytes;
+        } catch (Exception e) {
             e.printStackTrace();
+            return new byte[]{};
         }
-
-        byte[] toCheckBytes = ByteUtil.byteMerger(addressBytes, lengthBytes);
-        toCheckBytes = ByteUtil.byteMerger(toCheckBytes, messageBytes);
-
-        int checkSum = Util.computeCheckSum(toCheckBytes, 0, toCheckBytes.length);
-        byte[] checkSumBytes = ByteUtil.byteMerger("*".getBytes(), new byte[]{(byte) checkSum});
-        checkSumBytes = ByteUtil.byteMerger(checkSumBytes, MESSAGE_END_SYMBOL.getBytes());
-
-        bytes = ByteUtil.byteMerger(bytes, toCheckBytes);
-        bytes = ByteUtil.byteMerger(bytes, checkSumBytes);
-//        log(bytes);
-        return bytes;
     }
 
-    public static byte[] format(String targetAddress, String message, String type, int frameCount) {
-        message = shortcutMessage(message); // 裁剪内容到限制54字节内
-
-        message = type + message;
-        targetAddress = Util.stringAddZero(targetAddress, 12);
-        System.out.println(targetAddress);
-        byte[] bytes = messageHead.getBytes();
-        String unique = ConvertUtil.rc4ToHex();
-        byte[] addressBytes = ByteUtil.byteMerger(ConvertUtil.str2Bcd(targetAddress), ConvertUtil.str2Bcd(unique));
-        byte[] lengthBytes = new byte[]{getDataLengthByte(message, frameCount)};
-        byte[] messageBytes = new byte[0];
-        try {
-            messageBytes = message.getBytes("GB2312");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        byte[] toCheckBytes = ByteUtil.byteMerger(addressBytes, lengthBytes);
-        toCheckBytes = ByteUtil.byteMerger(toCheckBytes, messageBytes);
-
-        int checkSum = Util.computeCheckSum(toCheckBytes, 0, toCheckBytes.length);
-        byte[] checkSumBytes = ByteUtil.byteMerger("*".getBytes(), new byte[]{(byte) checkSum});
-        checkSumBytes = ByteUtil.byteMerger(checkSumBytes, MESSAGE_END_SYMBOL.getBytes());
-
-        bytes = ByteUtil.byteMerger(bytes, toCheckBytes);
-        bytes = ByteUtil.byteMerger(bytes, checkSumBytes);
-//        log(bytes);
-        return bytes;
-    }
     public static void main(String[] args) {
 
         int c = 41573;
@@ -145,16 +117,9 @@ public class MessageFormat {
         System.out.println((c & 4095));
     }
 
-    private static byte getDataLengthByte (String message, int frameCountInt) {
-        String messageLengthBitStr = null;
-        try {
-            messageLengthBitStr = Util.stringAddZero(Integer.toBinaryString(message.getBytes("GB2312").length), 6);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-//        System.out.println("messageLengthBitStr: " + messageLengthBitStr);
+    private static byte getDataLengthByte (byte[] messageBytes, int frameCountInt) {
+        String messageLengthBitStr = Util.stringAddZero(Integer.toBinaryString(messageBytes.length), 6);
         String frameCount = Util.stringAddZero(Integer.toBinaryString(frameCountInt), 2);
-//        System.out.println("frameCount: " + frameCount);
         return Util.BitToByte(frameCount + messageLengthBitStr);
     }
 

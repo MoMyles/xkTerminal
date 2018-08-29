@@ -293,11 +293,13 @@ public class DataHandler extends Handler {
                             break;
                         }
                         // 渔货交易数据
-                        case MessageFormat.MESSAGE_TYPE_TRADE: {
-                            final String unique = ConvertUtil.rc4ToHex();
-                            MyApplication.getInstance().sendBytes(MessageFormat.format(PreferencesUtils.getString(MyApplication.getInstance().getApplicationContext(), "server_address", Constants.MUSHROOM_ADDRESS), content, MessageFormat.MESSAGE_TYPE_TRADE, 0, unique));
-                            break;
-                        }
+//                        case MessageFormat.MESSAGE_TYPE_TRADE: {
+//                            final String unique = ConvertUtil.rc4ToHex();
+//                            MyApplication.getInstance().sendBytes(MessageFormat.format(
+//                                    PreferencesUtils.getString(MyApplication.getInstance().getApplicationContext(), "server_address", Constants.MUSHROOM_ADDRESS)
+//                                    , content, MessageFormat.MESSAGE_TYPE_TRADE, 0, unique));
+//                            break;
+//                        }
                         // app更新
                         case MessageFormat.MESSAGE_TYPE_APP_VERSION: {
                             String currentVersion = APKVersionCodeUtils.getVerName(MyApplication.getInstance());

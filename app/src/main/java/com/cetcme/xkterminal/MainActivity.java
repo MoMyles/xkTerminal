@@ -960,23 +960,25 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
         MessageProxy.insert(db, newMessage);
         failedMessageId = newMessage.getId();
-
-        if (length > 54) {
+        try {
+            if (length > 54) {
 //            final QMUITipDialog tipDialog = new QMUITipDialog.Builder(MainActivity.this)
 //                    .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
 //                    .setTipWord("发送中")
 //                    .create();
 //            tipDialog.show();
-            final String unique = ConvertUtil.rc4ToHex();
-            String firstContent = MessageFormat.shortcutMessage(content);
-            final String secondContent = content.replace(firstContent, "");
 
-            byte[] messageBytes2 = MessageFormat.format(receiver, secondContent, receiver.length() == 11 ? MessageFormat.MESSAGE_TYPE_CELLPHONE : MessageFormat.MESSAGE_TYPE_NORMAL, 0, unique);
-            ((MyApplication) getApplication()).sendMessageBytes(failedMessageId, messageBytes2, true);
+                final String unique = ConvertUtil.rc4ToHex();
+                String firstContent = MessageFormat.shortcutMessage(content);
+                final String secondContent = content.replace(firstContent, "");
 
-            byte[] messageBytes = MessageFormat.format(receiver, firstContent, receiver.length() == 11 ? MessageFormat.MESSAGE_TYPE_CELLPHONE : MessageFormat.MESSAGE_TYPE_NORMAL, 1, unique);
-            ((MyApplication) getApplication()).sendMessageBytes(failedMessageId, messageBytes, false);
-            backToMessageFragment();
+                byte[] messageBytes2 = MessageFormat.format(receiver, secondContent.getBytes("GB2312"), receiver.length() == 11 ? MessageFormat.MESSAGE_TYPE_CELLPHONE : MessageFormat.MESSAGE_TYPE_NORMAL, 0);
+                ((MyApplication) getApplication()).sendMessageBytes(failedMessageId, messageBytes2, true);
+
+                byte[] messageBytes = MessageFormat.format(receiver, firstContent.getBytes("GB2312"), receiver.length() == 11 ? MessageFormat.MESSAGE_TYPE_CELLPHONE : MessageFormat.MESSAGE_TYPE_NORMAL, 1);
+                ((MyApplication) getApplication()).sendMessageBytes(failedMessageId, messageBytes, false);
+                backToMessageFragment();
+
 //            System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
 //            new Handler().postDelayed(new Runnable() {
 //                @Override
@@ -988,7 +990,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 //                }
 //            }, 10000);
 
-            // 显示短信发送失败
+                // 显示短信发送失败
 //            messageSendFailed = true;
 //            new Handler().postDelayed(new Runnable() {
 //                @Override
@@ -1006,13 +1008,13 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 //                }
 //            }, Constant.MESSAGE_FAIL_TIME + 10000);
 
-        } else {
-            byte[] messageBytes = MessageFormat.format(receiver, content, receiver.length() == 11 ? MessageFormat.MESSAGE_TYPE_CELLPHONE : MessageFormat.MESSAGE_TYPE_NORMAL, 0);
-            ((MyApplication) getApplication()).sendMessageBytes(failedMessageId, messageBytes, false);
-            System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
-            backToMessageFragment();
+            } else {
+                byte[] messageBytes = MessageFormat.format(receiver, content.getBytes("GB2312"), receiver.length() == 11 ? MessageFormat.MESSAGE_TYPE_CELLPHONE : MessageFormat.MESSAGE_TYPE_NORMAL, 0);
+                ((MyApplication) getApplication()).sendMessageBytes(failedMessageId, messageBytes, false);
+                System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
+                backToMessageFragment();
 
-            // 显示短信发送失败
+                // 显示短信发送失败
 //            messageSendFailed = true;
 //            new Handler().postDelayed(new Runnable() {
 //                @Override
@@ -1029,8 +1031,10 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 //                    }
 //                }
 //            }, Constant.MESSAGE_FAIL_TIME);
-        }
+            }
+        } catch (Exception e) {
 
+        }
         // 短信推送
         JSONObject sendJson = new JSONObject();
         try {
@@ -1107,9 +1111,13 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         MessageProxy.insert(db, newMessage);
         failedMessageId = newMessage.getId();
 
-        byte[] messageBytes = MessageFormat.format(receiver, content, receiver.length() == 11 ? MessageFormat.MESSAGE_TYPE_CELLPHONE : MessageFormat.MESSAGE_TYPE_NORMAL, 0);
-        ((MyApplication) getApplication()).sendBytes(messageBytes);
-        System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
+        try {
+            byte[] messageBytes = MessageFormat.format(receiver, content.getBytes("GB2312"), receiver.length() == 11 ? MessageFormat.MESSAGE_TYPE_CELLPHONE : MessageFormat.MESSAGE_TYPE_NORMAL, 0);
+            ((MyApplication) getApplication()).sendBytes(messageBytes);
+            System.out.println("发送短信： " + ConvertUtil.bytesToHexString(messageBytes));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
         backToMessageFragment();
 
@@ -1344,9 +1352,14 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     public void sendCheckAndMapMessage() {
         if (mainFragment != null && mainFragment.skiaDrawView != null) {
-            String deviceID = mainFragment.skiaDrawView.mYimaLib.GetDeviceIDForLicSvr();
-            final String unique = ConvertUtil.rc4ToHex();
-            MyApplication.getInstance().sendBytes(MessageFormat.format(PreferencesUtils.getString(mContext, "server_address", Constant.SERVER_BD_NUMBER), deviceID, MessageFormat.MESSAGE_TYPE_CHECK_AND_MAP, 0, unique));
+            try {
+                String deviceID = mainFragment.skiaDrawView.mYimaLib.GetDeviceIDForLicSvr();
+                final String unique = ConvertUtil.rc4ToHex();
+                MyApplication.getInstance().sendBytes(MessageFormat.format(PreferencesUtils.getString(mContext, "server_address", Constant.SERVER_BD_NUMBER)
+                        , deviceID.getBytes("GB2312"), MessageFormat.MESSAGE_TYPE_CHECK_AND_MAP, 0));
+            } catch (Exception e) {
+
+            }
         }
     }
 

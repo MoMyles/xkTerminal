@@ -12,14 +12,17 @@ public class DataProcessor {
      * @param message
      */
     public static void sendMessage(String address, String message) {
-        byte[] bytes;
-        if (address.length() == 11) {
-            bytes = MessageFormat.format(address, message, MessageFormat.MESSAGE_TYPE_CELLPHONE, 0);
-        } else {
-            String unique = ConvertUtil.rc4ToHex();
-            bytes = MessageFormat.format(address, message, MessageFormat.MESSAGE_TYPE_NORMAL, 0, unique);
+        try {
+            byte[] bytes;
+            if (address.length() == 11) {
+                bytes = MessageFormat.format(address, message.getBytes("GB2312"), MessageFormat.MESSAGE_TYPE_CELLPHONE, 0);
+            } else {
+                bytes = MessageFormat.format(address, message.getBytes("GB2312"), MessageFormat.MESSAGE_TYPE_NORMAL, 0);
+            }
+            MyApplication.getInstance().sendBytes(bytes);
+        }catch (Exception e){
+
         }
-        MyApplication.getInstance().sendBytes(bytes);
     }
 
     /**
@@ -28,8 +31,11 @@ public class DataProcessor {
      * @param message
      */
     public static void sendTradeInfo(String address, String message) {
-        String unique = ConvertUtil.rc4ToHex();
-        MyApplication.getInstance().sendBytes(MessageFormat.format(address, message, MessageFormat.MESSAGE_TYPE_TRADE, 0, unique));
+        try {
+            MyApplication.getInstance().sendBytes(MessageFormat.format(address, message.getBytes("GB2312"), MessageFormat.MESSAGE_TYPE_TRADE, 0));
+        }catch (Exception e){
+
+        }
     }
 
 

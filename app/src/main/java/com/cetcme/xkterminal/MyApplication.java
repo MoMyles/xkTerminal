@@ -1176,7 +1176,12 @@ public class MyApplication extends MultiDexApplication {
             }
 
         }
-
+        if (serialCount >= 81) {
+            serialBuffer = new byte[100];
+            serialCount = 0;
+            hasHead = false;
+            return;
+        }
     }
 
     String TAG = "GPS Serial Port";

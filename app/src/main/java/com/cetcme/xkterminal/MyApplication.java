@@ -136,6 +136,8 @@ public class MyApplication extends MultiDexApplication {
     // 电压
     public static String voltage = "-";
 
+    public static Long voltageTime = 0L;
+
     public static final List<OtherShipBean> osbDataList = new ArrayList<>();
 
     /**

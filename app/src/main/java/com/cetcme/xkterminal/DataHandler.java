@@ -130,6 +130,7 @@ public class DataHandler extends Handler {
                             }
                         }
                         MyApplication.voltage = voltageStr == null ? "-" : voltageStr;
+                        MyApplication.voltageTime = new Date().getTime();
 //                        String str = "$06OK\r\n";
 //                        MyApplication.getInstance().sendBytes(str.getBytes());
                         EventBus.getDefault().post("voltage");

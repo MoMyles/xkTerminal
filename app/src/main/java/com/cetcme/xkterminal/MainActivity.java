@@ -14,6 +14,7 @@ import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -194,7 +195,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     }
                     MyApplication.getInstance().oldComTimeCounter++;
                     if (MyApplication.getInstance().oldComTimeCounter > 29) {
-                        if (System.currentTimeMillis() - MyApplication.getInstance().oldComTime >= 2 * 60 * 1000 && MyApplication.getInstance().isLocated) {
+                        Long distanceTime = (new Date().getTime() - MyApplication.voltageTime) / 1000;
+                        if (System.currentTimeMillis() - MyApplication.getInstance().oldComTime >= 2 * 60 * 1000 && MyApplication.getInstance().isLocated && distanceTime < 600) {
                             MyApplication.getInstance().closeSerialPort();
                             MyApplication.getInstance().startSerialPort();
                         }

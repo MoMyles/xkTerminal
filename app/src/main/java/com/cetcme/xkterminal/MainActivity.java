@@ -1046,196 +1046,254 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
     private void showMainBar() {
-        bottomBar.setVisibility(View.VISIBLE);
-        messageBar.setVisibility(View.GONE);
-        pageBar.setVisibility(View.GONE);
-        backBar.setVisibility(View.GONE);
-        sendBar.setVisibility(View.GONE);
-        messageDetailBar.setVisibility(View.GONE);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                bottomBar.setVisibility(View.VISIBLE);
+                messageBar.setVisibility(View.GONE);
+                pageBar.setVisibility(View.GONE);
+                backBar.setVisibility(View.GONE);
+                sendBar.setVisibility(View.GONE);
+                messageDetailBar.setVisibility(View.GONE);
+            }
+        });
     }
 
-    private void showMessageBar(String tg) {
-        bottomBar.setVisibility(View.GONE);
-        messageBar.setVisibility(View.VISIBLE);
-        pageBar.setVisibility(View.GONE);
-        backBar.setVisibility(View.GONE);
-        sendBar.setVisibility(View.GONE);
-        messageDetailBar.setVisibility(View.GONE);
-        if (tg != null) {
-            if (tg.equals("send")) {
-                messageBar.setNewBtnVisible(true);
-            } else {
-                messageBar.setNewBtnVisible(false);
+    private void showMessageBar(final String tg) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                bottomBar.setVisibility(View.GONE);
+                messageBar.setVisibility(View.VISIBLE);
+                pageBar.setVisibility(View.GONE);
+                backBar.setVisibility(View.GONE);
+                sendBar.setVisibility(View.GONE);
+                messageDetailBar.setVisibility(View.GONE);
+                if (tg != null) {
+                    if (tg.equals("send")) {
+                        messageBar.setNewBtnVisible(true);
+                    } else {
+                        messageBar.setNewBtnVisible(false);
+                    }
+                }
             }
-        }
+        });
     }
 
     private void showPageBar() {
-        bottomBar.setVisibility(View.GONE);
-        messageBar.setVisibility(View.GONE);
-        pageBar.setVisibility(View.VISIBLE);
-        backBar.setVisibility(View.GONE);
-        sendBar.setVisibility(View.GONE);
-        messageDetailBar.setVisibility(View.GONE);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                bottomBar.setVisibility(View.GONE);
+                messageBar.setVisibility(View.GONE);
+                pageBar.setVisibility(View.VISIBLE);
+                backBar.setVisibility(View.GONE);
+                sendBar.setVisibility(View.GONE);
+                messageDetailBar.setVisibility(View.GONE);
+            }
+        });
     }
 
     private void showBackBar() {
-        bottomBar.setVisibility(View.GONE);
-        messageBar.setVisibility(View.GONE);
-        pageBar.setVisibility(View.GONE);
-        backBar.setVisibility(View.VISIBLE);
-        sendBar.setVisibility(View.GONE);
-        messageDetailBar.setVisibility(View.GONE);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                bottomBar.setVisibility(View.GONE);
+                messageBar.setVisibility(View.GONE);
+                pageBar.setVisibility(View.GONE);
+                backBar.setVisibility(View.VISIBLE);
+                sendBar.setVisibility(View.GONE);
+                messageDetailBar.setVisibility(View.GONE);
+            }
+        });
     }
 
     public void showSendBar() {
-        bottomBar.setVisibility(View.GONE);
-        messageBar.setVisibility(View.GONE);
-        pageBar.setVisibility(View.GONE);
-        backBar.setVisibility(View.GONE);
-        sendBar.setVisibility(View.VISIBLE);
-        messageDetailBar.setVisibility(View.GONE);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                bottomBar.setVisibility(View.GONE);
+                messageBar.setVisibility(View.GONE);
+                pageBar.setVisibility(View.GONE);
+                backBar.setVisibility(View.GONE);
+                sendBar.setVisibility(View.VISIBLE);
+                messageDetailBar.setVisibility(View.GONE);
+            }
+        });
     }
 
-    private void showMessageDetailBar(String messageListStatus) {
-        bottomBar.setVisibility(View.GONE);
-        messageBar.setVisibility(View.GONE);
-        pageBar.setVisibility(View.GONE);
-        backBar.setVisibility(View.GONE);
-        sendBar.setVisibility(View.GONE);
-        messageDetailBar.setVisibility(View.VISIBLE);
-        messageDetailBar.setStatus(messageListStatus);
+    private void showMessageDetailBar(final String messageListStatus) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                bottomBar.setVisibility(View.GONE);
+                messageBar.setVisibility(View.GONE);
+                pageBar.setVisibility(View.GONE);
+                backBar.setVisibility(View.GONE);
+                sendBar.setVisibility(View.GONE);
+                messageDetailBar.setVisibility(View.VISIBLE);
+                messageDetailBar.setStatus(messageListStatus);
+            }
+        });
     }
 
     public void initMainFragment() {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if (mainFragment == null) {
-            mainFragment = new MainFragment();
-        }
-        showMainBar();
-        if (currentFragment == mainFragment) {
-            return;
-        }
-        if (currentFragment != null) {
-            transaction.hide(currentFragment);
-        }
-        if (!mainFragment.isAdded()) {
-            transaction.add(R.id.main_frame_layout, mainFragment).commit();
-        } else {
-            transaction.show(mainFragment).commit();
-        }
-        currentFragment = mainFragment;
-        fragmentName = "main";
-        messageReceiver = "";
-        messageContent = "";
-        messageTime = "";
-        messageId = -1;
-        messageIndex = -1;
-    }
-
-    public void initMessageFragment(String tg) {
-        if (messageFragment == null) {
-            messageFragment = new MessageFragment(tg);
-        } else {
-            messageFragment.setTg(tg);
-        }
-        showMessageBar(tg);
-
-        if (currentFragment == messageFragment) {
-            if (messageNewFragment != null) {
-                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                transaction.remove(messageNewFragment);
-                messageNewFragment = null;
-                fragmentName = "message";
-                transaction.show(messageFragment);
-                transaction.commit();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+//                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                if (mainFragment == null) {
+                    mainFragment = new MainFragment();
+                }
+                showMainBar();
+//                if (currentFragment == mainFragment) {
+//                    return;
+//                }
+//                if (currentFragment != null) {
+//                    transaction.hide(currentFragment);
+//                }
+//                if (!mainFragment.isAdded()) {
+//                    transaction.add(R.id.main_frame_layout, mainFragment).commit();
+//                } else {
+//                    transaction.show(mainFragment).commit();
+//                }
+                hideAndShow(mainFragment);
+                currentFragment = mainFragment;
+                fragmentName = "main";
+                messageReceiver = "";
+                messageContent = "";
+                messageTime = "";
+                messageId = -1;
+                messageIndex = -1;
             }
-            return;
-        }
-
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if (currentFragment != null) {
-            transaction.hide(currentFragment);
-        }
-        if (!messageFragment.isAdded()) {
-            transaction.add(R.id.main_frame_layout, messageFragment).commit();
-        } else {
-            transaction.show(messageFragment).commit();
-        }
-        currentFragment = messageFragment;
-        messageFragment.mainActivity = this;
-        fragmentName = "message";
-        messageListStatus = tg;
+        });
     }
 
-    public void initLogFragment(String tg) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if (logFragment == null) {
-            logFragment = new LogFragment(tg);
-        }
-        logFragment.setTg(tg);
-        if (tg.equals("inout")) {
-            showMessageBar("send");
-            messageBar.isInout = true;
-        } else {
-            showPageBar();
-        }
-        if (currentFragment == logFragment) {
-            return;
-        }
-        if (currentFragment != null) {
-            transaction.hide(currentFragment);
-        }
-        if (!logFragment.isAdded()) {
-            transaction.add(R.id.main_frame_layout, logFragment).commit();
-        } else {
-            transaction.show(logFragment).commit();
-        }
-        currentFragment = logFragment;
+    public void initMessageFragment(final String tg) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (messageFragment == null) {
+                    messageFragment = new MessageFragment(tg);
+                } else {
+                    messageFragment.setTg(tg);
+                }
+                showMessageBar(tg);
+//                if (currentFragment == messageFragment) {
+//                    if (messageNewFragment != null) {
+//                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//                        transaction.remove(messageNewFragment);
+//                        messageNewFragment = null;
+//                        fragmentName = "message";
+//                        transaction.show(messageFragment);
+//                        transaction.commit();
+//                    }
+//                    return;
+//                }
+//
+//                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//                if (currentFragment != null) {
+//                    transaction.hide(currentFragment);
+//                }
+//                if (!messageFragment.isAdded()) {
+//                    transaction.add(R.id.main_frame_layout, messageFragment).commit();
+//                } else {
+//                    transaction.show(messageFragment).commit();
+//                }
+                hideAndShow(messageFragment);
+                currentFragment = messageFragment;
+                messageFragment.mainActivity = MainActivity.this;
+                fragmentName = "message";
+                messageListStatus = tg;
+            }
+        });
+    }
 
-        fragmentName = "log";
+    public void initLogFragment(final String tg) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+//                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                if (logFragment == null) {
+                    logFragment = new LogFragment(tg);
+                }
+                logFragment.setTg(tg);
+                if (tg.equals("inout")) {
+                    showMessageBar("send");
+                    messageBar.isInout = true;
+                } else {
+                    showPageBar();
+                }
+//                if (currentFragment == logFragment) {
+//                    return;
+//                }
+//                if (currentFragment != null) {
+//                    transaction.hide(currentFragment);
+//                }
+//                if (!logFragment.isAdded()) {
+//                    transaction.add(R.id.main_frame_layout, logFragment).commit();
+//                } else {
+//                    transaction.show(logFragment).commit();
+//                }
+                hideAndShow(logFragment);
+                currentFragment = logFragment;
+
+                fragmentName = "log";
+            }
+        });
     }
 
     public void initSettingFragment() {
-        if (settingFragment == null) {
-            settingFragment = new SettingTabFragment();
-        }
-        showBackBar();
-        if (currentFragment == settingFragment) {
-            return;
-        }
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if (currentFragment != null) {
-            transaction.hide(currentFragment);
-        }
-        if (!settingFragment.isAdded()) {
-            transaction.add(R.id.main_frame_layout, settingFragment).commit();
-        } else {
-            transaction.show(settingFragment).commit();
-        }
-        currentFragment = settingFragment;
-        fragmentName = "setting";
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (settingFragment == null) {
+                    settingFragment = new SettingTabFragment();
+                }
+                showBackBar();
+//                if (currentFragment == settingFragment) {
+//                    return;
+//                }
+//                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//                if (currentFragment != null) {
+//                    transaction.hide(currentFragment);
+//                }
+//                if (!settingFragment.isAdded()) {
+//                    transaction.add(R.id.main_frame_layout, settingFragment).commit();
+//                } else {
+//                    transaction.show(settingFragment).commit();
+//                }
+                hideAndShow(settingFragment);
+                currentFragment = settingFragment;
+                fragmentName = "setting";
+            }
+        });
     }
 
     public void initAboutFragment() {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if (aboutFragment == null) {
-            aboutFragment = new AboutFragment();
-        }
-        showBackBar();
-        if (currentFragment == aboutFragment) {
-            return;
-        }
-        if (currentFragment != null) {
-            transaction.hide(currentFragment);
-        }
-        if (!aboutFragment.isAdded()) {
-            transaction.add(R.id.main_frame_layout, aboutFragment).commit();
-        } else {
-            transaction.show(aboutFragment).commit();
-        }
-        currentFragment = aboutFragment;
-        fragmentName = "about";
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                if (aboutFragment == null) {
+                    aboutFragment = new AboutFragment();
+                }
+                showBackBar();
+                if (currentFragment == aboutFragment) {
+                    return;
+                }
+                if (currentFragment != null) {
+                    transaction.hide(currentFragment);
+                }
+                if (!aboutFragment.isAdded()) {
+                    transaction.add(R.id.main_frame_layout, aboutFragment).commit();
+                } else {
+                    transaction.show(aboutFragment).commit();
+                }
+                currentFragment = aboutFragment;
+                fragmentName = "about";
+            }
+        });
     }
 
     public String messageReceiver = "";
@@ -1244,49 +1302,63 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     public int messageId = -1;
     public int messageIndex = -1;
 
-    public void initNewFragment(String tg) {
-        if (!tg.equals("new") && (messageContent.isEmpty())) {
-            Toast.makeText(this, "请选择一条短信", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (tg.equals("detail")) {
-            messageFragment.setMessageRead(messageIndex);
-            showMessageDetailBar(messageListStatus);
-            //backButtonStatus = "backToMessageList";
-        } else {
-            showSendBar();
-        }
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+    public void initNewFragment(final String tg) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (!tg.equals("new") && (messageContent.isEmpty())) {
+                    Toast.makeText(getApplicationContext(), "请选择一条短信", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (tg.equals("detail")) {
+                    messageFragment.setMessageRead(messageIndex);
+                    showMessageDetailBar(messageListStatus);
+                    //backButtonStatus = "backToMessageList";
+                } else {
+                    showSendBar();
+                }
+//                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 //        if (logFragment == null){
-        messageNewFragment = new MessageNewFragment(tg, messageReceiver, messageContent, messageTime, messageId);
-        messageNewFragment.mainActivity = this;
+                messageNewFragment = new MessageNewFragment(tg, messageReceiver, messageContent, messageTime, messageId);
+                messageNewFragment.mainActivity = MainActivity.this;
 //        }
 //        transaction.replace(R.id.main_frame_layout, messageNewFragment);
 //        transaction.commit();
-        transaction.add(R.id.main_frame_layout, messageNewFragment);
-        //transaction.show(messageNewFragment);
-        transaction.hide(messageFragment);
-        transaction.commit();
+//                transaction.add(R.id.main_frame_layout, messageNewFragment);
+//                //transaction.show(messageNewFragment);
+//                transaction.hide(messageFragment);
+//                transaction.commit();
+                hideAndShow(messageNewFragment);
 
 
-        fragmentName = "new";
+                fragmentName = "new";
+            }
+        });
     }
 
     public void backToMessageFragment() {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.remove(messageNewFragment);
-        messageNewFragment = null;
-        transaction.show(messageFragment);
-        transaction.commit();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+//                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//                transaction.remove(messageNewFragment);
+//                messageNewFragment = null;
+//                transaction.show(messageFragment);
+//                transaction.commit();
 
-        showMessageBar(null);
+                showMessageBar(null);
 
-        fragmentName = "message";
-        backButtonStatus = "backToMain";
+                hideAndShow(messageFragment);
 
-        if (messageFragment != null) {
-            messageFragment.setTg(messageFragment.tg);
-        }
+                fragmentName = "message";
+//                backButtonStatus = "backToMain";
+
+                if (messageFragment != null) {
+                    messageFragment.setTg(messageFragment.tg);
+                }
+
+            }
+        });
 
 //        if (messageFragment.tg.equals("send")) {
 //            messageFragment.reloadDate();
@@ -1294,20 +1366,52 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     }
 
-    public void nextPage() {
-        if (fragmentName.equals("message")) {
-            messageFragment.nextPage();
-        } else if (fragmentName.equals("log")) {
-            logFragment.nextPage();
+    private void hideAndShow(Fragment show) {
+        List<Fragment> fragments = getSupportFragmentManager().getFragments();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        if (fragments != null && !fragments.isEmpty()) {
+            for (Fragment f : fragments) {
+                if (f == messageNewFragment){
+                    ft.remove(f);
+                } else {
+                    ft.hide(f);
+                }
+            }
         }
+        if (show != null){
+            if (show.isAdded()) {
+                ft.show(show);
+            } else {
+                ft.add(R.id.main_frame_layout, show);
+            }
+        }
+        ft.commit();
+    }
+
+    public void nextPage() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (fragmentName.equals("message")) {
+                    messageFragment.nextPage();
+                } else if (fragmentName.equals("log")) {
+                    logFragment.nextPage();
+                }
+            }
+        });
     }
 
     public void prevPage() {
-        if (fragmentName.equals("message")) {
-            messageFragment.prevPage();
-        } else if (fragmentName.equals("log")) {
-            logFragment.prevPage();
-        }
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (fragmentName.equals("message")) {
+                    messageFragment.prevPage();
+                } else if (fragmentName.equals("log")) {
+                    logFragment.prevPage();
+                }
+            }
+        });
     }
 
     // 分包发送短信

@@ -986,7 +986,7 @@ public class MyApplication extends MultiDexApplication {
                         } else {
                             Thread.sleep(1);
                         }
-                    } catch (Exception e){
+                    } catch (Exception e) {
                         Thread.sleep(1);
                     }
                     byte[] buffer = new byte[1];
@@ -1006,8 +1006,6 @@ public class MyApplication extends MultiDexApplication {
                     }
                     oldComTime = System.currentTimeMillis();
                 } catch (Exception e) {
-                    e.printStackTrace();
-                    Log.e("TAG_ERROR", Utils.byte2HexStr(serialBuffer)+", "+serialBuffer.length);
                     serialBuffer = new byte[100];
                     serialCount = 0;
                     hasHead = false;
@@ -1015,31 +1013,6 @@ public class MyApplication extends MultiDexApplication {
             }
         }
     }
-
-//    private class GpsReadThread extends Thread {
-//
-//        @Override
-//        public void run() {
-//            super.run();
-//            while(!isInterrupted()) {
-//                int size;
-//                try {
-//                    Thread.sleep(1000);
-//                    byte[] buffer = new byte[200];
-//                    if (gpsInputStream == null) return;
-//                    size = gpsInputStream.read(buffer);
-//                    if (size > 0) {
-//                        onGpsDataReceived(buffer, size);
-//                    }
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                    return;
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
-//    }
 
 
     byte[] serialBuffer = new byte[100];
@@ -1049,9 +1022,8 @@ public class MyApplication extends MultiDexApplication {
     protected void onDataReceived(byte[] buffer, int size) {
         serialBuffer[serialCount] = buffer[0];
         serialCount++;
+        String head = serialCount < 3 ? "" : Util.bytesGetHead(serialBuffer, 3);
         if (serialCount == 3) {
-            String head = Util.bytesGetHead(serialBuffer, 3);
-            if (head == null) return;
             if (head.equals("$04") ||
                     head.equals("$R4") ||
                     head.equals("$R1") ||
@@ -1068,7 +1040,7 @@ public class MyApplication extends MultiDexApplication {
                 serialCount--;
             }
         }
-
+//        System.out.println("size: " + serialCount + "------收到包：" + ConvertUtil.bytesToHexString(serialBuffer));
         if (hasHead) {
             if (serialCount >= 81) {
                 serialBuffer = new byte[100];
@@ -1076,9 +1048,9 @@ public class MyApplication extends MultiDexApplication {
                 hasHead = false;
                 return;
             }
-            if (serialBuffer[serialCount - 2] == (byte) 0x0D && serialBuffer[serialCount - 1] == (byte) 0x0A) {
+            if (!"".equals(head) && !head.startsWith("$R") && serialBuffer[serialCount - 2] == (byte) 0x0D && serialBuffer[serialCount - 1] == (byte) 0x0A) {
                 serialBuffer = ByteUtil.subBytes(serialBuffer, 0, serialCount);
-                System.out.println("收到包：" + ConvertUtil.bytesToHexString(serialBuffer));
+//                System.out.println("收到包：" + ConvertUtil.bytesToHexString(serialBuffer));
                 Message message = new Message();
                 Bundle bundle = new Bundle();
                 bundle.putByteArray("bytes", serialBuffer);
@@ -1098,9 +1070,29 @@ public class MyApplication extends MultiDexApplication {
                 hasHead = false;
                 serialBuffer = new byte[100];
                 serialCount = 0;
+            } else if (serialBuffer[serialCount - 1] == (byte) 0x3B && serialBuffer[serialCount - 3] == 0x2A) {
+                serialBuffer = ByteUtil.subBytes(serialBuffer, 0, serialCount);
+                Message message = new Message();
+                Bundle bundle = new Bundle();
+                bundle.putByteArray("bytes", serialBuffer);
+                switch (Util.bytesGetHead(serialBuffer, 3)) {
+                    case "$R1":
+                        // 接收时间
+                        if (serialCount == 25) {
+                            message.what = DataHandler.SERIAL_PORT_TIME_NUMBER_AND_COMMUNICATION_FROM;
+                        } else if (serialCount == 20) {
+                            message.what = DataHandler.SERIAL_PORT_TIME;
+                        }
+                        message.setData(bundle);
+                        mHandler.sendMessage(message);
+                        break;
+                }
+                hasHead = false;
+                serialBuffer = new byte[100];
+                serialCount = 0;
             } else if (serialBuffer[serialCount - 1] == (byte) 0x3B) {
                 serialBuffer = ByteUtil.subBytes(serialBuffer, 0, serialCount);
-                System.out.println("收到包：" + ConvertUtil.bytesToHexString(serialBuffer));
+//                System.out.println("收到包：" + ConvertUtil.bytesToHexString(serialBuffer));
                 Message message = new Message();
                 Bundle bundle = new Bundle();
                 bundle.putByteArray("bytes", serialBuffer);
@@ -1114,16 +1106,16 @@ public class MyApplication extends MultiDexApplication {
                         message.setData(bundle);
                         mHandler.sendMessage(message);
                         break;
-                    case "$R1":
-                        // 接收时间
-                        if (serialCount == 25) {
-                            message.what = DataHandler.SERIAL_PORT_TIME_NUMBER_AND_COMMUNICATION_FROM;
-                        } else if (serialCount == 20) {
-                            message.what = DataHandler.SERIAL_PORT_TIME;
-                        }
-                        message.setData(bundle);
-                        mHandler.sendMessage(message);
-                        break;
+//                    case "$R1":
+//                        // 接收时间
+//                        if (serialCount == 25) {
+//                            message.what = DataHandler.SERIAL_PORT_TIME_NUMBER_AND_COMMUNICATION_FROM;
+//                        } else if (serialCount == 20) {
+//                            message.what = DataHandler.SERIAL_PORT_TIME;
+//                        }
+//                        message.setData(bundle);
+//                        mHandler.sendMessage(message);
+//                        break;
                     case "$R2":
                         // 接收时间
                         message.what = DataHandler.SERIAL_PORT_ID_EDIT_OK;
@@ -1164,13 +1156,13 @@ public class MyApplication extends MultiDexApplication {
                         break;
                     case "$R8":
                         if (serialBuffer[3] == 0x01) {
-                            System.out.println("报警中");
+//                            System.out.println("报警中");
                             // 报警中
                             message.what = DataHandler.SERIAL_PORT_ALERT_START;
                             message.setData(bundle);
                             mHandler.sendMessage(message);
                         } else if (serialBuffer[3] == 0x02) {
-                            System.out.println("报警失败");
+//                            System.out.println("报警失败");
                             // 报警失败
                             message.what = DataHandler.SERIAL_PORT_ALERT_FAIL;
                             message.setData(bundle);
@@ -1192,7 +1184,6 @@ public class MyApplication extends MultiDexApplication {
                 serialBuffer = new byte[100];
                 serialCount = 0;
             }
-
         }
         if (serialCount >= 81) {
             serialBuffer = new byte[100];
@@ -1279,7 +1270,7 @@ public class MyApplication extends MultiDexApplication {
                 @Override
                 public void run() {
                     String nettySendResult = SendMsg.getSendMsg().sendMsg(buffer);
-                    Log.e(TAG, "sendBytes: " + nettySendResult);
+//                    Log.e(TAG, "sendBytes: " + nettySendResult);
                 }
             }).start();
         }

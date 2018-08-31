@@ -432,7 +432,6 @@ public class DataHandler extends Handler {
                     if (!MyApplication.getInstance().isSendThreadStart) {
                         MyApplication.getInstance().startSendThread();
                         MyApplication.getInstance().isSendThreadStart = true;
-                        Log.e("TAG_CHECK", "启动发送信息线程");
                     }
                     System.out.println(rightDate);
                     break;

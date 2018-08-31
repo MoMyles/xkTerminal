@@ -2,7 +2,6 @@ package com.cetcme.xkterminal.Fragment.setting;
 
 
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,7 +11,6 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,18 +22,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.DataFormat.IDFormat;
-import com.cetcme.xkterminal.DataFormat.MessageFormat;
-import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
 import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.MyApplication;
-import com.cetcme.xkterminal.MyClass.AdminPswUtil;
 import com.cetcme.xkterminal.MyClass.CommonUtil;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.DensityUtil;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.MyClass.widget.PswDialog;
-import com.cetcme.xkterminal.Navigation.SkiaDrawView;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.SelfCheckActivity;
 import com.cetcme.xkterminal.Sqlite.Bean.FriendBean;
@@ -50,14 +44,12 @@ import com.google.zxing.qrcode.QRCodeWriter;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
-import com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 import org.xutils.DbManager;
 
 import java.io.UnsupportedEncodingException;
@@ -73,8 +65,6 @@ import butterknife.Unbinder;
 import yimamapapi.skia.YimaLib;
 
 import static android.content.Context.MODE_PRIVATE;
-import static com.cetcme.xkterminal.MyClass.CommonUtil.isNumber;
-import static com.cetcme.xkterminal.Navigation.Constant.YIMA_WORK_PATH;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -127,7 +117,13 @@ public class SystemSettingFragment extends Fragment {
         getData();
         mainActivity = (MainActivity) getActivity();
 
-        MyApplication.getInstance().sendBytes(IDFormat.getID());
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                MyApplication.getInstance().sendBytes(IDFormat.getID());
+            }
+        }, 200);
+
         return view;
     }
 
@@ -394,7 +390,7 @@ public class SystemSettingFragment extends Fragment {
                     }
                 }, 15000);*/
 
-               startActivity(new Intent(getActivity(), SelfCheckActivity.class));
+                startActivity(new Intent(getActivity(), SelfCheckActivity.class));
 
             }
         });
@@ -556,27 +552,38 @@ public class SystemSettingFragment extends Fragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(SmsEvent smsEvent) {
+
+        final JSONObject receiveJson = smsEvent.getReceiveJson();
         try {
-            JSONObject receiveJson = smsEvent.getReceiveJson();
             String type = receiveJson.getString("apiType");
             switch (type) {
                 case "device_id":
-                    String deviceId = receiveJson.getString("deviceID");
-                    tv_device_id.setText(deviceId);
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    String deviceId = receiveJson.getString("deviceID");
+                                    tv_device_id.setText(deviceId);
 
-                    String savedDeviceId = PreferencesUtils.getString(getActivity(), "deviceID", "");
-                    if (!deviceId.equals(savedDeviceId)) {
-                        PreferencesUtils.putString(getActivity(), "deviceID", deviceId);
-                        // 更改device_id后 更改wifi ssid
-                        String newSSID = "北斗" + deviceId;
-                        PreferencesUtils.putString(getActivity(), "wifiSSID", newSSID);
-                        MyApplication.getInstance().mainActivity.createWifiHotspot();
-                        wifi_ssid_textView.setText(newSSID);
+                                    String savedDeviceId = PreferencesUtils.getString(getActivity(), "deviceID", "");
+                                    if (!deviceId.equals(savedDeviceId)) {
+                                        PreferencesUtils.putString(getActivity(), "deviceID", deviceId);
+                                        // 更改device_id后 更改wifi ssid
+                                        String newSSID = "北斗" + deviceId;
+                                        PreferencesUtils.putString(getActivity(), "wifiSSID", newSSID);
+                                        MyApplication.getInstance().mainActivity.createWifiHotspot();
+                                        wifi_ssid_textView.setText(newSSID);
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
                     }
                     break;
             }
-
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -1029,7 +1036,7 @@ public class SystemSettingFragment extends Fragment {
     }
 
     //要转换的地址或字符串,可以是中文
-    public static Bitmap createQRImage(String url, int QR_WIDTH, int QR_HEIGHT ) {
+    public static Bitmap createQRImage(String url, int QR_WIDTH, int QR_HEIGHT) {
         try {//判断URL合法性
             if (url == null || "".equals(url) || url.length() < 1) {
                 return null;
@@ -1038,7 +1045,7 @@ public class SystemSettingFragment extends Fragment {
             hints.put(EncodeHintType.CHARACTER_SET, "utf-8");
             //图像数据转换，使用了矩阵转换
             BitMatrix bitMatrix = null;
-                bitMatrix = new QRCodeWriter().encode(url, BarcodeFormat.QR_CODE, QR_WIDTH, QR_HEIGHT, hints);
+            bitMatrix = new QRCodeWriter().encode(url, BarcodeFormat.QR_CODE, QR_WIDTH, QR_HEIGHT, hints);
             int[] pixels = new int[QR_WIDTH * QR_HEIGHT];
             //下面这里按照二维码的算法，逐个生成二维码的图片，
             //两个for循环是图片横列扫描的结果
@@ -1046,8 +1053,7 @@ public class SystemSettingFragment extends Fragment {
                 for (int x = 0; x < QR_WIDTH; x++) {
                     if (bitMatrix.get(x, y)) {
                         pixels[y * QR_WIDTH + x] = 0xff000000;
-                    }
-                    else {
+                    } else {
                         pixels[y * QR_HEIGHT + x] = 0xffffffff;
                     }
                 }
@@ -1056,8 +1062,7 @@ public class SystemSettingFragment extends Fragment {
             bitmap.setPixels(pixels, 0, QR_WIDTH, 0, 0, QR_WIDTH, QR_HEIGHT);
             //显示到一个ImageView上面
             return bitmap;
-        }
-        catch (WriterException e) {
+        } catch (WriterException e) {
             e.printStackTrace();
         }
         return null;

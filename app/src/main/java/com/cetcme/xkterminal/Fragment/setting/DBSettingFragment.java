@@ -52,7 +52,7 @@ public class DBSettingFragment extends Fragment {
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
-        Log.e("DBSettingFragment", "onCreateView: ");
+//        Log.e("DBSettingFragment", "onCreateView: ");
         unbinder = ButterKnife.bind(this, view);
         initData(view);
 

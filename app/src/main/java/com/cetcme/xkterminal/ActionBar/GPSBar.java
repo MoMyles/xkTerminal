@@ -387,26 +387,26 @@ public class GPSBar extends RelativeLayout {
                 }
 
                 // 未定位闪烁
-                if (Constant.NO_GPS_FLASH_TIME != 0) {
-                    int noGpsFlashTime = Constant.NO_GPS_FLASH_TIME / 100;
-                    if (i % noGpsFlashTime == 0) {
-                        flashTextViewVisible = !flashTextViewVisible;
-                        Message message = new Message();
-                        message.what = FLASH_NO_GPS;
-                        handler.sendMessage(message);
-                    }
-                }
-
-                // 无AIS闪烁
-                if (Constant.NO_AIS_FLASH_TIME != 0) {
-                    int noGpsFlashTime = Constant.NO_GPS_FLASH_TIME / 100;
-                    if (i % noGpsFlashTime == 0) {
-                        flashAisTextViewVisible = !flashAisTextViewVisible;
-                        Message message = new Message();
-                        message.what = FLASH_NO_AIS;
-                        handler.sendMessage(message);
-                    }
-                }
+//                if (Constant.NO_GPS_FLASH_TIME != 0) {
+//                    int noGpsFlashTime = Constant.NO_GPS_FLASH_TIME / 100;
+//                    if (i % noGpsFlashTime == 0) {
+//                        flashTextViewVisible = !flashTextViewVisible;
+//                        Message message = new Message();
+//                        message.what = FLASH_NO_GPS;
+//                        handler.sendMessage(message);
+//                    }
+//                }
+//
+//                // 无AIS闪烁
+//                if (Constant.NO_AIS_FLASH_TIME != 0) {
+//                    int noGpsFlashTime = Constant.NO_GPS_FLASH_TIME / 100;
+//                    if (i % noGpsFlashTime == 0) {
+//                        flashAisTextViewVisible = !flashAisTextViewVisible;
+//                        Message message = new Message();
+//                        message.what = FLASH_NO_AIS;
+//                        handler.sendMessage(message);
+//                    }
+//                }
 
                 if (i == 10000) i = 0;
                 i++;

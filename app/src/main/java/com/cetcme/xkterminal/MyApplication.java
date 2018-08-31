@@ -977,7 +977,18 @@ public class MyApplication extends MultiDexApplication {
             while (canRead) {
                 int size;
                 try {
-                    Thread.sleep(1);
+//                    String str2 = DateUtil.parseDateToString(Constant.SYSTEM_DATE, DateUtil.DatePattern.YYYYMMDDHHMMSS);
+                    try {
+                        String str2 = PreferencesUtils.getString(getApplicationContext(), "lastSendTime");
+                        Date d = DateUtil.parseStringToDate(str2, DateUtil.DatePattern.YYYYMMDDHHMMSS);
+                        if (Constant.SYSTEM_DATE.getTime() - d.getTime() < 500) {
+                            Thread.sleep(500);
+                        } else {
+                            Thread.sleep(1);
+                        }
+                    } catch (Exception e){
+                        Thread.sleep(1);
+                    }
                     byte[] buffer = new byte[1];
                     if (mInputStream == null) {
                         if (mSerialPort != null) {

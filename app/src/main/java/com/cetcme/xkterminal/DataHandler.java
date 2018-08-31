@@ -372,7 +372,7 @@ public class DataHandler extends Handler {
                         final boolean gpsStatus = status.charAt(7) == '1';
 
                         if (!gpsStatus) {
-                            myApplication.mainActivity.showMessageDialog("自身设备", "卫星中断故障", MessageDialogActivity.TYPE_ALARM);
+//                            myApplication.mainActivity.showMessageDialog("自身设备", "卫星中断故障", MessageDialogActivity.TYPE_ALARM);
 //                            MainActivity.play("卫星中断故障");
                             myApplication.mainActivity.dismissSelfCheckHud();
                         } else {

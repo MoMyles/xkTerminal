@@ -76,13 +76,15 @@ public class GPSBar extends RelativeLayout {
     private static final int FLASH_NO_AIS = 3;
     private static final int UPDATE_GPS_STATUS = 4;
 
-    TimeHandler timeHandler;
+    private TimeHandler timeHandler;
     // 用于关闭app
     private int clickTime = 0;
 
     private ArrayList<TextView> textViews = new ArrayList<>();
 
     private Toast newMsgToast;
+
+    private boolean canTime = true;
 
     public GPSBar(Context context) {
         super(context);
@@ -345,9 +347,7 @@ public class GPSBar extends RelativeLayout {
                 try {
                     Thread.sleep(100);
                 } catch (Exception e) {
-
                 }
-
 
                 if (i % 10 == 0) {
                     // 更新时间
@@ -410,8 +410,15 @@ public class GPSBar extends RelativeLayout {
 
                 if (i == 10000) i = 0;
                 i++;
-            } while (true);
+            } while (canTime);
         }
+    }
+
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        canTime = false;
     }
 
     long bootTime = 0;

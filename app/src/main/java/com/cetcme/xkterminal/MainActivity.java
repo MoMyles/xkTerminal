@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     public String fragmentName = "main";
 
-//    public String backButtonStatus = "backToMain";
+    //    public String backButtonStatus = "backToMain";
     public String messageListStatus = "";
 
     //按2次返回退出
@@ -133,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private Timer timer = null;
 
     private static Context mContext;
+    private boolean isAis = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -180,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             @Override
             public void run() {
 
-                while (true) {
+                while (isAis) {
                     if (System.currentTimeMillis() - MyApplication.getInstance().oldAisReceiveTime > 10 * 1000) {
                         runOnUiThread(new Runnable() {
                             @Override
@@ -240,7 +241,10 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         new Thread() {
             @Override
             public void run() {
-                new SocketServer().startService(MainActivity.this);
+                try {
+                    new SocketServer().startService(MainActivity.this);
+                } catch (Exception e) {
+                }
             }
         }.start();
 
@@ -428,6 +432,10 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             // 退出时释放连接
             mTts.destroy();
         }
+        if (kProgressHUD != null) {
+            kProgressHUD.dismiss();
+        }
+        isAis = false;
 
 //        if (aisInputStream != null) {
 //            try {
@@ -960,14 +968,14 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         if (fragments != null && !fragments.isEmpty()) {
             for (Fragment f : fragments) {
-                if (f == messageNewFragment){
+                if (f == messageNewFragment) {
                     ft.remove(f);
                 } else {
                     ft.hide(f);
                 }
             }
         }
-        if (show != null){
+        if (show != null) {
             if (show.isAdded()) {
                 ft.show(show);
             } else {

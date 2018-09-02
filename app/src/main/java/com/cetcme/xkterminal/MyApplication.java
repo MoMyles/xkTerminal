@@ -1,6 +1,7 @@
 package com.cetcme.xkterminal;
 
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.Process;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
 import android.text.TextUtils;
@@ -38,7 +40,6 @@ import com.cetcme.xkterminal.netty.utils.SendMsg;
 import com.cetcme.xkterminal.port.AisReadThread;
 import com.cetcme.xkterminal.port.USBEvent;
 import com.cetcme.xkterminal.port.USBInfo;
-import com.cetcme.xkterminal.port.Utils;
 import com.ftdi.j2xx.D2xxManager;
 import com.ftdi.j2xx.FT_Device;
 import com.iflytek.cloud.SpeechConstant;
@@ -157,7 +158,6 @@ public class MyApplication extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-
         mContext = this;
 
 //        if (!PreferencesUtils.getBoolean(this, "copiedYimaFile")) {
@@ -982,6 +982,7 @@ public class MyApplication extends MultiDexApplication {
                         String str2 = PreferencesUtils.getString(getApplicationContext(), "lastSendTime");
                         Date d = DateUtil.parseStringToDate(str2, DateUtil.DatePattern.YYYYMMDDHHMMSS);
                         if (Constant.SYSTEM_DATE.getTime() - d.getTime() < 500) {
+                            System.out.println(str2 + "============================canRead");
                             Thread.sleep(500);
                         } else {
                             Thread.sleep(1);
@@ -1040,7 +1041,7 @@ public class MyApplication extends MultiDexApplication {
                 serialCount--;
             }
         }
-//        System.out.println("size: " + serialCount + "------收到包：" + ConvertUtil.bytesToHexString(serialBuffer));
+        System.out.println("size: " + serialCount + "------收到包：" + ConvertUtil.bytesToHexString(serialBuffer));
         if (hasHead) {
             if (serialCount >= 81) {
                 serialBuffer = new byte[100];

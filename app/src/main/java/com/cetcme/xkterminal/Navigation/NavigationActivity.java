@@ -358,50 +358,58 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
     @Override
     public void onMapClicked(M_POINT m_point) {
         // 没有读取航线文件的时候，选取导航终点，直线导航
-        if (routeFileName == null) {
-            if (!inNavigating) {
+        try {
+            if (routeFileName == null) {
+                if (!inNavigating) {
 
-                if (myLocation == null || (myLocation.getLatitude() == 0 && myLocation.getLongitude() == 0)) {
-                    toast.setText("未获取自身定位");
-                    toast.show();
-                    MainActivity.play("未获取自身定位");
-                    return;
+                    if (myLocation == null || (myLocation.getLatitude() == 0 && myLocation.getLongitude() == 0)) {
+                        toast.setText("未获取自身定位");
+                        toast.show();
+                        MainActivity.play("未获取自身定位");
+                        return;
+                    }
+
+                    if (routeID == -1) {
+                        // 创建航线，添加自己定位
+                        startWp = fMainView.mYimaLib.AddWayPoint(myLocation.getLongitude(), myLocation.getLatitude(), "1", 20, "1");
+                        int[] wpids = new int[]{startWp};
+                        routeID = fMainView.mYimaLib.AddRoute("导航航线", wpids, 1, true);
+                    }
+
+                    if (endWp != -1) {
+                        // 如果已经选取了导航终点，更新位置
+                        fMainView.mYimaLib.SetWayPointCoor(endWp, m_point.x, m_point.y);
+                    } else {
+                        endWp = fMainView.mYimaLib.AddWayPoint(m_point.x, m_point.y, "1", 20, "1");
+                        fMainView.mYimaLib.AddRouteWayPoint(routeID, 1, new int[]{endWp}, 1);
+                    }
+
+                    fMainView.postInvalidate();
                 }
-
-                if (routeID == -1) {
-                    // 创建航线，添加自己定位
-                    startWp = fMainView.mYimaLib.AddWayPoint(myLocation.getLongitude(), myLocation.getLatitude(), "1", 20, "1");
-                    int[] wpids = new int[]{startWp};
-                    routeID = fMainView.mYimaLib.AddRoute("导航航线", wpids, 1, true);
-                }
-
-                if (endWp != -1) {
-                    // 如果已经选取了导航终点，更新位置
-                    fMainView.mYimaLib.SetWayPointCoor(endWp, m_point.x, m_point.y);
-                } else {
-                    endWp = fMainView.mYimaLib.AddWayPoint(m_point.x, m_point.y, "1", 20, "1");
-                    fMainView.mYimaLib.AddRouteWayPoint(routeID, 1, new int[]{endWp}, 1);
-                }
-
-                fMainView.postInvalidate();
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     @Override
     public void onMapTouched(int action) {
-        if (inNavigating) {
-            switch (action) {
-                case MotionEvent.ACTION_DOWN:
-                    handler.removeMessages(MESSAGE_TYPE_SET_NEED_CENTER_OWN_SHIP);
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    needCenterOwnShip = false;
-                    break;
-                case MotionEvent.ACTION_UP:
-                    handler.sendEmptyMessageDelayed(MESSAGE_TYPE_SET_NEED_CENTER_OWN_SHIP, 1000 * 5);
-                    break;
+        try {
+            if (inNavigating) {
+                switch (action) {
+                    case MotionEvent.ACTION_DOWN:
+                        handler.removeMessages(MESSAGE_TYPE_SET_NEED_CENTER_OWN_SHIP);
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        needCenterOwnShip = false;
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        handler.sendEmptyMessageDelayed(MESSAGE_TYPE_SET_NEED_CENTER_OWN_SHIP, 1000 * 5);
+                        break;
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

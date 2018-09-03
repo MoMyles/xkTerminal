@@ -21,7 +21,9 @@ import com.cetcme.xkterminal.MyClass.ScreenBrightness;
 import com.cetcme.xkterminal.MyClass.SoundPlay;
 import com.cetcme.xkterminal.Socket.SocketServer;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
+import com.cetcme.xkterminal.Sqlite.Bean.SignBean;
 import com.cetcme.xkterminal.Sqlite.Proxy.GroupProxy;
+import com.cetcme.xkterminal.Sqlite.Proxy.SignProxy;
 import com.cetcme.xkterminal.netty.utils.Constants;
 import com.cetcme.xkterminal.port.USBInfo;
 import com.cetcme.xkterminal.port.Utils;
@@ -150,6 +152,17 @@ public class DataHandler extends Handler {
                     int group = Integer.parseInt(messageStrings[3]);
                     int frameCount = Integer.parseInt(messageStrings[4]);
                     switch (type) {
+                        case MessageFormat.MESSAGE_TYPE_CARD_RECORD:// 打卡记录
+                            String[] cardArr = content.split(",");
+                            String name = cardArr[0];
+                            String cardNo = cardArr[1];
+                            String cardTime = cardArr[2];
+                            SignBean sb = new SignBean();
+                            sb.setName(name);
+                            sb.setIdCard(cardNo);
+                            sb.setTime(DateUtil.parseStringToDate(cardTime, DateUtil.DatePattern.YYYYMMDDHHMMSS_));
+                            SignProxy.insert(db, sb);
+                            break;
                         case MessageFormat.MESSAGE_TYPE_BROADCASTING:// 电台信息
                             Map<String, USBInfo> map = MyApplication.getInstance().openMap;
                             if (map != null && !map.isEmpty()) {
@@ -161,8 +174,6 @@ public class DataHandler extends Handler {
                                             FT_Device device = usbInfo.getFtDevice();
                                             if (device != null) {
 //                                                device.write(content.getBytes());
-                                                Log.e("TAG_DIANTAI", content);
-                                                Log.e("TAG_DIANTAI", Utils.byte2HexStr(bytes));
                                                 device.write(bytes);
                                             }
                                         }
@@ -380,7 +391,7 @@ public class DataHandler extends Handler {
                             MyApplication.powerFrom = "电池供电";
                         }
                         if (!gpsStatus) {
-                            myApplication.mainActivity.showMessageDialog("自身设备", "卫星中断故障", MessageDialogActivity.TYPE_ALARM);
+//                            myApplication.mainActivity.showMessageDialog("自身设备", "卫星中断故障", MessageDialogActivity.TYPE_ALARM);
 //                            MainActivity.play("卫星中断故障");
                             myApplication.mainActivity.dismissSelfCheckHud();
                         } else {

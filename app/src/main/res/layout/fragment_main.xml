@@ -266,8 +266,7 @@
                 android:switchMinWidth="24dp"
                 android:text="区域报警"
                 android:textOff="关"
-                android:textOn="开"
-                android:visibility="gone" />
+                android:textOn="开"/>
 
             <Switch
                 android:id="@+id/switch_pin"

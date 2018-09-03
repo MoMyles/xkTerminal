@@ -35,6 +35,7 @@ public class MessageFormat {
 
     public static final String MESSAGE_TYPE_APP_VERSION         = "15"; // 获取服务器app版本号
     public static final String MESSAGE_TYPE_BROADCASTING        = "16"; // 电台信息
+    public static final String MESSAGE_TYPE_CARD_RECORD        = "17"; // 打卡记录
 
     private static final String messageHead = "$04";
 

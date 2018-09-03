@@ -107,7 +107,7 @@ public class MessageDialogActivity extends Activity {
 
     protected void onDestroy() {
         SoundPlay.stopAlertSound();
-        MessageProxy.setMessageReadById(MyApplication.getInstance().getDb(), id);
+//        MessageProxy.setMessageReadById(MyApplication.getInstance().getDb(), id);
         MyApplication.getInstance().mainActivity.modifyGpsBarMessageCount();
         MyApplication.getInstance().messageDialogActivity = null;
         super.onDestroy();

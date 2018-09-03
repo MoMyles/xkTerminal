@@ -41,6 +41,7 @@
         android:layout_marginTop="8dp"
         android:gravity="center"
         android:text="附近船舶"
+        android:visibility="gone"
         android:textSize="16sp"/>
 
     <Button

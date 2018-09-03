@@ -8,7 +8,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -18,7 +17,6 @@ import android.widget.Toast;
 
 import com.cetcme.xkterminal.DataFormat.AlertFormat;
 import com.cetcme.xkterminal.MainActivity;
-import com.cetcme.xkterminal.MessageDialogActivity;
 import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.DateUtil;
@@ -26,13 +24,9 @@ import com.cetcme.xkterminal.MyClass.LunarUtil;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.MyClass.ScreenBrightness;
 import com.cetcme.xkterminal.MyClass.SoundPlay;
-import com.cetcme.xkterminal.MyClass.widget.MyTextView;
 import com.cetcme.xkterminal.R;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -40,7 +34,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * Created by qiuhong on 10/01/2018.
@@ -83,6 +76,7 @@ public class GPSBar extends RelativeLayout {
     private ArrayList<TextView> textViews = new ArrayList<>();
 
     private Toast newMsgToast;
+    private boolean isRuning = true;
 
     public GPSBar(Context context) {
         super(context);
@@ -410,8 +404,14 @@ public class GPSBar extends RelativeLayout {
 
                 if (i == 10000) i = 0;
                 i++;
-            } while (true);
+            } while (isRuning);
         }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        isRuning = false;
     }
 
     long bootTime = 0;

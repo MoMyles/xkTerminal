@@ -66,7 +66,7 @@ public class BottomBar2 extends RelativeLayout implements View.OnClickListener {
         }
     }
 
-    private EasyPopup popup, popup2, popup3;
+    private EasyPopup popup, popup2, popup3, popup4;
 
     @Override
     public void onClick(View view) {
@@ -130,7 +130,7 @@ public class BottomBar2 extends RelativeLayout implements View.OnClickListener {
                 btn10.setOnClickListener(this);
                 Button btn11 = popup2.findViewById(R.id.btn11);// 航迹
                 btn11.setOnClickListener(this);
-                popup2.showAtAnchorView(btn_map, XGravity.CENTER, YGravity.ABOVE, 130, -160);
+                popup2.showAtAnchorView(btn_map, XGravity.CENTER, YGravity.ABOVE, 130, -140);
                 break;
             case R.id.btn4: // 导航
                 // mainActivity.startActivity(new Intent(mainActivity, NavigationMainActivity.class));
@@ -175,7 +175,23 @@ public class BottomBar2 extends RelativeLayout implements View.OnClickListener {
                 dismiss(popup2);
                 break;
             case R.id.button_post:
+
+                popup4 = EasyPopup.create()
+                        .setContentView(LayoutInflater.from(getContext()).inflate(R.layout.bar_bottom_item_inout, null))
+                        .apply();
+                Button btn14 = popup4.findViewById(R.id.btn14);// 申报
+                btn14.setOnClickListener(this);
+                Button btn15 = popup4.findViewById(R.id.btn15);// 人员
+                btn15.setOnClickListener(this);
+                popup4.showAtAnchorView(btn_post, XGravity.CENTER, YGravity.ABOVE, 130, -90);
+                break;
+            case R.id.btn14:
                 mainActivity.initLogFragment("inout");
+                dismiss(popup4);
+                break;
+            case R.id.btn15:
+                mainActivity.initLogFragment("sign");
+                dismiss(popup4);
                 break;
             default:
                 break;

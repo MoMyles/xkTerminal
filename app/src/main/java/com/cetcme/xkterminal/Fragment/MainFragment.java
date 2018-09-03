@@ -29,6 +29,7 @@ import android.widget.Toast;
 import com.cetcme.xkterminal.DataFormat.AlertFormat;
 import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.Fragment.adapter.RvShipAdapter;
+import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.Constant;
 import com.cetcme.xkterminal.MyClass.GPSFormatUtils;
@@ -445,10 +446,10 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                 geoX[i] = JIN_YU_AREA_X[i];
                 geoY[i] = JIN_YU_AREA_Y[i];
             }
-            areas.add(new WarnArea(0, JIN_YU_AREA_COLOR[0], JIN_YU_AREA_COLOR[1]
+            areas.add(new WarnArea(1, JIN_YU_AREA_COLOR[0], JIN_YU_AREA_COLOR[1]
                     , JIN_YU_AREA_COLOR[2], geoX, geoY));
-            areas.add(new WarnArea(2, JIN_YU_AREA_COLOR[0], JIN_YU_AREA_COLOR[1]
-                    , JIN_YU_AREA_COLOR[2], geoX, geoY));
+//            areas.add(new WarnArea(2, JIN_YU_AREA_COLOR[0], JIN_YU_AREA_COLOR[1]
+//                    , JIN_YU_AREA_COLOR[2], geoX, geoY));
             curLayerPos = skiaDrawView.drawBanArea(areas);
         } else {
             for (WarnArea area : areas) {
@@ -659,7 +660,8 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
                         if (exists) {
                             // 报警
                             MyApplication.getInstance().mainActivity.showMessageDialog("自身设备", "危险区域报警", 1);
-                            SoundPlay.startAlertSound(MyApplication.getInstance().mainActivity);
+//                            SoundPlay.startAlertSound(MyApplication.getInstance().mainActivity);
+                            MainActivity.play("您已进入危险区");
                         }
                         break;
                     case 2:// 禁出

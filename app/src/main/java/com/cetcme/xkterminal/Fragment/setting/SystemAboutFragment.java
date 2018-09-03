@@ -29,7 +29,7 @@ public class SystemAboutFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_system_about, container, false);
         TextView tv_version = view.findViewById(R.id.tv_version);
         String version = APKVersionCodeUtils.getVerName(getActivity());
-        tv_version.setText(version+"(江苏)");
+        tv_version.setText(version+"(广州)");
         return view;
     }
 

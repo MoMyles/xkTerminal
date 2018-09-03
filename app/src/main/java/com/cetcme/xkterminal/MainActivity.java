@@ -957,17 +957,17 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
     public void showMessageDialog(String address, String content, int type) {
-        int id = addMessage(address, content, false);
+//        int id = addMessage(address, content, false);
 
         if (MyApplication.getInstance().messageDialogActivity == null) {
             // type 0: 救护, 1: 报警提醒, 2: 夜间点名
             Intent intent = new Intent(MainActivity.this, MessageDialogActivity.class);
             intent.putExtra("content", content);
             intent.putExtra("type", type);
-            intent.putExtra("id", id);
+//            intent.putExtra("id", id);
             startActivity(intent);
         } else {
-            MyApplication.getInstance().messageDialogActivity.updateMessage(id, content, type);
+//            MyApplication.getInstance().messageDialogActivity.updateMessage(id, content, type);
         }
     }
 
@@ -1750,7 +1750,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     @Override
     protected void onResume() {
         super.onResume();
-        if (isSelfCheckLoading) {
+        if (!isSelfCheckLoading) {
             dismissSelfCheckHud();
         }
     }

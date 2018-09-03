@@ -85,7 +85,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
     private double endDistToRead = -1;
 
     private RelativeLayout rl1;
-    private Switch mSwitchMap, mSwitchYQ, mSwitchArea, mSwitchPin;
+    private Switch mSwitchMap, mSwitchYQ, mSwitchArea, mSwitchPin, switch_rotate;
     private Button btn1;
 
     @Override
@@ -164,6 +164,19 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
                     fMainView.changeMap(0);
                 } else {
                     fMainView.changeMap(3);
+                }
+            }
+        });
+
+        switch_rotate = findViewById(R.id.switch_rotate);
+
+        switch_rotate.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked && MyApplication.getInstance().getCurrentLocation()!=null){
+                    setOwnShip(MyApplication.getInstance().getCurrentLocation(), MyApplication.getInstance().getCurrentLocation().getHeading(), true);
+                } else {
+                    setOwnShip(MyApplication.getInstance().getCurrentLocation(), MyApplication.getInstance().getCurrentLocation().getHeading(), false);
                 }
             }
         });
@@ -648,7 +661,11 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
             double time = restDis / myLocation.getSpeed();// 小时
             Calendar calendar = Calendar.getInstance();
             calendar.add(Calendar.HOUR_OF_DAY, (int) time);
-            tv_end_time.setText(DateUtil.parseDateToString(calendar.getTime(), DateUtil.DatePattern.HHMMSS));
+            if (time == 0) {
+                tv_end_time.setText(calendar.get(Calendar.MINUTE) + " m");
+            } else {
+                tv_end_time.setText(time + "h " + calendar.get(Calendar.MINUTE) + " m");
+            }
             M_POINT wpCoor = fMainView.mYimaLib.getWayPointCoor(endWp);
             double fangwei = fMainView.mYimaLib.GetBearingBetwTwoPoint(myLocation.getLongitude(), myLocation.getLatitude(),
                     wpCoor.x, wpCoor.y);//方位
@@ -674,7 +691,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
     private void updateShipInfo(LocationBean locationBean) {
         tv_lon.setText(GPSFormatUtils.DDtoDMS(locationBean.getLongitude() / 10000000d, true));
         tv_lat.setText(GPSFormatUtils.DDtoDMS(locationBean.getLatitude() / 10000000d, false));
-        tv_head.setText(locationBean.getHeading() + "");
-        tv_speed.setText(locationBean.getSpeed() + "");
+        tv_head.setText(locationBean.getHeading() + "°");
+        tv_speed.setText(locationBean.getSpeed() + "kn");
     }
 }

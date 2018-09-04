@@ -2,19 +2,19 @@ package com.cetcme.xkterminal.MyClass;
 
 import com.cetcme.xkterminal.DataFormat.Util.ConvertUtil;
 
-import java.text.NumberFormat;
 import java.util.Date;
 
 public class GPSFormatUtils {
 
     /**
      * 功能：         度-->度分秒
+     *
      * @param d 传入待转化格式的经度或者纬度
      */
-    public static String DDtoDMS(Double d, boolean isJd){
+    public static String DDtoDMS(Double d, boolean isJd) {
 
-        String[] array=d.toString().split("[.]");
-        String degrees=array[0];//得到度
+        String[] array = d.toString().split("[.]");
+        String degrees = array[0];//得到度
         if (d < 0) {
             // 西经 南纬
             degrees = degrees.replace("-", "");
@@ -32,29 +32,30 @@ public class GPSFormatUtils {
             }
         }
 
-        Double m=Double.parseDouble("0."+array[1])*60;
-        String[] array1=m.toString().split("[.]");
-        int minutes=Integer.parseInt(array1[0]);//得到分
+        Double m = Double.parseDouble("0." + array[1]) * 60;
+        String[] array1 = m.toString().split("[.]");
+        int minutes = Integer.parseInt(array1[0]);//得到分
 
-        Double s=Double.parseDouble("0."+array1[1])*60;
-        String[] array2=s.toString().split("[.]");
+        Double s = Double.parseDouble("0." + array1[1]) * 60;
+        String[] array2 = s.toString().split("[.]");
         int seconds = Integer.parseInt(array2[0]);//得到秒
-        return  degrees + "°" + String.format("%.3f", m) + '’';
+        return degrees + "°" + String.format("%.2f", m) + "’";
     }
 
     /**
      * 功能：         度-->度分
+     *
      * @param d 传入待转化格式的经度或者纬度
      */
-    public static byte[] formatGps(Double d){
+    public static byte[] formatGps(Double d) {
 
-        String[] array=d.toString().split("[.]");
-        String degrees=array[0];//得到度
+        String[] array = d.toString().split("[.]");
+        String degrees = array[0];//得到度
         if (degrees.length() == 1) degrees = "00" + degrees;
         if (degrees.length() == 2) degrees = "0" + degrees;
 
-        Double m=Double.parseDouble("0."+array[1])*60;
-        String[] array1=m.toString().split("[.]");
+        Double m = Double.parseDouble("0." + array[1]) * 60;
+        String[] array1 = m.toString().split("[.]");
         String minutes = array1[0];//得到分
         if (minutes.length() == 1) minutes = "0" + minutes;
 

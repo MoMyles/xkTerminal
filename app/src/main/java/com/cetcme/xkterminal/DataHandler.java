@@ -116,15 +116,24 @@ public class DataHandler extends Handler {
                         }
                         if (lb != null) {
                             try {
+                                int du = (int) (Double.parseDouble(lat) / 100);
+                                double fen = (Double.parseDouble(lat) - du * 100) / 60;
+                                double a = du + fen;
+
+                                int du2 = (int) (Double.parseDouble(lon) / 100);
+                                double fen2 = (Double.parseDouble(lon) - du2 * 100) / 60;
+                                double a2 = du2 + fen2;
+
+
                                 if ("N".equals(latDirect)) {
-                                    lb.setLatitude((int) (Double.parseDouble(lat) * 1e5));
+                                    lb.setLatitude((int) (a * 1e7));
                                 } else {
-                                    lb.setLatitude((int) (-1 * Double.parseDouble(lat) * 1e5));
+                                    lb.setLatitude((int) (-1 * a * 1e7));
                                 }
                                 if ("E".equals(lonDirect)) {
-                                    lb.setLongitude((int) (Double.parseDouble(lon) * 1e5));
+                                    lb.setLongitude((int) (a2 * 1e7));
                                 } else {
-                                    lb.setLongitude((int) (-1 * Double.parseDouble(lon) * 1e5));
+                                    lb.setLongitude((int) (-1 * a2 * 1e7));
                                 }
                                 lb.setSpeed(Float.parseFloat(speed));
                                 lb.setHeading(Float.parseFloat(cog));

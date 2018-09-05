@@ -137,6 +137,7 @@ public class DataHandler extends Handler {
                                 }
                                 lb.setSpeed(Float.parseFloat(speed));
                                 lb.setHeading(Float.parseFloat(cog));
+                                lb.setAcqtime(Constant.SYSTEM_DATE);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }

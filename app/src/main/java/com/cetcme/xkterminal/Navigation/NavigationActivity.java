@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
+import com.cetcme.xkterminal.DataFormat.Util.Util;
 import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.GPSFormatUtils;
@@ -689,8 +690,11 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
      * @param locationBean
      */
     private void updateShipInfo(LocationBean locationBean) {
-        tv_lon.setText(GPSFormatUtils.DDtoDMS(locationBean.getLongitude() / 10000000d, true));
-        tv_lat.setText(GPSFormatUtils.DDtoDMS(locationBean.getLatitude() / 10000000d, false));
+//        tv_lon.setText(GPSFormatUtils.DDtoDMS(locationBean.getLongitude() / 10000000d, true));
+//        tv_lat.setText(GPSFormatUtils.DDtoDMS(locationBean.getLatitude() / 10000000d, false));
+        tv_lon.setText(Util.degToDMS(locationBean.getLongitude() * 1.0 / 1e7, Util.GeoType.LONGITUDE));
+//        tv_lat.setText(GPSFormatUtils.DDtoDMS(locationBean.getLatitude() / 10000000d, false));
+        tv_lat.setText(Util.degToDMS(locationBean.getLatitude() * 1.0 / 1e7, Util.GeoType.LATITUDE));
         tv_head.setText(locationBean.getHeading() + "°");
         tv_speed.setText(locationBean.getSpeed() + "kn");
     }

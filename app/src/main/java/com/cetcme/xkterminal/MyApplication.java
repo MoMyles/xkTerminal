@@ -1041,7 +1041,7 @@ public class MyApplication extends MultiDexApplication {
                 serialCount--;
             }
         }
-        System.out.println("size: " + serialCount + "------收到包：" + ConvertUtil.bytesToHexString(serialBuffer));
+//        System.out.println("size: " + serialCount + "------收到包：" + ConvertUtil.bytesToHexString(serialBuffer));
         if (hasHead) {
             if (serialCount >= 81) {
                 serialBuffer = new byte[100];

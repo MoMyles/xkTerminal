@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cetcme.xkterminal.DataFormat.AlertFormat;
+import com.cetcme.xkterminal.DataFormat.Util.Util;
 import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.Fragment.adapter.RvShipAdapter;
 import com.cetcme.xkterminal.MyApplication;
@@ -959,8 +960,10 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
      * @param locationBean
      */
     private void updateShipInfo(LocationBean locationBean) {
-        tv_lon.setText(GPSFormatUtils.DDtoDMS(locationBean.getLongitude() / 10000000d, true));
-        tv_lat.setText(GPSFormatUtils.DDtoDMS(locationBean.getLatitude() / 10000000d, false));
+//        tv_lon.setText(GPSFormatUtils.DDtoDMS(locationBean.getLongitude() / 10000000d, true));
+        tv_lon.setText(Util.degToDMS(locationBean.getLongitude() * 1.0 / 1e7, Util.GeoType.LONGITUDE));
+//        tv_lat.setText(GPSFormatUtils.DDtoDMS(locationBean.getLatitude() / 10000000d, false));
+        tv_lat.setText(Util.degToDMS(locationBean.getLatitude() * 1.0 / 1e7, Util.GeoType.LATITUDE));
         tv_head.setText(locationBean.getHeading() + "°");
         tv_speed.setText(String.format("%.1f", locationBean.getSpeed()) + "kn");
     }

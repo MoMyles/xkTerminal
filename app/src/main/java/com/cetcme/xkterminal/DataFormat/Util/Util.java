@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.widget.Toast;
 
+import com.cetcme.xkterminal.netty.utils.Constants;
+
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
@@ -12,6 +14,46 @@ import java.util.Date;
  */
 
 public class Util {
+
+
+    private static final String DMS_FORMAT = "%s%d°%d′%s\"";
+
+    public static enum GeoType {
+        LONGITUDE, LATITUDE;
+    }
+
+    /* 转换“度”格式的经度或者纬度为 度分秒 格式 */
+    public static String degToDMS(Double geo, GeoType type) {
+        if (geo == null) {
+            return "";
+        }
+        String hemiSign;
+        if (type == GeoType.LONGITUDE) {
+            hemiSign = geo < 0 ? Constants.LongitudeHemisphere.WEST.toString() : Constants.LongitudeHemisphere.EAST.toString();
+        } else {
+            hemiSign = geo < 0 ? Constants.LatitudeHemisphere.SOUTH.toString() : Constants.LatitudeHemisphere.NORTH.toString();
+        }
+        double absGeo = Math.abs(geo);
+        int degree = (int) absGeo;
+        double minDouble = (absGeo - degree) * 60;
+        int minute = (int) minDouble;
+        double secDouble = (minDouble - minute) * 60;
+
+        // 设定小数最大为2位
+        String second = format(secDouble, 2);
+        return String.format(DMS_FORMAT, hemiSign, degree, minute, second);
+    }
+
+    /**
+     * 四舍五入保留小数点
+     *
+     * @param value
+     * @param digits
+     * @return
+     */
+    public static String format(double value, int digits) {
+        return String.format("%." + digits + "f", value);
+    }
 
     /**
      * Byte转Bit

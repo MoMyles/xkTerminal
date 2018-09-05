@@ -111,17 +111,29 @@ public class DataHandler extends Handler {
                             lb = new LocationBean();
                             MyApplication.currentLocation = lb;
                         }
+                        Log.e("TAG_LOCATION", lon+","+lat);
                         if (lb != null) {
                             try {
+                                int tmp = (int) (Double.parseDouble(lat) / 100);// 度
+                                double f = (Double.parseDouble(lat) - tmp * 100) / 60;//分转度
+                               // double m = (Double.parseDouble(lat) - (int)Double.parseDouble(lat)) / 60;//秒转度
+                                double a = tmp + f;//+ m;
+
+                                int tmp2 = (int) (Double.parseDouble(lon) / 100);// 度
+                                double f2 = (Double.parseDouble(lon) - tmp2 * 100) / 60;//分转度
+                                //double m2 = (Double.parseDouble(lon) - (int)Double.parseDouble(lon)) / 60;//秒转度
+                                double a2 = tmp2 + f2;// + m2;
+
+
                                 if ("N".equals(latDirect)) {
-                                    lb.setLatitude((int) (Double.parseDouble(lat) * 1e5));
+                                    lb.setLatitude((int) (a * 1e7));
                                 } else {
-                                    lb.setLatitude((int) (-1 * Double.parseDouble(lat) * 1e5));
+                                    lb.setLatitude((int) (-1 * a * 1e7));
                                 }
                                 if ("E".equals(lonDirect)) {
-                                    lb.setLongitude((int) (Double.parseDouble(lon) * 1e5));
+                                    lb.setLongitude((int) (a2 * 1e7));
                                 } else {
-                                    lb.setLongitude((int) (-1 * Double.parseDouble(lon) * 1e5));
+                                    lb.setLongitude((int) (-1 * a2 * 1e7));
                                 }
                                 lb.setSpeed(Float.parseFloat(speed));
                                 lb.setHeading(Float.parseFloat(cog));

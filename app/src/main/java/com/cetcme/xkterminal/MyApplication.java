@@ -40,6 +40,7 @@ import com.cetcme.xkterminal.netty.utils.SendMsg;
 import com.cetcme.xkterminal.port.AisReadThread;
 import com.cetcme.xkterminal.port.USBEvent;
 import com.cetcme.xkterminal.port.USBInfo;
+import com.cetcme.xkterminal.thread.DataReadThread;
 import com.ftdi.j2xx.D2xxManager;
 import com.ftdi.j2xx.FT_Device;
 import com.iflytek.cloud.SpeechConstant;
@@ -106,6 +107,7 @@ public class MyApplication extends MultiDexApplication {
     private OutputStream mOutputStream;
     private InputStream mInputStream;
     private ReadThread mReadThread;
+    private DataReadThread dataReadThread;
 
     //    private SerialPort gpsSerialPort = null;
 //    private OutputStream gpsOutputStream;
@@ -302,9 +304,11 @@ public class MyApplication extends MultiDexApplication {
             mSerialPort = getSerialPort();
             mOutputStream = mSerialPort.getOutputStream();
             mInputStream = mSerialPort.getInputStream();
-            canRead = true;
-            mReadThread = new ReadThread();
-            mReadThread.start();
+//            canRead = true;
+//            mReadThread = new ReadThread();
+//            mReadThread.start();
+            dataReadThread = new DataReadThread(this, mSerialPort);
+            dataReadThread.start();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -932,6 +936,9 @@ public class MyApplication extends MultiDexApplication {
 
     public void closeSerialPort() {
         canRead = false;
+        if (dataReadThread!=null){
+            dataReadThread.close();
+        }
         try {
             if (mInputStream != null) {
                 mInputStream.close();
@@ -977,12 +984,10 @@ public class MyApplication extends MultiDexApplication {
             while (canRead) {
                 int size;
                 try {
-//                    String str2 = DateUtil.parseDateToString(Constant.SYSTEM_DATE, DateUtil.DatePattern.YYYYMMDDHHMMSS);
                     try {
                         String str2 = PreferencesUtils.getString(getApplicationContext(), "lastSendTime");
                         Date d = DateUtil.parseStringToDate(str2, DateUtil.DatePattern.YYYYMMDDHHMMSS);
                         if (Constant.SYSTEM_DATE.getTime() - d.getTime() < 500) {
-                            System.out.println(str2 + "============================canRead");
                             Thread.sleep(500);
                         } else {
                             Thread.sleep(1);

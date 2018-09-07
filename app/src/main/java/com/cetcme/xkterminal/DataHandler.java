@@ -103,7 +103,7 @@ public class DataHandler extends Handler {
                         String hexStr = ConvertUtil.bytesToHexString(new byte[]{bytes[39]});
                         int voltage = Integer.parseInt(hexStr, 16);
 //                        Log.e("TAG_", voltage+"");
-                        String voltageStr = voltage * 0.02 + "";
+                        String voltageStr = String.format("%.2f", voltage * 2.0 / 100) + "";
                         LocationBean lb = null;
                         if (MyApplication.getInstance().getCurrentLocation() != null) {
                             lb = MyApplication.getInstance().getCurrentLocation();
@@ -111,7 +111,6 @@ public class DataHandler extends Handler {
                             lb = new LocationBean();
                             MyApplication.currentLocation = lb;
                         }
-                        Log.e("TAG_LOCATION", lon+","+lat);
                         if (lb != null) {
                             try {
                                 int tmp = (int) (Double.parseDouble(lat) / 100);// 度

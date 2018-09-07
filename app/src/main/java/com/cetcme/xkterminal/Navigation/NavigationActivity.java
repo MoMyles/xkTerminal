@@ -21,7 +21,6 @@ import com.cetcme.xkterminal.DataFormat.Util.DateUtil;
 import com.cetcme.xkterminal.DataFormat.Util.Util;
 import com.cetcme.xkterminal.MainActivity;
 import com.cetcme.xkterminal.MyApplication;
-import com.cetcme.xkterminal.MyClass.GPSFormatUtils;
 import com.cetcme.xkterminal.MyClass.PreferencesUtils;
 import com.cetcme.xkterminal.R;
 import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
@@ -109,39 +108,47 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
 
         fMainView.setOnMapClickListener(this);
 
-        new Handler().postDelayed(new Runnable() {
+        fMainView.postDelayed(new Runnable() {
             @Override
             public void run() {
-                //121.768783,28.696902
-                fMainView.mYimaLib.CenterMap((int) (121.768783 * 1e7), (int) (28.696902 * 1e7));
-                fMainView.mYimaLib.SetCurrentScale(2000.0f);
+                LocationBean lb = MyApplication.getInstance().getCurrentLocation();
+                fMainView.mYimaLib.SetCurrentScale(20000.0f);
+                    needCenterOwnShip = true;
+                if (lb.getLatitude() != 0 && lb.getLongitude() != 0) {
+                    setOwnShip(lb, lb.getHeading(), false);
+//                    skiaDrawView.mYimaLib.CenterMap(myLocation.x, myLocation.y);
+                } else {
+                    // 没有位置则固定中心点 121.768783,28.696902
+                    fMainView.mYimaLib.CenterMap((int) (121.768783 * 1e7), (int) (28.696902 * 1e7));
+                }
+                needCenterOwnShip = false;
                 fMainView.postInvalidate();
-
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (routeFileName != null) {
-                            fMainView.mYimaLib.AddRoutesFromFile(Constant.ROUTE_FILE_PATH + "/" + routeFileName);
-                            int routeCount = fMainView.mYimaLib.GetRoutesCount();
-                            routeID = fMainView.mYimaLib.GetRouteIDFromPos(routeCount - 1);
-                            int[] wpids = fMainView.mYimaLib.GetRouteWayPointsID(routeID);
-
-                            endDistToRead = 0.0;
-                            for (int i = 0; i < wpids.length - 1; i++) {
-                                M_POINT startPoint = fMainView.mYimaLib.getWayPointCoor(wpids[i]);
-                                M_POINT endPoint = fMainView.mYimaLib.getWayPointCoor(wpids[i + 1]);
-                                endDistToRead += fMainView.mYimaLib.GetDistBetwTwoPoint(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
-                            }
-
-                            M_POINT point = fMainView.mYimaLib.getWayPointCoor(wpids[0]);
-                            fMainView.mYimaLib.CenterMap(point.x, point.y);
-                            fMainView.postInvalidate();
-                        }
-                    }
-                }, 200);
-
             }
         }, 200);
+
+        fMainView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                if (routeFileName != null) {
+                    fMainView.mYimaLib.AddRoutesFromFile(Constant.ROUTE_FILE_PATH + "/" + routeFileName);
+                    int routeCount = fMainView.mYimaLib.GetRoutesCount();
+                    routeID = fMainView.mYimaLib.GetRouteIDFromPos(routeCount - 1);
+                    int[] wpids = fMainView.mYimaLib.GetRouteWayPointsID(routeID);
+
+                    endDistToRead = 0.0;
+                    for (int i = 0; i < wpids.length - 1; i++) {
+                        M_POINT startPoint = fMainView.mYimaLib.getWayPointCoor(wpids[i]);
+                        M_POINT endPoint = fMainView.mYimaLib.getWayPointCoor(wpids[i + 1]);
+                        endDistToRead += fMainView.mYimaLib.GetDistBetwTwoPoint(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+                    }
+
+//                    M_POINT point = fMainView.mYimaLib.getWayPointCoor(wpids[0]);
+//                    fMainView.mYimaLib.CenterMap(point.x, point.y);
+//                    fMainView.postInvalidate();
+                }
+            }
+        }, 400);
 
         btn1 = findViewById(R.id.btn1);
         rl1 = findViewById(R.id.rl1);
@@ -174,7 +181,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
         switch_rotate.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked && MyApplication.getInstance().getCurrentLocation()!=null){
+                if (isChecked && MyApplication.getInstance().getCurrentLocation() != null) {
                     setOwnShip(MyApplication.getInstance().getCurrentLocation(), MyApplication.getInstance().getCurrentLocation().getHeading(), true);
                 } else {
                     setOwnShip(MyApplication.getInstance().getCurrentLocation(), MyApplication.getInstance().getCurrentLocation().getHeading(), false);
@@ -474,7 +481,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
 //        fMainView.mYimaLib.SetOwnShipBasicInfo("本船", "123456789", 100, 50);
         fMainView.mYimaLib.SetOwnShipCurrentInfo(locationBean.getLongitude(), locationBean.getLatitude(), heading, 50, 50, 0, 0);
         fMainView.mYimaLib.SetOwnShipShowSymbol(false, 4, true, 16, 5000000);
-        fMainView.mYimaLib.RotateMapByScrnCenter(rotateScreen ? 0 - heading : 0);
+        fMainView.mYimaLib.RotateMapByScrnCenter(rotateScreen || switch_rotate.isChecked() ? 0 - heading : 0);
         if (needCenterOwnShip) {
             fMainView.mYimaLib.CenterMap(myLocation.getLongitude(), myLocation.getLatitude());
         }

@@ -86,13 +86,14 @@ public class DataReadThread extends Thread {
                 }
             } else if (hasHead("$R1", byts)) {
                 if (hasBan(byts)) {
-                    if (byts[size - 3] == 0x2A)
-                    if (size == 25) {
-                        sendMessage(byts, DataHandler.SERIAL_PORT_TIME_NUMBER_AND_COMMUNICATION_FROM);
-                    } else if (size == 20) {
-                        sendMessage(byts, DataHandler.SERIAL_PORT_TIME);
-                    }
-                    BYTE_LIST.clear();
+                    //if (byts[size - 3] == 0x2A) {
+                        if (size == 25) {
+                            sendMessage(byts, DataHandler.SERIAL_PORT_TIME_NUMBER_AND_COMMUNICATION_FROM);
+                        } else if (size == 20) {
+                            sendMessage(byts, DataHandler.SERIAL_PORT_TIME);
+                        }
+                        BYTE_LIST.clear();
+                    //}
                 }
             } else if (hasHead("$R2", byts)) {
                 if (hasBan(byts)) {

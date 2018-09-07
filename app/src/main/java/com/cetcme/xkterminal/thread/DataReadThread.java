@@ -1,12 +1,16 @@
 package com.cetcme.xkterminal.thread;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 
 import com.cetcme.xkterminal.DataFormat.Util.Util;
 import com.cetcme.xkterminal.DataHandler;
 import com.cetcme.xkterminal.MyApplication;
+import com.cetcme.xkterminal.port.Utils;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -15,17 +19,24 @@ import android_serialport_api.SerialPort;
 
 public class DataReadThread extends Thread {
 
-
+    private MyApplication context;
     private Handler mHandler;
     private InputStream inputStream;
     private final ArrayList<Byte> BYTE_LIST = new ArrayList<>();
     private boolean canRead = true;
 
     public DataReadThread(MyApplication context, SerialPort port) {
+        this.context = context;
         if (port != null) {
             this.inputStream = port.getInputStream();
         }
+        if (Looper.myLooper() != Looper.getMainLooper()){
+            Looper.prepare();
+        }
         mHandler = new DataHandler(context);
+        if (Looper.myLooper() != Looper.getMainLooper()){
+            Looper.loop();
+        }
     }
 
     public void close() {
@@ -46,10 +57,15 @@ public class DataReadThread extends Thread {
                         analysisData(byts[i]);
                     }
                 }
+            } catch (java.io.IOException e) {
+                e.printStackTrace();
+                break;
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+        context.closeSerialPort();
+        context.startSerialPort();
     }
 
     private void analysisData(byte b) {
@@ -59,49 +75,54 @@ public class DataReadThread extends Thread {
             byte[] byts = list2array(BYTE_LIST, size);
             if (hasHead("$04", byts)) {
                 if (hasTail(byts)) {
-                    int xIndex = size;
-                    for (int i = size - 1; i > 0; i--) {
-                        if (byts[i] == 0x2A) {
-                            xIndex = i;
-                            break;
-                        }
-                    }
-                    if (xIndex == size) {// 未找到*
-                        return;
-                    }
-                    int checkSum = Util.computeCheckSum(byts, 3, xIndex);
-                    byte check = (byte) checkSum;
-                    if (check == byts[xIndex + 1]) {
+//                    Log.i("DATA_READ_THREAD", Utils.byte2HexStr(byts));
+//                    int xIndex = size;
+//                    for (int i = size - 1; i > 0; i--) {
+//                        if (byts[i] == 0x2A) {
+//                            xIndex = i;
+//                            break;
+//                        }
+//                    }
+//                    if (xIndex == size) {// 未找到*
+//                        return;
+//                    }
+//                    int checkSum = Util.computeCheckSum(byts, 3, xIndex);
+//                    byte check = (byte) checkSum;
+//                    if (check == byts[xIndex + 1]) {
                         //校验成功
 
                         sendMessage(byts, DataHandler.SERIAL_PORT_RECEIVE_NEW_MESSAGE);
 
                         BYTE_LIST.clear();
-                    }
+//                    }
                 }
             } else if (hasHead("$R4", byts)) {
                 if (hasBan(byts)) {
+                    Log.i("DATA_READ_THREAD", Utils.byte2HexStr(byts));
                     sendMessage(byts, DataHandler.SERIAL_PORT_MESSAGE_SEND_SUCCESS);
                     BYTE_LIST.clear();
                 }
             } else if (hasHead("$R1", byts)) {
                 if (hasBan(byts)) {
-                    //if (byts[size - 3] == 0x2A) {
+                    Log.i("DATA_READ_THREAD", Utils.byte2HexStr(byts));
+                    if (byts[size - 3] == 0x2A) {
                         if (size == 25) {
                             sendMessage(byts, DataHandler.SERIAL_PORT_TIME_NUMBER_AND_COMMUNICATION_FROM);
                         } else if (size == 20) {
                             sendMessage(byts, DataHandler.SERIAL_PORT_TIME);
                         }
                         BYTE_LIST.clear();
-                    //}
+                    }
                 }
             } else if (hasHead("$R2", byts)) {
                 if (hasBan(byts)) {
+                    Log.i("DATA_READ_THREAD", Utils.byte2HexStr(byts));
                     sendMessage(byts, DataHandler.SERIAL_PORT_ID_EDIT_OK);
                     BYTE_LIST.clear();
                 }
             } else if (hasHead("$R5", byts)) {
                 if (hasBan(byts)) {
+                    Log.i("DATA_READ_THREAD", Utils.byte2HexStr(byts));
                     if (size == 14) {
                         // 紧急报警成功
                         sendMessage(byts, DataHandler.SERIAL_PORT_ALERT_SEND_SUCCESS);
@@ -116,21 +137,25 @@ public class DataReadThread extends Thread {
                 }
             } else if (hasHead("$R0", byts)) {
                 if (hasBan(byts)) {
+                    Log.i("DATA_READ_THREAD", Utils.byte2HexStr(byts));
                     sendMessage(byts, DataHandler.SERIAL_PORT_RECEIVE_NEW_SIGN);
                     BYTE_LIST.clear();
                 }
             } else if (hasHead("$R6", byts)) {
                 if (hasBan(byts)) {
+                    Log.i("DATA_READ_THREAD", Utils.byte2HexStr(byts));
                     sendMessage(byts, DataHandler.SERIAL_PORT_MODIFY_SCREEN_BRIGHTNESS);
                     BYTE_LIST.clear();
                 }
             } else if (hasHead("$R7", byts)) {
                 if (hasBan(byts)) {
+                    Log.i("DATA_READ_THREAD", Utils.byte2HexStr(byts));
                     sendMessage(byts, DataHandler.SERIAL_PORT_SHUT_DOWN);
                     BYTE_LIST.clear();
                 }
             } else if (hasHead("$R8", byts)) {
                 if (hasBan(byts)) {
+                    Log.i("DATA_READ_THREAD", Utils.byte2HexStr(byts));
                     if (byts[3] == 0x01) {
                         sendMessage(byts, DataHandler.SERIAL_PORT_ALERT_START);
                     } else if (byts[3] == 0x02) {
@@ -140,6 +165,7 @@ public class DataReadThread extends Thread {
                 }
             } else if (hasHead("$RA", byts)) {
                 if (hasBan(byts)) {
+                    Log.i("DATA_READ_THREAD", Utils.byte2HexStr(byts));
                     sendMessage(byts, DataHandler.SERIAL_PORT_CHECK);
                     BYTE_LIST.clear();
                 }

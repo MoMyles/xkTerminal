@@ -153,6 +153,7 @@ public class AisReadThread extends Thread {
                         }
                         MyApplication.getInstance().sendBytes(finalB);
                     }
+                    aisByts.clear();
                 }
             } else if (tmp.startsWith("!AIVDO")
                     || tmp.startsWith("!AIVDM")
@@ -394,6 +395,7 @@ public class AisReadThread extends Thread {
                             preRestStr = tmp.substring((Integer) map.get("index"));
                         }
                     }
+                    aisByts.clear();
                 }
             } else {
                 aisByts.remove(0);

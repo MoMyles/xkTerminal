@@ -34,6 +34,7 @@ import org.json.JSONObject;
 import org.xutils.DbManager;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
@@ -79,6 +80,7 @@ public class DataHandler extends Handler {
     }
 
     String content = "";
+    private boolean isSave = true;
 
     @Override
     public void handleMessage(Message msg) {
@@ -136,7 +138,25 @@ public class DataHandler extends Handler {
                                 }
                                 lb.setSpeed(Float.parseFloat(speed));
                                 lb.setHeading(Float.parseFloat(cog));
-                                lb.setAcqtime(Constant.SYSTEM_DATE);
+                                Calendar calendar = Calendar.getInstance();
+                                calendar.setTime(Constant.SYSTEM_DATE);
+                                lb.setAcqtime(calendar.getTime());
+                                if (calendar.get(Calendar.MINUTE) % 2 == 0 && isSave) {
+                                    calendar.set(Calendar.HOUR_OF_DAY, 0);
+                                    calendar.set(Calendar.MINUTE, 0);
+                                    calendar.set(Calendar.SECOND, 0);
+                                    calendar.set(Calendar.MILLISECOND, 0);
+                                    lb.setNavtime(calendar.getTime());
+                                    if (db != null){
+                                        try {
+                                            db.saveBindingId(lb);
+                                        }catch (Exception e){
+                                        }
+                                    }
+                                    isSave = false;
+                                } else {
+                                    isSave = true;
+                                }
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }

@@ -85,7 +85,7 @@ public class SkiaDrawView extends View {
         mYimaLib.SetIfShowMapFrame(false); // TODO:
 
         boolean islicenceOk = mYimaLib.GetIfHadSetRightLicenceKey();
-        Log.e("yima", "GetIfHadSetRightLicenceKey: " + islicenceOk);
+//        Log.e("yima", "GetIfHadSetRightLicenceKey: " + islicenceOk);
 
 
 //        String DeviceID = SkiaDrawView.mYimaLib.GetDeviceIDForLicSvr();

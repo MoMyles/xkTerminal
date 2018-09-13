@@ -1,14 +1,18 @@
 package com.cetcme.xkterminal.Navigation;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,7 +22,9 @@ import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.DateUtil;
 import com.cetcme.xkterminal.R;
 import com.qiuhong.qhlibrary.QHTitleView.QHTitleView;
-import com.qmuiteam.qmui.util.QMUIDisplayHelper;
+import com.zyyoona7.popup.EasyPopup;
+import com.zyyoona7.popup.XGravity;
+import com.zyyoona7.popup.YGravity;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -30,7 +36,10 @@ import org.xutils.ex.DbException;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -44,12 +53,20 @@ import butterknife.ButterKnife;
 import static com.cetcme.xkterminal.Navigation.FileUtil.stampToDate;
 
 
-public class RouteListActivity extends Activity {
+public class RouteListActivity extends FragmentActivity {
 
     @BindView(R.id.listView)
     ListView listView;
     @BindView(R.id.qhTitleView)
     QHTitleView qhTitleView;
+    @BindView(R.id.ll_search)
+    LinearLayout llSearch;
+    @BindView(R.id.et_start)
+    EditText etStart;
+    @BindView(R.id.et_end)
+    EditText etEnd;
+    @BindView(R.id.btn_search)
+    Button btnSearch;
 
     //    private SimpleAdapter simpleAdapter;
     private TestAdapter testAdapter;
@@ -63,6 +80,8 @@ public class RouteListActivity extends Activity {
     private DbManager db = MyApplication.getInstance().getDb();
 
     private String tag = "航线";
+
+    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +107,92 @@ public class RouteListActivity extends Activity {
             getRouteData();
         }
 
+        etStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                buildTime(etStart);
+            }
+        });
+        etEnd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                buildTime(etEnd);
+            }
+        });
+
+        btnSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    Date start = sdf.parse(etStart.getText().toString().trim());
+                    Date end = sdf.parse(etEnd.getText().toString().trim());
+                    getRouteData(start.getTime(), end.getTime());
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private void buildTime(final EditText et) {
+        final View view = getLayoutInflater().inflate(R.layout.dialog_date_time_picker, null);
+        final EditText et1 = view.findViewById(R.id.et1);
+        final EditText et2 = view.findViewById(R.id.et2);
+        final EditText et3 = view.findViewById(R.id.et3);
+        final EditText et4 = view.findViewById(R.id.et4);
+        final EditText et5 = view.findViewById(R.id.et5);
+        final EditText et6 = view.findViewById(R.id.et6);
+        final Button btn = view.findViewById(R.id.btn);
+        final Button btn2 = view.findViewById(R.id.btn2);
+        String time = et.getText().toString();
+        if (!TextUtils.isEmpty(time)) {
+            try {
+                Calendar calendar = Calendar.getInstance();
+                Date date = sdf.parse(time);
+                calendar.setTime(date);
+                et1.setText("" + calendar.get(Calendar.YEAR));
+                et2.setText("" + (calendar.get(Calendar.MONTH) + 1));
+                et3.setText("" + calendar.get(Calendar.DAY_OF_MONTH));
+                et4.setText("" + calendar.get(Calendar.HOUR_OF_DAY));
+                et5.setText("" + calendar.get(Calendar.MINUTE));
+                et6.setText("" + calendar.get(Calendar.SECOND));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        final EasyPopup popup = EasyPopup.create(RouteListActivity.this)
+                .setContentView(view)
+                .setOutsideTouchable(false);
+        popup.showAtAnchorView(findViewById(android.R.id.content).getRootView(), XGravity.CENTER, YGravity.CENTER, 0, 0);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String y = et1.getText().toString().trim();
+                String m = et2.getText().toString().trim();
+                String d = et3.getText().toString().trim();
+                String h = et4.getText().toString().trim();
+                String mi = et5.getText().toString().trim();
+                String s = et6.getText().toString().trim();
+                et.setText(y + "-" + re10(m) + "-" + re10(d) + " " + re10(h) + ":" + re10(mi) + ":" + re10(s));
+                popup.dismiss();
+            }
+        });
+        btn2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popup.dismiss();
+            }
+        });
+    }
+
+    private String re10(String s) {
+        if (TextUtils.isEmpty(s)){
+            s = "0";
+        }
+        if (s.length() < 2) {
+            return "0" + s;
+        }
+        return s;
     }
 
     @Override
@@ -100,6 +205,7 @@ public class RouteListActivity extends Activity {
         qhTitleView.setTitle(tag + "列表");
         qhTitleView.setBackView(R.mipmap.title_icon_back_2x);
         qhTitleView.setRightView(tag.equals("航迹") ? 0 : R.mipmap.title_icon_add_2x);
+        llSearch.setVisibility(tag.equals("航迹") ? View.VISIBLE : View.GONE);
         qhTitleView.setBackgroundResource(R.drawable.top_select);
         qhTitleView.setClickCallback(new QHTitleView.ClickCallback() {
             @Override
@@ -208,11 +314,20 @@ public class RouteListActivity extends Activity {
 
         try {
             List<String> navs = new ArrayList<>();
-            Cursor cursor = db.execQuery("select navtime from t_location group by navtime");
+            long pre7Time = 0l;
+            if (com.cetcme.xkterminal.MyClass.Constant.SYSTEM_DATE != null) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(com.cetcme.xkterminal.MyClass.Constant.SYSTEM_DATE);
+                etEnd.setText(sdf.format(calendar.getTime()));
+                calendar.add(Calendar.DAY_OF_MONTH, -7);
+                pre7Time = calendar.getTime().getTime();
+                etStart.setText(sdf.format(calendar.getTime()));
+            }
+            Cursor cursor = db.execQuery("select navtime from t_location where navtime >= " + pre7Time + " group by navtime");
             //判断游标是否为空
             if (cursor.moveToFirst()) {
                 //遍历游标
-                for(int i = 0; i < cursor.getCount(); i++){
+                for (int i = 0; i < cursor.getCount(); i++) {
                     cursor.moveToPosition(i);
                     //获得ID
                     String navtime = cursor.getString(0);
@@ -222,7 +337,7 @@ public class RouteListActivity extends Activity {
                         Date date = new Date(Long.parseLong(navtime));
 
                         Map<String, Object> map = new Hashtable<>();
-                        map.put("fileName",  DateUtil.Date2String(date));
+                        map.put("fileName", DateUtil.Date2String(date));
                         map.put("lastModifyTime", "");
                         map.put("lastModifyStamp", "");
                         map.put("fileLength", "");
@@ -239,6 +354,52 @@ public class RouteListActivity extends Activity {
         testAdapter.notifyDataSetChanged();
         return dataList;
     }
+
+
+    public List<Map<String, Object>> getRouteData(long start, long end) {
+        if (end - start < 0) {
+            Toast.makeText(getApplicationContext(), "结束时间不能小于开始时间", Toast.LENGTH_SHORT).show();
+            return null;
+        } else if (end - start > 7 * 24 * 60 * 60 * 1000) {
+            Toast.makeText(getApplicationContext(), "查询范围为7天以内", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+        dataList.clear();
+
+        try {
+            List<String> navs = new ArrayList<>();
+            Cursor cursor = db.execQuery("select navtime from t_location where navtime between " + start + " and " + end + " group by navtime");
+            //判断游标是否为空
+            if (cursor.moveToFirst()) {
+                //遍历游标
+                for (int i = 0; i < cursor.getCount(); i++) {
+                    cursor.moveToPosition(i);
+                    //获得ID
+                    String navtime = cursor.getString(0);
+                    //输出用户信息
+                    if (navtime != null) {
+                        navs.add(navtime);
+                        Date date = new Date(Long.parseLong(navtime));
+
+                        Map<String, Object> map = new Hashtable<>();
+                        map.put("fileName", DateUtil.Date2String(date));
+                        map.put("lastModifyTime", "");
+                        map.put("lastModifyStamp", "");
+                        map.put("fileLength", "");
+                        map.put("navtime", navtime);
+                        dataList.add(map);
+                    }
+                }
+            }
+            cursor.close();
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
+
+        testAdapter.notifyDataSetChanged();
+        return dataList;
+    }
+
     @Override
     public void onBackPressed() {
         setResult(ACTIVITY_RESULT_ROUTE_NOTHING);

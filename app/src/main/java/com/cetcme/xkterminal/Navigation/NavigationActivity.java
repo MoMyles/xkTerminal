@@ -589,9 +589,9 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onLocationEvent(LocationBean lb) {
-        Log.i("TAG", "onLocationEvent: 收到自身位置");
-        Log.i("TAG", "onLocationEvent: 纬度lat:" + lb.getLatitude());
-        Log.i("TAG", "onLocationEvent: 经度lon:" + lb.getLongitude());
+//        Log.i("TAG", "onLocationEvent: 收到自身位置");
+//        Log.i("TAG", "onLocationEvent: 纬度lat:" + lb.getLatitude());
+//        Log.i("TAG", "onLocationEvent: 经度lon:" + lb.getLongitude());
         if (myLocation == null) {
             myLocation = lb;
 //            fMainView.mYimaLib.CenterMap(myLocation.getLongitude(), myLocation.getLatitude());
@@ -666,7 +666,15 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
             }
 
             //更新距离、方位等信息
-            double time = restDis / myLocation.getSpeed();// 小时
+            double time = 0;
+            double speed = 10;
+            if (myLocation.getSpeed() != 0){
+                speed = myLocation.getSpeed();
+            }
+            try {
+                time = restDis / speed;// 小时
+            } catch (Exception e){
+            }
             Calendar calendar = Calendar.getInstance();
             calendar.add(Calendar.HOUR_OF_DAY, (int) time);
             if (time == 0) {

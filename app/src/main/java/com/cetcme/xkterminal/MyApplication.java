@@ -350,7 +350,7 @@ public class MyApplication extends MultiDexApplication {
                     connectFunction(arr[0], arr[1]);
                 }
             }
-        } catch (D2xxManager.D2xxException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

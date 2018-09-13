@@ -148,6 +148,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         //隐藏动作条
         getSupportActionBar().hide();
 
+        setStartOpenApp();
+
         mHandler = new Handler();
 
         db = ((MyApplication) getApplication()).db;
@@ -256,6 +258,17 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         }
 
 
+    }
+
+    /**
+     * 设置开机拉起
+     */
+    private void setStartOpenApp() {
+        Intent intent = new Intent("android.q-zheng.action.APPMONITOR");
+        intent.putExtra("package_name", getPackageName());
+        intent.putExtra("self_starting", true);
+        intent.putExtra("period", 0);
+        sendBroadcast(intent);
     }
 
     @Override

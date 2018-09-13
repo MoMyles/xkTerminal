@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
@@ -99,6 +100,7 @@ public class SystemSettingFragment extends Fragment {
     private MainActivity mainActivity;
     private DbManager db = MyApplication.getInstance().getDb();
     private QMUITipDialog tipDialog;
+    private Handler handler;
 
     Unbinder unbinder;
 
@@ -113,6 +115,28 @@ public class SystemSettingFragment extends Fragment {
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
+        handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what){
+                    case 0x1:
+                        String deviceId = (String) msg.obj;
+                        tv_device_id.setText(deviceId);
+
+                        String savedDeviceId = PreferencesUtils.getString(getActivity(), "deviceID", "");
+                        if (!deviceId.equals(savedDeviceId)) {
+                            PreferencesUtils.putString(getActivity(), "deviceID", deviceId);
+                            // 更改device_id后 更改wifi ssid
+                            String newSSID = "北斗" + deviceId;
+                            PreferencesUtils.putString(getActivity(), "wifiSSID", newSSID);
+                            MyApplication.getInstance().mainActivity.createWifiHotspot();
+                            wifi_ssid_textView.setText(newSSID);
+                        }
+                        break;
+                }
+            }
+        };
+
         initView(view);
         getData();
         mainActivity = (MainActivity) getActivity();
@@ -123,6 +147,7 @@ public class SystemSettingFragment extends Fragment {
                 MyApplication.getInstance().sendBytes(IDFormat.getID());
             }
         }, 200);
+
 
         return view;
     }
@@ -558,28 +583,12 @@ public class SystemSettingFragment extends Fragment {
             String type = receiveJson.getString("apiType");
             switch (type) {
                 case "device_id":
-                    if (getActivity() != null) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    String deviceId = receiveJson.getString("deviceID");
-                                    tv_device_id.setText(deviceId);
-
-                                    String savedDeviceId = PreferencesUtils.getString(getActivity(), "deviceID", "");
-                                    if (!deviceId.equals(savedDeviceId)) {
-                                        PreferencesUtils.putString(getActivity(), "deviceID", deviceId);
-                                        // 更改device_id后 更改wifi ssid
-                                        String newSSID = "北斗" + deviceId;
-                                        PreferencesUtils.putString(getActivity(), "wifiSSID", newSSID);
-                                        MyApplication.getInstance().mainActivity.createWifiHotspot();
-                                        wifi_ssid_textView.setText(newSSID);
-                                    }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
+                    String deviceId = receiveJson.getString("deviceID");
+                    Message msg = Message.obtain();
+                    msg.what = 0x1;
+                    msg.obj = deviceId;
+                    if (handler!=null){
+                        handler.sendMessage(msg);
                     }
                     break;
             }
@@ -603,7 +612,6 @@ public class SystemSettingFragment extends Fragment {
     }
 
     private void getData() {
-
         String ssid = PreferencesUtils.getString(getActivity(), "wifiSSID");
         if (ssid != null) {
             wifi_ssid_textView.setText(ssid);

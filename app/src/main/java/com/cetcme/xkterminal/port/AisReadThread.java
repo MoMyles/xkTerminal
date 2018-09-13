@@ -122,6 +122,7 @@ public class AisReadThread extends Thread {
 //                        MyApplication.getInstance().sendBytes(MessageFormat.format(PreferencesUtils.getString(MyApplication.getInstance().getApplicationContext(), "server_address", Constant.SERVER_BD_NUMBER)// 蘑菇头编号
 //                                , content, MessageFormat.MESSAGE_TYPE_BROADCASTING, 0, unique));
                     }
+                    aisByts.clear();
                 }
             } else if (tmp.startsWith("!AIVDO")
                     || tmp.startsWith("!AIVDM")
@@ -188,7 +189,7 @@ public class AisReadThread extends Thread {
                                     if (0 == result) {
                                         AisInfo aisInfo = new AisInfo("null");
                                         Sixbit sixbit = vdm.sixbit();
-                                        Log.e("TAG", "msg: " + vdm.msgid());
+//                                        Log.e("TAG", "msg: " + vdm.msgid());
                                         switch (vdm.msgid()) {
                                             case 1:
                                                 Message1 message1 = new Message1();
@@ -365,6 +366,7 @@ public class AisReadThread extends Thread {
                             preRestStr = tmp.substring((Integer) map.get("index"));
                         }
                     }
+                    aisByts.clear();
                 }
             } else {
                 aisByts.remove(0);

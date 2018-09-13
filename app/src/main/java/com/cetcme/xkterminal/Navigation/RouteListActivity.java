@@ -326,6 +326,7 @@ public class RouteListActivity extends FragmentActivity {
             Cursor cursor = db.execQuery("select navtime from t_location where navtime >= " + pre7Time + " group by navtime");
             //判断游标是否为空
             if (cursor.moveToFirst()) {
+                Calendar calendar = Calendar.getInstance();
                 //遍历游标
                 for (int i = 0; i < cursor.getCount(); i++) {
                     cursor.moveToPosition(i);
@@ -335,9 +336,14 @@ public class RouteListActivity extends FragmentActivity {
                     if (navtime != null) {
                         navs.add(navtime);
                         Date date = new Date(Long.parseLong(navtime));
-
+                        calendar.setTime(date);
+                        String fileName = DateUtil.Date2String(date);
+                        if (calendar.get(Calendar.HOUR_OF_DAY) == 0 && calendar.get(Calendar.MINUTE) == 0 && calendar.get(Calendar.SECOND) == 0
+                                 && calendar.get(Calendar.MILLISECOND) == 0){
+                            fileName = DateUtil.Date2String(date, "yyyy-MM-dd");
+                        }
                         Map<String, Object> map = new Hashtable<>();
-                        map.put("fileName", DateUtil.Date2String(date));
+                        map.put("fileName", fileName);
                         map.put("lastModifyTime", "");
                         map.put("lastModifyStamp", "");
                         map.put("fileLength", "");
@@ -371,6 +377,7 @@ public class RouteListActivity extends FragmentActivity {
             Cursor cursor = db.execQuery("select navtime from t_location where navtime between " + start + " and " + end + " group by navtime");
             //判断游标是否为空
             if (cursor.moveToFirst()) {
+                Calendar calendar = Calendar.getInstance();
                 //遍历游标
                 for (int i = 0; i < cursor.getCount(); i++) {
                     cursor.moveToPosition(i);
@@ -380,9 +387,14 @@ public class RouteListActivity extends FragmentActivity {
                     if (navtime != null) {
                         navs.add(navtime);
                         Date date = new Date(Long.parseLong(navtime));
-
+                        calendar.setTime(date);
+                        String fileName = DateUtil.Date2String(date);
+                        if (calendar.get(Calendar.HOUR_OF_DAY) == 0 && calendar.get(Calendar.MINUTE) == 0 && calendar.get(Calendar.SECOND) == 0
+                                && calendar.get(Calendar.MILLISECOND) == 0){
+                            fileName = DateUtil.Date2String(date, "yyyy-MM-dd");
+                        }
                         Map<String, Object> map = new Hashtable<>();
-                        map.put("fileName", DateUtil.Date2String(date));
+                        map.put("fileName", fileName);
                         map.put("lastModifyTime", "");
                         map.put("lastModifyStamp", "");
                         map.put("fileLength", "");

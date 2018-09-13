@@ -154,7 +154,7 @@ public class DataHandler extends Handler {
                                         }
                                     }
                                     isSave = false;
-                                } else {
+                                } else if(calendar.get(Calendar.MINUTE) % 2 != 0) {
                                     isSave = true;
                                 }
                             } catch (Exception e) {

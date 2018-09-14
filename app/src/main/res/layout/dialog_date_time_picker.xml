@@ -6,7 +6,9 @@
     android:layout_marginTop="8dp"
     android:focusable="true"
     android:focusableInTouchMode="true"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="8dp"
+    android:background="#ccc">
 
 
     <LinearLayout
@@ -15,126 +17,77 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <EditText
-            android:id="@+id/et1"
+        <TextView
+            android:id="@+id/tv1"
             android:layout_width="0dp"
             android:layout_height="32dp"
             android:layout_weight="1"
-            android:inputType="number"
-            android:textColor="#000"
-            android:textSize="12sp"
-            android:padding="4dp"
+            android:background="@drawable/border_black"
             android:gravity="center"
-            android:background="@drawable/border_black"/>
+            android:padding="4dp"
+            android:textColor="#000"
+            android:textSize="12sp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="年"
             android:textColor="#000"
-            android:textSize="10sp" />
+            android:textSize="12sp" />
 
-        <EditText
-            android:id="@+id/et2"
+        <TextView
+            android:id="@+id/tv2"
             android:layout_width="0dp"
             android:layout_height="32dp"
             android:layout_weight="1"
-            android:inputType="number"
-            android:textColor="#000"
-            android:textSize="12sp"
-            android:padding="4dp"
+            android:background="@drawable/border_black"
             android:gravity="center"
-            android:background="@drawable/border_black"/>
+            android:padding="4dp"
+            android:textColor="#000"
+            android:textSize="12sp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="月"
             android:textColor="#000"
-            android:textSize="10sp" />
+            android:textSize="12sp" />
 
-        <EditText
-            android:id="@+id/et3"
+        <TextView
+            android:id="@+id/tv3"
             android:layout_width="0dp"
             android:layout_height="32dp"
             android:layout_weight="1"
-            android:inputType="number"
-            android:textColor="#000"
-            android:padding="4dp"
+            android:background="@drawable/border_black"
             android:gravity="center"
-            android:textSize="12sp"
-            android:background="@drawable/border_black"/>
+            android:padding="4dp"
+            android:textColor="#000"
+            android:textSize="12sp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="日"
             android:textColor="#000"
-            android:textSize="10sp" />
-    </LinearLayout>
+            android:textSize="12sp" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="8dp">
-
-        <EditText
-            android:id="@+id/et4"
+        <TextView
+            android:id="@+id/tv4"
             android:layout_width="0dp"
             android:layout_height="32dp"
             android:layout_weight="1"
-            android:inputType="number"
-            android:textColor="#000"
-            android:textSize="12sp"
-            android:padding="4dp"
+            android:background="@drawable/border_black"
             android:gravity="center"
-            android:background="@drawable/border_black"/>
+            android:padding="4dp"
+            android:textColor="#000"
+            android:textSize="12sp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="时"
             android:textColor="#000"
-            android:textSize="10sp" />
-
-        <EditText
-            android:id="@+id/et5"
-            android:layout_width="0dp"
-            android:layout_height="32dp"
-            android:layout_weight="1"
-            android:inputType="number"
-            android:textColor="#000"
-            android:textSize="12sp"
-            android:padding="4dp"
-            android:gravity="center"
-            android:background="@drawable/border_black"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="分"
-            android:textColor="#000"
-            android:textSize="10sp" />
-
-        <EditText
-            android:id="@+id/et6"
-            android:layout_width="0dp"
-            android:layout_height="32dp"
-            android:layout_weight="1"
-            android:inputType="number"
-            android:textColor="#000"
-            android:padding="4dp"
-            android:gravity="center"
-            android:textSize="12sp"
-            android:background="@drawable/border_black"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="秒"
-            android:textColor="#000"
-            android:textSize="10sp" />
+            android:textSize="12sp" />
     </LinearLayout>
 
     <LinearLayout

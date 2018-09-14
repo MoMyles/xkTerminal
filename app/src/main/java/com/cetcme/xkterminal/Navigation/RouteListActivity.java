@@ -22,6 +22,7 @@ import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.DateUtil;
 import com.cetcme.xkterminal.R;
 import com.qiuhong.qhlibrary.QHTitleView.QHTitleView;
+import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 import com.zyyoona7.popup.EasyPopup;
 import com.zyyoona7.popup.XGravity;
 import com.zyyoona7.popup.YGravity;
@@ -127,6 +128,7 @@ public class RouteListActivity extends FragmentActivity {
                     Date start = sdf.parse(etStart.getText().toString().trim());
                     Date end = sdf.parse(etEnd.getText().toString().trim());
                     getRouteData(start.getTime(), end.getTime());
+                    Toast.makeText(getApplicationContext(), "查询完成", Toast.LENGTH_SHORT).show();
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -134,14 +136,313 @@ public class RouteListActivity extends FragmentActivity {
         });
     }
 
+
     private void buildTime(final EditText et) {
         final View view = getLayoutInflater().inflate(R.layout.dialog_date_time_picker, null);
-        final EditText et1 = view.findViewById(R.id.et1);
-        final EditText et2 = view.findViewById(R.id.et2);
-        final EditText et3 = view.findViewById(R.id.et3);
-        final EditText et4 = view.findViewById(R.id.et4);
-        final EditText et5 = view.findViewById(R.id.et5);
-        final EditText et6 = view.findViewById(R.id.et6);
+        final TextView tv1 = view.findViewById(R.id.tv1);
+        tv1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(com.cetcme.xkterminal.MyClass.Constant.SYSTEM_DATE);
+                final int year = calendar.get(Calendar.YEAR);
+                final View content = getLayoutInflater().inflate(R.layout.popup_years, null);
+//                content.getLayoutParams().width = QMUIDisplayHelper.getScreenWidth(getApplicationContext());
+                ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(QMUIDisplayHelper.getScreenWidth(getApplicationContext()), ViewGroup.LayoutParams.WRAP_CONTENT);
+                content.setLayoutParams(lp);
+                final EasyPopup pop = EasyPopup.create(RouteListActivity.this)
+                        .setContentView(content)
+                        .setOutsideTouchable(false);
+                final TextView _tv1 = content.findViewById(R.id.tv1);
+                final TextView _tv2 = content.findViewById(R.id.tv2);
+                final TextView _tv3 = content.findViewById(R.id.tv3);
+                final TextView _tv4 = content.findViewById(R.id.tv4);
+                final TextView _tv5 = content.findViewById(R.id.tv5);
+                _tv1.setText("" + (year - 5 + 1));
+                _tv2.setText("" + (year - 5 + 2));
+                _tv3.setText("" + (year - 5 + 3));
+                _tv4.setText("" + (year - 5 + 4));
+                _tv5.setText("" + (year - 5 + 5));
+
+                bindKeyClick(pop, _tv1, tv1);
+                bindKeyClick(pop, _tv2, tv1);
+                bindKeyClick(pop, _tv3, tv1);
+                bindKeyClick(pop, _tv4, tv1);
+                bindKeyClick(pop, _tv5, tv1);
+
+                pop.showAtAnchorView(getWindow().getDecorView().findViewById(android.R.id.content), XGravity.CENTER, YGravity.CENTER, 0, 60);
+            }
+        });
+        final TextView tv2 = view.findViewById(R.id.tv2);
+        tv2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final View content = getLayoutInflater().inflate(R.layout.popup_months, null);
+                ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(QMUIDisplayHelper.getScreenWidth(getApplicationContext()), ViewGroup.LayoutParams.WRAP_CONTENT);
+                content.setLayoutParams(lp);
+                final EasyPopup pop = EasyPopup.create(RouteListActivity.this)
+                        .setContentView(content)
+                        .setOutsideTouchable(false);
+                final TextView _tv1 = content.findViewById(R.id.tv1);
+                final TextView _tv2 = content.findViewById(R.id.tv2);
+                final TextView _tv3 = content.findViewById(R.id.tv3);
+                final TextView _tv4 = content.findViewById(R.id.tv4);
+                final TextView _tv5 = content.findViewById(R.id.tv5);
+                final TextView _tv6 = content.findViewById(R.id.tv6);
+                final TextView _tv7 = content.findViewById(R.id.tv7);
+                final TextView _tv8 = content.findViewById(R.id.tv8);
+                final TextView _tv9 = content.findViewById(R.id.tv9);
+                final TextView _tv10 = content.findViewById(R.id.tv10);
+                final TextView _tv11 = content.findViewById(R.id.tv11);
+                final TextView _tv12 = content.findViewById(R.id.tv12);
+                _tv1.setText("01");
+                _tv2.setText("02");
+                _tv3.setText("03");
+                _tv4.setText("04");
+                _tv5.setText("05");
+                _tv6.setText("06");
+                _tv7.setText("07");
+                _tv8.setText("08");
+                _tv9.setText("09");
+                _tv10.setText("10");
+                _tv11.setText("11");
+                _tv12.setText("12");
+
+                bindKeyClick(pop, _tv1, tv2);
+                bindKeyClick(pop, _tv2, tv2);
+                bindKeyClick(pop, _tv3, tv2);
+                bindKeyClick(pop, _tv4, tv2);
+                bindKeyClick(pop, _tv5, tv2);
+                bindKeyClick(pop, _tv6, tv2);
+                bindKeyClick(pop, _tv7, tv2);
+                bindKeyClick(pop, _tv8, tv2);
+                bindKeyClick(pop, _tv9, tv2);
+                bindKeyClick(pop, _tv10, tv2);
+                bindKeyClick(pop, _tv11, tv2);
+                bindKeyClick(pop, _tv12, tv2);
+
+                pop.showAtAnchorView(getWindow().getDecorView().findViewById(android.R.id.content), XGravity.CENTER, YGravity.CENTER, 0, 120);
+            }
+        });
+        final TextView tv3 = view.findViewById(R.id.tv3);
+        tv3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final View content = getLayoutInflater().inflate(R.layout.popup_days, null);
+                ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(QMUIDisplayHelper.getScreenWidth(getApplicationContext()), ViewGroup.LayoutParams.WRAP_CONTENT);
+                content.setLayoutParams(lp);
+                final EasyPopup pop = EasyPopup.create(RouteListActivity.this)
+                        .setContentView(content)
+                        .setOutsideTouchable(false);
+                final TextView _tv1 = content.findViewById(R.id.tv1);
+                final TextView _tv2 = content.findViewById(R.id.tv2);
+                final TextView _tv3 = content.findViewById(R.id.tv3);
+                final TextView _tv4 = content.findViewById(R.id.tv4);
+                final TextView _tv5 = content.findViewById(R.id.tv5);
+                final TextView _tv6 = content.findViewById(R.id.tv6);
+                final TextView _tv7 = content.findViewById(R.id.tv7);
+                final TextView _tv8 = content.findViewById(R.id.tv8);
+                final TextView _tv9 = content.findViewById(R.id.tv9);
+                final TextView _tv10 = content.findViewById(R.id.tv10);
+                final TextView _tv11 = content.findViewById(R.id.tv11);
+                final TextView _tv12 = content.findViewById(R.id.tv12);
+                final TextView _tv13 = content.findViewById(R.id.tv13);
+                final TextView _tv14 = content.findViewById(R.id.tv14);
+                final TextView _tv15 = content.findViewById(R.id.tv15);
+                final TextView _tv16 = content.findViewById(R.id.tv16);
+                final TextView _tv17 = content.findViewById(R.id.tv17);
+                final TextView _tv18 = content.findViewById(R.id.tv18);
+                final TextView _tv19 = content.findViewById(R.id.tv19);
+                final TextView _tv20 = content.findViewById(R.id.tv20);
+                final TextView _tv21 = content.findViewById(R.id.tv21);
+                final TextView _tv22 = content.findViewById(R.id.tv22);
+                final TextView _tv23 = content.findViewById(R.id.tv23);
+                final TextView _tv24 = content.findViewById(R.id.tv24);
+                final TextView _tv25 = content.findViewById(R.id.tv25);
+                final TextView _tv26 = content.findViewById(R.id.tv26);
+                final TextView _tv27 = content.findViewById(R.id.tv27);
+                final TextView _tv28 = content.findViewById(R.id.tv28);
+                final TextView _tv29 = content.findViewById(R.id.tv29);
+                final TextView _tv30 = content.findViewById(R.id.tv30);
+                final TextView _tv31 = content.findViewById(R.id.tv31);
+
+                _tv1.setText("01");
+                _tv2.setText("02");
+                _tv3.setText("03");
+                _tv4.setText("04");
+                _tv5.setText("05");
+                _tv6.setText("06");
+                _tv7.setText("07");
+                _tv8.setText("08");
+                _tv9.setText("09");
+                _tv10.setText("10");
+                _tv11.setText("11");
+                _tv12.setText("12");
+                _tv13.setText("13");
+                _tv14.setText("14");
+                _tv15.setText("15");
+                _tv16.setText("16");
+                _tv17.setText("17");
+                _tv18.setText("18");
+                _tv19.setText("19");
+                _tv20.setText("20");
+                _tv21.setText("21");
+                _tv22.setText("22");
+                _tv23.setText("23");
+                _tv24.setText("24");
+                _tv25.setText("25");
+                _tv26.setText("26");
+                _tv27.setText("27");
+                _tv28.setText("28");
+                _tv29.setText("29");
+                _tv30.setText("30");
+                _tv31.setText("31");
+
+                bindKeyClick(pop, _tv1, tv3);
+                bindKeyClick(pop, _tv2, tv3);
+                bindKeyClick(pop, _tv3, tv3);
+                bindKeyClick(pop, _tv4, tv3);
+                bindKeyClick(pop, _tv5, tv3);
+                bindKeyClick(pop, _tv6, tv3);
+                bindKeyClick(pop, _tv7, tv3);
+                bindKeyClick(pop, _tv8, tv3);
+                bindKeyClick(pop, _tv9, tv3);
+                bindKeyClick(pop, _tv10, tv3);
+                bindKeyClick(pop, _tv11, tv3);
+                bindKeyClick(pop, _tv12, tv3);
+                bindKeyClick(pop, _tv13, tv3);
+                bindKeyClick(pop, _tv14, tv3);
+                bindKeyClick(pop, _tv15, tv3);
+                bindKeyClick(pop, _tv16, tv3);
+                bindKeyClick(pop, _tv17, tv3);
+                bindKeyClick(pop, _tv18, tv3);
+                bindKeyClick(pop, _tv19, tv3);
+                bindKeyClick(pop, _tv20, tv3);
+                bindKeyClick(pop, _tv21, tv3);
+                bindKeyClick(pop, _tv22, tv3);
+                bindKeyClick(pop, _tv23, tv3);
+                bindKeyClick(pop, _tv24, tv3);
+                bindKeyClick(pop, _tv25, tv3);
+                bindKeyClick(pop, _tv26, tv3);
+                bindKeyClick(pop, _tv27, tv3);
+                bindKeyClick(pop, _tv28, tv3);
+                bindKeyClick(pop, _tv29, tv3);
+                bindKeyClick(pop, _tv30, tv3);
+                bindKeyClick(pop, _tv31, tv3);
+
+                int year = Integer.parseInt(tv1.getText().toString());
+                int m = Integer.parseInt(tv2.getText().toString());
+
+                if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0) {
+                    //闰年
+                    if (m == 2) {
+                        _tv30.setVisibility(View.INVISIBLE);
+                        _tv31.setVisibility(View.INVISIBLE);
+                    }
+                } else {
+                    if (m == 2) {
+                        _tv29.setVisibility(View.INVISIBLE);
+                        _tv30.setVisibility(View.INVISIBLE);
+                        _tv31.setVisibility(View.INVISIBLE);
+                    }
+                }
+
+                if (m == 4 || m == 6 || m == 9 || m == 11) {
+                    _tv31.setVisibility(View.INVISIBLE);
+                }
+
+                pop.showAtAnchorView(getWindow().getDecorView().findViewById(android.R.id.content), XGravity.CENTER, YGravity.CENTER, 0, 120);
+            }
+        });
+        final TextView tv4 = view.findViewById(R.id.tv4);
+        tv4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final View content = getLayoutInflater().inflate(R.layout.popup_hours, null);
+                ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(QMUIDisplayHelper.getScreenWidth(getApplicationContext()), ViewGroup.LayoutParams.WRAP_CONTENT);
+                content.setLayoutParams(lp);
+                final EasyPopup pop = EasyPopup.create(RouteListActivity.this)
+                        .setContentView(content)
+                        .setOutsideTouchable(false);
+                final TextView _tv1 = content.findViewById(R.id.tv1);
+                final TextView _tv2 = content.findViewById(R.id.tv2);
+                final TextView _tv3 = content.findViewById(R.id.tv3);
+                final TextView _tv4 = content.findViewById(R.id.tv4);
+                final TextView _tv5 = content.findViewById(R.id.tv5);
+                final TextView _tv6 = content.findViewById(R.id.tv6);
+                final TextView _tv7 = content.findViewById(R.id.tv7);
+                final TextView _tv8 = content.findViewById(R.id.tv8);
+                final TextView _tv9 = content.findViewById(R.id.tv9);
+                final TextView _tv10 = content.findViewById(R.id.tv10);
+                final TextView _tv11 = content.findViewById(R.id.tv11);
+                final TextView _tv12 = content.findViewById(R.id.tv12);
+                final TextView _tv13 = content.findViewById(R.id.tv13);
+                final TextView _tv14 = content.findViewById(R.id.tv14);
+                final TextView _tv15 = content.findViewById(R.id.tv15);
+                final TextView _tv16 = content.findViewById(R.id.tv16);
+                final TextView _tv17 = content.findViewById(R.id.tv17);
+                final TextView _tv18 = content.findViewById(R.id.tv18);
+                final TextView _tv19 = content.findViewById(R.id.tv19);
+                final TextView _tv20 = content.findViewById(R.id.tv20);
+                final TextView _tv21 = content.findViewById(R.id.tv21);
+                final TextView _tv22 = content.findViewById(R.id.tv22);
+                final TextView _tv23 = content.findViewById(R.id.tv23);
+                final TextView _tv24 = content.findViewById(R.id.tv24);
+
+                _tv1.setText("01");
+                _tv2.setText("02");
+                _tv3.setText("03");
+                _tv4.setText("04");
+                _tv5.setText("05");
+                _tv6.setText("06");
+                _tv7.setText("07");
+                _tv8.setText("08");
+                _tv9.setText("09");
+                _tv10.setText("10");
+                _tv11.setText("11");
+                _tv12.setText("12");
+                _tv13.setText("13");
+                _tv14.setText("14");
+                _tv15.setText("15");
+                _tv16.setText("16");
+                _tv17.setText("17");
+                _tv18.setText("18");
+                _tv19.setText("19");
+                _tv20.setText("20");
+                _tv21.setText("21");
+                _tv22.setText("22");
+                _tv23.setText("23");
+                _tv24.setText("00");
+
+                bindKeyClick(pop, _tv1, tv4);
+                bindKeyClick(pop, _tv2, tv4);
+                bindKeyClick(pop, _tv3, tv4);
+                bindKeyClick(pop, _tv4, tv4);
+                bindKeyClick(pop, _tv5, tv4);
+                bindKeyClick(pop, _tv6, tv4);
+                bindKeyClick(pop, _tv7, tv4);
+                bindKeyClick(pop, _tv8, tv4);
+                bindKeyClick(pop, _tv9, tv4);
+                bindKeyClick(pop, _tv10, tv4);
+                bindKeyClick(pop, _tv11, tv4);
+                bindKeyClick(pop, _tv12, tv4);
+
+                bindKeyClick(pop, _tv13, tv4);
+                bindKeyClick(pop, _tv14, tv4);
+                bindKeyClick(pop, _tv15, tv4);
+                bindKeyClick(pop, _tv16, tv4);
+                bindKeyClick(pop, _tv17, tv4);
+                bindKeyClick(pop, _tv18, tv4);
+                bindKeyClick(pop, _tv19, tv4);
+                bindKeyClick(pop, _tv20, tv4);
+                bindKeyClick(pop, _tv21, tv4);
+                bindKeyClick(pop, _tv22, tv4);
+                bindKeyClick(pop, _tv23, tv4);
+                bindKeyClick(pop, _tv24, tv4);
+
+                pop.showAtAnchorView(getWindow().getDecorView().findViewById(android.R.id.content), XGravity.CENTER, YGravity.CENTER, 0, 120);
+            }
+        });
         final Button btn = view.findViewById(R.id.btn);
         final Button btn2 = view.findViewById(R.id.btn2);
         String time = et.getText().toString();
@@ -150,12 +451,10 @@ public class RouteListActivity extends FragmentActivity {
                 Calendar calendar = Calendar.getInstance();
                 Date date = sdf.parse(time);
                 calendar.setTime(date);
-                et1.setText("" + calendar.get(Calendar.YEAR));
-                et2.setText("" + (calendar.get(Calendar.MONTH) + 1));
-                et3.setText("" + calendar.get(Calendar.DAY_OF_MONTH));
-                et4.setText("" + calendar.get(Calendar.HOUR_OF_DAY));
-                et5.setText("" + calendar.get(Calendar.MINUTE));
-                et6.setText("" + calendar.get(Calendar.SECOND));
+                tv1.setText("" + calendar.get(Calendar.YEAR));
+                tv2.setText(re10("" + (calendar.get(Calendar.MONTH) + 1)));
+                tv3.setText(re10("" + calendar.get(Calendar.DAY_OF_MONTH)));
+                tv4.setText(re10("" + calendar.get(Calendar.HOUR_OF_DAY)));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -167,13 +466,11 @@ public class RouteListActivity extends FragmentActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String y = et1.getText().toString().trim();
-                String m = et2.getText().toString().trim();
-                String d = et3.getText().toString().trim();
-                String h = et4.getText().toString().trim();
-                String mi = et5.getText().toString().trim();
-                String s = et6.getText().toString().trim();
-                et.setText(y + "-" + re10(m) + "-" + re10(d) + " " + re10(h) + ":" + re10(mi) + ":" + re10(s));
+                String y = tv1.getText().toString().trim();
+                String m = tv2.getText().toString().trim();
+                String d = tv3.getText().toString().trim();
+                String h = tv4.getText().toString().trim();
+                et.setText(y + "-" + re10(m) + "-" + re10(d) + " " + re10(h) + ":00:00");
                 popup.dismiss();
             }
         });
@@ -185,8 +482,18 @@ public class RouteListActivity extends FragmentActivity {
         });
     }
 
+    private void bindKeyClick(final EasyPopup pop, final TextView _tv1, final TextView tv1) {
+        _tv1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tv1.setText(_tv1.getText().toString().trim());
+                pop.dismiss();
+            }
+        });
+    }
+
     private String re10(String s) {
-        if (TextUtils.isEmpty(s)){
+        if (TextUtils.isEmpty(s)) {
             s = "0";
         }
         if (s.length() < 2) {
@@ -318,6 +625,9 @@ public class RouteListActivity extends FragmentActivity {
             if (com.cetcme.xkterminal.MyClass.Constant.SYSTEM_DATE != null) {
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(com.cetcme.xkterminal.MyClass.Constant.SYSTEM_DATE);
+                calendar.set(Calendar.MINUTE, 0);
+                calendar.set(Calendar.SECOND, 0);
+                calendar.set(Calendar.MILLISECOND, 0);
                 etEnd.setText(sdf.format(calendar.getTime()));
                 calendar.add(Calendar.DAY_OF_MONTH, -7);
                 pre7Time = calendar.getTime().getTime();
@@ -339,7 +649,7 @@ public class RouteListActivity extends FragmentActivity {
                         calendar.setTime(date);
                         String fileName = DateUtil.Date2String(date);
                         if (calendar.get(Calendar.HOUR_OF_DAY) == 0 && calendar.get(Calendar.MINUTE) == 0 && calendar.get(Calendar.SECOND) == 0
-                                 && calendar.get(Calendar.MILLISECOND) == 0){
+                                && calendar.get(Calendar.MILLISECOND) == 0) {
                             fileName = DateUtil.Date2String(date, "yyyy-MM-dd");
                         }
                         Map<String, Object> map = new Hashtable<>();
@@ -390,7 +700,7 @@ public class RouteListActivity extends FragmentActivity {
                         calendar.setTime(date);
                         String fileName = DateUtil.Date2String(date);
                         if (calendar.get(Calendar.HOUR_OF_DAY) == 0 && calendar.get(Calendar.MINUTE) == 0 && calendar.get(Calendar.SECOND) == 0
-                                && calendar.get(Calendar.MILLISECOND) == 0){
+                                && calendar.get(Calendar.MILLISECOND) == 0) {
                             fileName = DateUtil.Date2String(date, "yyyy-MM-dd");
                         }
                         Map<String, Object> map = new Hashtable<>();

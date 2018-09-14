@@ -610,13 +610,13 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
         updateShipInfo(lb);
 
         if (inNavigating) {
-            if (navtime == null) navtime = com.cetcme.xkterminal.MyClass.Constant.SYSTEM_DATE;
-            myLocation.setNavtime(navtime);
-            try {
-                db.saveBindingId(lb);
-            } catch (DbException e) {
-                e.printStackTrace();
-            }
+//            if (navtime == null) navtime = com.cetcme.xkterminal.MyClass.Constant.SYSTEM_DATE;
+//            myLocation.setNavtime(navtime);
+//            try {
+//                db.saveBindingId(lb);
+//            } catch (DbException e) {
+//                e.printStackTrace();
+//            }
 
             // 判断是否有危险
             String msg = safetyControl(myLocation, lb.getHeading(), routeID);

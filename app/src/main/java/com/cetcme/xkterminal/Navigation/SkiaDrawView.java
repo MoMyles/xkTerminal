@@ -83,7 +83,7 @@ public class SkiaDrawView extends View {
         mContext = ctx;
         bNormalDragMapMode = false;
         mYimaLib.SetIfShowMapFrame(false); // TODO:
-
+        mYimaLib.SetShipTrackShowOrNot(true, true,0, false);
         boolean islicenceOk = mYimaLib.GetIfHadSetRightLicenceKey();
 //        Log.e("yima", "GetIfHadSetRightLicenceKey: " + islicenceOk);
 

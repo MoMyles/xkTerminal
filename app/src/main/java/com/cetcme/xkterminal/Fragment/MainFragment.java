@@ -943,7 +943,7 @@ public class MainFragment extends Fragment implements SkiaDrawView.OnMapClickLis
     public void setOwnShip(M_POINT m_point, float heading, boolean rotateScreen) {
 //        skiaDrawView.mYimaLib.SetOwnShipBasicInfo("本船", "123456789", 100, 50);
         skiaDrawView.mYimaLib.SetOwnShipCurrentInfo(m_point.x, m_point.y, heading, 50, 50, 0, 0);
-        skiaDrawView.mYimaLib.SetOwnShipShowSymbol(false, 4, true, 16, 5000000);
+        skiaDrawView.mYimaLib.SetOwnShipShowSymbol(false, 4, true, 16, 1000.0f);
         if (!showOtherShip) {
             skiaDrawView.mYimaLib.RotateMapByScrnCenter(rotateScreen ? 0 - heading : 0);
             if (isFirst) {// 第一次定位信息来了居中

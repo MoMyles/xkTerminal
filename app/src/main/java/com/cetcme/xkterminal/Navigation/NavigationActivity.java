@@ -480,7 +480,7 @@ public class NavigationActivity extends AppCompatActivity implements SkiaDrawVie
     public void setOwnShip(LocationBean locationBean, float heading, boolean rotateScreen) {
 //        fMainView.mYimaLib.SetOwnShipBasicInfo("本船", "123456789", 100, 50);
         fMainView.mYimaLib.SetOwnShipCurrentInfo(locationBean.getLongitude(), locationBean.getLatitude(), heading, 50, 50, 0, 0);
-        fMainView.mYimaLib.SetOwnShipShowSymbol(false, 4, true, 16, 5000000);
+        fMainView.mYimaLib.SetOwnShipShowSymbol(false, 4, true, 16, 1000.0f);
         fMainView.mYimaLib.RotateMapByScrnCenter(rotateScreen || switch_rotate.isChecked() ? 0 - heading : 0);
         if (needCenterOwnShip) {
             fMainView.mYimaLib.CenterMap(myLocation.getLongitude(), myLocation.getLatitude());

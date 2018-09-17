@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
@@ -49,8 +50,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
 
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     //    private Button mITVMenu;
-    private AppCompatButton mClearTrack;
-    private AppCompatButton mListTrack;
+    private AppCompatButton mClearTrack, playTrack, mListTrack;
     private LinearLayout mLlBottom;
     private DbManager db = MyApplication.getInstance().getDb();
     private int type = 0;
@@ -84,6 +84,8 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
         mClearTrack.setOnClickListener(this);
         mListTrack = findViewById(R.id.listTrack);
         mListTrack.setOnClickListener(this);
+        playTrack = findViewById(R.id.playTrack);
+        playTrack.setOnClickListener(this);
         mLlBottom = findViewById(R.id.ly_bottom);
 
 
@@ -101,6 +103,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
             @Override
             public void run() {
                 LocationBean lb = MyApplication.getInstance().getCurrentLocation();
+                fMainView.mYimaLib.SetCurrentScale(20000.0f);
                 if (lb.getLatitude() != 0 && lb.getLongitude() != 0) {
                     setOwnShip(lb, lb.getHeading(), false);
 //                    skiaDrawView.mYimaLib.CenterMap(myLocation.x, myLocation.y);
@@ -108,7 +111,6 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
                     // 没有位置则固定中心点 121.768783,28.696902
                     fMainView.mYimaLib.CenterMap((int) (121.768783 * 1e7), (int) (28.696902 * 1e7));
                 }
-                fMainView.mYimaLib.SetCurrentScale(20000.0f);
                 fMainView.postInvalidate();
                 new Handler().postDelayed(new Runnable() {
                     @Override
@@ -181,6 +183,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
                                 fMainView.AddLineLayerAndObject(list);
 //                                mClearTrack.setVisibility(View.VISIBLE);
                                 mListTrack.setVisibility(View.VISIBLE);
+                                playTrack.setVisibility(View.VISIBLE);
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -241,7 +244,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
 
     public void changeMapCenter(View view) {
         if (MyApplication.currentLocation != null) {
-            fMainView.mYimaLib.SetOwnShipShowSymbol(false, 4, true, 16, 5000000);
+            fMainView.mYimaLib.SetOwnShipShowSymbol(false, 4, true, 16, 1000.0f);
             fMainView.mYimaLib.CenterMap(MyApplication.currentLocation.getLongitude(), MyApplication.currentLocation.getLatitude());
             fMainView.postInvalidate();
         } else {
@@ -686,6 +689,41 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
                         ViewGroup.LayoutParams.WRAP_CONTENT);
                 alertDialog.show();
                 break;
+            case R.id.playTrack:
+                if (!canPlay){
+                    playTrack.setText("停止回放");
+                    if (hangjiList != null && !hangjiList.isEmpty()) {
+                        final int len = hangjiList.size();
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                canPlay = true;
+                                for (int i = 0; i < len; i++) {
+                                    if (canPlay) {
+                                        final LocationBean cur = hangjiList.get(i);
+                                        Message msg = Message.obtain();
+                                        if (i == len - 1) {
+                                            msg.what = 0x1;
+                                        }
+                                        msg.obj = cur;
+                                        playTrackhandler.sendMessage(msg);
+                                        try {
+                                            Thread.sleep(1000);
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
+                                    } else {
+                                        break;
+                                    }
+                                }
+                            }
+                        }).start();
+                    }
+                } else {
+                    canPlay = false;
+                    playTrack.setText("航迹回放");
+                }
+                break;
             case R.id.tv_route:
                 type = 1;
                 startActivityForResult(new Intent(this, RouteListActivity.class), REQUSET_CODE_HANGXIAN);
@@ -714,6 +752,29 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
             default:
         }
     }
+
+    private boolean canPlay = false;
+
+    private final Handler playTrackhandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+//            try {
+//                Thread.sleep(1000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+            if (msg.what == 0x1) {
+                playTrack.setText("航迹回放");
+            }
+            if (canPlay) {
+                LocationBean cur = (LocationBean) msg.obj;
+                fMainView.mYimaLib.SetOwnShipCurrentInfo(cur.getLongitude(), cur.getLatitude(), cur.getHeading()
+                        , cur.getHeading(), 0, cur.getSpeed(), 0);
+                fMainView.mYimaLib.CenterMap(cur.getLongitude(), cur.getLatitude());
+                fMainView.postInvalidate();
+            }
+        }
+    };
 
 //    private PopupWindow menu;
 
@@ -755,6 +816,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
 //    }
 
     public void Back_Event(View view) {
+        canPlay = false;
         finish();
     }
 
@@ -780,7 +842,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
 
     public void setOwnShip(LocationBean locationBean, float heading, boolean rotateScreen) {
         fMainView.mYimaLib.SetOwnShipCurrentInfo(locationBean.getLongitude(), locationBean.getLatitude(), heading, 50, 50, 0, 0);
-        fMainView.mYimaLib.SetOwnShipShowSymbol(false, 4, true, 16, 5000000);
+        fMainView.mYimaLib.SetOwnShipShowSymbol(false, 4, true, 16, 1000.0f);
         fMainView.mYimaLib.RotateMapByScrnCenter(rotateScreen ? 0 - heading : 0);
         fMainView.mYimaLib.CenterMap(locationBean.getLongitude(), locationBean.getLatitude());
         fMainView.postInvalidate();

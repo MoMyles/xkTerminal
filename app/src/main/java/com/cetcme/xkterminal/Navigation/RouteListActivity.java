@@ -5,7 +5,9 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -21,6 +23,7 @@ import com.cetcme.xkterminal.Event.SmsEvent;
 import com.cetcme.xkterminal.MyApplication;
 import com.cetcme.xkterminal.MyClass.DateUtil;
 import com.cetcme.xkterminal.R;
+import com.cetcme.xkterminal.Sqlite.Bean.LocationBean;
 import com.qiuhong.qhlibrary.QHTitleView.QHTitleView;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 import com.zyyoona7.popup.EasyPopup;
@@ -127,8 +130,10 @@ public class RouteListActivity extends FragmentActivity {
                 try {
                     Date start = sdf.parse(etStart.getText().toString().trim());
                     Date end = sdf.parse(etEnd.getText().toString().trim());
-                    getRouteData(start.getTime(), end.getTime());
-                    Toast.makeText(getApplicationContext(), "查询完成", Toast.LENGTH_SHORT).show();
+                    List<Map<String, Object>> ss = getRouteData(start.getTime(), end.getTime());
+                    if (ss != null) {
+                        Toast.makeText(getApplicationContext(), "查询完成", Toast.LENGTH_SHORT).show();
+                    }
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -551,15 +556,15 @@ public class RouteListActivity extends FragmentActivity {
                     intent.putExtra("requestCode", 0);
                     intent.putExtra("resultCode", ACTIVITY_RESULT_ROUTE_SHOW);
                     intent.putExtra("fileName", dataList.get(i).get("fileName").toString());
+                    startActivity(intent);
+                    finish();
                 } else {
-                    intent.setClass(RouteListActivity.this, NavigationMainActivity.class);
-                    intent.putExtra("requestCode", 1);
-                    intent.putExtra("resultCode", ACTIVITY_RESULT_ROUTE_SHOW);
-                    intent.putExtra("navtime", dataList.get(i).get("navtime").toString());
+//                    intent.setClass(RouteListActivity.this, NavigationMainActivity.class);
+//                    intent.putExtra("requestCode", 1);
+//                    intent.putExtra("resultCode", ACTIVITY_RESULT_ROUTE_SHOW);
+//                    intent.putExtra("navtime", dataList.get(i).get("navtime").toString());
                 }
-                startActivity(intent);
 //                setResult(ACTIVITY_RESULT_ROUTE_SHOW, intent);
-                finish();
             }
         });
 
@@ -658,6 +663,17 @@ public class RouteListActivity extends FragmentActivity {
                         map.put("lastModifyStamp", "");
                         map.put("fileLength", "");
                         map.put("navtime", navtime);
+
+                        List<LocationBean> list = db.selector(LocationBean.class)
+                                .where("navtime", "=", navtime)
+                                .orderBy("acqtime")
+                                .findAll();
+                        int num = list == null ? 0 : list.size();
+                        String start = list == null || list.isEmpty() ? "" : DateUtil.Date2String(list.get(0).getAcqtime(), "yyyy-MM-dd HH:mm:ss");
+                        String end = list == null || list.isEmpty() ? "" : DateUtil.Date2String(list.get(list.size() - 1).getAcqtime(), "yyyy-MM-dd HH:mm:ss");
+                        map.put("num", num);
+                        map.put("start", start);
+                        map.put("end", end);
                         dataList.add(map);
                     }
                 }
@@ -709,6 +725,17 @@ public class RouteListActivity extends FragmentActivity {
                         map.put("lastModifyStamp", "");
                         map.put("fileLength", "");
                         map.put("navtime", navtime);
+
+                        List<LocationBean> list = db.selector(LocationBean.class)
+                                .where("navtime", "=", navtime)
+                                .orderBy("acqtime")
+                                .findAll();
+                        int num = list == null ? 0 : list.size();
+                        String s = list == null || list.isEmpty() ? "" : DateUtil.Date2String(list.get(0).getAcqtime(), "yyyy-MM-dd HH:mm:ss");
+                        String e = list == null || list.isEmpty() ? "" : DateUtil.Date2String(list.get(list.size() - 1).getAcqtime(), "yyyy-MM-dd HH:mm:ss");
+                        map.put("num", num);
+                        map.put("start", s);
+                        map.put("end", e);
                         dataList.add(map);
                     }
                 }
@@ -745,24 +772,98 @@ public class RouteListActivity extends FragmentActivity {
         }
 
         @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
+        public View getView(final int i, View view, ViewGroup viewGroup) {
             ViewHolder vh = null;
             if (view == null) {
                 view = getLayoutInflater().inflate(R.layout.cell_route_list, viewGroup, false);
                 vh = new ViewHolder();
                 vh.mTv1 = view.findViewById(R.id.tv_name);
                 vh.mTv2 = view.findViewById(R.id.tv_time);
+                vh.mTv3 = view.findViewById(R.id.tv_end);
+                vh.mTv4 = view.findViewById(R.id.tv_num);
+                vh.ll = view.findViewById(R.id.ll_btn);
+                vh.btn1 = view.findViewById(R.id.btn_list);
+                vh.btn2 = view.findViewById(R.id.btn_read);
                 view.setTag(vh);
             } else {
                 vh = (ViewHolder) view.getTag();
             }
-            Map<String, Object> item = getItem(i);
-            if (item != null) {
-                vh.mTv1.setText(item.get("fileName") + "");
-                vh.mTv2.setText(item.get("lastModifyTime") + "");
+            final Map<String, Object> item = getItem(i);
+            if (tag.equals("航线")) {
+                vh.mTv2.setVisibility(View.VISIBLE);
+                vh.mTv3.setVisibility(View.GONE);
+                vh.mTv4.setVisibility(View.GONE);
+                vh.ll.setVisibility(View.GONE);
+                vh.btn1.setOnClickListener(null);
+                vh.btn2.setOnClickListener(null);
+                if (item != null) {
+                    vh.mTv1.setText(item.get("fileName") + "");
+                    vh.mTv2.setText(item.get("lastModifyTime") + "");
+                } else {
+                    vh.mTv1.setText("");
+                    vh.mTv2.setText("");
+                }
+
             } else {
-                vh.mTv1.setText("");
-                vh.mTv2.setText("");
+                //航迹
+                vh.mTv2.setVisibility(View.GONE);
+                vh.mTv3.setVisibility(View.VISIBLE);
+                vh.mTv4.setVisibility(View.VISIBLE);
+                vh.ll.setVisibility(View.VISIBLE);
+                if (item != null) {
+                    vh.mTv1.setText(item.get("start") + "");
+                    vh.mTv3.setText(item.get("end") + "");
+                    vh.mTv4.setText(item.get("num") + "");
+                    vh.btn1.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            try {
+                                List<LocationBean> hangjiList = null;
+                                hangjiList = db.selector(LocationBean.class)
+                                        .where("navtime", "=", dataList.get(i).get("navtime").toString())
+                                        .orderBy("acqtime")
+                                        .findAll();
+                                if (hangjiList == null || hangjiList.isEmpty()) {
+                                    Toast.makeText(getApplicationContext(), "未查询到相关航迹", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                                final View content = LayoutInflater.from(getApplicationContext()).inflate(R.layout.dialog_route_list, null);
+                                final QHTitleView qhTitleView = content.findViewById(R.id.qhTitleView);
+                                qhTitleView.setTitle("航迹记录");
+                                final ListView listView = content.findViewById(R.id.listView);
+                                HangjiAdapter adapter = new HangjiAdapter(RouteListActivity.this, hangjiList);
+                                listView.setAdapter(adapter);
+//                                final AlertDialog alertDialog = new AlertDialog.Builder(RouteListActivity.this).setView(content).create();
+//                                alertDialog.getWindow().setLayout(QMUIDisplayHelper.getScreenWidth(getApplicationContext()) * 8 / 10,
+//                                        ViewGroup.LayoutParams.WRAP_CONTENT);
+//                                alertDialog.show();
+                                final EasyPopup popup = EasyPopup.create(RouteListActivity.this)
+                                        .setContentView(content)
+                                        .setOutsideTouchable(false);
+                                popup.showAtAnchorView(findViewById(android.R.id.content).getRootView(), XGravity.CENTER, YGravity.CENTER, 0 , -100);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                    vh.btn2.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent();
+                            intent.setClass(RouteListActivity.this, NavigationMainActivity.class);
+                            intent.putExtra("requestCode", 1);
+                            intent.putExtra("resultCode", ACTIVITY_RESULT_ROUTE_SHOW);
+                            intent.putExtra("navtime", dataList.get(i).get("navtime").toString());
+                            startActivity(intent);
+                        }
+                    });
+                } else {
+                    vh.mTv1.setText("");
+                    vh.mTv3.setText("");
+                    vh.mTv4.setText("");
+                    vh.btn1.setOnClickListener(null);
+                    vh.btn2.setOnClickListener(null);
+                }
             }
             return view;
         }
@@ -770,6 +871,11 @@ public class RouteListActivity extends FragmentActivity {
         class ViewHolder {
             TextView mTv1;
             TextView mTv2;
+            TextView mTv3;
+            TextView mTv4;
+            LinearLayout ll;
+            Button btn1;
+            Button btn2;
         }
     }
 

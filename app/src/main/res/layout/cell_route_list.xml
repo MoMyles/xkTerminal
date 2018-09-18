@@ -2,9 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="#fff"
     android:orientation="horizontal"
-    android:padding="10dp"
-    android:background="#fff">
+    android:gravity="center_vertical"
+    android:padding="10dp">
 
     <TextView
         android:id="@+id/tv_name"
@@ -12,17 +13,70 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="12123"
+        android:gravity="center_vertical"
         android:textColor="#000"
-        android:textSize="20sp"
+        android:textSize="12sp"
         android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_end"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="12123"
+        android:gravity="center_vertical"
+        android:textColor="#000"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/tv_num"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="12123"
+        android:gravity="center_vertical"
+        android:textColor="#000"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/tv_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="file_time"
+        android:gravity="center_vertical"
         android:textColor="#000"
-        android:textSize="20sp" />
+        android:textSize="12sp" />
 
+    <LinearLayout
+        android:id="@+id/ll_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/btn_list"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_margin="4dp"
+            android:background="@color/QHTitleColor"
+            android:text="航迹记录"
+            android:textColor="#fff"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/btn_read"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_margin="4dp"
+            android:background="@color/QHTitleColor"
+            android:text="航迹查看"
+            android:textColor="#fff"
+            android:textSize="12sp" />
+    </LinearLayout>
 
 </LinearLayout>

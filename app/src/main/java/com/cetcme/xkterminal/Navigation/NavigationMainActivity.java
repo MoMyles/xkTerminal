@@ -680,7 +680,7 @@ public class NavigationMainActivity extends AppCompatActivity implements SkiaDra
             case R.id.listTrack:
                 final View content = LayoutInflater.from(getApplicationContext()).inflate(R.layout.dialog_route_list, null);
                 final QHTitleView qhTitleView = content.findViewById(R.id.qhTitleView);
-                qhTitleView.setTitle("查看航迹列表");
+                qhTitleView.setTitle("航迹记录");
                 final ListView listView = content.findViewById(R.id.listView);
                 HangjiAdapter adapter = new HangjiAdapter(this, hangjiList);
                 listView.setAdapter(adapter);

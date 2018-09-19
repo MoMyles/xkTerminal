@@ -34,18 +34,18 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <!-- <service android:name=".services.BitBangModeIntentService"  android:enabled="true"/> -->
-        <!-- <service android:name=".services.BitBangModeService"  android:enabled="true"/> -->
-        <!-- 开机广播接受者 -->
-        <!--<receiver android:name=".MyClass.BootBroadcastReceiver">-->
-            <!--<intent-filter>-->
+         <!--<service android:name=".services.BitBangModeIntentService"  android:enabled="true"/> -->
+         <!--<service android:name=".services.BitBangModeService"  android:enabled="true"/> -->
+         <!--开机广播接受者 -->
+        <receiver android:name=".MyClass.BootBroadcastReceiver">
+            <intent-filter>
 
-                <!--&lt;!&ndash; 注册开机广播地址 &ndash;&gt;-->
-                <!--<action android:name="android.intent.action.BOOT_COMPLETED" />-->
+                <!-- 注册开机广播地址 -->
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
 
-                <!--<category android:name="android.intent.category.DEFAULT" />-->
-            <!--</intent-filter>-->
-        <!--</receiver>-->
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
 
         <activity
             android:name=".MainActivity"

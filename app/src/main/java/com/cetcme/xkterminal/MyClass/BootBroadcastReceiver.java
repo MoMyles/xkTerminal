@@ -16,8 +16,8 @@ public class BootBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        Log.d("XRGPS", "BootReceiver.onReceive: " + intent.getAction());
-        System.out.println("自启动程序即将执行");
+//        Log.d("XRGPS", "BootReceiver.onReceive: " + intent.getAction());
+//        System.out.println("自启动程序即将执行");
         //MainActivity就是开机显示的界面
         Intent mBootIntent = new Intent(context, MainActivity.class);
         //下面这句话必须加上才能开机自动运行app的界面

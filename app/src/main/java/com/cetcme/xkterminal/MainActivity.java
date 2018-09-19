@@ -266,7 +266,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private void setStartOpenApp() {
         Intent intent = new Intent("android.q-zheng.action.APPMONITOR");
         intent.putExtra("package_name", getPackageName());
-        intent.putExtra("self_starting", true);
+        intent.putExtra("self_starting", false);
         intent.putExtra("period", 0);
         sendBroadcast(intent);
     }

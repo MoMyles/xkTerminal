@@ -21,8 +21,8 @@ android {
         applicationId "com.cetcme.xkterminal"
         minSdkVersion 16
         targetSdkVersion 27
-        versionCode 14
-        versionName '1.2.14'
+        versionCode 15
+        versionName '1.2.15'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         // Enabling multidex support.
         multiDexEnabled true

@@ -334,25 +334,29 @@ public class USBFragment2 extends Fragment implements View.OnClickListener {
                     Toast.makeText(getActivity(), "串口未打开，请先打开串口", Toast.LENGTH_SHORT).show();
                     break;
                 }
-                if (!openMap.containsKey(currentPath)) break;
-                USBInfo usbInfo = openMap.get(currentPath);
-                FT_Device ftDevice = usbInfo.getFtDevice();
-                String content = et_send.getText().toString();
-                if (TextUtils.isEmpty(content)) {
-                    break;
-                }
-                byte[] byts = null;
-                if (send16) {
-                    byts = Utils.hexStr2Bytes(content.replace(" ", "").toUpperCase());
-                } else {
-                    byts = content.getBytes();
-                }
-                if (byts != null && ftDevice != null) {
-                    try {
-                        ftDevice.write(byts, byts.length);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                try {
+                    if (!openMap.containsKey(currentPath)) break;
+                    USBInfo usbInfo = openMap.get(currentPath);
+                    FT_Device ftDevice = usbInfo.getFtDevice();
+                    String content = et_send.getText().toString();
+                    if (TextUtils.isEmpty(content)) {
+                        break;
                     }
+                    byte[] byts = null;
+                    if (send16) {
+                        byts = Utils.hexStr2Bytes(content.replace(" ", "").toUpperCase());
+                    } else {
+                        byts = content.getBytes();
+                    }
+                    if (byts != null && ftDevice != null) {
+                        try {
+                            ftDevice.write(byts, byts.length);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
                 break;
         }

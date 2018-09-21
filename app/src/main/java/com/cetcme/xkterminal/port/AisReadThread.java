@@ -70,28 +70,32 @@ public class AisReadThread extends Thread {
     @Override
     public void run() {
         while (canRead) {
-            if (ftDevice == null) continue;
-            int iavailable = ftDevice.getQueueStatus();
-            if (iavailable > 0) {
+            try {
+                if (ftDevice == null) continue;
+                int iavailable = ftDevice.getQueueStatus();
+                if (iavailable > 0) {
 
-                if (iavailable > readLength) {
-                    iavailable = readLength;
+                    if (iavailable > readLength) {
+                        iavailable = readLength;
+                    }
+
+                    ftDevice.read(readData, iavailable);
+
+                    byte[] byts = new byte[iavailable];
+
+                    for (int i = 0; i < iavailable; i++) {
+                        byts[i] = readData[i];
+                        formatAis(readData[i]);
+                    }
+                    if (USBFragment2.currentPath.equals(path)) {
+                        Message message = Message.obtain();
+                        message.what = 0x1;
+                        message.obj = byts;
+                        handler.sendMessage(message);
+                    }
                 }
-
-                ftDevice.read(readData, iavailable);
-
-                byte[] byts = new byte[iavailable];
-
-                for (int i = 0; i < iavailable; i++) {
-                    byts[i] = readData[i];
-                    formatAis(readData[i]);
-                }
-                if (USBFragment2.currentPath.equals(path)) {
-                    Message message = Message.obtain();
-                    message.what = 0x1;
-                    message.obj = byts;
-                    handler.sendMessage(message);
-                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
